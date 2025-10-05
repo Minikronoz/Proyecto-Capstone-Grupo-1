@@ -1,0 +1,8 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="basededatos" id="16C38C27-641C-BB6E-5F8C-5070AE825AE7" version="3.5">
+<createdBy>minik</createdBy>
+<createdTime>2025-09-29 00:20:09 UTC</createdTime>
+<ownerDesignName>basededatos</ownerDesignName>
+<capitalNames>false</capitalNames>
+<designId>16C38C27-641C-BB6E-5F8C-5070AE825AE7</designId>
+</OSDM_Design>
