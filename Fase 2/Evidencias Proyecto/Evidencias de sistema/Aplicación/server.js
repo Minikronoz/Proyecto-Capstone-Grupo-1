@@ -69,5 +69,5 @@ app.post('/api/scrape/:store', (req, res) => {
 
 const PORT = 3001;
 http.listen(PORT, () => {
-  console.log(`✅ Servidor backend escuchando en http://localhost:${PORT}`);
+  console.log(`Servidor backend escuchando en http://localhost:${PORT}`);
 });

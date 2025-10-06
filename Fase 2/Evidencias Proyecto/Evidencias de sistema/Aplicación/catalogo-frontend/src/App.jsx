@@ -28,6 +28,7 @@ function App() {
 
   // Perfil / auth
   const [currentAuthUser, setCurrentAuthUser] = useState(null); // firebase auth user
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUserDoc, setCurrentUserDoc] = useState(null); // firestore doc data
   const [currentUserDocId, setCurrentUserDocId] = useState(null); // firestore doc id
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -72,6 +73,7 @@ function App() {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setCurrentAuthUser(user);
+      setIsLoggedIn(!!user);
       if (!user) {
         setUserName("Invitado");
         setUserRole(null);
@@ -114,6 +116,7 @@ function App() {
   const handleUserLogout = async () => {
     try {
       await signOut(auth);
+      setIsLoggedIn(false);
     } catch (err) {
       console.error("Error cerrando sesión:", err);
     }
@@ -169,7 +172,7 @@ function App() {
         setDisplayedProducts(sorted.slice(0, PRODUCTS_PER_PAGE));
         setCurrentPage(1);
 
-        setTimeout(() => setShowModal(true), 120000);
+        setTimeout(() => setShowModal(true), 60000);
       } catch (err) {
         console.error("Error cargando los JSON:", err);
       } finally {
@@ -190,7 +193,15 @@ function App() {
       loadMoreProducts();
     }
   };
-
+    useEffect(() => {
+      if (!isLoggedIn) {
+        const timer = setTimeout(() => {
+          setShowModal(true);
+        }, 60000); // 1 minuto
+        return () => clearTimeout(timer);
+      }
+    }, [isLoggedIn]);
+    
 // --- Nuevo useEffect: actualizar filtro al cambiar supermercados ---
 useEffect(() => {
   if (!hasSearch) return; // solo aplicar si ya se hizo una búsqueda
@@ -327,8 +338,14 @@ useEffect(() => {
     );
     setQuantityFilters(uniqueQuantities);
     setActiveQuantity(null);
-    setSearchCount((prev) => prev + 1);
-    if (searchCount + 1 >= 3) setShowModal(true);
+    if (!isLoggedIn) {
+      setSearchCount(prev => {
+        const newCount = prev + 1;
+        if (newCount >= 3) setShowModal(true);
+        return newCount;
+      });
+    }
+    
     await Busquedas(selectedSuggestion.trim().toLowerCase());
     setSuggestions([]);
   };
@@ -666,21 +683,22 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* Ventana emergente registro */}
-      {showModal && (
-        <div className="ventana-emergente-overlay">
-          <div className="ventana-emergente-modal">
-            <h2>¡Mejora tu experiencia!</h2>
-            <p>Regístrate para acceder a más funciones.</p>
-            <button onClick={handleGoToRegister} className="ventana-emergente-boton">
-              Ir al registro
-            </button>
-            <button onClick={() => setShowModal(false)} className="ventana-emergente-boton-cerrar">
-              Cerrar
-            </button>
+        {/* Ventana emergente registro */}
+        {!isLoggedIn && showModal && (
+          <div className="ventana-emergente-overlay">
+            <div className="ventana-emergente-modal">
+              <h2>¡Mejora tu experiencia!</h2>
+              <p>Regístrate para acceder a más funciones.</p>
+              <button onClick={handleGoToRegister} className="ventana-emergente-boton">
+                Ir al registro
+              </button>
+              <button onClick={() => setShowModal(false)} className="ventana-emergente-boton-cerrar">
+                Cerrar
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+
 
       {/* Modal de edición de perfil */}
       {showProfileModal && currentAuthUser && (
