@@ -20,7 +20,7 @@ function App() {
   const [userName, setUserName] = useState("Invitado");
   const [userRole, setUserRole] = useState(null);
   const [quantityFilters, setQuantityFilters] = useState([]);
-  const [activeQuantity, setActiveQuantity] = useState(null);
+  const [activeQuantities, setActiveQuantities] = useState(new Set());
   const [searchCount, setSearchCount] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [selectedStores, setSelectedStores] = useState(new Set(['unimarc', 'tottus', 'jumbo', 'acuenta']));
@@ -210,11 +210,23 @@ useEffect(() => {
   if (selectedStores.size === 0) {
     setFilteredProducts([]);
     setDisplayedProducts([]);
+    setQuantityFilters([]);
+    setActiveQuantities(new Set());
     return;
   }
 
   // Aplicar el filtro usando los valores actuales
   const results = filterBySearch(selectedSuggestion || searchTerm);
+
+  // Recalcular cantidades disponibles en base a resultados
+  const uniqueQuantities = Array.from(new Set(results.map((p) => p.quantity).filter(Boolean))).sort(
+    (a, b) => parseFloat(a) - parseFloat(b)
+  );
+  setQuantityFilters(uniqueQuantities);
+
+  // Reiniciar selección de cantidades al cambiar supermercados
+  setActiveQuantities(new Set());
+
   setFilteredProducts(results);
   setDisplayedProducts(results.slice(0, PRODUCTS_PER_PAGE));
   setCurrentPage(1);
@@ -337,7 +349,7 @@ useEffect(() => {
       (a, b) => parseFloat(a) - parseFloat(b)
     );
     setQuantityFilters(uniqueQuantities);
-    setActiveQuantity(null);
+    setActiveQuantities(new Set());
     if (!isLoggedIn) {
       setSearchCount(prev => {
         const newCount = prev + 1;
@@ -355,20 +367,32 @@ useEffect(() => {
     navigate("/formularioregistro");
   };
 
-  // Modificar handleQuantityFilter
+  // Modificar handleQuantityFilter a multi-selección (toggle)
   const handleQuantityFilter = (qty) => {
-    setActiveQuantity(qty);
-    const results = filterBySearch(selectedSuggestion || searchTerm);
-    const filteredByQty = results.filter((p) => p.quantity === qty);
-    setFilteredProducts(filteredByQty);
-    // Actualizar displayedProducts con los productos filtrados por cantidad
-    setDisplayedProducts(filteredByQty.slice(0, PRODUCTS_PER_PAGE));
-    setCurrentPage(1);
+    setActiveQuantities((prev) => {
+      const next = new Set(prev);
+      if (next.has(qty)) {
+        next.delete(qty);
+      } else {
+        next.add(qty);
+      }
+
+      const baseResults = filterBySearch(selectedSuggestion || searchTerm);
+      const finalResults = next.size > 0
+        ? baseResults.filter((p) => p.quantity && next.has(p.quantity))
+        : baseResults;
+
+      setFilteredProducts(finalResults);
+      setDisplayedProducts(finalResults.slice(0, PRODUCTS_PER_PAGE));
+      setCurrentPage(1);
+
+      return next;
+    });
   };
 
   // Modificar handleClearQuantityFilter
   const handleClearQuantityFilter = () => {
-    setActiveQuantity(null);
+    setActiveQuantities(new Set());
     const results = filterBySearch(selectedSuggestion || searchTerm);
     setFilteredProducts(results);
     // Resetear displayedProducts con todos los productos filtrados
@@ -562,7 +586,7 @@ useEffect(() => {
           {quantityFilters.map((qty) => (
             <button
               key={qty}
-              className={`App_filter-button ${activeQuantity === qty ? "active" : ""}`}
+              className={`App_filter-button ${activeQuantities.has(qty) ? "active" : ""}`}
               onClick={() => handleQuantityFilter(qty)}
             >
               {qty}

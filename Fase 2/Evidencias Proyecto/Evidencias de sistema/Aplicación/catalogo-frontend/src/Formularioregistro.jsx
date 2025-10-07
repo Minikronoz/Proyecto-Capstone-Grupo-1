@@ -24,6 +24,590 @@ const regiones = {
   "Magallanes": ["Punta Arenas", "Laguna Blanca", "Río Verde", "San Gregorio", "Cabo de Hornos", "Antártica", "Porvenir", "Primavera", "Timaukel", "Natales", "Torres del Paine"] 
 };
 
+// Catálogo de sectores por comuna
+const sectoresPorComuna = {
+  // Región Metropolitana - Principales comunas
+  "Santiago": [
+    "Centro",
+    "Barrio Brasil",
+    "Barrio Lastarria", 
+    "Barrio Yungay",
+    "Barrio Franklin",
+    "Barrio Matta",
+    "Barrio República",
+    "Barrio Estación Central",
+    "Barrio Meiggs",
+    "Barrio Patronato",
+    "Barrio Bellavista",
+    "Barrio Concha y Toro",
+    "Barrio San Diego",
+    "Barrio Santa Ana"
+  ],
+  "Las Condes": [
+    "Centro",
+    "El Golf",
+    "San Carlos de Apoquindo",
+    "Las Condes Centro",
+    "Nueva Las Condes",
+    "El Arrayán",
+    "La Dehesa"
+  ],
+  "Providencia": [
+    "Centro",
+    "Nueva Providencia",
+    "Los Leones",
+    "Manuel Montt",
+    "Pedro de Valdivia",
+    "Tobalaba"
+  ],
+  "Maipú": [
+    "Centro",
+    "Maipú Centro",
+    "Pudahuel",
+    "Cerro Navia",
+    "Lo Prado",
+    "Quinta Normal",
+    "Renca"
+  ],
+  "Puente Alto": [
+    "Centro",
+    "Puente Alto Centro",
+    "San José de Maipo",
+    "Pirque",
+    "La Florida",
+    "Peñalolén",
+    "Macul"
+  ],
+  "La Florida": [
+    "Centro",
+    "La Florida Centro",
+    "Peñalolén",
+    "Macul",
+    "Ñuñoa",
+    "Providencia"
+  ],
+  "Ñuñoa": [
+    "Centro",
+    "Ñuñoa Centro",
+    "Macul",
+    "Providencia",
+    "Las Condes",
+    "Lo Barnechea"
+  ],
+  "San Miguel": [
+    "Centro",
+    "San Miguel Centro",
+    "La Granja",
+    "La Pintana",
+    "El Bosque",
+    "La Cisterna"
+  ],
+  "San Bernardo": [
+    "Centro",
+    "San Bernardo Centro",
+    "Buin",
+    "Paine",
+    "Calera de Tango",
+    "El Monte"
+  ],
+  "Quilicura": [
+    "Centro",
+    "Quilicura Centro",
+    "Lampa",
+    "Colina",
+    "Tiltil",
+    "Huechuraba"
+  ],
+  "Vitacura": [
+    "Centro",
+    "Vitacura Centro",
+    "Las Condes",
+    "Lo Barnechea",
+    "Huechuraba",
+    "Providencia"
+  ],
+  "Lo Barnechea": [
+    "Centro",
+    "Lo Barnechea Centro",
+    "Las Condes",
+    "Vitacura",
+    "Huechuraba",
+    "San José de Maipo"
+  ],
+
+  // Región de Valparaíso
+  "Valparaíso": [
+    "Centro",
+    "Puerto",
+    "Playa Ancha",
+    "Cerro Alegre",
+    "Cerro Concepción",
+    "Cerro Cárcel",
+    "Cerro Panteón",
+    "Cerro Barón",
+    "Cerro Las Cañas",
+    "Cerro La Cruz",
+    "Cerro El Litre",
+    "Cerro La Loma",
+    "Cerro La Merced",
+    "Cerro La Pólvora",
+    "Cerro La Virgen",
+    "Cerro Los Placeres",
+    "Cerro Mariposa",
+    "Cerro Monjas",
+    "Cerro O'Higgins",
+    "Cerro Pajonal",
+    "Cerro Ramaditas",
+    "Cerro San Juan de Dios",
+    "Cerro San Roque",
+    "Cerro Santa Elena",
+    "Cerro Santo Domingo",
+    "Cerro Toro",
+    "Cerro Yungay",
+    "Cerro Zapallar",
+    "Cerro Zorrilla"
+  ],
+  "Viña del Mar": [
+    "Centro",
+    "Viña del Mar Centro",
+    "Reñaca",
+    "Concón",
+    "Quintero",
+    "Puchuncaví",
+    "Casablanca"
+  ],
+  "Concón": [
+    "Centro",
+    "Concón Centro",
+    "Reñaca",
+    "Viña del Mar",
+    "Quintero",
+    "Puchuncaví"
+  ],
+  "Quilpué": [
+    "Centro",
+    "Quilpué Centro",
+    "Limache",
+    "Olmué",
+    "Villa Alemana"
+  ],
+  "Villa Alemana": [
+    "Centro",
+    "Villa Alemana Centro",
+    "Quilpué",
+    "Limache",
+    "Olmué"
+  ],
+
+  // Región del Biobío
+  "Concepción": [
+    "Centro",
+    "Concepción Centro",
+    "Coronel",
+    "Chiguayante",
+    "Florida",
+    "Hualpén",
+    "Hualqui",
+    "Lota",
+    "Penco",
+    "San Pedro de la Paz",
+    "Santa Juana",
+    "Talcahuano",
+    "Tomé"
+  ],
+  "Talcahuano": [
+    "Centro",
+    "Talcahuano Centro",
+    "Hualpén",
+    "Hualqui",
+    "Lota",
+    "Penco",
+    "San Pedro de la Paz",
+    "Santa Juana",
+    "Tomé"
+  ],
+  "Hualpén": [
+    "Armando Alarcón del Canto",
+    "Parque Central Hualpén",
+    "Hualpencillo",
+    "4 Esquinas",
+    "Cristo Redentor",
+    "Villa Acero",
+    "Villa San Pedro",
+    "Villa Los Héroes",
+    "Villa Los Pinos",
+    "Villa Los Robles",
+    "Villa Los Tilos",
+    "Villa Los Laureles",
+    "Villa Los Nogales",
+    "Villa Los Cerezos",
+    "Villa Los Manzanos",
+    "Villa Los Perales",
+    "Villa Los Olmos",
+    "Villa Los Sauces",
+    "Villa Los Álamos",
+    "Villa Los Eucaliptos"
+  ],
+  "Chiguayante": [
+    "Centro",
+    "Chiguayante Centro",
+    "Concepción",
+    "Florida",
+    "Hualpén",
+    "Hualqui"
+  ],
+  "Coronel": [
+    "Centro",
+    "Coronel Centro",
+    "Concepción",
+    "Lota",
+    "San Pedro de la Paz",
+    "Santa Juana"
+  ],
+
+  // Región de la Araucanía
+  "Temuco": [
+    "Centro",
+    "Temuco Centro",
+    "Carahue",
+    "Cholchol",
+    "Cunco",
+    "Curarrehue",
+    "Freire",
+    "Galvarino",
+    "Gorbea",
+    "Lautaro",
+    "Loncoche",
+    "Melipeuco",
+    "Nueva Imperial",
+    "Padre Las Casas",
+    "Perquenco",
+    "Pitrufquén",
+    "Pucón",
+    "Saavedra",
+    "Teodoro Schmidt",
+    "Toltén",
+    "Vilcún",
+    "Villarrica"
+  ],
+  "Padre Las Casas": [
+    "Centro",
+    "Padre Las Casas Centro",
+    "Temuco",
+    "Freire",
+    "Perquenco"
+  ],
+  "Villarrica": [
+    "Centro",
+    "Villarrica Centro",
+    "Pucón",
+    "Curarrehue",
+    "Freire"
+  ],
+
+  // Región de O'Higgins
+  "Rancagua": [
+    "Centro",
+    "Rancagua Centro",
+    "Codegua",
+    "Coinco",
+    "Coltauco",
+    "Doñihue",
+    "Graneros",
+    "Las Cabras",
+    "Machalí",
+    "Malloa",
+    "Mostazal",
+    "Olivar",
+    "Peumo",
+    "Pichidegua",
+    "Quinta de Tilcoco",
+    "Rengo",
+    "Requínoa",
+    "San Vicente"
+  ],
+  "Rengo": [
+    "Centro",
+    "Rengo Centro",
+    "Rancagua",
+    "Requínoa",
+    "Malloa",
+    "Quinta de Tilcoco"
+  ],
+  "San Vicente": [
+    "Centro",
+    "San Vicente Centro",
+    "Rancagua",
+    "Machalí",
+    "Malloa",
+    "Mostazal"
+  ],
+
+  // Región del Maule
+  "Talca": [
+    "Centro",
+    "Talca Centro",
+    "Constitución",
+    "Curepto",
+    "Empedrado",
+    "Maule",
+    "Pelarco",
+    "Pencahue",
+    "Río Claro",
+    "San Clemente",
+    "San Rafael"
+  ],
+  "Curicó": [
+    "Centro",
+    "Curicó Centro",
+    "Hualañé",
+    "Licantén",
+    "Molina",
+    "Rauco",
+    "Romeral",
+    "Sagrada Familia",
+    "Teno",
+    "Vichuquén"
+  ],
+  "Linares": [
+    "Centro",
+    "Linares Centro",
+    "Colbún",
+    "Longaví",
+    "Parral",
+    "Retiro",
+    "San Javier",
+    "Villa Alegre",
+    "Yerbas Buenas"
+  ],
+
+  // Región de Ñuble
+  "Chillán": [
+    "Centro",
+    "Chillán Centro",
+    "Chillán Viejo",
+    "Cobquecura",
+    "Coelemu",
+    "Coihueco",
+    "El Carmen",
+    "Ninhue",
+    "Ñiquén",
+    "Pemuco",
+    "Pinto",
+    "Portezuelo",
+    "Quillón",
+    "Quirihue",
+    "Ránquil",
+    "San Carlos",
+    "San Fabián",
+    "San Ignacio",
+    "San Nicolás",
+    "Treguaco",
+    "Yungay"
+  ],
+  "Chillán Viejo": [
+    "Centro",
+    "Chillán Viejo Centro",
+    "Chillán",
+    "El Carmen",
+    "Pinto",
+    "Pemuco"
+  ],
+
+  // Región de Los Ríos
+  "Valdivia": [
+    "Centro",
+    "Valdivia Centro",
+    "Corral",
+    "Lanco",
+    "Los Lagos",
+    "Máfil",
+    "Mariquina",
+    "Paillaco",
+    "Panguipulli",
+    "La Unión",
+    "Futrono",
+    "Lago Ranco",
+    "Río Bueno"
+  ],
+  "La Unión": [
+    "Centro",
+    "La Unión Centro",
+    "Valdivia",
+    "Futrono",
+    "Lago Ranco",
+    "Río Bueno"
+  ],
+
+  // Región de Los Lagos
+  "Puerto Montt": [
+    "Centro",
+    "Puerto Montt Centro",
+    "Calbuco",
+    "Cochamó",
+    "Fresia",
+    "Frutillar",
+    "Los Muermos",
+    "Llanquihue",
+    "Maullín",
+    "Puerto Varas"
+  ],
+  "Osorno": [
+    "Centro",
+    "Osorno Centro",
+    "Puerto Octay",
+    "Purranque",
+    "Puyehue",
+    "Río Negro",
+    "San Juan de la Costa",
+    "San Pablo"
+  ],
+  "Castro": [
+    "Centro",
+    "Castro Centro",
+    "Ancud",
+    "Chonchi",
+    "Curaco de Vélez",
+    "Dalcahue",
+    "Puqueldón",
+    "Queilén",
+    "Quellón",
+    "Quemchi",
+    "Quinchao"
+  ],
+
+  // Región de Aysén
+  "Coyhaique": [
+    "Centro",
+    "Coyhaique Centro",
+    "Lago Verde",
+    "Aysén",
+    "Cisnes",
+    "Guaitecas",
+    "Chile Chico",
+    "Río Ibáñez",
+    "Tortel"
+  ],
+
+  // Región de Magallanes
+  "Punta Arenas": [
+    "Centro",
+    "Punta Arenas Centro",
+    "Laguna Blanca",
+    "Río Verde",
+    "San Gregorio",
+    "Cabo de Hornos",
+    "Antártica",
+    "Porvenir",
+    "Primavera",
+    "Timaukel",
+    "Natales",
+    "Torres del Paine"
+  ],
+
+  // Región de Arica y Parinacota
+  "Arica": [
+    "Centro",
+    "Arica Centro",
+    "Camarones",
+    "Putre",
+    "General Lagos"
+  ],
+
+  // Región de Tarapacá
+  "Iquique": [
+    "Centro",
+    "Iquique Centro",
+    "Alto Hospicio",
+    "Pozo Almonte",
+    "Camiña",
+    "Colchane",
+    "Huara",
+    "Pica"
+  ],
+
+  // Región de Antofagasta
+  "Antofagasta": [
+    "Centro",
+    "Antofagasta Centro",
+    "Mejillones",
+    "Sierra Gorda",
+    "Taltal",
+    "Calama",
+    "Ollagüe",
+    "San Pedro de Atacama",
+    "Tocopilla",
+    "María Elena"
+  ],
+  "Calama": [
+    "Centro",
+    "Calama Centro",
+    "Antofagasta",
+    "Ollagüe",
+    "San Pedro de Atacama"
+  ],
+
+  // Región de Atacama
+  "Copiapó": [
+    "Centro",
+    "Copiapó Centro",
+    "Caldera",
+    "Tierra Amarilla",
+    "Chañaral",
+    "Diego de Almagro",
+    "Vallenar",
+    "Alto del Carmen",
+    "Freirina",
+    "Huasco"
+  ],
+  "Vallenar": [
+    "Centro",
+    "Vallenar Centro",
+    "Copiapó",
+    "Alto del Carmen",
+    "Freirina",
+    "Huasco"
+  ],
+
+  // Región de Coquimbo
+  "La Serena": [
+    "Centro",
+    "La Serena Centro",
+    "Coquimbo",
+    "Andacollo",
+    "La Higuera",
+    "Paiguano",
+    "Vicuña",
+    "Illapel",
+    "Canela",
+    "Los Vilos",
+    "Salamanca",
+    "Ovalle",
+    "Combarbalá",
+    "Monte Patria",
+    "Punitaqui",
+    "Río Hurtado"
+  ],
+  "Coquimbo": [
+    "Centro",
+    "Coquimbo Centro",
+    "La Serena",
+    "Andacollo",
+    "La Higuera",
+    "Paiguano",
+    "Vicuña"
+  ],
+  "Ovalle": [
+    "Centro",
+    "Ovalle Centro",
+    "La Serena",
+    "Combarbalá",
+    "Monte Patria",
+    "Punitaqui",
+    "Río Hurtado"
+  ]
+};
+
 // Validaciones (email, password, RUT, rol tributario)
 const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 const validatePassword = (password) => password.length >= 6;
@@ -78,12 +662,7 @@ function Formularioregistro() {
   const [selectedComuna, setSelectedComuna] = useState("");
   const [sector, setSector] = useState("");
   const [tieneNegocio, setTieneNegocio] = useState(false);
-  const [nombreNegocio, setNombreNegocio] = useState("");
-  const [rolTributario, setRolTributario] = useState("");
-  const [giroNegocio, setGiroNegocio] = useState("");
-  const [telefonoNegocio, setTelefonoNegocio] = useState("");
-  const [emailNegocio, setEmailNegocio] = useState("");
-  const [webNegocio, setWebNegocio] = useState("");
+  const [negocios, setNegocios] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
   const [isEditing, setIsEditing] = useState(false);
 
@@ -112,12 +691,27 @@ function Formularioregistro() {
           setSector(data.sector || "");
           if (data.tieneNegocio) {
             setTieneNegocio(true);
-            setNombreNegocio(data.negocio.nombre || "");
-            setRolTributario(data.negocio.rolTributario || "");
-            setGiroNegocio(data.negocio.giro || "");
-            setTelefonoNegocio(data.negocio.telefono || "");
-            setEmailNegocio(data.negocio.email || "");
-            setWebNegocio(data.negocio.web || "");
+            // Compatibilidad: soportar 'negocios' (array) o 'negocio' (objeto antiguo)
+            if (Array.isArray(data.negocios) && data.negocios.length > 0) {
+              setNegocios(data.negocios.map((n) => ({
+                nombre: n.nombre || "",
+                rolTributario: n.rolTributario || "",
+                giro: n.giro || "",
+                telefono: n.telefono || "",
+                email: n.email || "",
+                web: n.web || "",
+                region: n.region || "",
+                comuna: n.comuna || "",
+                sector: n.sector || "",
+              })));
+            } else if (data.negocio) {
+              const n = data.negocio;
+              setNegocios([{ nombre: n.nombre || "", rolTributario: n.rolTributario || "", giro: n.giro || "", telefono: n.telefono || "", email: n.email || "", web: n.web || "", region: n.region || "", comuna: n.comuna || "", sector: n.sector || "" }]);
+            } else {
+              setNegocios([{ nombre: "", rolTributario: "", giro: "", telefono: "", email: "", web: "", region: "", comuna: "", sector: "" }]);
+            }
+          } else {
+            setNegocios([]);
           }
         }
       }
@@ -129,7 +723,7 @@ function Formularioregistro() {
     e.preventDefault();
     setErrorMsg("");
 
-    if (!nombre || !apellido || !rut || !fechaNacimiento || !sexo || !email || !password || !selectedRegion || !selectedComuna) {
+    if (!nombre || !apellido || !rut || !fechaNacimiento || !sexo || !email || !password || !selectedRegion || !selectedComuna || !sector) {
       return setErrorMsg("Completa todos los campos obligatorios.");
     }
     if (!validateEmail(email)) return setErrorMsg("Correo inválido");
@@ -137,8 +731,13 @@ function Formularioregistro() {
     if (!validateRut(rut)) return setErrorMsg("RUT inválido");
 
     if (tieneNegocio) {
-      if (!nombreNegocio || !rolTributario || !giroNegocio) return setErrorMsg("Completa los datos de tu negocio.");
-      if (!validateRolTributario(rolTributario)) return setErrorMsg("Rol tributario inválido");
+      if (!negocios.length) return setErrorMsg("Agrega al menos un negocio.");
+      for (const n of negocios) {
+        if (!n.nombre || !n.rolTributario || !n.giro || !n.region || !n.comuna || !n.sector) {
+          return setErrorMsg("Completa los campos obligatorios del negocio (Nombre, Rol, Giro, Región, Comuna y Sector).");
+        }
+        if (!validateRolTributario(n.rolTributario)) return setErrorMsg("Rol tributario inválido en uno de los negocios");
+      }
     }
 
     try {
@@ -148,9 +747,18 @@ function Formularioregistro() {
         nombre, apellido, rut: formatRut(rut), fechaNacimiento, sexo, email,
         region: selectedRegion, comuna: selectedComuna, sector: sector || null,
         tieneNegocio,
-        negocio: tieneNegocio
-          ? { nombre: nombreNegocio, rolTributario, giro: giroNegocio, telefono: telefonoNegocio || null, email: emailNegocio || null, web: webNegocio || null }
-          : null,
+        negocios: tieneNegocio ? negocios.map(n => ({
+          nombre: n.nombre,
+          rolTributario: n.rolTributario,
+          giro: n.giro,
+          telefono: n.telefono || null,
+          email: n.email || null,
+          web: n.web || null,
+          region: n.region,
+          comuna: n.comuna,
+          sector: n.sector || null,
+        })) : [],
+        negocio: null,
         role
       });
       localStorage.setItem("userName", nombre);
@@ -195,8 +803,13 @@ function Formularioregistro() {
     }
     if (!validateEmail(email)) return setErrorMsg("Correo inválido");
     if (tieneNegocio) {
-      if (!nombreNegocio || !rolTributario || !giroNegocio) return setErrorMsg("Completa los datos de tu negocio.");
-      if (!validateRolTributario(rolTributario)) return setErrorMsg("Rol tributario inválido");
+      if (!negocios.length) return setErrorMsg("Agrega al menos un negocio.");
+      for (const n of negocios) {
+        if (!n.nombre || !n.rolTributario || !n.giro || !n.region || !n.comuna) {
+          return setErrorMsg("Completa los campos obligatorios del negocio (Nombre, Rol, Giro, Región, Comuna).");
+        }
+        if (!validateRolTributario(n.rolTributario)) return setErrorMsg("Rol tributario inválido en uno de los negocios");
+      }
     }
 
     try {
@@ -205,9 +818,18 @@ function Formularioregistro() {
         nombre, apellido, rut: formatRut(rut), fechaNacimiento, sexo, email,
         region: selectedRegion, comuna: selectedComuna, sector: sector || null,
         tieneNegocio,
-        negocio: tieneNegocio
-          ? { nombre: nombreNegocio, rolTributario, giro: giroNegocio, telefono: telefonoNegocio || null, email: emailNegocio || null, web: webNegocio || null }
-          : null,
+        negocios: tieneNegocio ? negocios.map(n => ({
+          nombre: n.nombre,
+          rolTributario: n.rolTributario,
+          giro: n.giro,
+          telefono: n.telefono || null,
+          email: n.email || null,
+          web: n.web || null,
+          region: n.region,
+          comuna: n.comuna,
+          sector: n.sector || null,
+        })) : [],
+        negocio: null,
       });
 
       if (auth.currentUser.email !== email) await updateEmail(auth.currentUser, email);
@@ -259,19 +881,95 @@ function Formularioregistro() {
             <option value="">Selecciona Comuna</option>
             {selectedRegion && regiones[selectedRegion].map(comuna => <option key={comuna} value={comuna}>{comuna}</option>)}
           </select>
-          <input className="formularioRegistro_input" type="text" placeholder="Sector (opcional)" value={sector} onChange={(e) => setSector(e.target.value)} />
+          {/* Sector obligatorio: select si hay catálogo para la comuna, si no input */}
+          {selectedComuna && sectoresPorComuna[selectedComuna] ? (
+            <select className="formularioRegistro_input" value={sector} onChange={(e) => setSector(e.target.value)} required>
+              <option value="">Selecciona Sector</option>
+              {sectoresPorComuna[selectedComuna].map(sec => <option key={sec} value={sec}>{sec}</option>)}
+            </select>
+          ) : (
+            <input className="formularioRegistro_input" type="text" placeholder="Sector" value={sector} onChange={(e) => setSector(e.target.value)} required />
+          )}
           <label>
             <input type="checkbox" checked={tieneNegocio} onChange={(e) => setTieneNegocio(e.target.checked)} /> Tengo un negocio
           </label>
 
           {tieneNegocio && (
             <>
-              <input className="formularioRegistro_input" type="text" placeholder="Nombre del negocio" value={nombreNegocio} onChange={(e) => setNombreNegocio(e.target.value)} required />
-              <input className="formularioRegistro_input" type="text" placeholder="Rol Tributario" value={rolTributario} onChange={(e) => setRolTributario(e.target.value)} required />
-              <input className="formularioRegistro_input" type="text" placeholder="Giro del negocio" value={giroNegocio} onChange={(e) => setGiroNegocio(e.target.value)} required />
-              <input className="formularioRegistro_input" type="text" placeholder="Teléfono del negocio" value={telefonoNegocio} onChange={(e) => setTelefonoNegocio(e.target.value)} />
-              <input className="formularioRegistro_input" type="email" placeholder="Correo del negocio" value={emailNegocio} onChange={(e) => setEmailNegocio(e.target.value)} />
-              <input className="formularioRegistro_input" type="text" placeholder="Web del negocio" value={webNegocio} onChange={(e) => setWebNegocio(e.target.value)} />
+              {negocios.map((n, idx) => (
+                <div key={idx} className="formularioRegistro_negocio_group">
+                  <input className="formularioRegistro_input" type="text" placeholder="Nombre del negocio" value={n.nombre} onChange={(e) => {
+                    const arr = [...negocios];
+                    arr[idx] = { ...arr[idx], nombre: e.target.value };
+                    setNegocios(arr);
+                  }} required />
+                  <input className="formularioRegistro_input" type="text" placeholder="Rol Tributario" value={n.rolTributario} onChange={(e) => {
+                    const arr = [...negocios];
+                    arr[idx] = { ...arr[idx], rolTributario: e.target.value };
+                    setNegocios(arr);
+                  }} required />
+                  <input className="formularioRegistro_input" type="text" placeholder="Giro del negocio" value={n.giro} onChange={(e) => {
+                    const arr = [...negocios];
+                    arr[idx] = { ...arr[idx], giro: e.target.value };
+                    setNegocios(arr);
+                  }} required />
+                  <select className="formularioRegistro_input" value={n.region} onChange={(e) => {
+                    const arr = [...negocios];
+                    arr[idx] = { ...arr[idx], region: e.target.value, comuna: "" };
+                    setNegocios(arr);
+                  }} required>
+                    <option value="">Región del negocio</option>
+                    {Object.keys(regiones).map(region => <option key={region} value={region}>{region}</option>)}
+                  </select>
+                  <select className="formularioRegistro_input" value={n.comuna} onChange={(e) => {
+                    const arr = [...negocios];
+                    arr[idx] = { ...arr[idx], comuna: e.target.value };
+                    setNegocios(arr);
+                  }} required>
+                    <option value="">Comuna del negocio</option>
+                    {n.region && regiones[n.region].map(comuna => <option key={comuna} value={comuna}>{comuna}</option>)}
+                  </select>
+                  {n.comuna && sectoresPorComuna[n.comuna] ? (
+                    <select className="formularioRegistro_input" value={n.sector || ""} onChange={(e) => {
+                      const arr = [...negocios];
+                      arr[idx] = { ...arr[idx], sector: e.target.value };
+                      setNegocios(arr);
+                    }} required>
+                      <option value="">Sector del negocio</option>
+                      {sectoresPorComuna[n.comuna].map(sec => <option key={sec} value={sec}>{sec}</option>)}
+                    </select>
+                  ) : (
+                    <input className="formularioRegistro_input" type="text" placeholder="Sector del negocio" value={n.sector || ""} onChange={(e) => {
+                      const arr = [...negocios];
+                      arr[idx] = { ...arr[idx], sector: e.target.value };
+                      setNegocios(arr);
+                    }} required />
+                  )}
+                  <input className="formularioRegistro_input" type="text" placeholder="Teléfono del negocio (opcional)" value={n.telefono || ""} onChange={(e) => {
+                    const arr = [...negocios];
+                    arr[idx] = { ...arr[idx], telefono: e.target.value };
+                    setNegocios(arr);
+                  }} />
+                  <input className="formularioRegistro_input" type="email" placeholder="Correo del negocio (opcional)" value={n.email || ""} onChange={(e) => {
+                    const arr = [...negocios];
+                    arr[idx] = { ...arr[idx], email: e.target.value };
+                    setNegocios(arr);
+                  }} />
+                  <input className="formularioRegistro_input" type="text" placeholder="Web del negocio (opcional)" value={n.web || ""} onChange={(e) => {
+                    const arr = [...negocios];
+                    arr[idx] = { ...arr[idx], web: e.target.value };
+                    setNegocios(arr);
+                  }} />
+                  <div className="formularioRegistro_negocio_actions">
+                    <button type="button" className="formularioRegistro_button_secundario" onClick={() => {
+                      const arr = [...negocios];
+                      arr.splice(idx, 1);
+                      setNegocios(arr);
+                    }}>Eliminar negocio</button>
+                  </div>
+                </div>
+              ))}
+              <button type="button" className="formularioRegistro_button" onClick={() => setNegocios([...negocios, { nombre: "", rolTributario: "", giro: "", telefono: "", email: "", web: "", region: "", comuna: "", sector: "" }])}>Agregar negocio</button>
             </>
           )}
 
@@ -311,12 +1009,80 @@ function Formularioregistro() {
 
           {tieneNegocio && (
             <>
-              <input className="formularioRegistro_input" type="text" placeholder="Nombre del negocio" value={nombreNegocio} onChange={(e) => setNombreNegocio(e.target.value)} required />
-              <input className="formularioRegistro_input" type="text" placeholder="Rol Tributario" value={rolTributario} onChange={(e) => setRolTributario(e.target.value)} required />
-              <input className="formularioRegistro_input" type="text" placeholder="Giro del negocio" value={giroNegocio} onChange={(e) => setGiroNegocio(e.target.value)} required />
-              <input className="formularioRegistro_input" type="text" placeholder="Teléfono del negocio" value={telefonoNegocio} onChange={(e) => setTelefonoNegocio(e.target.value)} />
-              <input className="formularioRegistro_input" type="email" placeholder="Correo del negocio" value={emailNegocio} onChange={(e) => setEmailNegocio(e.target.value)} />
-              <input className="formularioRegistro_input" type="text" placeholder="Web del negocio" value={webNegocio} onChange={(e) => setWebNegocio(e.target.value)} />
+              {negocios.map((n, idx) => (
+                <div key={idx} className="formularioRegistro_negocio_group">
+                  <input className="formularioRegistro_input" type="text" placeholder="Nombre del negocio" value={n.nombre} onChange={(e) => {
+                    const arr = [...negocios];
+                    arr[idx] = { ...arr[idx], nombre: e.target.value };
+                    setNegocios(arr);
+                  }} required />
+                  <input className="formularioRegistro_input" type="text" placeholder="Rol Tributario" value={n.rolTributario} onChange={(e) => {
+                    const arr = [...negocios];
+                    arr[idx] = { ...arr[idx], rolTributario: e.target.value };
+                    setNegocios(arr);
+                  }} required />
+                  <input className="formularioRegistro_input" type="text" placeholder="Giro del negocio" value={n.giro} onChange={(e) => {
+                    const arr = [...negocios];
+                    arr[idx] = { ...arr[idx], giro: e.target.value };
+                    setNegocios(arr);
+                  }} required />
+                  <select className="formularioRegistro_input" value={n.region} onChange={(e) => {
+                    const arr = [...negocios];
+                    arr[idx] = { ...arr[idx], region: e.target.value, comuna: "" };
+                    setNegocios(arr);
+                  }} required>
+                    <option value="">Región del negocio</option>
+                    {Object.keys(regiones).map(region => <option key={region} value={region}>{region}</option>)}
+                  </select>
+                  <select className="formularioRegistro_input" value={n.comuna} onChange={(e) => {
+                    const arr = [...negocios];
+                    arr[idx] = { ...arr[idx], comuna: e.target.value };
+                    setNegocios(arr);
+                  }} required>
+                    <option value="">Comuna del negocio</option>
+                    {n.region && regiones[n.region].map(comuna => <option key={comuna} value={comuna}>{comuna}</option>)}
+                  </select>
+                  {n.comuna && sectoresPorComuna[n.comuna] ? (
+                    <select className="formularioRegistro_input" value={n.sector || ""} onChange={(e) => {
+                      const arr = [...negocios];
+                      arr[idx] = { ...arr[idx], sector: e.target.value };
+                      setNegocios(arr);
+                    }} required>
+                      <option value="">Sector del negocio</option>
+                      {sectoresPorComuna[n.comuna].map(sec => <option key={sec} value={sec}>{sec}</option>)}
+                    </select>
+                  ) : (
+                    <input className="formularioRegistro_input" type="text" placeholder="Sector del negocio" value={n.sector || ""} onChange={(e) => {
+                      const arr = [...negocios];
+                      arr[idx] = { ...arr[idx], sector: e.target.value };
+                      setNegocios(arr);
+                    }} required />
+                  )}
+                  <input className="formularioRegistro_input" type="text" placeholder="Teléfono del negocio (opcional)" value={n.telefono || ""} onChange={(e) => {
+                    const arr = [...negocios];
+                    arr[idx] = { ...arr[idx], telefono: e.target.value };
+                    setNegocios(arr);
+                  }} />
+                  <input className="formularioRegistro_input" type="email" placeholder="Correo del negocio (opcional)" value={n.email || ""} onChange={(e) => {
+                    const arr = [...negocios];
+                    arr[idx] = { ...arr[idx], email: e.target.value };
+                    setNegocios(arr);
+                  }} />
+                  <input className="formularioRegistro_input" type="text" placeholder="Web del negocio (opcional)" value={n.web || ""} onChange={(e) => {
+                    const arr = [...negocios];
+                    arr[idx] = { ...arr[idx], web: e.target.value };
+                    setNegocios(arr);
+                  }} />
+                  <div className="formularioRegistro_negocio_actions">
+                    <button type="button" className="formularioRegistro_button_secundario" onClick={() => {
+                      const arr = [...negocios];
+                      arr.splice(idx, 1);
+                      setNegocios(arr);
+                    }}>Eliminar negocio</button>
+                  </div>
+                </div>
+              ))}
+              <button type="button" className="formularioRegistro_button" onClick={() => setNegocios([...negocios, { nombre: "", rolTributario: "", giro: "", telefono: "", email: "", web: "", region: "", comuna: "", sector: "" }])}>Agregar negocio</button>
             </>
           )}
 
