@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { db } from "./firebase"; //  config firebase
-import { collection, getDocs } from "firebase/firestore";
+import { db, auth } from "./firebase"; //  config firebase
+import { collection, getDocs, query, where } from "firebase/firestore";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, Cell
+  BarChart, Bar, Cell, PieChart, Pie
 } from "recharts";
 import "./Dashboard.css";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +19,13 @@ function Dashboard() {
   const [regionesFiltradas, setRegionesFiltradas] = useState(new Set());
   const [buscadorTermino, setBuscadorTermino] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [userBusinessLocation, setUserBusinessLocation] = useState(null);
+  const [demographicData, setDemographicData] = useState({
+    sexDistribution: [],
+    businessUsers: 0,
+    ageDistribution: []
+  });
   const navigate = useNavigate();
 
 
@@ -35,6 +42,35 @@ function Dashboard() {
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Obtener datos del usuario actual y su ubicación de negocio
+  useEffect(() => {
+    const getCurrentUserData = async () => {
+      if (auth.currentUser) {
+        try {
+          const q = query(collection(db, "usuarios"), where("email", "==", auth.currentUser.email));
+          const snap = await getDocs(q);
+          if (!snap.empty) {
+            const userData = snap.docs[0].data();
+            setCurrentUser(userData);
+            
+            // Si tiene negocios, usar la ubicación del primer negocio para filtros
+            if (userData.tieneNegocio && userData.negocios && userData.negocios.length > 0) {
+              const firstBusiness = userData.negocios[0];
+              setUserBusinessLocation({
+                region: firstBusiness.region,
+                comuna: firstBusiness.comuna,
+                sector: firstBusiness.sector
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Error obteniendo datos del usuario:', error);
+        }
+      }
+    };
+    getCurrentUserData();
   }, []);
 
   useEffect(() => {
@@ -57,6 +93,60 @@ function Dashboard() {
 
         setBusquedas(busquedasData);
         setUsuarios(usuariosData);
+
+        // Calcular datos demográficos
+        const sexCounts = {};
+        let businessUsersCount = 0;
+        const ageGroups = {
+          '18-25': 0,
+          '26-35': 0,
+          '36-45': 0,
+          '46-55': 0,
+          '56-65': 0,
+          '65+': 0
+        };
+
+        usuariosData.forEach(user => {
+          // Distribución por sexo
+          if (user.sexo) {
+            sexCounts[user.sexo] = (sexCounts[user.sexo] || 0) + 1;
+          }
+
+          // Usuarios con negocios
+          if (user.tieneNegocio) {
+            businessUsersCount++;
+          }
+
+          // Distribución por edad
+          if (user.fechaNacimiento) {
+            const birthDate = new Date(user.fechaNacimiento);
+            const today = new Date();
+            const age = today.getFullYear() - birthDate.getFullYear();
+            
+            if (age >= 18 && age <= 25) ageGroups['18-25']++;
+            else if (age >= 26 && age <= 35) ageGroups['26-35']++;
+            else if (age >= 36 && age <= 45) ageGroups['36-45']++;
+            else if (age >= 46 && age <= 55) ageGroups['46-55']++;
+            else if (age >= 56 && age <= 65) ageGroups['56-65']++;
+            else if (age > 65) ageGroups['65+']++;
+          }
+        });
+
+        const sexDistribution = Object.entries(sexCounts).map(([sex, count]) => ({
+          name: sex,
+          value: count
+        }));
+
+        const ageDistribution = Object.entries(ageGroups).map(([ageGroup, count]) => ({
+          name: ageGroup,
+          value: count
+        }));
+
+        setDemographicData({
+          sexDistribution,
+          businessUsers: businessUsersCount,
+          ageDistribution
+        });
 
         // --- Agrupar por día ---
         const countsDia = {};
@@ -181,6 +271,67 @@ function Dashboard() {
         <h2> Total Usuarios</h2>
         <p style={{ fontSize: "2rem", fontWeight: "bold", color: "#2c3e50", textAlign: "center" }}>{totalUsuarios}</p>
       </div>
+
+      {/* Cards demográficas */}
+      <div className="card small">
+        <h2>Distribución por Sexo</h2>
+        <ResponsiveContainer width="100%" height={150}>
+          <PieChart>
+            <Pie
+              data={demographicData.sexDistribution}
+              cx="50%"
+              cy="50%"
+              innerRadius={30}
+              outerRadius={60}
+              paddingAngle={5}
+              dataKey="value"
+            >
+              {demographicData.sexDistribution.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="card small">
+        <h2>Usuarios con Negocios</h2>
+        <p style={{ fontSize: "2rem", fontWeight: "bold", color: "#e67e22", textAlign: "center" }}>
+          {demographicData.businessUsers}
+        </p>
+        <p style={{ fontSize: "1rem", color: "#7f8c8d", textAlign: "center" }}>
+          de {totalUsuarios} usuarios totales
+        </p>
+      </div>
+
+      <div className="card small">
+        <h2>Distribución por Edad</h2>
+        <ResponsiveContainer width="100%" height={150}>
+          <BarChart data={demographicData.ageDistribution}>
+            <XAxis dataKey="name" fontSize={12} />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="value" fill="#2ecc71" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Card de ubicación del negocio del usuario */}
+      {userBusinessLocation && (
+        <div className="card small">
+          <h2>Tu Ubicación de Negocio</h2>
+          <p style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#9b59b6", textAlign: "center" }}>
+            {userBusinessLocation.region}
+          </p>
+          <p style={{ fontSize: "1rem", color: "#7f8c8d", textAlign: "center" }}>
+            {userBusinessLocation.comuna}
+          </p>
+          <p style={{ fontSize: "0.9rem", color: "#95a5a6", textAlign: "center" }}>
+            {userBusinessLocation.sector}
+          </p>
+        </div>
+      )}
       
       <div className="card small">
         <h2>{buscadorTermino ? `Búsquedas de "${buscadorTermino}"` : "Total Búsquedas"}</h2>
@@ -250,9 +401,11 @@ function Dashboard() {
 
       <div className="card small">
         <h2>
-          {buscadorTermino 
-            ? `Región con más búsquedas de "${buscadorTermino}" hoy` 
-            : "Región Más Activa Hoy"}
+          {userBusinessLocation 
+            ? `Actividad en ${userBusinessLocation.region}` 
+            : buscadorTermino 
+              ? `Región con más búsquedas de "${buscadorTermino}" hoy` 
+              : "Región Más Activa Hoy"}
         </h2>
         <p style={{ fontSize: "1.5rem", fontWeight: "bold", color: "#e67e22", textAlign: "center" }}>
           {(() => {
@@ -269,6 +422,32 @@ function Dashboard() {
               );
             }
 
+            // Si el usuario tiene ubicación de negocio, mostrar actividad en su región
+            if (userBusinessLocation) {
+              const busquedasEnMiRegion = busquedasHoy.filter(b => 
+                b.region === userBusinessLocation.region
+              );
+              
+              const busquedasEnMiComuna = busquedasEnMiRegion.filter(b => 
+                b.comuna === userBusinessLocation.comuna
+              );
+
+              return (
+                <>
+                  {busquedasEnMiRegion.length} búsquedas
+                  <span style={{ display: 'block', fontSize: '1rem', color: '#7f8c8d' }}>
+                    en {userBusinessLocation.region}
+                  </span>
+                  {busquedasEnMiComuna.length > 0 && (
+                    <span style={{ display: 'block', fontSize: '0.9rem', color: '#95a5a6' }}>
+                      ({busquedasEnMiComuna.length} en {userBusinessLocation.comuna})
+                    </span>
+                  )}
+                </>
+              );
+            }
+
+            // Comportamiento original si no hay ubicación de negocio
             const regionesHoy = {};
             busquedasHoy.forEach(b => {
               if (!b.region) return;
@@ -427,6 +606,23 @@ function Dashboard() {
             <YAxis />
             <Tooltip />
             <Bar dataKey="total" fill="#2ecc71" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Análisis por edad - qué buscan diferentes grupos de edad */}
+      <div className="card large">
+        <h2>Búsquedas por Grupo de Edad</h2>
+        <p style={{ fontSize: "0.9rem", color: "#7f8c8d", marginBottom: "1rem" }}>
+          Descubre qué productos buscan las personas de diferentes rangos de edad
+        </p>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={demographicData.ageDistribution}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="value" fill="#9b59b6" />
           </BarChart>
         </ResponsiveContainer>
       </div>
