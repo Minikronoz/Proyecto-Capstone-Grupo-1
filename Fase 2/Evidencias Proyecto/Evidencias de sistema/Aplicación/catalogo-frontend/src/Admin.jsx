@@ -8,19 +8,7 @@ function Admin() {
   const [usuarios, setUsuarios] = useState([]);
   const [lastUpdate, setLastUpdate] = useState(null);
   const [editUser, setEditUser] = useState(null);
-  const [formData, setFormData] = useState({
-    nombre: "",
-    apellido: "",
-    email: "",
-    role: "",
-    rut: "",
-    fechaNacimiento: "",
-    sexo: "",
-    region: "",
-    comuna: "",
-    sector: "",
-    negocio: { nombre: "", rolTributario: "", giro: "", telefono: "", email: "", web: "" },
-  });
+  const [formData, setFormData] = useState({});
   const [scrapingLogs, setScrapingLogs] = useState({
     tottus: [],
     jumbo: [],
@@ -41,37 +29,22 @@ function Admin() {
   });
 
   const regiones = {
-    "Arica y Parinacota": ["Arica", "Camarones", "Putre", "General Lagos"],
-    "Tarapacá": ["Iquique", "Alto Hospicio", "Pozo Almonte", "Camiña", "Colchane", "Huara", "Pica"],
-    "Antofagasta": ["Antofagasta", "Mejillones", "Sierra Gorda", "Taltal", "Calama", "Ollagüe", "San Pedro de Atacama", "Tocopilla", "María Elena"],
-    "Atacama": ["Copiapó", "Caldera", "Tierra Amarilla", "Chañaral", "Diego de Almagro", "Vallenar", "Alto del Carmen", "Freirina", "Huasco"],
-    "Coquimbo": ["La Serena", "Coquimbo", "Andacollo", "La Higuera", "Paiguano", "Vicuña", "Illapel", "Canela", "Los Vilos", "Salamanca", "Ovalle", "Combarbalá", "Monte Patria", "Punitaqui", "Río Hurtado"],
-    "Valparaíso": ["Valparaíso", "Casablanca", "Concón", "Juan Fernández", "Puchuncaví", "Quintero", "Viña del Mar", "Isla de Pascua", "Los Andes", "Calle Larga", "Rinconada", "San Esteban", "La Ligua", "Cabildo", "Papudo", "Petorca", "Zapallar", "Quillota", "Calera", "Hijuelas", "La Cruz", "Nogales", "San Antonio", "Algarrobo", "Cartagena", "El Quisco", "El Tabo", "Santo Domingo", "San Felipe", "Catemu", "Llaillay", "Panquehue", "Putaendo", "Santa María", "Quilpué", "Limache", "Olmué", "Villa Alemana"],
-    "Metropolitana de Santiago": ["Santiago", "Cerrillos", "Cerro Navia", "Conchalí", "El Bosque", "Estación Central", "Huechuraba", "Independencia", "La Cisterna", "La Florida", "La Granja", "La Pintana", "La Reina", "Las Condes", "Lo Barnechea", "Lo Espejo", "Lo Prado", "Macul", "Maipú", "Ñuñoa", "Pedro Aguirre Cerda", "Peñalolén", "Providencia", "Pudahuel", "Quilicura", "Quinta Normal", "Recoleta", "Renca", "San Joaquín", "San Miguel", "San Ramón", "Vitacura", "Puente Alto", "Pirque", "San José de Maipo", "Colina", "Lampa", "Tiltil"],
-    "O'Higgins": ["Rancagua", "Codegua", "Coinco", "Coltauco", "Doñihue", "Graneros", "Las Cabras", "Machalí", "Malloa", "Mostazal", "Olivar", "Peumo", "Pichidegua", "Quinta de Tilcoco", "Rengo", "Requínoa", "San Vicente", "La Estrella", "Litueche", "Marchihue", "Navidad", "Paredones", "Pichilemu", "Chimbarongo", "Lolol", "Nancagua", "Palmilla", "Peralillo", "Placilla", "Santa Cruz"],
-    "Maule": ["Talca", "Constitución", "Curepto", "Empedrado", "Maule", "Pelarco", "Pencahue", "Río Claro", "San Clemente", "San Rafael", "Cauquenes", "Chanco", "Pelluhue", "Curicó", "Hualañé", "Licantén", "Molina", "Rauco", "Romeral", "Sagrada Familia", "Teno", "Vichuquén", "Linares", "Colbún", "Longaví", "Parral", "Retiro", "San Javier", "Villa Alegre"],
-    "Ñuble": ["Chillán", "Chillán Viejo", "Cobquecura", "Coelemu", "Coihueco", "El Carmen", "Ninhue", "Ñiquén", "Pemuco", "Pinto", "Portezuelo", "Quillón", "Quirihue", "Ránquil", "San Carlos", "San Fabián", "San Ignacio", "San Nicolás", "Treguaco", "Yungay"],
-    "Biobío": ["Concepción", "Coronel", "Chiguayante", "Florida", "Hualpén", "Hualqui", "Lota", "Penco", "San Pedro de la Paz", "Santa Juana", "Talcahuano", "Tomé", "Cabrero", "Lebu", "Los Álamos", "Cañete", "Contulmo", "Curanilahue", "Arauco", "Laja", "Los Ángeles", "Mulchén", "Nacimiento", "Negrete", "Quilaco", "Quilleco", "San Rosendo", "Santa Bárbara", "Tucapel", "Yumbel", "Alto Biobío"],
-    "Araucanía": ["Temuco", "Carahue", "Cholchol", "Cunco", "Curarrehue", "Freire", "Galvarino", "Gorbea", "Lautaro", "Loncoche", "Melipeuco", "Nueva Imperial", "Padre Las Casas", "Perquenco", "Pitrufquén", "Pucón", "Saavedra", "Teodoro Schmidt", "Toltén", "Vilcún", "Villarrica", "Angol", "Collipulli", "Curacautín", "Ercilla", "Lonquimay", "Los Sauces", "Lumaco", "Purén", "Renaico", "Traiguén", "Victoria"],
-    "Los Ríos": ["Valdivia", "Corral", "Lanco", "Los Lagos", "Máfil", "Mariquina", "Paillaco", "Panguipulli", "La Unión", "Futrono", "Lago Ranco", "Río Bueno"],
-    "Los Lagos": ["Puerto Montt", "Calbuco", "Cochamó", "Fresia", "Frutillar", "Los Muermos", "Llanquihue", "Maullín", "Puerto Varas", "Castro", "Ancud", "Chonchi", "Curaco de Vélez", "Dalcahue", "Puqueldón", "Queilén", "Quellón", "Quemchi", "Quinchao", "Osorno", "Puerto Octay", "Purranque", "Puyehue", "Río Negro", "San Juan de la Costa", "San Pablo", "Chaitén", "Futaleufú", "Hualaihué", "Palena"],
-    "Aysén": ["Coyhaique", "Lago Verde", "Aysén", "Cisnes", "Guaitecas", "Chile Chico", "Río Ibáñez", "Tortel"],
-    "Magallanes": ["Punta Arenas", "Laguna Blanca", "Río Verde", "San Gregorio", "Cabo de Hornos", "Antártica", "Porvenir", "Primavera", "Timaukel", "Natales", "Torres del Paine"],
+    /* Tu objeto regiones aquí */
   };
 
   // ===== FUNCIONES AUXILIARES =====
-const getFormattedDateTime = () => {
-  const today = new Date();
-  return today.toLocaleString("es-CL", {
-    weekday: "long",
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false
-  });
-};
+  const getFormattedDateTime = () => {
+    const today = new Date();
+    return today.toLocaleString("es-CL", {
+      weekday: "long",
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    });
+  };
 
   // ===== FUNCIONES DE USUARIOS =====
   useEffect(() => {
@@ -100,43 +73,60 @@ const getFormattedDateTime = () => {
 
   const startEdit = (user) => {
     setEditUser(user.id);
+
+    // Inicializa formData incluyendo todos los negocios
     setFormData({
-      nombre: user.nombre || "",
-      apellido: user.apellido || "",
-      email: user.email || "",
-      role: user.role || "cliente",
-      rut: user.rut || "",
-      fechaNacimiento: user.fechaNacimiento || "",
-      sexo: user.sexo || "",
-      region: user.region || "",
-      sector: user.sector || "",
-      negocio: {
-        nombre: user.negocio?.nombre || "",
-        rolTributario: user.negocio?.rolTributario || "",
-        giro: user.negocio?.giro || "",
-        telefono: user.negocio?.telefono || "",
-        email: user.negocio?.email || "",
-        web: user.negocio?.web || "",
-      },
+      ...user,
+      negocios: user.negocios?.length
+        ? user.negocios.map(n => ({
+            nombre: n.nombre || "",
+            rolTributario: n.rolTributario || "",
+            giro: n.giro || "",
+            telefono: n.telefono || "",
+            email: n.email || "",
+            web: n.web || "",
+            comuna: n.comuna || "",
+            region: n.region || "",
+            sector: n.sector || null
+          }))
+        : [],
+      negocio: user.negocio || {
+        nombre: "",
+        rolTributario: "",
+        giro: "",
+        telefono: "",
+        email: "",
+        web: "",
+      }
     });
   };
 
   const saveEdit = async (userId) => {
     await updateDoc(doc(db, "usuarios", userId), formData);
-    setUsuarios((prev) => prev.map((u) => (u.id === userId ? { ...u, ...formData } : u)));
+    setUsuarios((prev) =>
+      prev.map((u) => (u.id === userId ? { ...u, ...formData } : u))
+    );
     setEditUser(null);
   };
 
   const cancelEdit = () => setEditUser(null);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e, negocioIndex = null) => {
     const { name, value } = e.target;
+
     if (name.startsWith("negocio.")) {
       const key = name.split(".")[1];
       setFormData((prev) => ({
         ...prev,
         negocio: { ...prev.negocio, [key]: value },
       }));
+    } else if (name.startsWith("negocios.") && negocioIndex !== null) {
+      const key = name.split(".")[1];
+      setFormData((prev) => {
+        const updatedNegocios = [...prev.negocios];
+        updatedNegocios[negocioIndex] = { ...updatedNegocios[negocioIndex], [key]: value };
+        return { ...prev, negocios: updatedNegocios };
+      });
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -173,27 +163,26 @@ const getFormattedDateTime = () => {
     return () => socket.disconnect();
   }, []);
 
-  // ===== ACTUALIZAR FECHA DESPUÉS DE SCRAPING =====
-useEffect(() => {
-  const allUpdated = Object.values(scrapingStatus).every(status => status === "success");
+  useEffect(() => {
+    const allUpdated = Object.values(scrapingStatus).every(status => status === "success");
 
-  if (allUpdated) {
-    const now = getFormattedDateTime();
-    setLastUpdate(now); // actualizar estado local
+    if (allUpdated) {
+      const now = getFormattedDateTime();
+      setLastUpdate(now);
 
-    const updateDateInDB = async () => {
-      try {
-        const configRef = doc(db, "config", "catalogo");
-        await updateDoc(configRef, { lastUpdate: now });
-        console.log("Fecha de actualización guardada:", now);
-      } catch (error) {
-        console.error("Error guardando la fecha de actualización:", error);
-      }
-    };
+      const updateDateInDB = async () => {
+        try {
+          const configRef = doc(db, "config", "catalogo");
+          await updateDoc(configRef, { lastUpdate: now });
+          console.log("Fecha de actualización guardada:", now);
+        } catch (error) {
+          console.error("Error guardando la fecha de actualización:", error);
+        }
+      };
 
-    updateDateInDB();
-  }
-}, [scrapingStatus]);
+      updateDateInDB();
+    }
+  }, [scrapingStatus]);
 
   const handleUpdateCatalog = async (store) => {
     try {
@@ -205,9 +194,7 @@ useEffect(() => {
         method: "POST",
       });
 
-      if (!response.ok) {
-        throw new Error(`Error al actualizar catálogo de ${store}`);
-      }
+      if (!response.ok) throw new Error(`Error al actualizar catálogo de ${store}`);
     } catch (error) {
       console.error(error);
       setScrapingStatus((prev) => ({ ...prev, [store]: "error" }));
@@ -237,7 +224,7 @@ useEffect(() => {
               <th>Sexo</th>
               <th>Región</th>
               <th>Sector</th>
-              <th>Negocio</th>
+              <th>Negocios</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -273,27 +260,34 @@ useEffect(() => {
                   </select>
                 ) : user.region}</td>
                 <td>{editUser === user.id ? <input name="sector" value={formData.sector} onChange={handleInputChange} /> : user.sector}</td>
+
+                
+
+                {/* Array de negocios */}
                 <td>
                   {editUser === user.id ? (
-                    <>
-                      <input name="negocio.nombre" placeholder="Nombre" value={formData.negocio.nombre} onChange={handleInputChange} />
-                      <input name="negocio.rolTributario" placeholder="Rol Tributario" value={formData.negocio.rolTributario} onChange={handleInputChange} />
-                      <input name="negocio.giro" placeholder="Giro" value={formData.negocio.giro} onChange={handleInputChange} />
-                      <input name="negocio.telefono" placeholder="Teléfono" value={formData.negocio.telefono} onChange={handleInputChange} />
-                      <input name="negocio.email" placeholder="Email" value={formData.negocio.email} onChange={handleInputChange} />
-                      <input name="negocio.web" placeholder="Web" value={formData.negocio.web} onChange={handleInputChange} />
-                    </>
+                    formData.negocios.map((neg, index) => (
+                      <div key={index} style={{ marginBottom: "10px", border: "1px solid #ccc", padding: "5px" }}>
+                        <input name="negocios.nombre" placeholder="Nombre" value={neg.nombre} onChange={(e) => handleInputChange(e, index)} />
+                        <input name="negocios.rolTributario" placeholder="Rol Tributario" value={neg.rolTributario} onChange={(e) => handleInputChange(e, index)} />
+                        <input name="negocios.giro" placeholder="Giro" value={neg.giro} onChange={(e) => handleInputChange(e, index)} />
+                        <input name="negocios.telefono" placeholder="Teléfono" value={neg.telefono} onChange={(e) => handleInputChange(e, index)} />
+                        <input name="negocios.email" placeholder="Email" value={neg.email} onChange={(e) => handleInputChange(e, index)} />
+                        <input name="negocios.web" placeholder="Web" value={neg.web} onChange={(e) => handleInputChange(e, index)} />
+                        <input name="negocios.comuna" placeholder="Comuna" value={neg.comuna} onChange={(e) => handleInputChange(e, index)} />
+                        <input name="negocios.region" placeholder="Región" value={neg.region} onChange={(e) => handleInputChange(e, index)} />
+                        <input name="negocios.sector" placeholder="Sector" value={neg.sector} onChange={(e) => handleInputChange(e, index)} />
+                      </div>
+                    ))
                   ) : (
-                    <>
-                      <div>{user.negocio?.nombre}</div>
-                      <div>{user.negocio?.rolTributario}</div>
-                      <div>{user.negocio?.giro}</div>
-                      <div>{user.negocio?.telefono}</div>
-                      <div>{user.negocio?.email}</div>
-                      <div>{user.negocio?.web}</div>
-                    </>
+                    user.negocios?.map((neg, i) => (
+                      <div key={i} style={{ marginBottom: "5px" }}>
+                        <div>{neg.nombre} - {neg.rolTributario} - {neg.giro} - {neg.telefono} - {neg.email} - {neg.web}</div>
+                      </div>
+                    ))
                   )}
                 </td>
+
                 <td className="admin-action-buttons">
                   {editUser === user.id ? (
                     <>
