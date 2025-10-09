@@ -8,15 +8,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const outputDir = join(__dirname, '..', 'catalogo-frontend', 'public', 'json-jumbo');
 
-// Función para generar fecha y hora legible: DD-MM-YYYY_HH:MM
-function getDateTimeString() {
+// Función para obtener fecha solo: YYYY-MM-DD
+function getDateString() {
   const now = new Date();
-  const dd = String(now.getDate()).padStart(2, '0');
-  const mm = String(now.getMonth() + 1).padStart(2, '0');
   const yyyy = now.getFullYear();
-  const hh = String(now.getHours()).padStart(2, '0');
-  const min = String(now.getMinutes()).padStart(2, '0');
-  return `${dd}-${mm}-${yyyy}_${hh}:${min}`;
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
 }
 
 async function main() {
@@ -100,11 +98,15 @@ async function main() {
     return acc;
   }, []);
 
-  const dateTimeStr = getDateTimeString();
-  await writeFile(join(outputDir, `despensa-jumbo-${dateTimeStr}.json`), JSON.stringify(productosUnicos, null, 2));
-  await writeFile(join(outputDir, 'despensa-jumbo-latest.json'), JSON.stringify(productosUnicos, null, 2));
+  const dateOnly = getDateString(); // solo fecha
+  const datedFile = join(outputDir, `despensa-jumbo-${dateOnly}.json`);
+  const latestFile = join(outputDir, 'despensa-jumbo-latest.json');
+
+  await writeFile(datedFile, JSON.stringify(productosUnicos, null, 2));   // archivo con fecha
+  await writeFile(latestFile, JSON.stringify(productosUnicos, null, 2));  // latest
 
   console.log(`Archivos guardados con ${productosUnicos.length} productos`);
+  console.log(`Archivos generados:\n- ${datedFile}\n- ${latestFile}`);
 
   await browser.close();
 }

@@ -1,13 +1,13 @@
-// src/index.jsx
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./index.css";
 import App from "./App.jsx";
 import Formularioregistro from "./Formularioregistro.jsx";
-import Admin from "./Admin.jsx"; // 🔹 importar la página de admin
+import Admin from "./Admin.jsx";
 import Dashboard from "./Dashboard.jsx";
-import Usuario from "./Usuario.jsx"; // 🔹 importar la página de usuario
+import Usuario from "./Usuario.jsx";
+import PriceHistoryPage from "./PriceHistoryPage.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -16,8 +16,10 @@ createRoot(document.getElementById("root")).render(
         <Route path="/" element={<App />} />
         <Route path="/formularioregistro" element={<Formularioregistro />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/admin" element={<Admin />} /> {/* 🔹 ruta de admin */}
-        <Route path="/usuario" element={<Usuario />} /> {/* 🔹 ruta de usuario */}
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/usuario" element={<Usuario />} />
+        {/* 🔹 ruta dinámica para historial de precios */}
+        <Route path="/price-history/:storeName/:productName" element={<PriceHistoryPage />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>

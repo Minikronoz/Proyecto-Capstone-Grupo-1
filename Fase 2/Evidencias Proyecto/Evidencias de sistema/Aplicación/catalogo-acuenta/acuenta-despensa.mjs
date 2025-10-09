@@ -26,15 +26,13 @@ function waitForUserInput(message) {
   });
 }
 
-// Función para obtener fecha y hora legible: DD-MM-YYYY_HH:MM
-function getDateTimeString() {
+// Función para obtener fecha solo: YYYY-MM-DD
+function getDateString() {
   const now = new Date();
-  const dd = String(now.getDate()).padStart(2, '0');
-  const mm = String(now.getMonth() + 1).padStart(2, '0');
   const yyyy = now.getFullYear();
-  const hh = String(now.getHours()).padStart(2, '0');
-  const min = String(now.getMinutes()).padStart(2, '0');
-  return `${dd}-${mm}-${yyyy}_${hh}:${min}`;
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
 }
 
 const browser = await firefox.launch({ headless: true, slowMo: 500 });
@@ -141,20 +139,20 @@ try {
   // Crear carpeta si no existe
   await mkdir(outputDir, { recursive: true });
 
-  // Guardar archivos con fecha y hora DD-MM-YYYY_HH:MM
-  const dateTimeStr = getDateTimeString();
-  const datedFile = join(outputDir, `despensa-acuenta-${dateTimeStr}.json`);
+  // Guardar archivos
+  const dateOnly = getDateString(); // solo fecha
   const latestFile = join(outputDir, 'despensa-acuenta-latest.json');
+  const datedFile = join(outputDir, `despensa-acuenta-${dateOnly}.json`);
 
-  await writeFile(datedFile, JSON.stringify(productos, null, 2));
-  await writeFile(latestFile, JSON.stringify(productos, null, 2));
+  await writeFile(datedFile, JSON.stringify(productos, null, 2));   // archivo con fecha
+  await writeFile(latestFile, JSON.stringify(productos, null, 2));  // latest
 
   console.log(`\nProceso completado. Total productos guardados: ${productos.length}`);
   console.log(`Archivos generados:\n- ${datedFile}\n- ${latestFile}`);
 
 } catch (error) {
   console.error('Error durante el scraping:', error);
-  await page.screenshot({ path: 'error-acuenta.png', fullPage: true });
+  await page.screenshot({ path: join(outputDir, 'error-acuenta.png'), fullPage: true });
 } finally {
   await browser.close();
 }

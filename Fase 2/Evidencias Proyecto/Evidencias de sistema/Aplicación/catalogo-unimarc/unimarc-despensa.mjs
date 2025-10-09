@@ -10,32 +10,24 @@ const outputDir = join(__dirname, '..', 'catalogo-frontend', 'public', 'json-uni
 
 await mkdir(outputDir, { recursive: true });
 
-// Función para guardar archivo JSON
-async function saveJsonFile(data, filename) {
-  try {
-    const filePath = join(outputDir, filename);
-    await writeFile(filePath, JSON.stringify(data, null, 2));
-    console.log(`Archivo ${filename} guardado con éxito (${data.length} productos)`);
-
-    // Actualizar también el archivo latest
-    const latestPath = join(outputDir, 'despensa-unimarc-latest.json');
-    await writeFile(latestPath, JSON.stringify(data, null, 2));
-    console.log('Archivo despensa-unimarc-latest.json actualizado');
-  } catch (error) {
-    console.error('Error al guardar el archivo:', error);
-    throw error;
-  }
+// Función para obtener fecha solo: YYYY-MM-DD
+function getDateString() {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
 }
 
-// Función para obtener fecha y hora legible: DD-MM-YYYY_HH:MM
+// Función para obtener fecha y hora legible: YYYY-MM-DD-HH:MM
 function getDateTimeString() {
   const now = new Date();
-  const dd = String(now.getDate()).padStart(2, '0');
-  const mm = String(now.getMonth() + 1).padStart(2, '0');
   const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
   const hh = String(now.getHours()).padStart(2, '0');
   const min = String(now.getMinutes()).padStart(2, '0');
-  return `${dd}-${mm}-${yyyy}_${hh}:${min}`;
+  return `${yyyy}-${mm}-${dd}-${hh}:${min}`;
 }
 
 async function main() {
@@ -97,13 +89,16 @@ async function main() {
     console.log(`✔ Página ${pageNumber} → ${products.length} productos encontrados`);
   }
 
-  const dateTimeStr = getDateTimeString();
-  await writeFile(join(outputDir, `despensa-unimarc-${dateTimeStr}.json`), JSON.stringify(productos, null, 2));
-  console.log(`Archivo con fecha y hora guardado: despensa-unimarc-${dateTimeStr}.json`);
+  // Guardar JSON con fecha (YYYY-MM-DD) y archivo latest
+  const dateOnly = getDateString(); 
+  const datedFile = join(outputDir, `despensa-unimarc-${dateOnly}.json`);
+  const latestFile = join(outputDir, 'despensa-unimarc-latest.json');
 
-  // Archivo latest
-  await writeFile(join(outputDir, 'despensa-unimarc-latest.json'), JSON.stringify(productos, null, 2));
-  console.log('Archivo latest actualizado: despensa-unimarc-latest.json');
+  await writeFile(datedFile, JSON.stringify(productos, null, 2));   // archivo con fecha
+  await writeFile(latestFile, JSON.stringify(productos, null, 2));  // latest
+
+  console.log(`Archivos guardados con ${productos.length} productos`);
+  console.log(`Archivos generados:\n- ${datedFile}\n- ${latestFile}`);
 
   await browser.close();
 }

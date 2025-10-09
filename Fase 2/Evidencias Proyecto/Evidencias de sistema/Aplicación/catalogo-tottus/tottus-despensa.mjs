@@ -9,19 +9,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const outputDir = join(__dirname, '..', 'catalogo-frontend', 'public', 'json-tottus');
 
+// Función para esperar input del usuario (captcha)
 function waitForUserInput(message) {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   return new Promise(resolve => { rl.question(message, answer => { rl.close(); resolve(answer); }); });
 }
 
-function getDateTimeString() {
+// Función para obtener fecha solo: YYYY-MM-DD
+function getDateString() {
   const now = new Date();
-  const dd = String(now.getDate()).padStart(2, '0');
-  const mm = String(now.getMonth() + 1).padStart(2, '0');
   const yyyy = now.getFullYear();
-  const hh = String(now.getHours()).padStart(2, '0');
-  const min = String(now.getMinutes()).padStart(2, '0');
-  return `${dd}-${mm}-${yyyy}_${hh}:${min}`;
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
 }
 
 async function main() {
@@ -53,7 +53,7 @@ async function main() {
       }
     }
 
-    // Captcha
+    // Captcha inicial
     if (await page.locator('iframe[title*="challenge"]').count() > 0) {
       await waitForUserInput('Captcha detectado, presiona Enter cuando lo hayas resuelto...');
     }
@@ -126,18 +126,22 @@ async function main() {
         if (handle) await page.evaluate(btn => btn.click(), handle);
         else await nextButton.click();
         await page.waitForTimeout(2500);
+
         if (await page.locator('iframe[title*="challenge"]').count() > 0) {
           await waitForUserInput('Captcha detectado durante navegación. Presiona Enter cuando termines...');
         }
+
         currentPage++;
       } else hasNextPage = false;
     }
 
-    const dateTimeStr = getDateTimeString();
-    await writeFile(join(outputDir, `despensa-tottus-${dateTimeStr}.json`), JSON.stringify(productos, null, 2));
+    // Guardar JSON con **solo fecha** y archivo latest
+    const dateOnly = getDateString();
+    await writeFile(join(outputDir, `despensa-tottus-${dateOnly}.json`), JSON.stringify(productos, null, 2));
     await writeFile(join(outputDir, 'despensa-tottus-latest.json'), JSON.stringify(productos, null, 2));
 
-    console.log(`Archivo guardado en ${outputDir} con ${productos.length} productos`);
+    console.log(`Archivos guardados en ${outputDir} con ${productos.length} productos`);
+    console.log(`Archivos generados:\n- despensa-tottus-${dateOnly}.json\n- despensa-tottus-latest.json`);
 
   } catch (error) {
     console.error('Error:', error);
