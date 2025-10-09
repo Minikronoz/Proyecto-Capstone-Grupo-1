@@ -1,117 +1,149 @@
+import React, { useEffect, useState } from "react";
+import { auth, db } from "./firebase";
+import { collection, query, where, getDocs, updateDoc, doc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 import "./App.css";
 
-// UserProfilePage.jsx
 
+function Usuario() {
+  const [usuario, setUsuario] = useState(null);
+  const [cargando, setCargando] = useState(true);
+  const [formData, setFormData] = useState({});
+  const navigate = useNavigate();
 
-const mockUsers = [
-  {
-    id: 1,
-    nombre: "Carlos",
-    apellido: "Catalán",
-    email: "carlos@example.com",
-    role: "cliente",
-    rut: "12345678-9",
-    fechaNacimiento: "1990-05-20",
-    sexo: "masculino",
-    region: "Metropolitana de Santiago",
-    comuna: "Santiago",
-    sector: "Centro",
-    negocio: { nombre: "Mi Negocio", rolTributario: "123", giro: "Retail", telefono: "123456789", email: "negocio@example.com", web: "www.negocio.cl" }
-  }
-];
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        navigate("/login");
+        return;
+      }
 
-function UserProfilePage() {
-  const [users, setUsers] = useState(mockUsers);
-  const [editUser, setEditUser] = useState(mockUsers[0]);
+      try {
+        const usuariosRef = collection(db, "usuarios");
+        const q = query(usuariosRef, where("email", "==", user.email));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          const docSnap = querySnapshot.docs[0];
+          setUsuario({ id: docSnap.id, ...docSnap.data() });
+          setFormData(docSnap.data());
+        } else {
+          console.error("No se encontró el documento del usuario");
+        }
+      } catch (error) {
+        console.error("Error al obtener datos del usuario:", error);
+      } finally {
+        setCargando(false);
+      }
+    };
+
+    fetchUserData();
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Para campos de negocio anidados
     if (name.startsWith("negocio.")) {
       const key = name.split(".")[1];
-      setEditUser(prev => ({ ...prev, negocio: { ...prev.negocio, [key]: value } }));
+      setFormData((prev) => ({
+        ...prev,
+        negocio: {
+          ...prev.negocio,
+          [key]: value,
+        },
+      }));
     } else {
-      setEditUser(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
-  const saveUser = () => {
-    setUsers(users.map(u => u.id === editUser.id ? editUser : u));
-    alert("Usuario guardado correctamente");
-  };
+const handleGuardar = async () => {
+  try {
+    if (!usuario) return;
+
+    const userRef = doc(db, "usuarios", usuario.id);
+    await updateDoc(userRef, formData);
+    alert("Datos actualizados correctamente ✅");
+
+    // Redirigir a la página principal (App.jsx)
+    navigate("/");
+  } catch (error) {
+    console.error("Error al actualizar datos:", error);
+    alert("Error al actualizar los datos ❌");
+  }
+};
+
+  if (cargando) return <p className="usuario-loading">Cargando datos...</p>;
+  if (!usuario) return <p className="usuario-error">No se encontró el usuario.</p>;
 
   return (
-    <div className="userprofile-container">
-      <h1>Editar Usuario</h1>
-      <div className="userprofile-form">
-        <div className="form-section">
-          <h2>Datos Personales</h2>
-          <label>Nombre</label>
-          <input name="nombre" value={editUser.nombre} onChange={handleChange} />
+    <div className="usuario-perfil-container">
+      <h2 className="usuario-perfil-title">Mi Perfil</h2>
 
-          <label>Apellido</label>
-          <input name="apellido" value={editUser.apellido} onChange={handleChange} />
+      <div className="usuario-perfil-form">
 
-          <label>Email</label>
-          <input name="email" value={editUser.email} onChange={handleChange} />
+        <section className="usuario-seccion">
+          <h3>Información Personal</h3>
+          <label>Nombre:</label>
+          <input type="text" name="nombre" value={formData.nombre || ""} onChange={handleChange} />
 
-          <label>Rol</label>
-          <select name="role" value={editUser.role} onChange={handleChange}>
-            <option value="cliente">Cliente</option>
-            <option value="usuario">Usuario</option>
-          </select>
+          <label>Apellido:</label>
+          <input type="text" name="apellido" value={formData.apellido || ""} onChange={handleChange} />
 
-          <label>RUT</label>
-          <input name="rut" value={editUser.rut} onChange={handleChange} />
+          <label>Rut:</label>
+          <input type="text" name="rut" value={formData.rut || ""} onChange={handleChange} />
 
-          <label>Fecha de Nacimiento</label>
-          <input type="date" name="fechaNacimiento" value={editUser.fechaNacimiento} onChange={handleChange} />
+          <label>Sexo:</label>
+          <input type="text" name="sexo" value={formData.sexo || ""} onChange={handleChange} />
 
-          <label>Sexo</label>
-          <select name="sexo" value={editUser.sexo} onChange={handleChange}>
-            <option value="">Seleccione</option>
-            <option value="masculino">Masculino</option>
-            <option value="femenino">Femenino</option>
-          </select>
+          <label>Fecha de nacimiento:</label>
+          <input type="date" name="fechaNacimiento" value={formData.fechaNacimiento || ""} onChange={handleChange} />
+        </section>
 
-          <label>Región</label>
-          <input name="region" value={editUser.region} onChange={handleChange} />
+        <section className="usuario-seccion">
+          <h3>Contacto</h3>
+          <label>Email:</label>
+          <input type="email" name="email" value={formData.email || ""} disabled />
 
-          <label>Comuna</label>
-          <input name="comuna" value={editUser.comuna} onChange={handleChange} />
+          <label>Teléfono:</label>
+          <input type="text" name="telefono" value={formData.telefono || ""} onChange={handleChange} />
 
-          <label>Sector</label>
-          <input name="sector" value={editUser.sector} onChange={handleChange} />
-        </div>
+          <label>Web:</label>
+          <input type="text" name="web" value={formData.web || ""} onChange={handleChange} />
+        </section>
 
-        <div className="form-section">
-          <h2>Datos del Negocio</h2>
-          <label>Nombre</label>
-          <input name="negocio.nombre" value={editUser.negocio.nombre} onChange={handleChange} />
+        <section className="usuario-seccion">
+          <h3>Ubicación</h3>
+          <label>Comuna:</label>
+          <input type="text" name="comuna" value={formData.comuna || ""} onChange={handleChange} />
 
-          <label>Rol Tributario</label>
-          <input name="negocio.rolTributario" value={editUser.negocio.rolTributario} onChange={handleChange} />
+          <label>Región:</label>
+          <input type="text" name="region" value={formData.region || ""} onChange={handleChange} />
 
-          <label>Giro</label>
-          <input name="negocio.giro" value={editUser.negocio.giro} onChange={handleChange} />
+          <label>Sector:</label>
+          <input type="text" name="sector" value={formData.sector || ""} onChange={handleChange} />
+        </section>
 
-          <label>Teléfono</label>
-          <input name="negocio.telefono" value={editUser.negocio.telefono} onChange={handleChange} />
+        {formData.tieneNegocio && (
+          <section className="usuario-seccion">
+            <h3>Datos del Negocio</h3>
+            <label>Nombre del negocio:</label>
+            <input type="text" name="negocio.nombre" value={formData.negocio?.nombre || ""} onChange={handleChange} />
 
-          <label>Email</label>
-          <input name="negocio.email" value={editUser.negocio.email} onChange={handleChange} />
+            <label>Email del negocio:</label>
+            <input type="text" name="negocio.email" value={formData.negocio?.email || ""} onChange={handleChange} />
 
-          <label>Web</label>
-          <input name="negocio.web" value={editUser.negocio.web} onChange={handleChange} />
-        </div>
+            <label>Giro:</label>
+            <input type="text" name="negocio.giro" value={formData.negocio?.giro || ""} onChange={handleChange} />
+          </section>
+        )}
 
-        <div className="form-actions">
-          <button className="btn-save" onClick={saveUser}>Guardar Cambios</button>
-        </div>
+        <button className="usuario-perfil-btn" onClick={handleGuardar}>Guardar cambios</button>
       </div>
     </div>
   );
 }
 
-export default UserProfilePage;
-
-
+export default Usuario;

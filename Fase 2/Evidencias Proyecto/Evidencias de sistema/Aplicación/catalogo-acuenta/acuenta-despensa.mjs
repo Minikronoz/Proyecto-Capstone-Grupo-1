@@ -1,3 +1,4 @@
+// acuenta-despensa.mjs
 import { firefox } from 'playwright';
 import { writeFile, mkdir } from 'fs/promises';
 import { join, dirname } from 'path';
@@ -8,7 +9,7 @@ import readline from 'readline';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Construir ruta relativa al directorio public/json-acuenta
+// Carpeta de salida
 const outputDir = join(__dirname, '..', 'catalogo-frontend', 'public', 'json-acuenta');
 
 // Función para esperar input del usuario (captcha)
@@ -17,7 +18,6 @@ function waitForUserInput(message) {
     input: process.stdin,
     output: process.stdout
   });
-
   return new Promise(resolve => {
     rl.question(message, answer => {
       rl.close();
@@ -26,13 +26,15 @@ function waitForUserInput(message) {
   });
 }
 
-// Función para obtener fecha actual en YYYY-MM-DD
-function getTodayDate() {
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd}`;
+// Función para obtener fecha y hora legible: DD-MM-YYYY_HH:MM
+function getDateTimeString() {
+  const now = new Date();
+  const dd = String(now.getDate()).padStart(2, '0');
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const yyyy = now.getFullYear();
+  const hh = String(now.getHours()).padStart(2, '0');
+  const min = String(now.getMinutes()).padStart(2, '0');
+  return `${dd}-${mm}-${yyyy}_${hh}:${min}`;
 }
 
 const browser = await firefox.launch({ headless: true, slowMo: 500 });
@@ -90,16 +92,26 @@ try {
 
         if (!title || !priceStr) return null;
 
+        // Construir link del producto
         const productCode = image.match(/productos\/(\d+)/)?.[1];
         const link = productCode ? `https://www.acuenta.cl/p/${title.toLowerCase().replace(/\s+/g, '-')}-${productCode}` : '';
 
+        // Función para extraer precio numérico
         const parsePrice = (str) => parseInt(str.replace(/[^0-9]/g, ''), 10);
         const price = parsePrice(priceStr);
         const normalPrice = normalPriceStr ? parsePrice(normalPriceStr) : null;
 
+        // Descuento
         let discountPercent = null;
         if (normalPrice && price && normalPrice > price) {
           discountPercent = Math.round(((normalPrice - price) / normalPrice) * 100);
+        }
+
+        // EXTRAER pricePerUnit (kg, g, l, ml)
+        let pricePerUnit = null;
+        const priceUnitEl = Array.from(item.querySelectorAll('p span')).find(span => /\/(kg|g|l|ml)/i.test(span.innerText));
+        if (priceUnitEl) {
+          pricePerUnit = priceUnitEl.innerText.trim();
         }
 
         return {
@@ -112,7 +124,7 @@ try {
           image,
           link,
           store: 'ACuenta',
-          productCode
+          pricePerUnit
         };
       } catch (error) {
         console.error('Error al procesar producto:', error);
@@ -129,9 +141,9 @@ try {
   // Crear carpeta si no existe
   await mkdir(outputDir, { recursive: true });
 
-  // Archivos con fecha y latest
-  const todayDate = getTodayDate();
-  const datedFile = join(outputDir, `despensa-acuenta-${todayDate}.json`);
+  // Guardar archivos con fecha y hora DD-MM-YYYY_HH:MM
+  const dateTimeStr = getDateTimeString();
+  const datedFile = join(outputDir, `despensa-acuenta-${dateTimeStr}.json`);
   const latestFile = join(outputDir, 'despensa-acuenta-latest.json');
 
   await writeFile(datedFile, JSON.stringify(productos, null, 2));

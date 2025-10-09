@@ -9,6 +9,7 @@ import { signOut } from "firebase/auth";
 import "./App.css";
 import { Busquedas } from "./utils/Busquedas";
 import { FaUserCircle, FaTachometerAlt, FaSignOutAlt } from "react-icons/fa";
+import Usuario from "./Usuario";
 
 function App() {
   const [allProducts, setAllProducts] = useState([]);
@@ -520,10 +521,10 @@ useEffect(() => {
         </div>
 
         <div className="App_nav-right">
-          {currentAuthUser ? (
-            <div className="App_user-info" onClick={handleOpenProfile} style={{ cursor: "pointer" }}>
-              <FaUserCircle className="App_user-icon" /> {userName || "Usuario"}
-            </div>
+                {currentAuthUser ? (
+                  <Link to="/usuario" className="App_user-info" style={{ cursor: "pointer", textDecoration: "none", color: "inherit" }}>
+                    <FaUserCircle className="App_user-icon" /> {userName || "Usuario"}
+                  </Link>
           ) : (
             // si no está logueado: mostrar link a registro/login (si quieres ocultarlo por completo, comenta esta línea)
             <Link to="/formularioregistro" className="App_dashboard-link">Iniciar / Registrar</Link>

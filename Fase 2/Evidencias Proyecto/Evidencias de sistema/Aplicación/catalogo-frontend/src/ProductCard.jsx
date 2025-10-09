@@ -30,9 +30,18 @@ export default function ProductCard({ product, onAdd }) {
       )}
 
       <h3 className={`productCard_title ${storeClass}`}>{product.title}</h3>
+
       <p className="productCard_price">
         {product.formattedPrice || `${product.price}`}
       </p>
+
+      {/* Mostrar pricePerKg o pricePerUnit según esté disponible */}
+      {(product.pricePerKg || product.pricePerUnit) && (
+        <p className="productCard_pricePerKg">
+          {product.pricePerKg || product.pricePerUnit}
+        </p>
+      )}
+
       <a href={product.link} target="_blank" className="productCard_link">
         Ver producto
       </a>

@@ -6,6 +6,7 @@ import "./App.css";
 
 function Admin() {
   const [usuarios, setUsuarios] = useState([]);
+  const [lastUpdate, setLastUpdate] = useState(null);
   const [editUser, setEditUser] = useState(null);
   const [formData, setFormData] = useState({
     nombre: "",
@@ -33,30 +34,44 @@ function Admin() {
     acuenta: false,
   });
   const [scrapingStatus, setScrapingStatus] = useState({
-    tottus: 'idle',
-    jumbo: 'idle',
-    unimarc: 'idle',
-    acuenta: 'idle'
+    tottus: "idle",
+    jumbo: "idle",
+    unimarc: "idle",
+    acuenta: "idle",
   });
 
-  const regiones = { 
-    "Arica y Parinacota": ["Arica", "Camarones", "Putre", "General Lagos"], 
-    "Tarapacá": ["Iquique", "Alto Hospicio", "Pozo Almonte", "Camiña", "Colchane", "Huara", "Pica"], 
-    "Antofagasta": ["Antofagasta", "Mejillones", "Sierra Gorda", "Taltal", "Calama", "Ollagüe", "San Pedro de Atacama", "Tocopilla", "María Elena"], 
-    "Atacama": ["Copiapó", "Caldera", "Tierra Amarilla", "Chañaral", "Diego de Almagro", "Vallenar", "Alto del Carmen", "Freirina", "Huasco"], 
-    "Coquimbo": ["La Serena", "Coquimbo", "Andacollo", "La Higuera", "Paiguano", "Vicuña", "Illapel", "Canela", "Los Vilos", "Salamanca", "Ovalle", "Combarbalá", "Monte Patria", "Punitaqui", "Río Hurtado"], 
-    "Valparaíso": ["Valparaíso", "Casablanca", "Concón", "Juan Fernández", "Puchuncaví", "Quintero", "Viña del Mar", "Isla de Pascua", "Los Andes", "Calle Larga", "Rinconada", "San Esteban", "La Ligua", "Cabildo", "Papudo", "Petorca", "Zapallar", "Quillota", "Calera", "Hijuelas", "La Cruz", "Nogales", "San Antonio", "Algarrobo", "Cartagena", "El Quisco", "El Tabo", "Santo Domingo", "San Felipe", "Catemu", "Llaillay", "Panquehue", "Putaendo", "Santa María", "Quilpué", "Limache", "Olmué", "Villa Alemana"], 
-    "Metropolitana de Santiago": ["Santiago", "Cerrillos", "Cerro Navia", "Conchalí", "El Bosque", "Estación Central", "Huechuraba", "Independencia", "La Cisterna", "La Florida", "La Granja", "La Pintana", "La Reina", "Las Condes", "Lo Barnechea", "Lo Espejo", "Lo Prado", "Macul", "Maipú", "Ñuñoa", "Pedro Aguirre Cerda", "Peñalolén", "Providencia", "Pudahuel", "Quilicura", "Quinta Normal", "Recoleta", "Renca", "San Joaquín", "San Miguel", "San Ramón", "Vitacura", "Puente Alto", "Pirque", "San José de Maipo", "Colina", "Lampa", "Tiltil"], 
-    "O'Higgins": ["Rancagua", "Codegua", "Coinco", "Coltauco", "Doñihue", "Graneros", "Las Cabras", "Machalí", "Malloa", "Mostazal", "Olivar", "Peumo", "Pichidegua", "Quinta de Tilcoco", "Rengo", "Requínoa", "San Vicente", "La Estrella", "Litueche", "Marchihue", "Navidad", "Paredones", "Pichilemu", "Chimbarongo", "Lolol", "Nancagua", "Palmilla", "Peralillo", "Placilla", "Santa Cruz"], 
-    "Maule": ["Talca", "Constitución", "Curepto", "Empedrado", "Maule", "Pelarco", "Pencahue", "Río Claro", "San Clemente", "San Rafael", "Cauquenes", "Chanco", "Pelluhue", "Curicó", "Hualañé", "Licantén", "Molina", "Rauco", "Romeral", "Sagrada Familia", "Teno", "Vichuquén", "Linares", "Colbún", "Longaví", "Parral", "Retiro", "San Javier", "Villa Alegre"], 
-    "Ñuble": ["Chillán", "Chillán Viejo", "Cobquecura", "Coelemu", "Coihueco", "El Carmen", "Ninhue", "Ñiquén", "Pemuco", "Pinto", "Portezuelo", "Quillón", "Quirihue", "Ránquil", "San Carlos", "San Fabián", "San Ignacio", "San Nicolás", "Treguaco", "Yungay"], 
-    "Biobío": ["Concepción", "Coronel", "Chiguayante", "Florida", "Hualpén", "Hualqui", "Lota", "Penco", "San Pedro de la Paz", "Santa Juana", "Talcahuano", "Tomé", "Cabrero", "Lebu", "Los Álamos", "Cañete", "Contulmo", "Curanilahue", "Arauco", "Laja", "Los Ángeles", "Mulchén", "Nacimiento", "Negrete", "Quilaco", "Quilleco", "San Rosendo", "Santa Bárbara", "Tucapel", "Yumbel", "Alto Biobío"], 
-    "Araucanía": ["Temuco", "Carahue", "Cholchol", "Cunco", "Curarrehue", "Freire", "Galvarino", "Gorbea", "Lautaro", "Loncoche", "Melipeuco", "Nueva Imperial", "Padre Las Casas", "Perquenco", "Pitrufquén", "Pucón", "Saavedra", "Teodoro Schmidt", "Toltén", "Vilcún", "Villarrica", "Angol", "Collipulli", "Curacautín", "Ercilla", "Lonquimay", "Los Sauces", "Lumaco", "Purén", "Renaico", "Traiguén", "Victoria"], 
+  const regiones = {
+    "Arica y Parinacota": ["Arica", "Camarones", "Putre", "General Lagos"],
+    "Tarapacá": ["Iquique", "Alto Hospicio", "Pozo Almonte", "Camiña", "Colchane", "Huara", "Pica"],
+    "Antofagasta": ["Antofagasta", "Mejillones", "Sierra Gorda", "Taltal", "Calama", "Ollagüe", "San Pedro de Atacama", "Tocopilla", "María Elena"],
+    "Atacama": ["Copiapó", "Caldera", "Tierra Amarilla", "Chañaral", "Diego de Almagro", "Vallenar", "Alto del Carmen", "Freirina", "Huasco"],
+    "Coquimbo": ["La Serena", "Coquimbo", "Andacollo", "La Higuera", "Paiguano", "Vicuña", "Illapel", "Canela", "Los Vilos", "Salamanca", "Ovalle", "Combarbalá", "Monte Patria", "Punitaqui", "Río Hurtado"],
+    "Valparaíso": ["Valparaíso", "Casablanca", "Concón", "Juan Fernández", "Puchuncaví", "Quintero", "Viña del Mar", "Isla de Pascua", "Los Andes", "Calle Larga", "Rinconada", "San Esteban", "La Ligua", "Cabildo", "Papudo", "Petorca", "Zapallar", "Quillota", "Calera", "Hijuelas", "La Cruz", "Nogales", "San Antonio", "Algarrobo", "Cartagena", "El Quisco", "El Tabo", "Santo Domingo", "San Felipe", "Catemu", "Llaillay", "Panquehue", "Putaendo", "Santa María", "Quilpué", "Limache", "Olmué", "Villa Alemana"],
+    "Metropolitana de Santiago": ["Santiago", "Cerrillos", "Cerro Navia", "Conchalí", "El Bosque", "Estación Central", "Huechuraba", "Independencia", "La Cisterna", "La Florida", "La Granja", "La Pintana", "La Reina", "Las Condes", "Lo Barnechea", "Lo Espejo", "Lo Prado", "Macul", "Maipú", "Ñuñoa", "Pedro Aguirre Cerda", "Peñalolén", "Providencia", "Pudahuel", "Quilicura", "Quinta Normal", "Recoleta", "Renca", "San Joaquín", "San Miguel", "San Ramón", "Vitacura", "Puente Alto", "Pirque", "San José de Maipo", "Colina", "Lampa", "Tiltil"],
+    "O'Higgins": ["Rancagua", "Codegua", "Coinco", "Coltauco", "Doñihue", "Graneros", "Las Cabras", "Machalí", "Malloa", "Mostazal", "Olivar", "Peumo", "Pichidegua", "Quinta de Tilcoco", "Rengo", "Requínoa", "San Vicente", "La Estrella", "Litueche", "Marchihue", "Navidad", "Paredones", "Pichilemu", "Chimbarongo", "Lolol", "Nancagua", "Palmilla", "Peralillo", "Placilla", "Santa Cruz"],
+    "Maule": ["Talca", "Constitución", "Curepto", "Empedrado", "Maule", "Pelarco", "Pencahue", "Río Claro", "San Clemente", "San Rafael", "Cauquenes", "Chanco", "Pelluhue", "Curicó", "Hualañé", "Licantén", "Molina", "Rauco", "Romeral", "Sagrada Familia", "Teno", "Vichuquén", "Linares", "Colbún", "Longaví", "Parral", "Retiro", "San Javier", "Villa Alegre"],
+    "Ñuble": ["Chillán", "Chillán Viejo", "Cobquecura", "Coelemu", "Coihueco", "El Carmen", "Ninhue", "Ñiquén", "Pemuco", "Pinto", "Portezuelo", "Quillón", "Quirihue", "Ránquil", "San Carlos", "San Fabián", "San Ignacio", "San Nicolás", "Treguaco", "Yungay"],
+    "Biobío": ["Concepción", "Coronel", "Chiguayante", "Florida", "Hualpén", "Hualqui", "Lota", "Penco", "San Pedro de la Paz", "Santa Juana", "Talcahuano", "Tomé", "Cabrero", "Lebu", "Los Álamos", "Cañete", "Contulmo", "Curanilahue", "Arauco", "Laja", "Los Ángeles", "Mulchén", "Nacimiento", "Negrete", "Quilaco", "Quilleco", "San Rosendo", "Santa Bárbara", "Tucapel", "Yumbel", "Alto Biobío"],
+    "Araucanía": ["Temuco", "Carahue", "Cholchol", "Cunco", "Curarrehue", "Freire", "Galvarino", "Gorbea", "Lautaro", "Loncoche", "Melipeuco", "Nueva Imperial", "Padre Las Casas", "Perquenco", "Pitrufquén", "Pucón", "Saavedra", "Teodoro Schmidt", "Toltén", "Vilcún", "Villarrica", "Angol", "Collipulli", "Curacautín", "Ercilla", "Lonquimay", "Los Sauces", "Lumaco", "Purén", "Renaico", "Traiguén", "Victoria"],
     "Los Ríos": ["Valdivia", "Corral", "Lanco", "Los Lagos", "Máfil", "Mariquina", "Paillaco", "Panguipulli", "La Unión", "Futrono", "Lago Ranco", "Río Bueno"],
-    "Los Lagos": ["Puerto Montt", "Calbuco", "Cochamó", "Fresia", "Frutillar", "Los Muermos", "Llanquihue", "Maullín", "Puerto Varas", "Castro", "Ancud", "Chonchi", "Curaco de Vélez", "Dalcahue", "Puqueldón", "Queilén", "Quellón", "Quemchi", "Quinchao", "Osorno", "Puerto Octay", "Purranque", "Puyehue", "Río Negro", "San Juan de la Costa", "San Pablo", "Chaitén", "Futaleufú", "Hualaihué", "Palena"], 
-    "Aysén": ["Coyhaique", "Lago Verde", "Aysén", "Cisnes", "Guaitecas", "Chile Chico", "Río Ibáñez", "Tortel"], 
-    "Magallanes": ["Punta Arenas", "Laguna Blanca", "Río Verde", "San Gregorio", "Cabo de Hornos", "Antártica", "Porvenir", "Primavera", "Timaukel", "Natales", "Torres del Paine"] 
+    "Los Lagos": ["Puerto Montt", "Calbuco", "Cochamó", "Fresia", "Frutillar", "Los Muermos", "Llanquihue", "Maullín", "Puerto Varas", "Castro", "Ancud", "Chonchi", "Curaco de Vélez", "Dalcahue", "Puqueldón", "Queilén", "Quellón", "Quemchi", "Quinchao", "Osorno", "Puerto Octay", "Purranque", "Puyehue", "Río Negro", "San Juan de la Costa", "San Pablo", "Chaitén", "Futaleufú", "Hualaihué", "Palena"],
+    "Aysén": ["Coyhaique", "Lago Verde", "Aysén", "Cisnes", "Guaitecas", "Chile Chico", "Río Ibáñez", "Tortel"],
+    "Magallanes": ["Punta Arenas", "Laguna Blanca", "Río Verde", "San Gregorio", "Cabo de Hornos", "Antártica", "Porvenir", "Primavera", "Timaukel", "Natales", "Torres del Paine"],
   };
+
+  // ===== FUNCIONES AUXILIARES =====
+const getFormattedDateTime = () => {
+  const today = new Date();
+  return today.toLocaleString("es-CL", {
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  });
+};
 
   // ===== FUNCIONES DE USUARIOS =====
   useEffect(() => {
@@ -94,7 +109,6 @@ function Admin() {
       fechaNacimiento: user.fechaNacimiento || "",
       sexo: user.sexo || "",
       region: user.region || "",
-      comuna: user.comuna || "",
       sector: user.sector || "",
       negocio: {
         nombre: user.negocio?.nombre || "",
@@ -132,55 +146,76 @@ function Admin() {
   useEffect(() => {
     const socket = io("http://localhost:3001");
 
-    socket.on('scrapingLog', ({ store, log, type }) => {
-      setScrapingLogs(prev => ({
+    socket.on("scrapingLog", ({ store, log, type }) => {
+      setScrapingLogs((prev) => ({
         ...prev,
-        [store]: [...prev[store], { text: log, type }]
+        [store]: [...prev[store], { text: log, type }],
       }));
     });
 
-    socket.on('scrapingError', ({ store }) => {
-      setScrapingStatus(prev => ({
-        ...prev,
-        [store]: 'error'
-      }));
-      setIsLoading(prev => ({
-        ...prev,
-        [store]: false
-      }));
+    socket.on("scrapingError", ({ store }) => {
+      setScrapingStatus((prev) => ({ ...prev, [store]: "error" }));
+      setIsLoading((prev) => ({ ...prev, [store]: false }));
     });
 
-    socket.on('scrapingComplete', ({ store, success }) => {
-      setScrapingStatus(prev => ({
-        ...prev,
-        [store]: success ? 'success' : 'error'
-      }));
-      setIsLoading(prev => ({
-        ...prev,
-        [store]: false
-      }));
+    socket.on("scrapingComplete", ({ store, success }) => {
+      setScrapingStatus((prev) => ({ ...prev, [store]: success ? "success" : "error" }));
+      setIsLoading((prev) => ({ ...prev, [store]: false }));
+
+      setTimeout(() => {
+        setScrapingLogs((prev) => ({
+          ...prev,
+          [store]: [{ text: "✅ Catálogo actualizado" }],
+        }));
+      }, 2000);
     });
 
     return () => socket.disconnect();
   }, []);
 
+  // ===== ACTUALIZAR FECHA DESPUÉS DE SCRAPING =====
+useEffect(() => {
+  const allUpdated = Object.values(scrapingStatus).every(status => status === "success");
+
+  if (allUpdated) {
+    const now = getFormattedDateTime();
+    setLastUpdate(now); // actualizar estado local
+
+    const updateDateInDB = async () => {
+      try {
+        const configRef = doc(db, "config", "catalogo");
+        await updateDoc(configRef, { lastUpdate: now });
+        console.log("Fecha de actualización guardada:", now);
+      } catch (error) {
+        console.error("Error guardando la fecha de actualización:", error);
+      }
+    };
+
+    updateDateInDB();
+  }
+}, [scrapingStatus]);
+
   const handleUpdateCatalog = async (store) => {
     try {
-      setIsLoading(prev => ({ ...prev, [store]: true }));
-      setScrapingStatus(prev => ({ ...prev, [store]: 'loading' }));
-      setScrapingLogs(prev => ({ ...prev, [store]: [] })); // Limpiar logs anteriores
-      
+      setIsLoading((prev) => ({ ...prev, [store]: true }));
+      setScrapingStatus((prev) => ({ ...prev, [store]: "loading" }));
+      setScrapingLogs((prev) => ({ ...prev, [store]: [] }));
+
       const response = await fetch(`http://localhost:3001/api/scrape/${store}`, {
-        method: 'POST'
+        method: "POST",
       });
-      
+
       if (!response.ok) {
         throw new Error(`Error al actualizar catálogo de ${store}`);
       }
     } catch (error) {
       console.error(error);
-      setScrapingStatus(prev => ({ ...prev, [store]: 'error' }));
-      setIsLoading(prev => ({ ...prev, [store]: false }));
+      setScrapingStatus((prev) => ({ ...prev, [store]: "error" }));
+      setIsLoading((prev) => ({ ...prev, [store]: false }));
+      setScrapingLogs((prev) => ({
+        ...prev,
+        [store]: [{ text: "❌ Error al actualizar catálogo" }],
+      }));
     }
   };
 
@@ -188,6 +223,7 @@ function Admin() {
     <div className="admin-container">
       <h1 className="admin-title">Administración de Usuarios</h1>
 
+      {/* Tabla de usuarios */}
       <div className="admin-table-wrapper">
         <table className="admin-table">
           <thead>
@@ -200,7 +236,6 @@ function Admin() {
               <th>Fecha Nac.</th>
               <th>Sexo</th>
               <th>Región</th>
-              <th>Comuna</th>
               <th>Sector</th>
               <th>Negocio</th>
               <th>Acciones</th>
@@ -234,19 +269,9 @@ function Admin() {
                 <td>{editUser === user.id ? (
                   <select name="region" value={formData.region} onChange={handleInputChange}>
                     <option value="">Seleccione</option>
-                    {Object.keys(regiones).map((reg) => (
-                      <option key={reg} value={reg}>{reg}</option>
-                    ))}
+                    {Object.keys(regiones).map((reg) => <option key={reg} value={reg}>{reg}</option>)}
                   </select>
                 ) : user.region}</td>
-                <td>{editUser === user.id ? (
-                  <select name="comuna" value={formData.comuna} onChange={handleInputChange}>
-                    <option value="">Seleccione</option>
-                    {regiones[formData.region]?.map((com) => (
-                      <option key={com} value={com}>{com}</option>
-                    ))}
-                  </select>
-                ) : user.comuna}</td>
                 <td>{editUser === user.id ? <input name="sector" value={formData.sector} onChange={handleInputChange} /> : user.sector}</td>
                 <td>
                   {editUser === user.id ? (
@@ -307,11 +332,7 @@ function Admin() {
                 <td>{store.charAt(0).toUpperCase() + store.slice(1)}</td>
                 <td>{isLoading[store] ? <span className="loading-indicator">Actualizando...</span> : <span className="status-indicator">Listo</span>}</td>
                 <td>
-                  <button
-                    className="admin-btn-update"
-                    onClick={() => handleUpdateCatalog(store)}
-                    disabled={isLoading[store]}
-                  >
+                  <button className="admin-btn-update" onClick={() => handleUpdateCatalog(store)} disabled={isLoading[store]}>
                     Actualizar Catálogo
                   </button>
                 </td>

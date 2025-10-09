@@ -858,3 +858,80 @@
 .App_user-dropdown-item:hover {
   background-color: #f0f0f0;
 }
+
+/*usuario paguina*/
+.usuario-perfil-container {
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.usuario-perfil-title {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  color: #333;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.usuario-perfil-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.usuario-seccion {
+  margin-bottom: 20px;
+}
+
+.usuario-seccion h3 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #555;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 4px;
+}
+
+.usuario-perfil-form label {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #444;
+}
+
+.usuario-perfil-form input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.usuario-perfil-btn {
+  margin-top: 25px;
+  padding: 12px 20px;
+  background-color: #0077ff;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.usuario-perfil-btn:hover {
+  background-color: #005fcc;
+}
+
+.usuario-loading,
+.usuario-error {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #555;
+}
