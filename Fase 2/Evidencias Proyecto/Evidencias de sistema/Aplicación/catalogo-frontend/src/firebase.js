@@ -11,7 +11,7 @@ const firebaseConfig = {
   projectId: "sistema-de-reportes-4a05b",
   storageBucket: "sistema-de-reportes-4a05b.firebasestorage.app",
   messagingSenderId: "1032166949458",
-  appId: "1:1032166948:web:38a48da4d2a06892de558b",
+  appId: "1:1032166949458:web:38a48da4d2a06892de558b",
   measurementId: "G-L5VD3FLMF5"
 };
 

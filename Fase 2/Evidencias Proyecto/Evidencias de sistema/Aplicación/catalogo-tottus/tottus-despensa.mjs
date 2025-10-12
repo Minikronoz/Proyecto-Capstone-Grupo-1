@@ -90,28 +90,31 @@ async function main() {
               if (image.startsWith('//')) image = 'https:' + image;
             }
 
-            // Link robusto
-            let raw = item.getAttribute('href') || item.getAttribute('data-pod') || item.getAttribute('data-product-url') || '';
-            if (!raw) { const aInside = item.querySelector('a[href]'); if (aInside) raw = aInside.getAttribute('href') || ''; }
+            // Link
+            let raw = item.getAttribute('href') || item.getAttribute('data-pod') || '';
+            if (!raw) {
+              const aInside = item.querySelector('a[href]');
+              if (aInside) raw = aInside.getAttribute('href') || '';
+            }
             let link = '';
-            if (raw) { raw = raw.trim(); if (!raw.startsWith('http')) { if (!raw.startsWith('/')) raw = '/' + raw; link = 'https://www.tottus.cl' + raw; } else link = raw; }
-
-            // Captura el precio por unidad (ej: $ 3.978 por KG)
-            let pricePerUnit = null;
-            const pricePerUnitSpan = item.querySelector('.pod-subtitle-unit + span, .price-extras span');
-            if (pricePerUnitSpan) {
-              const match = pricePerUnitSpan.innerText.match(/\(\$\s*\d+(?:\.\d+)?\s*(?:por|x)\s*\d+\s*(GR|KG|ML|L)\)/i);
-              if (match) pricePerUnit = match[0].trim();
+            if (raw) {
+              raw = raw.trim();
+              if (!raw.startsWith('http')) {
+                if (!raw.startsWith('/')) raw = '/' + raw;
+                link = 'https://www.tottus.cl' + raw;
+              } else link = raw;
             }
 
-            // Otros datos extras
-            let priceExtras = null;
-            const extraSpan = item.querySelector('.price-extras span');
-            if (extraSpan) priceExtras = extraSpan.innerText.replace(/\s+/g, ' ').trim();
+            // 🔹 Tottus NO muestra pricePerUnit en el listado
+            // Se deja como null (se puede obtener desde la página del producto si es necesario)
+            const pricePerUnit = null;
+            const priceExtras = null;
 
             if (!title || !price) return null;
             return { brand, title, unit, price, pricePerUnit, priceExtras, image, link, store: 'Tottus' };
-          } catch { return null; }
+          } catch {
+            return null;
+          }
         }).filter(p => p !== null)
       );
 

@@ -566,7 +566,43 @@
 
 .App_refresh-button:hover { background-color: #1e8449; }
 
-.App_quantity-filters { display: flex; flex-wrap: wrap; gap: 10px; margin: 15px 0; }
+.App_quantity-filters-container {
+  display: flex;
+  flex-direction: column;
+  margin: 15px 0;
+  width: 100%;
+  position: relative;
+}
+
+.App_quantity-filters-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  padding-bottom: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: #bdc3c7 #f8f9fa;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.App_quantity-filters-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.App_quantity-filters-scroll::-webkit-scrollbar-track {
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.App_quantity-filters-scroll::-webkit-scrollbar-thumb {
+  background-color: #bdc3c7;
+  border-radius: 10px;
+}
+
+.App_quantity-filters-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: #95a5a6;
+}
 
 .App_filter-button {
   background-color: #ecf0f1;
@@ -576,6 +612,8 @@
   cursor: pointer;
   transition: all 0.25s ease;
   font-size: 0.9rem;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .App_filter-button:hover,
@@ -594,6 +632,8 @@
   cursor: pointer;
   transition: all 0.25s ease;
   font-size: 0.9rem;
+  margin-top: 10px;
+  align-self: flex-end;
 }
 
 .App_clear-filter:hover { background-color: #c0392b; }

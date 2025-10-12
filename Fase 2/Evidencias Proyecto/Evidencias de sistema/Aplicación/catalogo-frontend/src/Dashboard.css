@@ -28,9 +28,33 @@ h1 {
   grid-column: span 3;
 }
 
+@media (max-width: 1200px) {
+  .card.small {
+    grid-column: span 4;
+  }
+}
+
+@media (max-width: 900px) {
+  .card.small {
+    grid-column: span 6;
+  }
+}
+
+@media (max-width: 600px) {
+  .card.small {
+    grid-column: span 12;
+  }
+}
+
 /* Card mediana (6 columnas) */
 .card.medium {
   grid-column: span 6;
+}
+
+@media (max-width: 900px) {
+  .card.medium {
+    grid-column: span 12;
+  }
 }
 
 /* Card grande (12 columnas, ancho completo) */
@@ -56,6 +80,7 @@ h1 {
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .reset-btn:hover {
@@ -81,4 +106,54 @@ h1 {
 
 .back-button:hover {
   background-color: #2980b9;
+}
+
+.filters-control {
+  grid-column: span 12;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.active-filters {
+  background-color: #f0f7ff;
+  border-left: 4px solid #3498db;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.active-filters h3 {
+  margin-top: 0;
+  color: #2980b9;
+  font-size: 1.1rem;
+}
+
+.active-filters div {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* Estilos para el gráfico de términos más buscados con scroll horizontal */
+.terminos-scroll-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  width: 100%;
+  max-width: 1500px; /* Ancho exacto para 10 barras */
+  padding-bottom: 10px;
+  margin: 0 auto;
+}
+
+
+
+.chart-info-text {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  margin-bottom: 1rem;
+}
+
+.chart-total-text {
+  font-size: 0.85rem;
+  color: #95a5a6;
+  margin-top: 10px;
+  text-align: center;
 }

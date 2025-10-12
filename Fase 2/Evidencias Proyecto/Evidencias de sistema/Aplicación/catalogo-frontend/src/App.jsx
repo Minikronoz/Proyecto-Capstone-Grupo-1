@@ -26,6 +26,7 @@ function App() {
   const [showModal, setShowModal] = useState(false);
   const [selectedStores, setSelectedStores] = useState(new Set(['unimarc', 'tottus', 'jumbo', 'acuenta']));
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [hasSearch, setHasSearch] = useState(false); // Flag para saber si hay búsqueda activa
 
   // Perfil / auth
   const [currentAuthUser, setCurrentAuthUser] = useState(null); // firebase auth user
@@ -85,8 +86,10 @@ function App() {
 
       // buscar doc en collection 'usuarios' donde email === user.email
       try {
+        // Intentar obtener datos del usuario de Firestore
         const q = query(collection(db, "usuarios"), where("email", "==", user.email));
         const snap = await getDocs(q);
+        
         if (!snap.empty) {
           const docSnap = snap.docs[0];
           const data = docSnap.data();
@@ -98,16 +101,27 @@ function App() {
           localStorage.setItem("ventana-emergente-usuario-nombre", data.nombre || "Usuario");
           localStorage.setItem("ventana-emergente-usuario-rol", data.role || "usuario");
         } else {
-          // si no existe doc en 'usuarios'
-          setCurrentUserDoc(null);
+          // si no existe doc en 'usuarios', usar datos del auth
+          setCurrentUserDoc({ email: user.email });
           setCurrentUserDocId(null);
           setUserName(user.email || "Usuario");
           setUserRole("usuario");
+          console.log("Usuario no encontrado en Firestore, usando datos de autenticación.");
         }
       } catch (err) {
+        // Si hay error de permisos, usar datos de la autenticación
         console.error("Error obteniendo datos de usuario:", err);
-        setUserName(user.email || "Usuario");
-        setUserRole("usuario");
+        
+        // Obtener información del localStorage o utilizar datos de auth
+        const nombreGuardado = localStorage.getItem("ventana-emergente-usuario-nombre");
+        const rolGuardado = localStorage.getItem("ventana-emergente-usuario-rol");
+        
+        setCurrentUserDoc({ email: user.email });
+        setCurrentUserDocId(null);
+        setUserName(nombreGuardado || user.email || "Usuario");
+        setUserRole(rolGuardado || "usuario");
+        
+        console.log("Usando datos de auth y localStorage debido a error de permisos.");
       }
     });
 
@@ -205,8 +219,30 @@ function App() {
     
 // --- Nuevo useEffect: actualizar filtro al cambiar supermercados ---
 useEffect(() => {
-  if (!hasSearch) return; // solo aplicar si ya se hizo una búsqueda
+  // SIEMPRE verificar hasSearch primero y forzar que no haya filtros si no hay búsqueda
+  if (!hasSearch) {
+    // Asegurarse de que no haya filtros de cantidad visibles
+    setQuantityFilters([]);
+    setActiveQuantities(new Set());
+    
+    // Si no hay supermercados seleccionados, no mostrar nada
+    if (selectedStores.size === 0) {
+      setFilteredProducts([]);
+      setDisplayedProducts([]);
+      return;
+    }
+    
+    // Filtrar productos solo por supermercado (sin búsqueda activa)
+    const filtered = allProducts.filter(product => selectedStores.has(product.store));
+    const sorted = [...filtered].sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
+    setFilteredProducts(filtered);
+    setDisplayedProducts(sorted.slice(0, PRODUCTS_PER_PAGE));
+    setCurrentPage(1);
+    return;
+  }
 
+  // Si hay búsqueda activa, continuamos con el comportamiento normal
+  
   // Si no hay supermercados seleccionados, no mostrar nada
   if (selectedStores.size === 0) {
     setFilteredProducts([]);
@@ -219,7 +255,7 @@ useEffect(() => {
   // Aplicar el filtro usando los valores actuales
   const results = filterBySearch(selectedSuggestion || searchTerm);
 
-  // Recalcular cantidades disponibles en base a resultados
+  // Recalcular cantidades disponibles en base a resultados (solo con búsqueda activa)
   const uniqueQuantities = Array.from(new Set(results.map((p) => p.quantity).filter(Boolean))).sort(
     (a, b) => parseFloat(a) - parseFloat(b)
   );
@@ -231,7 +267,7 @@ useEffect(() => {
   setFilteredProducts(results);
   setDisplayedProducts(results.slice(0, PRODUCTS_PER_PAGE));
   setCurrentPage(1);
-}, [selectedStores]);
+}, [selectedStores, hasSearch, allProducts]);
 
 
   const parsePrice = (priceStr) => {
@@ -312,6 +348,13 @@ useEffect(() => {
       setFilteredProducts(all);
       setDisplayedProducts(sorted.slice(0, PRODUCTS_PER_PAGE));
       setCurrentPage(1);
+      
+      // Limpiar los filtros de cantidad al refrescar productos
+      // Solo mostrarlos si hay búsqueda activa
+      if (!hasSearch) {
+        setQuantityFilters([]);
+        setActiveQuantities(new Set());
+      }
     } catch (error) {
       console.error('Error refreshing products:', error);
     } finally {
@@ -323,10 +366,23 @@ useEffect(() => {
     const value = e.target.value;
     setSearchTerm(value);
     setSelectedSuggestion("");
+    
+    // Si el usuario borra todo el texto, reiniciar el estado de búsqueda
     if (!value.trim()) {
       setSuggestions([]);
+      // Reiniciar el estado de búsqueda cada vez que se borra completamente el texto
+      setHasSearch(false);
+      setQuantityFilters([]); // Ocultar los filtros de cantidad
+      
+      // Mostrar todos los productos filtrados solo por supermercados seleccionados
+      const filtered = allProducts.filter(product => selectedStores.has(product.store));
+      const sorted = [...filtered].sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
+      setFilteredProducts(filtered);
+      setDisplayedProducts(sorted.slice(0, PRODUCTS_PER_PAGE));
+      setCurrentPage(1);
       return;
     }
+    
     const trimmed = value.trim().toLowerCase();
     const firstWords = Array.from(
       new Set(
@@ -337,8 +393,6 @@ useEffect(() => {
     ).slice(0, 5);
     setSuggestions(firstWords);
   };
-
-  const [hasSearch, setHasSearch] = useState(false); 
 
   const handleProductSearch = async (e) => {
     e.preventDefault();
@@ -394,10 +448,23 @@ useEffect(() => {
   // Modificar handleClearQuantityFilter
   const handleClearQuantityFilter = () => {
     setActiveQuantities(new Set());
-    const results = filterBySearch(selectedSuggestion || searchTerm);
-    setFilteredProducts(results);
-    // Resetear displayedProducts con todos los productos filtrados
-    setDisplayedProducts(results.slice(0, PRODUCTS_PER_PAGE));
+    
+    if (!hasSearch) {
+      // Si no hay búsqueda activa, no mostrar filtros de cantidad
+      setQuantityFilters([]);
+      
+      // Solo filtrar por supermercado
+      const filtered = allProducts.filter(product => selectedStores.has(product.store));
+      const sorted = [...filtered].sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
+      setFilteredProducts(filtered);
+      setDisplayedProducts(sorted.slice(0, PRODUCTS_PER_PAGE));
+    } else {
+      // Si hay búsqueda activa, aplicar filtro normal
+      const results = filterBySearch(selectedSuggestion || searchTerm);
+      setFilteredProducts(results);
+      setDisplayedProducts(results.slice(0, PRODUCTS_PER_PAGE));
+    }
+    
     setCurrentPage(1);
   };
 
@@ -553,6 +620,16 @@ useEffect(() => {
             placeholder="Buscar productos..."
             value={searchTerm}
             onChange={handleInputChange}
+            onKeyDown={(e) => {
+              // Si presiona ESC, limpiar la búsqueda
+              if (e.key === 'Escape') {
+                setSearchTerm('');
+                setSelectedSuggestion('');
+                setHasSearch(false);
+                setQuantityFilters([]);
+                setSuggestions([]);
+              }
+            }}
             className="App_search-input"
           />
           {suggestions.length > 0 && (
@@ -583,16 +660,18 @@ useEffect(() => {
       </form>
 
       {quantityFilters.length > 0 && (
-        <div className="App_quantity-filters">
-          {quantityFilters.map((qty) => (
-            <button
-              key={qty}
-              className={`App_filter-button ${activeQuantities.has(qty) ? "active" : ""}`}
-              onClick={() => handleQuantityFilter(qty)}
-            >
-              {qty}
-            </button>
-          ))}
+        <div className="App_quantity-filters-container">
+          <div className="App_quantity-filters-scroll">
+            {quantityFilters.map((qty) => (
+              <button
+                key={qty}
+                className={`App_filter-button ${activeQuantities.has(qty) ? "active" : ""}`}
+                onClick={() => handleQuantityFilter(qty)}
+              >
+                {qty}
+              </button>
+            ))}
+          </div>
           <button className="App_clear-filter" onClick={handleClearQuantityFilter}>
             Limpiar filtro
           </button>

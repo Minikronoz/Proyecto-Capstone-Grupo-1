@@ -155,7 +155,7 @@ function Admin() {
       setTimeout(() => {
         setScrapingLogs((prev) => ({
           ...prev,
-          [store]: [{ text: "✅ Catálogo actualizado" }],
+          [store]: [{ text: "Catálogo actualizado" }],
         }));
       }, 2000);
     });
