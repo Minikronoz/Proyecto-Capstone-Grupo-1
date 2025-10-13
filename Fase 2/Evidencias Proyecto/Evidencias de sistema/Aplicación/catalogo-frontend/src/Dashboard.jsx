@@ -199,7 +199,7 @@ function Dashboard() {
   // Actualizar gráficos cuando cambian los filtros
   useEffect(() => {
     procesarDatos(busquedas);
-  }, [regionesFiltradas, comunasFiltradas, sectoresFiltrados, buscadorTermino, filtrosPersonalizados]);
+  }, [busquedas,regionesFiltradas, comunasFiltradas, sectoresFiltrados, buscadorTermino, filtrosPersonalizados]);
 
   // Procesar datos para los gráficos
   const procesarDatos = useCallback((data) => {
@@ -855,7 +855,7 @@ function Dashboard() {
       <div className="card large">
         <h2>Términos Más Buscados {regionesFiltradas.size > 0 && `(${regionesFiltradas.size} ${regionesFiltradas.size === 1 ? 'Región' : 'Regiones'} seleccionadas)`}</h2>
         <p className="chart-info-text">
-        Haz clic en una barra para ver análisis detallado |  Desplázate horizontalmente para ver todos los términos
+        Desplázate horizontalmente para ver todos los términos
         </p>
 
         {/* Contenedor con scroll horizontal - muestra 10 barras a la vez */}
@@ -906,7 +906,7 @@ function Dashboard() {
         </div>
 
         <p className="chart-total-text">
-          📊 Total de términos: {terminosMasBuscados.length}
+          Total de términos: {terminosMasBuscados.length}
         </p>
       </div>
 
@@ -914,7 +914,7 @@ function Dashboard() {
       {detallesTermino && (
         <>
           <div className="card large" style={{ backgroundColor: '#fff3e0', border: '2px solid #e67e22' }}>
-            <h2 style={{ color: '#e67e22' }}>📊 Análisis Detallado: "{detallesTermino.termino}"</h2>
+            <h2 style={{ color: '#e67e22' }}>Análisis Detallado: "{detallesTermino.termino}"</h2>
             <button 
               onClick={() => setTerminoSeleccionado(null)}
               style={{
