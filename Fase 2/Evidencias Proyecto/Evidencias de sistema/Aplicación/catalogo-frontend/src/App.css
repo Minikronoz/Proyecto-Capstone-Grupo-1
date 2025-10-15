@@ -12,11 +12,12 @@
 /* ===== TITULOS ===== */
 
 .admin-title {
-  text-align: left;        /* título alineado a la izquierda */
+  text-align: left;    /* título alineado a la izquierda */
   margin-bottom: 1.5rem;
   font-size: 2rem;
   color: #111;
 }
+
 .App_main-title {
   text-align: center;
   margin-bottom: 1.5rem;
@@ -1070,3 +1071,6 @@
   width: 100%;
   margin-top: 20px;
 }
+
+
+
