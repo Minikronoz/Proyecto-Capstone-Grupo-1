@@ -6,7 +6,7 @@ import {
   BarChart, Bar, Cell, PieChart, Pie, ReferenceLine
 } from "recharts";
 import { db, auth } from "./firebase";
-import { collection, getDocs, query, where, Timestamp } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 
 function Dashboard() {
   const [busquedas, setBusquedas] = useState([]);
@@ -46,7 +46,6 @@ function Dashboard() {
 
   const COLORS = ["#3498db", "#e67e22", "#2ecc71", "#9b59b6", "#e74c3c", "#16a085", "#f39c12", "#34495e"];
 
-  // Cerrar el dropdown cuando se hace click fuera de él
   useEffect(() => {
     const handleClickOutside = (event) => {
       const dropdown = document.getElementById("terminos-dropdown");
@@ -59,7 +58,6 @@ function Dashboard() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Cargar filtros desde localStorage al iniciar
   useEffect(() => {
     const savedFilters = localStorage.getItem('dashboardFilters');
     if (savedFilters) {
@@ -76,7 +74,6 @@ function Dashboard() {
     }
   }, []);
 
-  // Obtener datos del usuario actual y su ubicación de negocio
   useEffect(() => {
     const getCurrentUserData = async () => {
       if (auth.currentUser) {
@@ -87,7 +84,6 @@ function Dashboard() {
             const userData = snap.docs[0].data();
             setCurrentUser(userData);
             
-            // Si tiene negocios, aplicar filtros automáticamente
             if (userData.tieneNegocio && userData.negocios && userData.negocios.length > 0 && filtrosPersonalizados) {
               const regiones = new Set();
               const comunas = new Set();
@@ -103,7 +99,6 @@ function Dashboard() {
               setComunasFiltradas(comunas);
               setSectoresFiltrados(sectores);
               
-              // Guardar ubicaciones de TODOS los negocios
               const businessLocations = userData.negocios.map(n => ({
                 region: n.region,
                 comuna: n.comuna,
@@ -111,7 +106,6 @@ function Dashboard() {
               }));
               setUserBusinessLocation(businessLocations);
               
-              // Guardar en localStorage
               localStorage.setItem('dashboardFilters', JSON.stringify({
                 filtrosPersonalizados: true,
                 regiones: Array.from(regiones),
@@ -129,83 +123,73 @@ function Dashboard() {
     getCurrentUserData();
   }, [filtrosPersonalizados]);
 
-  // Cargar datos directamente desde Firestore
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 1. Cargar búsquedas
-        const busquedasQuery = query(collection(db, "busquedas"));
-        const busquedasSnap = await getDocs(busquedasQuery);
-        const busquedasData = busquedasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const response = await fetch('http://localhost:3001/api/busquedas');
+        if (!response.ok) {
+          throw new Error('Error al obtener los datos del servidor');
+        }
+        const busquedasData = await response.json();
         setBusquedas(busquedasData);
         
-        // 2. Cargar usuarios
         const usuariosQuery = query(collection(db, "usuarios"));
         const usuariosSnap = await getDocs(usuariosQuery);
         const usuariosData = usuariosSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setUsuarios(usuariosData);
         
-        // 3. Calcular datos demográficos
-        const sexCount = { Masculino: 0, Femenino: 0, Otro: 0 };
+        const sexCount = { Hombres: 0, Mujeres: 0, Otro: 0 };
         const ageRanges = { '18-24': 0, '25-34': 0, '35-44': 0, '45-54': 0, '55+': 0 };
-        let businessCount = 0;
         
-        usuariosData.forEach(user => {
-          // Contar por sexo
-          if (user.sexo) sexCount[user.sexo] = (sexCount[user.sexo] || 0) + 1;
-          
-          // Contar usuarios con negocios
-          if (user.tieneNegocio) businessCount++;
-          
-          // Calcular edad y asignar a rango
-          if (user.fechaNacimiento) {
-            try {
-              const birthDate = new Date(user.fechaNacimiento);
-              const age = new Date().getFullYear() - birthDate.getFullYear();
-              
-              if (age < 25) ageRanges['18-24']++;
-              else if (age < 35) ageRanges['25-34']++;
-              else if (age < 45) ageRanges['35-44']++;
-              else if (age < 55) ageRanges['45-54']++;
-              else ageRanges['55+']++;
-            } catch (e) {
-              console.error('Error calculando edad:', e);
+        const uniqueSearchers = new Set();
+        busquedasData.forEach(b => uniqueSearchers.add(b.usuarioRut));
+
+        uniqueSearchers.forEach(rut => {
+            const busquedaDeUsuario = busquedasData.find(b => b.usuarioRut === rut);
+            if (busquedaDeUsuario) {
+                if (busquedaDeUsuario.sexo) {
+                    const sexoKey = busquedaDeUsuario.sexo === 'Masculino' ? 'Hombres' : busquedaDeUsuario.sexo === 'Femenino' ? 'Mujeres' : 'Otro';
+                    sexCount[sexoKey] = (sexCount[sexoKey] || 0) + 1;
+                }
+
+                const age = busquedaDeUsuario.edad;
+                if (age) {
+                    if (age < 25) ageRanges['18-24']++;
+                    else if (age < 35) ageRanges['25-34']++;
+                    else if (age < 45) ageRanges['35-44']++;
+                    else if (age < 55) ageRanges['45-54']++;
+                    else ageRanges['55+']++;
+                }
             }
-          }
         });
         
-        // Actualizar datos demográficos
         setDemographicData({
           sexDistribution: [
-            { name: 'Hombres', value: sexCount.Masculino || 0 },
-            { name: 'Mujeres', value: sexCount.Femenino || 0 },
+            { name: 'Hombres', value: sexCount.Hombres || 0 },
+            { name: 'Mujeres', value: sexCount.Mujeres || 0 },
             { name: 'Otro', value: sexCount.Otro || 0 }
           ],
-          businessUsers: businessCount,
+          businessUsers: usuariosData.filter(u => u.tieneNegocio).length,
           ageDistribution: Object.entries(ageRanges).map(([name, value]) => ({ name, value }))
         });
         
-        // Procesar los datos para los gráficos
         procesarDatos(busquedasData);
         
       } catch (error) {
-        console.error('Error cargando datos de Firestore:', error);
+        console.error('Error cargando datos desde el servidor:', error);
       }
     };
     
     fetchData();
   }, []);
   
-  // Actualizar gráficos cuando cambian los filtros
   useEffect(() => {
     procesarDatos(busquedas);
-  }, [busquedas,regionesFiltradas, comunasFiltradas, sectoresFiltrados, buscadorTermino, filtrosPersonalizados]);
+  }, [busquedas, regionesFiltradas, comunasFiltradas, sectoresFiltrados, buscadorTermino, filtrosPersonalizados]);
 
-  // Procesar datos para los gráficos
   const procesarDatos = useCallback((data) => {
     if (!data || data.length === 0) return;
     
-    // Filtrar datos según los filtros activos
     let datosFiltrados = data;
     
     if (filtrosPersonalizados) {
@@ -220,24 +204,13 @@ function Dashboard() {
       }
     }
     
-    // --- Agrupar por día ---
     const countsDia = {};
     datosFiltrados.forEach(b => {
       if (!b.fechaBusqueda) return;
       
       let fecha;
       try {
-        if (b.fechaBusqueda.seconds) {
-          fecha = new Date(b.fechaBusqueda.seconds * 1000);
-        } else if (b.fechaBusqueda instanceof Date) {
-          fecha = b.fechaBusqueda;
-        } else if (typeof b.fechaBusqueda === 'string') {
-          fecha = new Date(b.fechaBusqueda);
-        } else {
-          console.log("Formato desconocido:", b.fechaBusqueda);
-          return;
-        }
-        
+        fecha = new Date(b.fechaBusqueda);
         const fechaStr = fecha.toLocaleDateString("es-CL");
         countsDia[fechaStr] = (countsDia[fechaStr] || 0) + 1;
       } catch (error) {
@@ -245,10 +218,8 @@ function Dashboard() {
       }
     });
 
-    // Convertir a formato para gráficos y ordenar por fecha
     let datosOrdenados = Object.entries(countsDia)
       .map(([date, total]) => {
-        // Convertir fecha de formato "DD-MM-YYYY" a Date para ordenar
         const parts = date.split('-');
         let dateObj;
         if (parts.length === 3) {
@@ -261,14 +232,12 @@ function Dashboard() {
       .sort((a, b) => a.dateObj - b.dateObj)
       .map(({ date, total }) => ({ date, total }));
 
-    // Limitar a últimos 7 días si hay muchos
     if (datosOrdenados.length > 7) {
       datosOrdenados = datosOrdenados.slice(-7);
     }
     
     setBusquedasPorDia(datosOrdenados);
 
-    // --- Términos más buscados ---
     const countsTermino = {};
     datosFiltrados.forEach(b => {
       if (!b.busqueda) return;
@@ -283,7 +252,6 @@ function Dashboard() {
     setTerminosMasBuscados(terminosOrdenados);
     setTerminosFiltrados(terminosOrdenados);
 
-    // --- Distribución por región ---
     const countsRegion = {};
     datosFiltrados.forEach(b => {
       if (!b.region) return;
@@ -296,7 +264,6 @@ function Dashboard() {
 
     setBusquedasPorRegion(regionesOrdenadas);
 
-    // --- Productos por ubicación ---
     const productosPorLoc = {};
     datosFiltrados.forEach(b => {
       if (!b.busqueda || !b.region) return;
@@ -310,7 +277,6 @@ function Dashboard() {
         (productosPorLoc[terminoNormalizado][ubicacion] || 0) + 1;
     });
 
-    // Convertir a formato para gráfico (top 10 productos más buscados)
     const productosArray = Object.entries(productosPorLoc)
       .map(([producto, ubicaciones]) => {
         const total = Object.values(ubicaciones).reduce((sum, val) => sum + val, 0);
@@ -319,13 +285,11 @@ function Dashboard() {
       .sort((a, b) => b.total - a.total)
       .slice(0, 10);
 
-    // Obtener todas las ubicaciones únicas
     const ubicacionesUnicas = new Set();
     productosArray.forEach(p => {
       Object.keys(p.ubicaciones).forEach(ub => ubicacionesUnicas.add(ub));
     });
 
-    // Formatear datos para el gráfico
     const datosProductosUbicacion = productosArray.map(p => {
       const item = { producto: p.producto };
       ubicacionesUnicas.forEach(ub => {
@@ -339,12 +303,10 @@ function Dashboard() {
       ubicaciones: Array.from(ubicacionesUnicas)
     });
 
-    // --- Predicción de tendencias ---
     const ultimosDias = 30;
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
     
-    // Agrupar búsquedas por día (últimos 30 días)
     const busquedasPorDiaCompleto = {};
     for (let i = ultimosDias - 1; i >= 0; i--) {
       const fecha = new Date(hoy);
@@ -354,19 +316,12 @@ function Dashboard() {
     }
 
     datosFiltrados.forEach(b => {
-      if (!b.fechaBusqueda) return;  // CORREGIDO: usar fechaBusqueda en lugar de fecha
+      if (!b.fechaBusqueda) return;
       
       let dateObj;
       try {
-        if (b.fechaBusqueda.seconds) {
-          dateObj = new Date(b.fechaBusqueda.seconds * 1000);
-        } else if (b.fechaBusqueda instanceof Date) {
-          dateObj = b.fechaBusqueda;
-        } else {
-          dateObj = new Date(b.fechaBusqueda);
-        }
+        dateObj = new Date(b.fechaBusqueda);
         
-        // Solo considerar fechas de los últimos 30 días
         if (dateObj >= new Date(hoy.getTime() - (ultimosDias * 24 * 60 * 60 * 1000))) {
           const fechaStr = dateObj.toISOString().split('T')[0];
           busquedasPorDiaCompleto[fechaStr] = (busquedasPorDiaCompleto[fechaStr] || 0) + 1;
@@ -376,17 +331,14 @@ function Dashboard() {
       }
     });
 
-    // Convertir a array y calcular predicción (promedio móvil simple)
     const datosHistoricos = Object.entries(busquedasPorDiaCompleto)
       .map(([fecha, total]) => ({ fecha, total, tipo: 'Histórico' }));
 
-    // Calcular predicción para próximos 7 días usando promedio móvil
-    const ventana = 7; // días para promedio móvil
+    const ventana = 7;
     const ultimosValores = datosHistoricos.slice(-ventana).map(d => d.total);
     const promedio = ultimosValores.reduce((sum, val) => sum + val, 0) / ventana;
 
-    // Asegurar que el promedio no sea cero para tener una predicción más útil
-    const valorPrediccion = Math.max(Math.round(promedio), 1); // Al menos 1 para visualización
+    const valorPrediccion = Math.max(Math.round(promedio), 1);
 
     const predicciones = [];
     for (let i = 1; i <= 7; i++) {
@@ -394,8 +346,7 @@ function Dashboard() {
       fecha.setDate(fecha.getDate() + i);
       const fechaStr = fecha.toISOString().split('T')[0];
       
-      // Añadir una pequeña variación para que el gráfico no sea una línea recta
-      const variacion = Math.random() * 0.2 + 0.9; // entre 0.9 y 1.1
+      const variacion = Math.random() * 0.2 + 0.9;
       
       predicciones.push({ 
         fecha: fechaStr, 
@@ -406,13 +357,11 @@ function Dashboard() {
 
     setPrediccionBusquedas([...datosHistoricos, ...predicciones]);
 
-    // --- Detalles del término seleccionado ---
     if (terminoSeleccionado) {
       const busquedasTermino = datosFiltrados.filter(b => 
         normalizarTexto(b.busqueda) === normalizarTexto(terminoSeleccionado)
       );
 
-      // Distribución por región
       const porRegion = {};
       busquedasTermino.forEach(b => {
         if (!b.region) return;
@@ -422,7 +371,6 @@ function Dashboard() {
         .map(([region, total]) => ({ region, total }))
         .sort((a, b) => b.total - a.total);
 
-      // Evolución temporal (últimos 30 días)
       const evolucionTemporal = {};
       const hace30Dias = new Date();
       hace30Dias.setDate(hace30Dias.getDate() - 30);
@@ -431,13 +379,7 @@ function Dashboard() {
         if (!b.fechaBusqueda) return;
         let dateObj;
         try {
-          if (b.fechaBusqueda.seconds) {
-            dateObj = new Date(b.fechaBusqueda.seconds * 1000);
-          } else if (b.fechaBusqueda instanceof Date) {
-            dateObj = b.fechaBusqueda;
-          } else {
-            dateObj = new Date(b.fechaBusqueda);
-          }
+          dateObj = new Date(b.fechaBusqueda);
 
           if (dateObj >= hace30Dias) {
             const fechaStr = dateObj.toLocaleDateString("es-CL");
@@ -473,7 +415,6 @@ function Dashboard() {
     }
   }, [regionesFiltradas, comunasFiltradas, sectoresFiltrados, filtrosPersonalizados, terminoSeleccionado]);
 
-  // Función para normalizar texto (remover tildes y convertir a minúsculas)
   const normalizarTexto = (texto) => {
     if (!texto) return '';
     return texto.toLowerCase()
@@ -481,7 +422,6 @@ function Dashboard() {
       .replace(/[\u0300-\u036f]/g, "");
   };
 
-  // Filtro del buscador de términos
   useEffect(() => {
     if (buscadorTermino.trim() === "") {
       setTerminosFiltrados(terminosMasBuscados);
@@ -494,14 +434,12 @@ function Dashboard() {
     }
   }, [buscadorTermino, terminosMasBuscados]);
 
-  // Función para quitar filtros personalizados
   const quitarFiltrosPersonalizados = () => {
     setFiltrosPersonalizados(false);
     setRegionesFiltradas(new Set());
     setComunasFiltradas(new Set());
     setSectoresFiltrados(new Set());
     
-    // Guardar en localStorage
     localStorage.setItem('dashboardFilters', JSON.stringify({
       filtrosPersonalizados: false,
       regiones: [],
@@ -511,11 +449,9 @@ function Dashboard() {
     }));
   };
 
-  // Función para restaurar filtros personalizados
   const restaurarFiltrosPersonalizados = () => {
     setFiltrosPersonalizados(true);
     
-    // Volver a aplicar filtros basados en el usuario actual
     if (currentUser?.negocios && currentUser.negocios.length > 0) {
       const regiones = new Set();
       const comunas = new Set();
@@ -538,7 +474,6 @@ function Dashboard() {
       }));
       setUserBusinessLocation(businessLocations);
       
-      // Guardar en localStorage
       localStorage.setItem('dashboardFilters', JSON.stringify({
         filtrosPersonalizados: true,
         regiones: Array.from(regiones),
@@ -549,14 +484,12 @@ function Dashboard() {
     }
   };
 
-  // Calcular total de usuarios únicos
   const totalUsuarios = new Set(usuarios.map(u => u.rut || u.email)).size;
 
   return (
     <div className="dashboard-container">
       <h1>Dashboard de Análisis</h1>
       
-      {/* Botón para quitar/restaurar filtros personalizados */}
       <div className="filters-control">
         {filtrosPersonalizados ? (
           <button 
@@ -575,8 +508,7 @@ function Dashboard() {
         )}
       </div>
 
-      {/* Indicador de filtros activos */}
-      {filtrosPersonalizados && userBusinessLocation && (
+      {filtrosPersonalizados && userBusinessLocation.length > 0 && (
         <div className="active-filters card small">
           <h3>Filtros activos:</h3>
           {regionesFiltradas.size > 0 && (
@@ -597,13 +529,11 @@ function Dashboard() {
         </div>
       )}
 
-      {/* Métricas principales */}
       <div className="card small">
         <h2> Total Usuarios</h2>
         <p style={{ fontSize: "2rem", fontWeight: "bold", color: "#2c3e50", textAlign: "center" }}>{totalUsuarios}</p>
       </div>
 
-      {/* Cards demográficas */}
       <div className="card small">
         <h2>Distribución por Sexo</h2>
         <ResponsiveContainer width="100%" height={150}>
@@ -648,7 +578,6 @@ function Dashboard() {
         </ResponsiveContainer>
       </div>
 
-      {/* Card de actividad en las ubicaciones de los negocios */}
       {userBusinessLocation && userBusinessLocation.length > 0 && (
         <div className="card small">
           <h2>Actividad en tus Ubicaciones</h2>
@@ -658,13 +587,7 @@ function Dashboard() {
               if (!b.fechaBusqueda) return false;
               let fechaStr;
               try {
-                if (b.fechaBusqueda.seconds) {
-                  fechaStr = new Date(b.fechaBusqueda.seconds * 1000).toLocaleDateString("es-CL");
-                } else if (b.fechaBusqueda instanceof Date) {
-                  fechaStr = b.fechaBusqueda.toLocaleDateString("es-CL");
-                } else {
-                  fechaStr = new Date(b.fechaBusqueda).toLocaleDateString("es-CL");
-                }
+                fechaStr = new Date(b.fechaBusqueda).toLocaleDateString("es-CL");
               } catch (error) {
                 return false;
               }
@@ -729,13 +652,7 @@ function Dashboard() {
               
               let fechaStr;
               try {
-                if (b.fechaBusqueda.seconds) {
-                  fechaStr = new Date(b.fechaBusqueda.seconds * 1000).toLocaleDateString("es-CL");
-                } else if (b.fechaBusqueda instanceof Date) {
-                  fechaStr = b.fechaBusqueda.toLocaleDateString("es-CL");
-                } else {
-                  fechaStr = new Date(b.fechaBusqueda).toLocaleDateString("es-CL");
-                }
+                fechaStr = new Date(b.fechaBusqueda).toLocaleDateString("es-CL");
               } catch (error) {
                 return false;
               }
@@ -743,7 +660,6 @@ function Dashboard() {
               return fechaStr === hoy;
             });
             
-            // Mostrar el término más buscado del día
             const terminosHoy = {};
             busquedasHoy.forEach(b => {
               if (!b.busqueda) return;
@@ -778,13 +694,7 @@ function Dashboard() {
               
               let fechaStr;
               try {
-                if (b.fechaBusqueda.seconds) {
-                  fechaStr = new Date(b.fechaBusqueda.seconds * 1000).toLocaleDateString("es-CL");
-                } else if (b.fechaBusqueda instanceof Date) {
-                  fechaStr = b.fechaBusqueda.toLocaleDateString("es-CL");
-                } else {
-                  fechaStr = new Date(b.fechaBusqueda).toLocaleDateString("es-CL");
-                }
+                fechaStr = new Date(b.fechaBusqueda).toLocaleDateString("es-CL");
               } catch (error) {
                 return false;
               }
@@ -792,7 +702,6 @@ function Dashboard() {
               return fechaStr === hoy;
             });
 
-            // Agrupar por región
             const regionesHoy = {};
             busquedasHoy.forEach(b => {
               if (!b.region) return;
@@ -816,7 +725,6 @@ function Dashboard() {
         </p>
       </div>
 
-      {/* Busquedas por día */}
       <div className="card large">
         <h2>Búsquedas por día {regionesFiltradas.size > 0 && `(${regionesFiltradas.size} ${regionesFiltradas.size === 1 ? 'Región' : 'Regiones'} seleccionadas)`}</h2>
         <ResponsiveContainer width="100%" height={300}>
@@ -826,7 +734,6 @@ function Dashboard() {
               dataKey="date"
               tick={{ fontSize: 14 }}
               tickFormatter={(value) => {
-                // Convertir de formato "DD-MM-YYYY" a "DD/MM"
                 const parts = value.split('-');
                 if (parts.length === 3) {
                   return `${parts[0]}/${parts[1]}`;
@@ -851,14 +758,12 @@ function Dashboard() {
         </ResponsiveContainer>
       </div>
 
-      {/* Términos más buscados with horizontal scroll */}
       <div className="card large">
         <h2>Términos Más Buscados {regionesFiltradas.size > 0 && `(${regionesFiltradas.size} ${regionesFiltradas.size === 1 ? 'Región' : 'Regiones'} seleccionadas)`}</h2>
         <p className="chart-info-text">
-        Desplázate horizontalmente para ver todos los términos
+        Haz clic en una barra para ver análisis detallado |  Desplázate horizontalmente para ver todos los términos
         </p>
 
-        {/* Contenedor con scroll horizontal - muestra 10 barras a la vez */}
         <div className="terminos-scroll-container">
           <div className="terminos-chart-wrapper" style={{ width: `${terminosMasBuscados.length * 150}px` }}>
             <BarChart 
@@ -910,7 +815,6 @@ function Dashboard() {
         </p>
       </div>
 
-      {/* Análisis detallado del término seleccionado */}
       {detallesTermino && (
         <>
           <div className="card large" style={{ backgroundColor: '#fff3e0', border: '2px solid #e67e22' }}>
@@ -935,7 +839,6 @@ function Dashboard() {
             </p>
           </div>
 
-          {/* Distribución por región del término */}
           <div className="card large">
             <h2>Distribución por Región: "{detallesTermino.termino}"</h2>
             <p style={{ fontSize: "0.9rem", color: "#7f8c8d", marginBottom: "1rem" }}>
@@ -952,7 +855,6 @@ function Dashboard() {
             </ResponsiveContainer>
           </div>
 
-          {/* Evolución temporal del término */}
           <div className="card large">
             <h2>Evolución Temporal: "{detallesTermino.termino}"</h2>
             <p style={{ fontSize: "0.9rem", color: "#7f8c8d", marginBottom: "1rem" }}>
@@ -984,7 +886,6 @@ function Dashboard() {
         </>
       )}
 
-      {/* Análisis por edad - qué buscan diferentes grupos de edad */}
       <div className="card large">
         <h2>Búsquedas por Grupo de Edad</h2>
         <p style={{ fontSize: "0.9rem", color: "#7f8c8d", marginBottom: "1rem" }}>
@@ -1001,7 +902,6 @@ function Dashboard() {
         </ResponsiveContainer>
       </div>
 
-      {/* Productos más buscados por ubicación */}
       {productosPorUbicacion.datos && productosPorUbicacion.datos.length > 0 && (
         <div className="card large">
           <h2>Comparativa de Productos Buscados por Ubicación</h2>
@@ -1030,7 +930,6 @@ function Dashboard() {
         </div>
       )}
 
-      {/* Predicción de tendencias de búsqueda */}
       {prediccionBusquedas.length > 0 && (
         <div className="card large">
           <h2>Predicción de Tendencias de Búsqueda</h2>

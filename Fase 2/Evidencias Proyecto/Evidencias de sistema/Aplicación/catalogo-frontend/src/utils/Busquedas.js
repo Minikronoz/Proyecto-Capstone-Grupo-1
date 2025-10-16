@@ -1,81 +1,41 @@
-import { db } from "../firebase";
-import { 
-  collection, 
-  addDoc, 
-  serverTimestamp, 
-  query, 
-  where, 
-  getDocs 
-} from "firebase/firestore";
+// Archivo: catalogo-frontend/src/utils/Busquedas.js
+
 import { auth } from "../firebase";
 
 export const Busquedas = async (busqueda) => {
   try {
-    let userInfo = {
-      usuarioRut: null,
-      nombre: null,
-      apellido: null,
-      fechaNacimiento: null, // ✅ agregado
-      edad: null,            // ✅ agregado
-      sexo: null,
-      region: null,
-      comuna: null,
-      sector: null,
-    };
-
-    // 🔹 Si hay usuario logueado, obtener info desde Firestore por su email
     const user = auth.currentUser;
-    if (user) {
-      const usuariosRef = collection(db, "usuarios");
-      const q = query(usuariosRef, where("email", "==", user.email));
-      const querySnapshot = await getDocs(q);
 
-      if (!querySnapshot.empty) {
-        const data = querySnapshot.docs[0].data();
-        console.log("📌 Datos del usuario encontrados:", data);
-
-        // 🔹 Calcular edad a partir de fechaNacimiento
-        let edadCalculada = null;
-        if (data.fechaNacimiento) {
-          const nacimiento = new Date(data.fechaNacimiento);
-          const hoy = new Date();
-          let edad = hoy.getFullYear() - nacimiento.getFullYear();
-          const mes = hoy.getMonth() - nacimiento.getMonth();
-
-          if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
-            edad--;
-          }
-          edadCalculada = edad;
-        }
-
-        userInfo = {
-          usuarioRut: data.rut || null,
-          nombre: data.nombre || null,
-          apellido: data.apellido || null,
-          fechaNacimiento: data.fechaNacimiento || null, // ✅ guardamos la fecha original
-          edad: edadCalculada,                           // ✅ guardamos también la edad
-          sexo: data.sexo || null,
-          region: data.region || null,
-          comuna: data.comuna || null,
-          sector: data.sector || null,
-        };
-      } else {
-        console.warn("⚠️ No se encontró el usuario en Firestore con email:", user.email);
-      }
-    } else {
-      console.warn("⚠️ No hay usuario logueado actualmente.");
+    // Si no hay usuario logueado, no hacemos nada.
+    if (!user || !user.email) {
+      console.warn("No hay usuario logueado. No se guardará la búsqueda.");
+      return;
     }
 
-    // 🔹 Guardar búsqueda con todos los datos requeridos
-    await addDoc(collection(db, "busquedas"), {
-      busqueda,               // ✅ ahora el campo se llama "busqueda"
-      fechaBusqueda: serverTimestamp(),
-      ...userInfo,            // ✅ incluye todos los datos del usuario
+    // El cuerpo de la petición que enviaremos a nuestro backend
+    const body = {
+      busqueda: busqueda,
+      userEmail: user.email,
+    };
+
+    // Hacemos la llamada a nuestra nueva API en el backend
+    const response = await fetch('http://localhost:3001/api/busquedas', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
     });
 
-    console.log("✅ Búsqueda guardada correctamente:", busqueda, userInfo);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.msg || 'Error al guardar la búsqueda');
+    }
+
+    const result = await response.json();
+    console.log(result.msg);
 
   } catch (error) {
-    console.error("❌ Error guardando búsqueda:", error);
+    console.error("Error guardando búsqueda en MongoDB:", error.message);
   }
 };

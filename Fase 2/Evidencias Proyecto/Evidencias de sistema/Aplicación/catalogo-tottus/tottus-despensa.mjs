@@ -1,13 +1,17 @@
 // tottus-despensa.mjs
 import { firefox } from 'playwright';
-import { writeFile, mkdir } from 'fs/promises';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import readline from 'readline';
+import mongoose from 'mongoose';
+
+// Importar configuración de la base de datos y modelos
+import conectarDB from '../config/db.js';
+import Product from '../models/Product.js';
+import PriceHistory from '../models/PriceHistory.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const outputDir = join(__dirname, '..', 'catalogo-frontend', 'public', 'json-tottus');
 
 // Función para esperar input del usuario (captcha)
 function waitForUserInput(message) {
@@ -15,17 +19,15 @@ function waitForUserInput(message) {
   return new Promise(resolve => { rl.question(message, answer => { rl.close(); resolve(answer); }); });
 }
 
-// Función para obtener fecha solo: YYYY-MM-DD
-function getDateString() {
-  const now = new Date();
-  const yyyy = now.getFullYear();
-  const mm = String(now.getMonth() + 1).padStart(2, '0');
-  const dd = String(now.getDate()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd}`;
-}
+// Función para parsear precio y convertirlo a número
+const parsePrice = (priceString) => {
+  if (!priceString) return null;
+  return parseInt(priceString.replace(/\$|\./g, '').trim(), 10);
+};
 
 async function main() {
-  await mkdir(outputDir, { recursive: true });
+  console.log('Iniciando script de scraping para Tottus...');
+  await conectarDB(); // Se conecta a la base de datos
 
   const browser = await firefox.launch({ headless: true, slowMo: 150 });
   const context = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
@@ -33,6 +35,8 @@ async function main() {
   await page.setDefaultTimeout(120000);
 
   const productos = [];
+  let productosNuevos = 0;
+  let productosActualizados = 0;
 
   try {
     await page.goto('https://www.tottus.cl/tottus-cl/lista/CATG27055/Despensa', { waitUntil: 'networkidle' });
@@ -111,7 +115,7 @@ async function main() {
             const priceExtras = null;
 
             if (!title || !price) return null;
-            return { brand, title, unit, price, pricePerUnit, priceExtras, image, link, store: 'Tottus' };
+            return { brand, title, unit, price, pricePerUnit, priceExtras, image, link, store: 'tottus' };
           } catch {
             return null;
           }
@@ -138,18 +142,57 @@ async function main() {
       } else hasNextPage = false;
     }
 
-    // Guardar JSON con **solo fecha** y archivo latest
-    const dateOnly = getDateString();
-    await writeFile(join(outputDir, `despensa-tottus-${dateOnly}.json`), JSON.stringify(productos, null, 2));
-    await writeFile(join(outputDir, 'despensa-tottus-latest.json'), JSON.stringify(productos, null, 2));
+    console.log(`Scraping finalizado. ${productos.length} productos encontrados. Guardando en DB...`);
+    
+    // Guardar productos en MongoDB
+    for (const prod of productos) {
+      const precioNumerico = parsePrice(prod.price);
+      if (isNaN(precioNumerico) || !prod.link) continue;
 
-    console.log(`Archivos guardados en ${outputDir} con ${productos.length} productos`);
-    console.log(`Archivos generados:\n- despensa-tottus-${dateOnly}.json\n- despensa-tottus-latest.json`);
+      const productoExistente = await Product.findOne({ link: prod.link });
+
+      if (productoExistente) {
+        if (productoExistente.currentPrice !== precioNumerico) {
+          productoExistente.currentPrice = precioNumerico;
+          productoExistente.formattedPrice = prod.price;
+          productoExistente.lastUpdate = new Date();
+          await productoExistente.save();
+          
+          const historial = new PriceHistory({ productId: productoExistente._id, price: precioNumerico });
+          await historial.save();
+          productosActualizados++;
+        }
+      } else {
+        const nuevoProducto = new Product({
+          title: prod.title, 
+          brand: prod.brand, 
+          store: prod.store,
+          currentPrice: precioNumerico, 
+          formattedPrice: prod.price,
+          image: prod.image, 
+          link: prod.link, 
+          lastUpdate: new Date()
+        });
+        const productoGuardado = await nuevoProducto.save();
+        
+        const historial = new PriceHistory({ productId: productoGuardado._id, price: precioNumerico });
+        await historial.save();
+        productosNuevos++;
+      }
+    }
+
+    console.log(`\n--- RESULTADO ---`);
+    console.log(`✅ Productos nuevos: ${productosNuevos}`);
+    console.log(`🔄 Productos actualizados: ${productosActualizados}`);
+    console.log(`-----------------`);
 
   } catch (error) {
     console.error('Error:', error);
-    try { await page.screenshot({ path: join(outputDir, 'error-screenshot.png'), fullPage: true }); } catch {}
-  } finally { await browser.close(); }
+  } finally { 
+    await browser.close();
+    await mongoose.disconnect();
+    console.log('Navegador y conexión a DB cerrados.');
+  }
 }
 
 main().catch(err => console.error(err));

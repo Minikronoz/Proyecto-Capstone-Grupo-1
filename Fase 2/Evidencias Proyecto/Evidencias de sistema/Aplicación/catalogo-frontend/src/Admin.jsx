@@ -134,33 +134,57 @@ function Admin() {
 
   // ===== FUNCIONES DE CATÁLOGOS =====
   useEffect(() => {
-    const socket = io("http://localhost:3001");
+    // Crear una sola conexión socket al puerto 3000
+    const socket = io("http://localhost:3000");
 
-    socket.on("scrapingLog", ({ store, log, type }) => {
+    socket.on("connect", () => {
+      console.log("Conectado al servidor para seguimiento de scraping");
+    });
+
+    socket.on("scrape-progress", (data) => {
+      const { store, message } = data;
       setScrapingLogs((prev) => ({
         ...prev,
-        [store]: [...prev[store], { text: log, type }],
+        [store.toLowerCase()]: [...prev[store.toLowerCase()], { text: message, type: "info" }],
       }));
     });
 
-    socket.on("scrapingError", ({ store }) => {
-      setScrapingStatus((prev) => ({ ...prev, [store]: "error" }));
-      setIsLoading((prev) => ({ ...prev, [store]: false }));
+    socket.on("scrape-error", (data) => {
+      const { store, message } = data;
+      console.error(`Error en scraping de ${store}:`, message);
+      setScrapingStatus((prev) => ({ ...prev, [store.toLowerCase()]: "error" }));
+      setIsLoading((prev) => ({ ...prev, [store.toLowerCase()]: false }));
+      setScrapingLogs((prev) => ({
+        ...prev,
+        [store.toLowerCase()]: [...prev[store.toLowerCase()], { text: `❌ ${message}`, type: "error" }],
+      }));
     });
 
-    socket.on("scrapingComplete", ({ store, success }) => {
-      setScrapingStatus((prev) => ({ ...prev, [store]: success ? "success" : "error" }));
-      setIsLoading((prev) => ({ ...prev, [store]: false }));
+    socket.on("scrape-complete", (data) => {
+      const { store, success } = data;
+      console.log(`Scraping de ${store} completado:`, success);
+      setScrapingStatus((prev) => ({
+        ...prev,
+        [store.toLowerCase()]: success ? "success" : "error",
+      }));
+      setIsLoading((prev) => ({ ...prev, [store.toLowerCase()]: false }));
+      setScrapingLogs((prev) => ({
+        ...prev,
+        [store.toLowerCase()]: [
+          ...prev[store.toLowerCase()],
+          { text: success ? "✅ Catálogo actualizado" : "❌ Error actualizando catálogo", type: success ? "success" : "error" }
+        ],
+      }));
 
-      setTimeout(() => {
-        setScrapingLogs((prev) => ({
-          ...prev,
-          [store]: [{ text: "Catálogo actualizado" }],
-        }));
-      }, 2000);
+      if (success) {
+        // Opcional: notificar al usuario
+        // alert(`Scraping de ${store} completado con éxito!`);
+      }
     });
 
-    return () => socket.disconnect();
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -184,24 +208,30 @@ function Admin() {
     }
   }, [scrapingStatus]);
 
+  // Reemplazar la función handleUpdateCatalog con ejecutarScraping
   const handleUpdateCatalog = async (store) => {
+    setIsLoading((prev) => ({ ...prev, [store]: true }));
+    setScrapingStatus((prev) => ({ ...prev, [store]: "running" }));
+    setScrapingLogs((prev) => ({ ...prev, [store]: [] }));
+    
     try {
-      setIsLoading((prev) => ({ ...prev, [store]: true }));
-      setScrapingStatus((prev) => ({ ...prev, [store]: "loading" }));
-      setScrapingLogs((prev) => ({ ...prev, [store]: [] }));
-
-      const response = await fetch(`http://localhost:3001/api/scrape/${store}`, {
+      const response = await fetch(`http://localhost:3000/api/scrape/${store}`, {
         method: "POST",
       });
-
-      if (!response.ok) throw new Error(`Error al actualizar catálogo de ${store}`);
+      
+      if (!response.ok) {
+        throw new Error(`Error al iniciar scraping de ${store}`);
+      }
+      
+      // La respuesta inicial será exitosa, pero el proceso continuará en segundo plano
+      // Los resultados llegarán a través de la conexión socket.io
     } catch (error) {
-      console.error(error);
+      console.error(`Error en scraping de ${store}:`, error);
       setScrapingStatus((prev) => ({ ...prev, [store]: "error" }));
       setIsLoading((prev) => ({ ...prev, [store]: false }));
       setScrapingLogs((prev) => ({
         ...prev,
-        [store]: [{ text: "❌ Error al actualizar catálogo" }],
+        [store]: [{ text: `❌ Error: ${error.message}` }],
       }));
     }
   };
