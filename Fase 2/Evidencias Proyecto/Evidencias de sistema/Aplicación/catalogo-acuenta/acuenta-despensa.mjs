@@ -15,7 +15,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 
-
 // Carpeta de salida
 const outputDir = join(__dirname, '..', 'catalogo-frontend', 'public', 'json-acuenta');
 
