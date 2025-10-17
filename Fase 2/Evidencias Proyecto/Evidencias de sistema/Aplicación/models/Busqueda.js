@@ -1,4 +1,3 @@
-// Archivo: Aplicación/models/Busqueda.js
 
 import mongoose from 'mongoose';
 

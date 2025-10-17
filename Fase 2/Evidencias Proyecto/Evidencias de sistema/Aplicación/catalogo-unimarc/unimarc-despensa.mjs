@@ -38,7 +38,7 @@ async function main() {
       Math.max(...els.map(el => parseInt(el.innerText)).filter(n => !isNaN(n)))
     );
 
-    // Para la prueba, solo scrapearemos 1 página. Cambia el '1' por 'lastPage' cuando quieras el scraping completo.
+
     // const pagesToScrape = 2; // Aumenté a 2 páginas para prueba
     const pagesToScrape = lastPage;
     for (let pageNumber = 1; pageNumber <= pagesToScrape; pageNumber++) {
@@ -108,7 +108,7 @@ async function main() {
     console.log(`-----------------`);
 
   } catch (error) {
-    console.error("❌ Error durante el scraping:", error);
+    console.error("Error durante el scraping:", error);
   } finally {
     await browser.close();
     await mongoose.disconnect();

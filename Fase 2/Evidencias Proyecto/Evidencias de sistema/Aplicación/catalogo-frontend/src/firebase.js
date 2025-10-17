@@ -1,6 +1,6 @@
 // Importamos lo que necesitamos
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";          // 🔹 para Auth
+import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore"; // 🔹 para Firestore
 import { getAnalytics } from "firebase/analytics";
 
@@ -17,8 +17,13 @@ const firebaseConfig = {
 
 // Inicializamos Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);      // 🔹 inicializamos Auth
-const db = getFirestore(app);   // 🔹 inicializamos Firestore
+const auth = getAuth(app);
+
+// Establecer persistencia local (mantiene sesión después de refrescar)
+setPersistence(auth, browserLocalPersistence)
+  .catch(error => console.error("Error configurando persistencia:", error));
+
+const db = getFirestore(app);   //inicializamos Firestore
 const analytics = getAnalytics(app);
 
 export { app, auth, db };

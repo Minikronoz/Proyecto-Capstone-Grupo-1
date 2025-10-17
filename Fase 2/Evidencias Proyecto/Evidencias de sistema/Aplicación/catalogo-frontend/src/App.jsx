@@ -397,6 +397,7 @@ useEffect(() => {
   const handleProductSearch = async (e) => {
     e.preventDefault();
     if (!selectedSuggestion) return;
+    
     setHasSearch(true);
     const results = filterBySearch(selectedSuggestion);
     setFilteredProducts(results);
@@ -413,7 +414,24 @@ useEffect(() => {
       });
     }
     
-    await Busquedas(selectedSuggestion.trim().toLowerCase());
+    // Obtener datos del usuario si está logueado
+    let usuarioInfo = null;
+    if (currentAuthUser && currentUserDoc) {
+      usuarioInfo = {
+        usuarioRut: currentUserDoc.rut || null,
+        nombre: currentUserDoc.nombre || null,
+        apellido: currentUserDoc.apellido || null,
+        edad: currentUserDoc.edad || null,
+        sexo: currentUserDoc.sexo || null,
+        region: currentUserDoc.negocios?.[0]?.region || currentUserDoc.region || null,
+        comuna: currentUserDoc.negocios?.[0]?.comuna || currentUserDoc.comuna || null,
+        sector: currentUserDoc.negocios?.[0]?.sector || currentUserDoc.sector || null
+      };
+    }
+    
+    // Registrar la búsqueda con la información del usuario
+    await Busquedas(selectedSuggestion.trim().toLowerCase(), usuarioInfo);
+    
     setSuggestions([]);
   };
 
@@ -597,7 +615,7 @@ useEffect(() => {
             <Link to="/formularioregistro" className="App_dashboard-link">Iniciar / Registrar</Link>
           )}
 
-          {userRole === "cliente" && (
+          {userRole === "cliente" && currentAuthUser && (
             <Link to="/dashboard" className="App_dashboard-link" title="Ir al dashboard">
               <FaTachometerAlt />
             </Link>

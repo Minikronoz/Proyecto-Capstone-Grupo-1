@@ -47,7 +47,7 @@ while (morePages) {
     }
   });
 
-  // 🔎 Validación
+  // Validación
   console.log(`✔ Página ${pageNumber} → ${validProducts.length} productos encontrados`);
   if (validProducts.length > 0) {
     console.log("Ejemplo producto:", validProducts[0]);

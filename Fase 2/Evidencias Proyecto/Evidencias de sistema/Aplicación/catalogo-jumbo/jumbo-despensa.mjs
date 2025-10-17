@@ -139,8 +139,8 @@ async function main() {
     }
 
     console.log(`\n--- RESULTADO ---`);
-    console.log(`✅ Productos nuevos: ${productosNuevos}`);
-    console.log(`🔄 Productos actualizados: ${productosActualizados}`);
+    console.log(`Productos nuevos: ${productosNuevos}`);
+    console.log(`Productos actualizados: ${productosActualizados}`);
     console.log(`-----------------`);
 
   } catch (err) {

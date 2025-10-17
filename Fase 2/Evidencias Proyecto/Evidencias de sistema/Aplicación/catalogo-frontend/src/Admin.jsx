@@ -156,7 +156,7 @@ function Admin() {
       setIsLoading((prev) => ({ ...prev, [store.toLowerCase()]: false }));
       setScrapingLogs((prev) => ({
         ...prev,
-        [store.toLowerCase()]: [...prev[store.toLowerCase()], { text: `❌ ${message}`, type: "error" }],
+        [store.toLowerCase()]: [...prev[store.toLowerCase()], { text: ` ${message}`, type: "error" }],
       }));
     });
 
@@ -172,7 +172,7 @@ function Admin() {
         ...prev,
         [store.toLowerCase()]: [
           ...prev[store.toLowerCase()],
-          { text: success ? "✅ Catálogo actualizado" : "❌ Error actualizando catálogo", type: success ? "success" : "error" }
+          { text: success ? " Catálogo actualizado" : " Error actualizando catálogo", type: success ? "success" : "error" }
         ],
       }));
 
@@ -231,7 +231,7 @@ function Admin() {
       setIsLoading((prev) => ({ ...prev, [store]: false }));
       setScrapingLogs((prev) => ({
         ...prev,
-        [store]: [{ text: `❌ Error: ${error.message}` }],
+        [store]: [{ text: ` Error: ${error.message}` }],
       }));
     }
   };

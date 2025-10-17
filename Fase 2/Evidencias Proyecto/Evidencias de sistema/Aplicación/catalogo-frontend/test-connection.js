@@ -13,7 +13,7 @@ const probarConexion = async () => {
 
   // Verificar si la cadena de conexión existe
   if (!dbUri) {
-    console.error('❌ Error: No se encontró la variable MONGODB_URI en el archivo .env');
+    console.error('Error: No se encontró la variable MONGODB_URI en el archivo .env');
     process.exit(1);
   }
 
@@ -24,14 +24,14 @@ const probarConexion = async () => {
     await mongoose.connect(dbUri);
 
     // 4. Si la conexión es exitosa, mostrar mensaje y desconectar
-    console.log('✅ ¡La conexión a MongoDB Atlas fue exitosa!');
+    console.log('¡La conexión a MongoDB Atlas fue exitosa!');
     await mongoose.disconnect();
     console.log('🔌 Conexión cerrada.');
     process.exit(0);
 
   } catch (error) {
     // 5. Si hay un error, mostrar el mensaje de error y salir
-    console.error('❌ Error al conectar a MongoDB:', error.message);
+    console.error('Error al conectar a MongoDB:', error.message);
     process.exit(1);
   }
 };

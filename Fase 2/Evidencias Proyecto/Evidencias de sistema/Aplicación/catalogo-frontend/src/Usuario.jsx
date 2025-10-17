@@ -68,11 +68,11 @@ function Usuario() {
 
       const userRef = doc(db, "usuarios", usuario.id);
       await updateDoc(userRef, formData);
-      alert("Datos actualizados correctamente ✅");
+      alert("Datos actualizados correctamente ");
       navigate("/");
     } catch (error) {
       console.error("Error al actualizar datos:", error);
-      alert("Error al actualizar los datos ❌");
+      alert("Error al actualizar los datos ");
     }
   };
 

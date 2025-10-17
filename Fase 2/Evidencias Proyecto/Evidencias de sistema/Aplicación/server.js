@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import conectarDB from './config/db.js';
 import Product from './models/Product.js';
 import PriceHistory from './models/PriceHistory.js';
+import Busqueda from './models/Busqueda.js'; // Importar el modelo de búsquedas
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -57,6 +58,41 @@ app.get('/api/products/:id/history', async (req, res) => {
   } catch (error) {
     console.error('Error al obtener historial:', error);
     res.status(500).json({ error: 'Error al obtener historial' });
+  }
+});
+
+// Ruta para guardar búsquedas
+app.post('/api/busquedas', async (req, res) => {
+  try {
+    const { busqueda, usuarioInfo } = req.body;
+    
+    // Validar datos
+    if (!busqueda || typeof busqueda !== 'string' || busqueda.trim().length === 0) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'El término de búsqueda es requerido' 
+      });
+    }
+    
+    // Crear nueva búsqueda
+    const nuevaBusqueda = new Busqueda({
+      busqueda: busqueda.toLowerCase().trim(),
+      usuarioInfo: usuarioInfo || {}
+    });
+    
+    // Guardar búsqueda en MongoDB
+    await nuevaBusqueda.save();
+    
+    res.status(201).json({ 
+      success: true, 
+      message: 'Búsqueda registrada correctamente' 
+    });
+  } catch (error) {
+    console.error('Error al guardar búsqueda:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error al registrar la búsqueda' 
+    });
   }
 });
 
@@ -114,6 +150,73 @@ app.post('/api/scrape/:store', (req, res) => {
       res.status(500).json({ success: false, error: `Error en scraping de ${store}`, details: errorOutput });
     }
   });
+});
+
+// --- Endpoint para obtener datos del dashboard ---
+app.get('/api/dashboard/data', async (req, res) => {
+  try {
+    // Obtener búsquedas
+    const busquedas = await Busqueda.find({}).sort({ fechaBusqueda: -1 });
+    
+    // Obtener usuarios únicos (basados en la información de usuarios en las búsquedas)
+    const usuariosUnicos = await Busqueda.aggregate([
+      { $match: { 'usuarioInfo.usuarioRut': { $ne: null } } },
+      { $group: { _id: '$usuarioInfo.usuarioRut', data: { $first: '$usuarioInfo' } } },
+      { $project: { 
+        _id: 0, 
+        rut: '$_id', 
+        nombre: '$data.nombre',
+        apellido: '$data.apellido',
+        edad: '$data.edad',
+        sexo: '$data.sexo',
+        region: '$data.region',
+        comuna: '$data.comuna',
+        sector: '$data.sector'
+      }}
+    ]);
+
+    res.json({
+      busquedas,
+      usuarios: usuariosUnicos
+    });
+  } catch (error) {
+    console.error('Error obteniendo datos del dashboard:', error);
+    res.status(500).json({ error: 'Error obteniendo datos del dashboard' });
+  }
+});
+
+// Reemplaza el endpoint de /api/user/current con esta versión mejorada
+app.get('/api/user/current', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'No autorizado' });
+    }
+    
+    const token = authHeader.split(' ')[1];
+    
+    // En una implementación completa, verificarías el token con Firebase Admin
+    // Por ahora, para hacer pruebas, respondemos con datos de prueba
+    // TODO: Implementar verificación real del token con admin.auth().verifyIdToken()
+    
+    // Simular datos del usuario para pruebas
+    res.json({
+      email: "usuario@ejemplo.com",
+      nombre: "Usuario Ejemplo",
+      tieneNegocio: true,
+      negocios: [
+        {
+          region: "Metropolitana",
+          comuna: "Santiago",
+          sector: "Centro"
+        }
+      ]
+    });
+  } catch (error) {
+    console.error('Error obteniendo datos del usuario:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
 });
 
 // --- Socket.IO para actualizaciones en tiempo real ---
