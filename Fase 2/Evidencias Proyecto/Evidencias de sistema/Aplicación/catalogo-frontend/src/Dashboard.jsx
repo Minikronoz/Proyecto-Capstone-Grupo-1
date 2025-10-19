@@ -5,26 +5,31 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Cell, PieChart, Pie, ReferenceLine, Legend
 } from "recharts";
-import { auth, db } from './firebase'; // Asegúrate de importar tus configuraciones de Firebase
-import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from './firebase';
+import { doc, getDoc, query, collection, where, getDocs } from "firebase/firestore";
 
 // Componente para mostrar actividad en todas las regiones del usuario
-function RegionActivityCards({ busquedas, userBusinessLocations }) {
+function RegionActivityCards({ busquedas, userBusinessLocations, filtrosPersonalizados }) {
   if (!busquedas || !userBusinessLocations || userBusinessLocations.length === 0) {
-    return null;
+    return <p>No hay datos de ubicación disponibles</p>;
   }
 
   // Agrupar búsquedas por región
   const busquedasPorRegion = userBusinessLocations.map(location => {
-    const busquedasEnRegion = busquedas.filter(b => 
-      b.usuarioInfo?.region === location.region
-    );
+    // Filtrar búsquedas por región y comuna
+    const busquedasFiltradas = busquedas.filter(b => {
+      if (!filtrosPersonalizados) return true;
+      return (
+        b.usuarioInfo && 
+        b.usuarioInfo.region === location.region && 
+        (!location.comuna || b.usuarioInfo.comuna === location.comuna)
+      );
+    });
     
     return {
       region: location.region,
       comuna: location.comuna,
-      busquedas: busquedasEnRegion,
-      count: busquedasEnRegion.length
+      count: busquedasFiltradas.length
     };
   });
 
@@ -36,7 +41,7 @@ function RegionActivityCards({ busquedas, userBusinessLocations }) {
           <p style={{ fontSize: "1.5rem", fontWeight: "bold", color: "#e67e22", textAlign: "center" }}>
             {item.count} búsquedas
             <span style={{ display: 'block', fontSize: '1rem', color: '#7f8c8d' }}>
-              en {item.comuna}
+              en {item.comuna || "toda la región"}
             </span>
           </p>
         </div>
@@ -61,7 +66,7 @@ function Dashboard() {
   const [isOpen, setIsOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [userBusinessLocation, setUserBusinessLocation] = useState([]);
-  const [filtrosPersonalizados, setFiltrosPersonalizados] = useState(true);
+  const [filtrosPersonalizados, setFiltrosPersonalizados] = useState(false);
   const [demographicData, setDemographicData] = useState({
     sexDistribution: [
       { name: 'Hombres', value: 0 },
@@ -102,7 +107,7 @@ function Dashboard() {
     if (savedFilters) {
       try {
         const filters = JSON.parse(savedFilters);
-        setFiltrosPersonalizados(filters.filtrosPersonalizados ?? true);
+        setFiltrosPersonalizados(filters.filtrosPersonalizados ?? false);
         if (filters.regiones) setRegionesFiltradas(new Set(filters.regiones));
         if (filters.comunas) setComunasFiltradas(new Set(filters.comunas));
         if (filters.sectores) setSectoresFiltrados(new Set(filters.sectores));
@@ -113,7 +118,7 @@ function Dashboard() {
     }
   }, []);
 
-  // Reemplaza el useEffect que maneja la autenticación con esta versión limpia
+  // Cargar datos de usuario y dashboard
   useEffect(() => {
     let isMounted = true;
     
@@ -159,35 +164,44 @@ function Dashboard() {
         const user = auth.currentUser;
         if (user && isMounted) {
           try {
-            const userDoc = await getDoc(doc(db, "usuarios", user.uid));
+            // Usar el mismo método que en App.jsx para obtener datos del usuario por email
+            const q = query(collection(db, "usuarios"), where("email", "==", user.email));
+            const snap = await getDocs(q);
             
-            if (userDoc.exists()) {
+            if (!snap.empty) {
+              const userDoc = snap.docs[0];
               const userData = userDoc.data();
+              console.log("Datos del usuario cargados desde Firebase:", userData);
               setCurrentUser(userData);
               
-              if (userData.tieneNegocio && userData.negocios?.length > 0 && filtrosPersonalizados) {
-                const regiones = new Set();
-                const comunas = new Set();
-                const sectores = new Set();
+              // Verificamos si el usuario tiene negocios registrados
+              if (userData.tieneNegocio && userData.negocios?.length > 0) {
+                console.log("Usuario tiene negocios:", userData.negocios);
                 
-                userData.negocios.forEach(negocio => {
-                  if (negocio.region) regiones.add(negocio.region);
-                  if (negocio.comuna) comunas.add(negocio.comuna);
-                  if (negocio.sector) sectores.add(negocio.sector);
-                });
+                // Extraer ubicaciones de los negocios
+                const businessLocations = userData.negocios
+                  .filter(n => n && typeof n === 'object') // Asegurarse de que son objetos válidos
+                  .map(n => ({
+                    region: n.region || '',
+                    comuna: n.comuna || '',
+                    sector: n.sector || ''
+                  }))
+                  .filter(loc => loc.region); // Filtramos ubicaciones sin región
                 
-                setRegionesFiltradas(regiones);
-                setComunasFiltradas(comunas);
-                setSectoresFiltrados(sectores);
+                console.log("Ubicaciones de negocio extraídas:", businessLocations);
                 
-                const businessLocations = userData.negocios.map(n => ({
-                  region: n.region,
-                  comuna: n.comuna,
-                  sector: n.sector
-                }));
-                setUserBusinessLocation(businessLocations);
+                if (businessLocations.length > 0) {
+                  setUserBusinessLocation(businessLocations);
+                  console.log("Ubicaciones de negocio cargadas:", businessLocations);
+                } else {
+                  console.warn("El usuario tiene negocios pero no tienen ubicaciones válidas");
+                }
+              } else {
+                console.log("El usuario no tiene negocios registrados");
               }
             } else {
+              // Si no se encuentra el usuario, usar los datos básicos de autenticación
+              console.warn("No se encontró información del usuario en la base de datos");
               setCurrentUser({
                 email: user.email,
                 nombre: user.displayName || user.email.split('@')[0],
@@ -216,13 +230,18 @@ function Dashboard() {
               
               const data = await response.json();
               
-              if (isMounted) {
-                setBusquedas(data.busquedas || []);
-                setUsuarios(data.usuarios || []);
-                
-                if (data.usuarios?.length > 0) {
-                  procesarDatosDemograficos(data.usuarios);
-                }
+              // Guardar los datos de búsquedas de MongoDB
+              setBusquedas(data.busquedas || []);
+              
+              // Cargar usuarios de Firebase para completar los datos
+              const firebaseUsers = await cargarUsuariosFirebase();
+              
+              // Combinar usuarios de MongoDB con usuarios de Firebase
+              const usuariosCombinados = [...(data.usuarios || [])];
+              
+              // Actualizar datos demográficos con todos los usuarios
+              if (usuariosCombinados.length > 0) {
+                procesarDatosDemograficos(usuariosCombinados);
               }
             } catch (error) {
               console.error("Error cargando datos del dashboard:", error);
@@ -244,7 +263,7 @@ function Dashboard() {
     return () => {
       isMounted = false;
     };
-  }, [navigate, filtrosPersonalizados]);
+  }, [navigate]);
 
   // Función para procesar los datos demográficos
   const procesarDatosDemograficos = (usuarios) => {
@@ -291,15 +310,29 @@ function Dashboard() {
     });
   };
 
+  // Efecto para procesar datos cuando cambien los filtros
   useEffect(() => {
     procesarDatos(busquedas);
-  }, [busquedas, regionesFiltradas, comunasFiltradas, sectoresFiltrados, buscadorTermino, filtrosPersonalizados]);
+    // Guardar configuración de filtros en localStorage
+    try {
+      localStorage.setItem('dashboardFilters', JSON.stringify({
+        filtrosPersonalizados,
+        regiones: Array.from(regionesFiltradas),
+        comunas: Array.from(comunasFiltradas),
+        sectores: Array.from(sectoresFiltrados),
+        userBusinessLocation
+      }));
+    } catch (error) {
+      console.error('Error guardando filtros:', error);
+    }
+  }, [busquedas, regionesFiltradas, comunasFiltradas, sectoresFiltrados, filtrosPersonalizados, buscadorTermino, userBusinessLocation]);
 
   const procesarDatos = useCallback((data) => {
     if (!data || data.length === 0) return;
     
     let datosFiltrados = data;
     
+    // Aplicar filtros si están activados
     if (filtrosPersonalizados) {
       if (regionesFiltradas.size > 0) {
         datosFiltrados = datosFiltrados.filter(b => 
@@ -613,78 +646,133 @@ function Dashboard() {
     }
   }, [buscadorTermino, terminosMasBuscados]);
 
+  // Funciones para manejar los filtros
   const quitarFiltrosPersonalizados = () => {
-    // Guardamos una copia de los datos originales antes de cambiar filtros
-    const datosOriginalesTodas = [...busquedas];
-    
-    // Cambiamos el estado de filtro
+    console.log("Desactivando filtros personalizados");
     setFiltrosPersonalizados(false);
     setRegionesFiltradas(new Set());
     setComunasFiltradas(new Set());
     setSectoresFiltrados(new Set());
-    
-    // Guardamos en localStorage
-    localStorage.setItem('dashboardFilters', JSON.stringify({
-      filtrosPersonalizados: false,
-      regiones: [],
-      comunas: [],
-      sectores: [],
-      userBusinessLocation: []
-    }));
-    
-    // Forzamos el reprocesamiento con los datos originales
-    setTimeout(() => {
-      procesarDatos(datosOriginalesTodas);
-    }, 0);
   };
 
   const restaurarFiltrosPersonalizados = () => {
-    // 1. Guardamos una copia de los datos originales antes de cambiar filtros
-    const datosOriginalesTodas = [...busquedas];
+    console.log("Activando filtros personalizados");
     
-    // 2. Establecemos el estado de filtros personalizados
+    // Verificar si hay datos de usuario
+    if (!currentUser) {
+      alert("Necesitas iniciar sesión para usar filtros personalizados.");
+      return;
+    }
+    
+    // Comprobación de negocios directamente desde currentUser
+    if (!currentUser.negocios || !Array.isArray(currentUser.negocios) || currentUser.negocios.length === 0) {
+      alert("No se detectaron ubicaciones de negocio para filtrar. Por favor, configura tus ubicaciones en tu perfil.");
+      return;
+    }
+    
+    const businessLocations = currentUser.negocios
+      .filter(n => n && typeof n === 'object') // Filtrar objetos válidos
+      .map(n => ({
+        region: n.region || '',
+        comuna: n.comuna || '',
+        sector: n.sector || ''
+      }))
+      .filter(loc => loc.region); // Solo considerar los que tengan región
+    
+    // Si no hay ubicaciones después de filtrar
+    if (businessLocations.length === 0) {
+      alert("No se detectaron ubicaciones de negocio válidas. Por favor, verifica que has configurado región y comuna.");
+      return;
+    }
+
+    setUserBusinessLocation(businessLocations);
     setFiltrosPersonalizados(true);
     
-    // 3. Aplicamos los filtros basados en el usuario actual
-    if (currentUser?.negocios && currentUser.negocios.length > 0) {
-      const regiones = new Set();
-      const comunas = new Set();
-      const sectores = new Set();
-      
-      currentUser.negocios.forEach(negocio => {
-        if (negocio.region) regiones.add(negocio.region);
-        if (negocio.comuna) comunas.add(negocio.comuna);
-        if (negocio.sector && negocio.sector !== "null") sectores.add(negocio.sector);
-      });
-      
-      setRegionesFiltradas(regiones);
-      setComunasFiltradas(comunas);
-      setSectoresFiltrados(sectores);
-      
-      const businessLocations = currentUser.negocios.map(n => ({
-        region: n.region,
-        comuna: n.comuna,
-        sector: n.sector
-      }));
-      setUserBusinessLocation(businessLocations);
-      
-      localStorage.setItem('dashboardFilters', JSON.stringify({
-        filtrosPersonalizados: true,
-        regiones: Array.from(regiones),
-        comunas: Array.from(comunas),
-        sectores: Array.from(sectores),
-        userBusinessLocation: businessLocations
-      }));
-      
-      // Usamos setTimeout para asegurarnos que los estados se actualicen
-      // antes de procesar los datos (esto es clave para el funcionamiento correcto)
-      setTimeout(() => {
-        procesarDatos(datosOriginalesTodas);
-      }, 10);
-    }
+    // Crear nuevos conjuntos para regiones y comunas
+    const regiones = new Set();
+    const comunas = new Set();
+    const sectores = new Set();
+    
+    // Añadir cada ubicación de negocio
+    businessLocations.forEach(location => {
+      if (location.region) regiones.add(location.region);
+      if (location.comuna) comunas.add(location.comuna);
+      if (location.sector) sectores.add(location.sector);
+    });
+    
+    console.log("Aplicando filtros:", {
+      regiones: Array.from(regiones),
+      comunas: Array.from(comunas),
+      sectores: Array.from(sectores)
+    });
+    
+    // Actualizar los estados
+    setRegionesFiltradas(regiones);
+    setComunasFiltradas(comunas);
+    setSectoresFiltrados(sectores);
   };
 
   const totalUsuarios = new Set(usuarios.map(u => u.rut || u.email)).size;
+
+  // Para depuración
+  console.log("Estado de filtro:", {
+    filtrosPersonalizados, 
+    userBusinessLocation,
+    regiones: Array.from(regionesFiltradas),
+    comunas: Array.from(comunasFiltradas)
+  });
+
+  // Dentro del componente Dashboard, añade esta nueva función
+  const obtenerUsuariosFirebase = async () => {
+    try {
+      // Esta función requiere que añadas admin-sdk de Firebase
+      // o alternativamente usar una API específica
+      // Aquí vamos a usar una solución más simple para el dashboard
+      const response = await fetch('http://localhost:3000/api/firebase/users');
+      if (!response.ok) {
+        throw new Error(`Error obteniendo usuarios de Firebase: ${response.status}`);
+      }
+      const firebaseUsers = await response.json();
+      console.log("Usuarios obtenidos de Firebase:", firebaseUsers);
+      return firebaseUsers;
+    } catch (error) {
+      console.error("Error al obtener usuarios de Firebase:", error);
+      return [];
+    }
+  };
+
+  // Añade una nueva función para cargar todos los usuarios de Firebase
+  const cargarUsuariosFirebase = async () => {
+    try {
+      const usersSnap = await getDocs(collection(db, "usuarios"));
+      const firebaseUsuarios = usersSnap.docs.map(doc => ({...doc.data(), id: doc.id}));
+      console.log("Usuarios cargados desde Firebase:", firebaseUsuarios.length);
+      
+      // Actualizar el estado de usuarios con los datos de Firebase
+      setUsuarios(prevUsuarios => {
+        // Crear un mapa de usuarios existentes por email para eliminar duplicados
+        const usuariosMap = new Map();
+        prevUsuarios.forEach(u => {
+          if (u.email) usuariosMap.set(u.email.toLowerCase(), u);
+        });
+        
+        // Añadir usuarios de Firebase que no estén ya en MongoDB
+        firebaseUsuarios.forEach(u => {
+          if (u.email && !usuariosMap.has(u.email.toLowerCase())) {
+            usuariosMap.set(u.email.toLowerCase(), u);
+          }
+        });
+        
+        // Convertir el mapa de vuelta a array
+        return Array.from(usuariosMap.values());
+      });
+      
+      return firebaseUsuarios;
+    } catch (error) {
+      console.error("Error cargando usuarios de Firebase:", error);
+      return [];
+    }
+  };
 
   return (
     <div className="dashboard-container">
@@ -705,37 +793,30 @@ function Dashboard() {
         <>
           <h1>Dashboard de Análisis</h1>
           
-          <div className="filters-control">
-            {filtrosPersonalizados ? (
-              <button 
-                className="reset-btn" 
-                onClick={quitarFiltrosPersonalizados}
-              >
-                Ver datos generales (quitar filtros personalizados)
-              </button>
-            ) : (
-              <button 
-                className="reset-btn" 
-                onClick={restaurarFiltrosPersonalizados}
-              >
-                Ver mis datos (restaurar filtros personalizados)
-              </button>
-            )}
+          {/* BOTÓN DE FILTRO - Colocado al inicio de la página y siempre visible */}
+          <div className="filters-control" style={{ gridColumn: 'span 12', marginBottom: '20px' }}>
+            <button 
+              className={`filter-toggle-btn ${filtrosPersonalizados ? 'active' : ''}`}
+              onClick={filtrosPersonalizados ? quitarFiltrosPersonalizados : restaurarFiltrosPersonalizados}
+              style={{ padding: '12px 20px', fontSize: '1rem', fontWeight: 'bold' }}
+            >
+              {filtrosPersonalizados 
+                ? "Ver datos globales" 
+                : "Ver solo mis ubicaciones"
+              }
+            </button>
           </div>
 
-          {filtrosPersonalizados && userBusinessLocation.length > 0 && (
-            <div className="active-filters card small">
-              <h3>Filtros activos:</h3>
-              {regionesFiltradas.size > 0 && (
-                <div>
-                  <strong>Regiones:</strong> {Array.from(regionesFiltradas).join(', ')}
-                </div>
-              )}
-              {comunasFiltradas.size > 0 && (
-                <div>
-                  <strong>Comunas:</strong> {Array.from(comunasFiltradas).join(', ')}
-                </div>
-              )}
+          {/* MUESTRA DE FILTROS ACTIVOS */}
+          {filtrosPersonalizados && (
+            <div className="active-filters card small" style={{ gridColumn: 'span 12', backgroundColor: '#e3f2fd', borderLeft: '4px solid #3498db' }}>
+              <h3>Filtros activos</h3>
+              <div>
+                <strong>Regiones:</strong> {Array.from(regionesFiltradas).join(', ') || 'Ninguna'}
+              </div>
+              <div>
+                <strong>Comunas:</strong> {Array.from(comunasFiltradas).join(', ') || 'Ninguna'}
+              </div>
               {sectoresFiltrados.size > 0 && (
                 <div>
                   <strong>Sectores:</strong> {Array.from(sectoresFiltrados).join(', ')}
@@ -745,7 +826,7 @@ function Dashboard() {
           )}
 
           <div className="card small">
-            <h2> Total Usuarios</h2>
+            <h2>Total Usuarios</h2>
             <p style={{ fontSize: "2rem", fontWeight: "bold", color: "#2c3e50", textAlign: "center" }}>{totalUsuarios}</p>
           </div>
 
@@ -846,14 +927,16 @@ function Dashboard() {
             <p style={{ fontSize: "2rem", fontWeight: "bold", color: "#3498db", textAlign: "center" }}>
               {(() => {
                 let busquedasFiltradas = busquedas;
-                if (regionesFiltradas.size > 0) {
-                  busquedasFiltradas = busquedasFiltradas.filter(b => b.usuarioInfo && regionesFiltradas.has(b.usuarioInfo.region));
-                }
-                if (comunasFiltradas.size > 0) {
-                  busquedasFiltradas = busquedasFiltradas.filter(b => b.usuarioInfo && comunasFiltradas.has(b.usuarioInfo.comuna));
-                }
-                if (sectoresFiltrados.size > 0) {
-                  busquedasFiltradas = busquedasFiltradas.filter(b => b.usuarioInfo && sectoresFiltrados.has(b.usuarioInfo.sector));
+                if (filtrosPersonalizados) {
+                  if (regionesFiltradas.size > 0) {
+                    busquedasFiltradas = busquedasFiltradas.filter(b => b.usuarioInfo && regionesFiltradas.has(b.usuarioInfo.region));
+                  }
+                  if (comunasFiltradas.size > 0) {
+                    busquedasFiltradas = busquedasFiltradas.filter(b => b.usuarioInfo && comunasFiltradas.has(b.usuarioInfo.comuna));
+                  }
+                  if (sectoresFiltrados.size > 0) {
+                    busquedasFiltradas = busquedasFiltradas.filter(b => b.usuarioInfo && sectoresFiltrados.has(b.usuarioInfo.sector));
+                  }
                 }
                 return busquedasFiltradas.length;
               })()}
@@ -867,7 +950,7 @@ function Dashboard() {
                 const hoy = new Date().toLocaleDateString("es-CL");
                 const busquedasHoy = busquedas.filter(b => {
                   if (!b.fechaBusqueda) return false;
-                  if (regionesFiltradas.size > 0 && (!b.usuarioInfo || !b.usuarioInfo.region || !regionesFiltradas.has(b.usuarioInfo.region))) return false;
+                  if (filtrosPersonalizados && regionesFiltradas.size > 0 && (!b.usuarioInfo || !b.usuarioInfo.region || !regionesFiltradas.has(b.usuarioInfo.region))) return false;
                   
                   let fechaStr;
                   try {
@@ -909,7 +992,7 @@ function Dashboard() {
                 const hoy = new Date().toLocaleDateString("es-CL");
                 let busquedasHoy = busquedas.filter(b => {
                   if (!b.fechaBusqueda) return false;
-                  if (regionesFiltradas.size > 0 && (!b.usuarioInfo || !b.usuarioInfo.region || !regionesFiltradas.has(b.usuarioInfo.region))) return false;
+                  if (filtrosPersonalizados && regionesFiltradas.size > 0 && (!b.usuarioInfo || !b.usuarioInfo.region || !regionesFiltradas.has(b.usuarioInfo.region))) return false;
                   
                   let fechaStr;
                   try {
@@ -945,7 +1028,7 @@ function Dashboard() {
           </div>
 
           <div className="card large">
-            <h2>Búsquedas por día {regionesFiltradas.size > 0 && `(${regionesFiltradas.size} ${regionesFiltradas.size === 1 ? 'Región' : 'Regiones'} seleccionadas)`}</h2>
+            <h2>Búsquedas por día {filtrosPersonalizados && regionesFiltradas.size > 0 && `(${regionesFiltradas.size} ${regionesFiltradas.size === 1 ? 'Región' : 'Regiones'} seleccionadas)`}</h2>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={busquedasPorDia}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -978,7 +1061,7 @@ function Dashboard() {
           </div>
 
           <div className="card large">
-            <h2>Términos Más Buscados {regionesFiltradas.size > 0 && `(${regionesFiltradas.size} ${regionesFiltradas.size === 1 ? 'Región' : 'Regiones'} seleccionadas)`}</h2>
+            <h2>Términos Más Buscados {filtrosPersonalizados && regionesFiltradas.size > 0 && `(${regionesFiltradas.size} ${regionesFiltradas.size === 1 ? 'Región' : 'Regiones'} seleccionadas)`}</h2>
             <p className="chart-info-text">
             Haz clic en una barra para ver análisis detallado |  Desplázate horizontalmente para ver todos los términos
             </p>
@@ -1204,7 +1287,14 @@ function Dashboard() {
             </div>
           )}
 
+          <RegionActivityCards 
+            busquedas={busquedas} 
+            userBusinessLocations={userBusinessLocation}
+            filtrosPersonalizados={filtrosPersonalizados}
+          />
+
           <button className="back-button" onClick={() => navigate('/')}>Volver</button>
+          
         </>
       )}
     </div>
