@@ -61,6 +61,75 @@ app.get('/api/products/:id/history', async (req, res) => {
   }
 });
 
+// Endpoint para obtener historial de precios por título y tienda
+app.get('/api/products/history', async (req, res) => {
+  try {
+    const { title, store } = req.query;
+    
+    if (!title || !store) {
+      return res.status(400).json({ error: 'Se requieren parámetros title y store' });
+    }
+    
+    // Primero buscar el producto actual
+    const currentProduct = await Product.findOne({
+      title: { $regex: new RegExp('^' + title + '$', 'i') },
+      store: store
+    });
+    
+    if (!currentProduct) {
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
+    
+    // Buscar historial de precios
+    const priceHistory = await PriceHistory.find({
+      productId: currentProduct._id
+    }).sort({ date: -1 });
+    
+    // Verificar si ya existe un registro para hoy
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const currentProductDate = new Date(currentProduct.lastUpdate);
+    currentProductDate.setHours(0, 0, 0, 0);
+    
+    // Comprobar si ya existe un registro de hoy en el historial
+    const hasTodayRecord = priceHistory.some(record => {
+      const recordDate = new Date(record.date);
+      recordDate.setHours(0, 0, 0, 0);
+      return recordDate.getTime() === today.getTime();
+    });
+    
+    // Preparar respuesta, incluir el producto actual solo si no hay registro de hoy
+    let result = [];
+    
+    if (!hasTodayRecord || currentProductDate.getTime() !== today.getTime()) {
+      result.push({
+        ...currentProduct.toObject(),
+        date: currentProduct.lastUpdate
+      });
+    }
+    
+    // Añadir el historial
+    result = [
+      ...result,
+      ...priceHistory.map(record => ({
+        title: currentProduct.title,
+        store: currentProduct.store,
+        currentPrice: record.price,
+        formattedPrice: `$${record.price}`,
+        date: record.date,
+        image: currentProduct.image,
+        link: currentProduct.link
+      }))
+    ];
+    
+    res.json(result);
+  } catch (error) {
+    console.error('Error obteniendo historial de precios:', error);
+    res.status(500).json({ error: 'Error al obtener historial de precios' });
+  }
+});
+
 // Ruta para guardar búsquedas
 app.post('/api/busquedas', async (req, res) => {
   try {

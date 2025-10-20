@@ -23,20 +23,6 @@ export default function PriceHistoryPage() {
   const [error, setError] = useState(null);
   const [imgError, setImgError] = useState(false);
 
-  // Obtiene los últimos N días
-  const getLastNDates = (n = 30) => {
-    const dates = [];
-    for (let i = 0; i < n; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, "0");
-      const dd = String(d.getDate()).padStart(2, "0");
-      dates.push(`${yyyy}-${mm}-${dd}`);
-    }
-    return dates;
-  };
-
   // Normaliza el precio y devuelve valor unitario
   const parsePrice = (p) => {
     if (!p) return 0;
@@ -56,52 +42,40 @@ export default function PriceHistoryPage() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const allProducts = [];
-        const dates = getLastNDates(30);
+        setLoading(true);
         const normalizedName = decodeURIComponent(productName).toLowerCase().trim();
         const normalizedStore = decodeURIComponent(storeName).toLowerCase();
-
-        // Primero intentar latest
-        const latestFile = `/json-${normalizedStore}/despensa-${normalizedStore}-latest.json`;
-        try {
-          const res = await fetch(latestFile);
-          if (res.ok) {
-            const latestData = await res.json();
-            const filteredLatest = latestData.filter(
-              (p) => p.title.toLowerCase().trim() === normalizedName
-            );
-            if (filteredLatest.length) {
-              filteredLatest.forEach((p) => (p.date = new Date().toISOString().split("T")[0]));
-              filteredLatest.forEach((p) => (p.store = storeName));
-              allProducts.push(...filteredLatest);
-            }
-          }
-        } catch (err) {
-          console.log("No se pudo cargar latest:", err.message);
+        
+        // Obtener el producto actual y su historial de precios desde MongoDB
+        const response = await fetch(`http://localhost:3000/api/products/history?title=${encodeURIComponent(normalizedName)}&store=${normalizedStore}`);
+        
+        if (!response.ok) {
+          throw new Error(`Error al obtener historial: ${response.status} ${response.statusText}`);
         }
-
-        // Luego cargar los diarios
-        for (const date of dates) {
-          const fileName = `/json-${normalizedStore}/despensa-${normalizedStore}-${date}.json`;
-          try {
-            const res = await fetch(fileName);
-            if (!res.ok) continue;
-            const data = await res.json();
-            const filtered = data.filter(
-              (p) => p.title.toLowerCase().trim() === normalizedName
-            );
-            if (filtered.length) {
-              filtered.forEach((p) => (p.date = date));
-              filtered.forEach((p) => (p.store = storeName));
-              allProducts.push(...filtered);
-            }
-          } catch (err) {
-            console.log(`Error cargando ${fileName}:`, err.message);
-          }
+        
+        const historyData = await response.json();
+        
+        // Si no hay datos, establecer un array vacío
+        if (!historyData || historyData.length === 0) {
+          setProducts([]);
+          return;
         }
-
-        setProducts(allProducts);
+        
+        // Formatear los datos para mostrar en la interfaz
+        const formattedProducts = historyData.map(item => ({
+          title: item.title || normalizedName,
+          store: item.store || normalizedStore,
+          price: item.formattedPrice || `$${item.currentPrice}`,
+          currentPrice: item.currentPrice,
+          formattedPrice: item.formattedPrice,
+          date: new Date(item.date || item.lastUpdate).toISOString().split('T')[0],
+          image: item.image,
+          link: item.link
+        }));
+        
+        setProducts(formattedProducts);
       } catch (err) {
+        console.error("Error obteniendo historial de precios:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -130,6 +104,16 @@ export default function PriceHistoryPage() {
   const chartData = validProducts.length
     ? {
         labels: validProducts
+          // Primero eliminar duplicados basados en la fecha (día)
+          .filter((item, index, self) => {
+            return index === self.findIndex((t) => {
+              const d1 = new Date(item.date);
+              const d2 = new Date(t.date);
+              return d1.getDate() === d2.getDate() && 
+                     d1.getMonth() === d2.getMonth() && 
+                     d1.getFullYear() === d2.getFullYear();
+            });
+          })
           .map((p) => {
             const d = new Date(p.date);
             return `${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -138,7 +122,19 @@ export default function PriceHistoryPage() {
         datasets: [
           {
             label: "Precio",
-            data: validProducts.map((p) => parsePrice(p)).reverse(),
+            // Aplicamos el mismo filtro para los datos
+            data: validProducts
+              .filter((item, index, self) => {
+                return index === self.findIndex((t) => {
+                  const d1 = new Date(item.date);
+                  const d2 = new Date(t.date);
+                  return d1.getDate() === d2.getDate() && 
+                         d1.getMonth() === d2.getMonth() && 
+                         d1.getFullYear() === d2.getFullYear();
+                });
+              })
+              .map((p) => parsePrice(p))
+              .reverse(),
             borderColor: "rgba(75, 192, 192, 1)",
             backgroundColor: "rgba(75, 192, 192, 0.2)",
             tension: 0.3,

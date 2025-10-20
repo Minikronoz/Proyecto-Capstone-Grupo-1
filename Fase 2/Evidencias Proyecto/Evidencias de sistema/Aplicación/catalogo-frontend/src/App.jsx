@@ -161,11 +161,14 @@ function App() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        setLoading(true);
+        
+        // Obtener productos desde el API conectado a MongoDB
         const [unimarcRes, tottusRes, jumboRes, acuentaRes] = await Promise.all([
-          fetch("/json-unimarc/despensa-unimarc-latest.json"),
-          fetch("/json-tottus/despensa-tottus-latest.json"),
-          fetch("/json-jumbo/despensa-jumbo-latest.json"),
-          fetch("/json-acuenta/despensa-acuenta-latest.json"),
+          fetch("http://localhost:3000/api/products?store=unimarc"),
+          fetch("http://localhost:3000/api/products?store=tottus"),
+          fetch("http://localhost:3000/api/products?store=jumbo"),
+          fetch("http://localhost:3000/api/products?store=acuenta"),
         ]);
 
         const unimarcData = await unimarcRes.json();
@@ -174,10 +177,10 @@ function App() {
         const acuentaData = await acuentaRes.json();
 
         const all = [
-          ...unimarcData.map((p) => ({ ...p, store: "unimarc", quantity: extractQuantity(p.title) })),
-          ...tottusData.map((p) => ({ ...p, store: "tottus", quantity: extractQuantity(p.title) })),
-          ...jumboData.map((p) => ({ ...p, store: "jumbo", quantity: extractQuantity(p.title) })),
-          ...acuentaData.map((p) => ({ ...p, store: "acuenta", quantity: extractQuantity(p.title) })),
+          ...unimarcData.map(p => ({ ...p, store: "unimarc", quantity: extractQuantity(p.title) })),
+          ...tottusData.map(p => ({ ...p, store: "tottus", quantity: extractQuantity(p.title) })),
+          ...jumboData.map(p => ({ ...p, store: "jumbo", quantity: extractQuantity(p.title) })),
+          ...acuentaData.map(p => ({ ...p, store: "acuenta", quantity: extractQuantity(p.title) })),
         ];
 
         setAllProducts(all);
@@ -189,11 +192,12 @@ function App() {
 
         setTimeout(() => setShowModal(true), 60000);
       } catch (err) {
-        console.error("Error cargando los JSON:", err);
+        console.error("Error cargando productos desde MongoDB:", err);
       } finally {
         setLoading(false);
       }
     };
+    
     fetchProducts();
   }, []);
 
@@ -307,7 +311,7 @@ useEffect(() => {
     try {
       const stores = ['unimarc', 'tottus', 'jumbo', 'acuenta'];
       await Promise.all(stores.map(store => 
-        fetch(`http://localhost:3001/api/scrape/${store}`, { method: 'POST' })
+        fetch(`http://localhost:3000/api/scrape/${store}`, { method: 'POST' })
       ));
       // Recargar productos después de actualizar
       await fetchProducts();
@@ -322,12 +326,12 @@ useEffect(() => {
   const handleRefreshProducts = async () => {
     setLoading(true);
     try {
-      // Re-fetch todos los productos
+      // Obtener productos desde el API conectado a MongoDB
       const [unimarcRes, tottusRes, jumboRes, acuentaRes] = await Promise.all([
-        fetch("/json-unimarc/despensa-unimarc-latest.json"),
-        fetch("/json-tottus/despensa-tottus-latest.json"),
-        fetch("/json-jumbo/despensa-jumbo-latest.json"),
-        fetch("/json-acuenta/despensa-acuenta-latest.json"),
+        fetch("http://localhost:3000/api/products?store=unimarc"),
+        fetch("http://localhost:3000/api/products?store=tottus"),
+        fetch("http://localhost:3000/api/products?store=jumbo"),
+        fetch("http://localhost:3000/api/products?store=acuenta"),
       ]);
 
       const unimarcData = await unimarcRes.json();
@@ -336,10 +340,10 @@ useEffect(() => {
       const acuentaData = await acuentaRes.json();
 
       const all = [
-        ...unimarcData.map((p) => ({ ...p, store: "unimarc", quantity: extractQuantity(p.title) })),
-        ...tottusData.map((p) => ({ ...p, store: "tottus", quantity: extractQuantity(p.title) })),
-        ...jumboData.map((p) => ({ ...p, store: "jumbo", quantity: extractQuantity(p.title) })),
-        ...acuentaData.map((p) => ({ ...p, store: "acuenta", quantity: extractQuantity(p.title) })),
+        ...unimarcData.map(p => ({ ...p, store: "unimarc", quantity: extractQuantity(p.title) })),
+        ...tottusData.map(p => ({ ...p, store: "tottus", quantity: extractQuantity(p.title) })),
+        ...jumboData.map(p => ({ ...p, store: "jumbo", quantity: extractQuantity(p.title) })),
+        ...acuentaData.map(p => ({ ...p, store: "acuenta", quantity: extractQuantity(p.title) })),
       ];
 
       setAllProducts(all);
@@ -349,8 +353,6 @@ useEffect(() => {
       setDisplayedProducts(sorted.slice(0, PRODUCTS_PER_PAGE));
       setCurrentPage(1);
       
-      // Limpiar los filtros de cantidad al refrescar productos
-      // Solo mostrarlos si hay búsqueda activa
       if (!hasSearch) {
         setQuantityFilters([]);
         setActiveQuantities(new Set());
