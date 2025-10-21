@@ -416,25 +416,38 @@ useEffect(() => {
       });
     }
     
-    // Obtener datos del usuario si está logueado
-    let usuarioInfo = null;
-    if (currentAuthUser && currentUserDoc) {
-      usuarioInfo = {
-        usuarioRut: currentUserDoc.rut || null,
-        nombre: currentUserDoc.nombre || null,
-        apellido: currentUserDoc.apellido || null,
-        edad: currentUserDoc.edad || null,
-        sexo: currentUserDoc.sexo || null,
-        region: currentUserDoc.negocios?.[0]?.region || currentUserDoc.region || null,
-        comuna: currentUserDoc.negocios?.[0]?.comuna || currentUserDoc.comuna || null,
-        sector: currentUserDoc.negocios?.[0]?.sector || currentUserDoc.sector || null
-      };
+// Obtener datos del usuario si está logueado
+let usuarioInfo = null;
+if (currentAuthUser && currentUserDoc) {
+  // Calcular edad si existe fechaNacimiento
+  let edad = null;
+  if (currentUserDoc.fechaNacimiento) {
+    const nacimiento = new Date(currentUserDoc.fechaNacimiento);
+    const hoy = new Date();
+    edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const mes = hoy.getMonth() - nacimiento.getMonth();
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+      edad--;
     }
-    
-    // Registrar la búsqueda con la información del usuario
-    await Busquedas(selectedSuggestion.trim().toLowerCase(), usuarioInfo);
-    
-    setSuggestions([]);
+  }
+
+  usuarioInfo = {
+    usuarioRut: currentUserDoc.rut || null,
+    nombre: currentUserDoc.nombre || null,
+    apellido: currentUserDoc.apellido || null,
+    edad: edad,
+    sexo: currentUserDoc.sexo || null,
+    region: currentUserDoc.negocios?.[0]?.region || currentUserDoc.region || null,
+    comuna: currentUserDoc.negocios?.[0]?.comuna || currentUserDoc.comuna || null,
+    sector: currentUserDoc.negocios?.[0]?.sector || currentUserDoc.sector || null
+  };
+}
+
+// Registrar la búsqueda con la información del usuario
+await Busquedas(selectedSuggestion.trim().toLowerCase(), usuarioInfo);
+
+setSuggestions([]);
+
   };
 
   const handleGoToRegister = () => {
