@@ -22,11 +22,11 @@ __export(ariaSnapshot_exports, {
   ParserError: () => ParserError,
   parseAriaSnapshot: () => parseAriaSnapshot,
   parseAriaSnapshotUnsafe: () => parseAriaSnapshotUnsafe,
-  valueOrRegex: () => valueOrRegex
+  textValue: () => textValue
 });
 module.exports = __toCommonJS(ariaSnapshot_exports);
-function parseAriaSnapshotUnsafe(yaml, text) {
-  const result = parseAriaSnapshot(yaml, text);
+function parseAriaSnapshotUnsafe(yaml, text, options = {}) {
+  const result = parseAriaSnapshot(yaml, text, options);
   if (result.errors.length)
     throw new Error(result.errors[0].message);
   return result.fragment;
@@ -95,7 +95,7 @@ function parseAriaSnapshot(yaml, text, options = {}) {
         }
         container.children.push({
           kind: "text",
-          text: valueOrRegex(value.value)
+          text: textValue(value.value)
         });
         continue;
       }
@@ -121,7 +121,7 @@ function parseAriaSnapshot(yaml, text, options = {}) {
           continue;
         }
         container.props = container.props ?? {};
-        container.props[key.value.slice(1)] = valueOrRegex(value.value);
+        container.props[key.value.slice(1)] = textValue(value.value);
         continue;
       }
       const childNode = KeyParser.parse(key, parseOptions, errors);
@@ -141,7 +141,7 @@ function parseAriaSnapshot(yaml, text, options = {}) {
           ...childNode,
           children: [{
             kind: "text",
-            text: valueOrRegex(String(value.value))
+            text: textValue(String(value.value))
           }]
         });
         continue;
@@ -173,16 +173,19 @@ function parseAriaSnapshot(yaml, text, options = {}) {
   convertSeq(fragment, yamlDoc.contents);
   if (errors.length)
     return { errors, fragment: emptyFragment };
-  if (fragment.children?.length === 1)
-    return { fragment: fragment.children[0], errors };
-  return { fragment, errors };
+  if (fragment.children?.length === 1 && (!fragment.containerMode || fragment.containerMode === "contain"))
+    return { fragment: fragment.children[0], errors: [] };
+  return { fragment, errors: [] };
 }
 const emptyFragment = { kind: "role", role: "fragment" };
 function normalizeWhitespace(text) {
   return text.replace(/[\u200b\u00ad]/g, "").replace(/[\r\n\s\t]+/g, " ").trim();
 }
-function valueOrRegex(value) {
-  return value.startsWith("/") && value.endsWith("/") && value.length > 1 ? { pattern: value.slice(1, -1) } : normalizeWhitespace(value);
+function textValue(value) {
+  return {
+    raw: value,
+    normalized: normalizeWhitespace(value)
+  };
 }
 class KeyParser {
   static parse(text, options, errors) {
@@ -346,6 +349,11 @@ class KeyParser {
       node.expanded = value === "true";
       return;
     }
+    if (key === "active") {
+      this._assert(value === "true" || value === "false", 'Value of "active" attribute must be a boolean', errorPos);
+      node.active = value === "true";
+      return;
+    }
     if (key === "level") {
       this._assert(!isNaN(Number(value)), 'Value of "level" attribute must be a number', errorPos);
       node.level = Number(value);
@@ -380,5 +388,5 @@ class ParserError extends Error {
   ParserError,
   parseAriaSnapshot,
   parseAriaSnapshotUnsafe,
-  valueOrRegex
+  textValue
 });

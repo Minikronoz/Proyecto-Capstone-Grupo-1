@@ -15,7 +15,7 @@ export default function ProductCard({ product, onAdd, onAddToClientCart }) {
       ? "acuenta"
       : "unimarc";
 
-  // 🔹 Registrar clic en Mongo con datos del usuario autenticado
+  //Registrar clic en Mongo con datos del usuario autenticado
   const handleProductClick = async (event) => {
     event.preventDefault(); //  Evita que se abra el enlace antes de enviar el clic
 

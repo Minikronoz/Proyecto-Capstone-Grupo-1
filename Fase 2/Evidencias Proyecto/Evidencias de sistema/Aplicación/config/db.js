@@ -12,17 +12,17 @@ const conectarDB = async () => {
       throw new Error('La variable de entorno MONGODB_URI no está configurada');
     }
 
-    // ✅ Agregamos las opciones correctas
+    // Agregamos las opciones correctas
     const connection = await mongoose.connect(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      w: "majority", // 👈 Corrige el error "majorit"
+      w: "majority",
     });
 
-    console.log('✅ MongoDB Atlas conectado:', connection.connection.host);
+    console.log('MongoDB Atlas conectado:', connection.connection.host);
     return connection;
   } catch (error) {
-    console.error('❌ Error conectando a MongoDB:', error.message);
+    console.error('Error conectando a MongoDB:', error.message);
     console.error('Detalles del error:', error);
     throw error;
   }

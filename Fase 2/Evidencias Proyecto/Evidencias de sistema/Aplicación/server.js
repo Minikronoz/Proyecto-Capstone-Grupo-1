@@ -213,6 +213,72 @@ app.post('/api/busquedas', async (req, res) => {
 });
 
 /* =============================================================
+   API para el Dashboard - Datos combinados
+   ============================================================= */
+app.get('/api/dashboard/data', async (req, res) => {
+  try {
+    // 1. Obtener todas las búsquedas de MongoDB
+    const busquedas = await Busqueda.find().lean();
+    
+    // 2. Extraer usuarios únicos de las búsquedas (información básica de MongoDB)
+    const usuariosSet = new Map();
+    busquedas.forEach(b => {
+      if (b.usuarioInfo && b.usuarioInfo.usuarioRut) {
+        usuariosSet.set(b.usuarioInfo.usuarioRut, {
+          rut: b.usuarioInfo.usuarioRut,
+          nombre: b.usuarioInfo.nombre,
+          apellido: b.usuarioInfo.apellido,
+          sexo: b.usuarioInfo.sexo,
+          edad: b.usuarioInfo.edad,
+          region: b.usuarioInfo.region,
+          comuna: b.usuarioInfo.comuna,
+          sector: b.usuarioInfo.sector
+        });
+      }
+    });
+    
+    // 3. Convertir el Map a array
+    const usuariosMongoDB = Array.from(usuariosSet.values());
+    
+    // 4. Devolver respuesta combinada
+    res.json({
+      busquedas,
+      usuarios: usuariosMongoDB
+    });
+    
+  } catch (error) {
+    console.error('Error obteniendo datos para dashboard:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// También necesitamos esta ruta para obtener usuarios de Firebase
+app.get('/api/firebase/users', async (req, res) => {
+  try {
+    // Obtener usuarios de Firebase (solo metadatos básicos)
+    const snapshot = await db.collection("usuarios").get();
+    
+    const usuarios = snapshot.docs.map(doc => ({
+      id: doc.id,
+      email: doc.data().email,
+      nombre: doc.data().nombre || '',
+      apellido: doc.data().apellido || '',
+      sexo: doc.data().sexo || 'Otro',
+      edad: doc.data().edad || null,
+      region: doc.data().region || '',
+      comuna: doc.data().comuna || '',
+      sector: doc.data().sector || '',
+      tieneNegocio: !!doc.data().tieneNegocio
+    }));
+    
+    res.json(usuarios);
+  } catch (error) {
+    console.error('Error obteniendo usuarios de Firebase:', error);
+    res.status(500).json({ error: 'Error al obtener usuarios' });
+  }
+});
+
+/* =============================================================
    🔹 Socket.IO
    ============================================================= */
 io.on('connection', (socket) => {

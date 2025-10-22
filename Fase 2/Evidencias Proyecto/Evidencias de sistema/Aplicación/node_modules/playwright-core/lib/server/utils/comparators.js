@@ -101,11 +101,11 @@ function validateBuffer(buffer, mimeType) {
   if (mimeType === "image/png") {
     const pngMagicNumber = [137, 80, 78, 71, 13, 10, 26, 10];
     if (buffer.length < pngMagicNumber.length || !pngMagicNumber.every((byte, index) => buffer[index] === byte))
-      throw new Error("could not decode image as PNG.");
+      throw new Error("Could not decode expected image as PNG.");
   } else if (mimeType === "image/jpeg") {
     const jpegMagicNumber = [255, 216];
     if (buffer.length < jpegMagicNumber.length || !jpegMagicNumber.every((byte, index) => buffer[index] === byte))
-      throw new Error("could not decode image as JPEG.");
+      throw new Error("Could not decode expected image as JPEG.");
   }
 }
 function compareText(actual, expectedBuffer) {
@@ -121,9 +121,9 @@ function compareText(actual, expectedBuffer) {
   const lines = import_utilsBundle2.diff.createPatch("file", expected, actual, void 0, void 0, { context: 5 }).split("\n");
   const coloredLines = lines.slice(4).map((line) => {
     if (line.startsWith("-"))
-      return import_utilsBundle2.colors.red(line);
-    if (line.startsWith("+"))
       return import_utilsBundle2.colors.green(line);
+    if (line.startsWith("+"))
+      return import_utilsBundle2.colors.red(line);
     if (line.startsWith("@@"))
       return import_utilsBundle2.colors.dim(line);
     return line;

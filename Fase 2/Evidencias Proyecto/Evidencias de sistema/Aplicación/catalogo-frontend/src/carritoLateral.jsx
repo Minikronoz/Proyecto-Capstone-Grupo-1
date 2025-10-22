@@ -6,7 +6,7 @@ export default function CarritoLateral() {
   const [carritoLateral, setCarritoLateral] = useState({});
   const [currentUser, setCurrentUser] = useState(null);
 
-  // 🔹 Cargar carrito del usuario
+  // Cargar carrito del usuario
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setCurrentUser(user);
@@ -24,7 +24,7 @@ export default function CarritoLateral() {
     return () => unsubscribe();
   }, []);
 
-  // 🔹 Función que interpreta precios tipo "2 x $2000"
+  // Función que interpreta precios tipo "2 x $2000"
   const desglosarPrecio = (texto) => {
     if (!texto) return { cantidad: 1, totalPack: 0, unitario: 0 };
     const str = texto.toString().trim();
@@ -43,7 +43,7 @@ export default function CarritoLateral() {
     return { cantidad: 1, totalPack: valor, unitario: valor };
   };
 
-  // 🔹 Agregar producto al carrito
+  // Agregar producto al carrito
   const handleAddToLateralCart = (product) => {
     const priceText = product.formattedPrice || product.price || product.currentPrice || "";
     const { cantidad, unitario } = desglosarPrecio(priceText);
@@ -70,7 +70,7 @@ export default function CarritoLateral() {
     });
   };
 
-  // 🔹 Eliminar producto del carrito
+  // Eliminar producto del carrito
   const handleRemoveFromLateralCart = (store, title) => {
     setCarritoLateral((prev) => {
       const updated = { ...prev };
@@ -80,7 +80,7 @@ export default function CarritoLateral() {
     });
   };
 
-  // 🔹 Guardar en Firestore (con un pequeño retraso)
+  // Guardar en Firestore (con un pequeño retraso)
   useEffect(() => {
     if (!currentUser) return;
     const saveCart = async () => {
@@ -107,7 +107,7 @@ export default function CarritoLateral() {
   const subtotal = (items) =>
     items.reduce((sum, item) => sum + (item.displayPrice || 0) * (item.quantity || 0), 0);
 
-  // 🔹 Render del carrito
+  // Render del carrito
   return (
     <div className="CarritoLateral_container sticky-cart">
       <h3>Carrito Lateral</h3>

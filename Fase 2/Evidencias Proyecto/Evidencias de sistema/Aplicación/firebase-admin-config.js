@@ -1,7 +1,9 @@
 // firebase-admin-config.js
 import admin from "firebase-admin";
 import fetch from "node-fetch";
-import serviceAccount from "./firebase-service-account.json" with { type: "json" };
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const serviceAccount = require('./firebase-service-account.json');
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -13,7 +15,7 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 db.settings({ ignoreUndefinedProperties: true });
 
-// 🧠 Función alternativa: obtener usuario por email usando REST
+// Función alternativa: obtener usuario por email usando REST
 export async function getUserDataByEmail(email) {
   const url = `https://firestore.googleapis.com/v1/projects/${serviceAccount.project_id}/databases/(default)/documents/usuarios/${email}`;
   const res = await fetch(url, {

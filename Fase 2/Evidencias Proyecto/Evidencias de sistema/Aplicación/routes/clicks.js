@@ -10,12 +10,12 @@ router.post("/", async (req, res) => {
 
     const { title, store, currentPrice, formattedPrice, image, link, userEmail } = req.body;
 
-    // 🔹 Validación básica
+    // Validación básica
     if (!title || !store || !userEmail) {
       return res.status(400).json({ msg: "Faltan datos (title, store o userEmail)" });
     }
 
-    // 🔹 Buscar usuario en Firestore por email
+    // Buscar usuario en Firestore por email
     const snapshot = await db.collection("usuarios").where("email", "==", userEmail).limit(1).get();
 
     if (snapshot.empty) {
@@ -38,7 +38,7 @@ router.post("/", async (req, res) => {
 
     const userData = snapshot.docs[0].data();
 
-    // 🔹 Calcular edad si existe fecha de nacimiento
+    //  Calcular edad si existe fecha de nacimiento
     let edadCalculada = null;
     if (userData.fechaNacimiento) {
       const nacimiento = new Date(userData.fechaNacimiento);
@@ -49,7 +49,7 @@ router.post("/", async (req, res) => {
       edadCalculada = edad;
     }
 
-    // 🔹 Crear nuevo clic con información del usuario y producto
+    //  Crear nuevo clic con información del usuario y producto
     const nuevoClick = new Click({
       title,
       store,

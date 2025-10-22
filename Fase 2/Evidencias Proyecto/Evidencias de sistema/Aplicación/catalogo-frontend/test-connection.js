@@ -17,7 +17,7 @@ const probarConexion = async () => {
     process.exit(1);
   }
 
-  console.log('🔄 Intentando conectar a MongoDB Atlas...');
+  console.log('Intentando conectar a MongoDB Atlas...');
 
   try {
     // 3. Intentar conectar a la base de datos
@@ -26,7 +26,7 @@ const probarConexion = async () => {
     // 4. Si la conexión es exitosa, mostrar mensaje y desconectar
     console.log('¡La conexión a MongoDB Atlas fue exitosa!');
     await mongoose.disconnect();
-    console.log('🔌 Conexión cerrada.');
+    console.log('Conexión cerrada.');
     process.exit(0);
 
   } catch (error) {

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const ClickSchema = new mongoose.Schema(
   {
-    // 🔹 Información del producto clickeado
+    // Información del producto clickeado
     title: { type: String, required: true },
     store: { type: String, required: true },
     currentPrice: { type: String },
@@ -10,7 +10,7 @@ const ClickSchema = new mongoose.Schema(
     image: { type: String },
     link: { type: String },
 
-    // 🔹 Información del usuario que hizo el clic
+    // Información del usuario que hizo el clic
     usuarioInfo: {
       usuarioRut: { type: String },
       nombre: { type: String },
@@ -22,7 +22,7 @@ const ClickSchema = new mongoose.Schema(
       sector: { type: String },
     },
 
-    // 🔹 Fecha del clic
+    // Fecha del clic
     fechaClick: { type: Date, default: Date.now },
   },
   { collection: "clicks" }
