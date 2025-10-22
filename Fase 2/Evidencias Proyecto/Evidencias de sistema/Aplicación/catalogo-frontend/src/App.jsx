@@ -28,6 +28,7 @@ function App() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasSearch, setHasSearch] = useState(false); // Flag para saber si hay búsqueda activa
 
+
   // Perfil / auth
   const [currentAuthUser, setCurrentAuthUser] = useState(null); // firebase auth user
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -40,6 +41,8 @@ function App() {
   const [carritoTottus, setCarritoTottus] = useState([]);
   const [carritoJumbo, setCarritoJumbo] = useState([]);
   const [carritoAcuenta, setCarritoAcuenta] = useState([]);
+// Carrito lateral general (panel izquierdo)
+  const [carritoLateral, setCarritoLateral] = useState([]);
 
   // Agregar estos estados nuevos junto a los otros
   const [displayedProducts, setDisplayedProducts] = useState([]);
@@ -184,7 +187,7 @@ function App() {
         ];
 
         setAllProducts(all);
-        const sorted = [...all].sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
+        const sorted = [...all].sort((a, b) => parsePrice(a.currentPrice) - parsePrice(b.currentPrice));
         setSortedProducts(sorted);
         setFilteredProducts(all);
         setDisplayedProducts(sorted.slice(0, PRODUCTS_PER_PAGE));
@@ -238,7 +241,7 @@ useEffect(() => {
     
     // Filtrar productos solo por supermercado (sin búsqueda activa)
     const filtered = allProducts.filter(product => selectedStores.has(product.store));
-    const sorted = [...filtered].sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
+    const sorted = [...filtered].sort((a, b) => parsePrice(a.currentPrice) - parsePrice(b.currentPrice));
     setFilteredProducts(filtered);
     setDisplayedProducts(sorted.slice(0, PRODUCTS_PER_PAGE));
     setCurrentPage(1);
@@ -296,7 +299,7 @@ useEffect(() => {
       return firstWord && firstWord.startsWith(trimmed);
     });
     
-    const sorted = [...filtered].sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
+    const sorted = [...filtered].sort((a, b) => parsePrice(a.currentPrice) - parsePrice(b.currentPrice));
     setSortedProducts(sorted);
     setFilteredProducts(filtered);
     // Resetear la paginación y mostrar los primeros productos
@@ -347,7 +350,7 @@ useEffect(() => {
       ];
 
       setAllProducts(all);
-      const sorted = [...all].sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
+      const sorted = [...all].sort((a, b) => parsePrice(a.currentPrice) - parsePrice(b.currentPrice));
       setSortedProducts(sorted);
       setFilteredProducts(all);
       setDisplayedProducts(sorted.slice(0, PRODUCTS_PER_PAGE));
@@ -378,7 +381,7 @@ useEffect(() => {
       
       // Mostrar todos los productos filtrados solo por supermercados seleccionados
       const filtered = allProducts.filter(product => selectedStores.has(product.store));
-      const sorted = [...filtered].sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
+      const sorted = [...filtered].sort((a, b) => parsePrice(a.currentPrice) - parsePrice(b.currentPrice));
       setFilteredProducts(filtered);
       setDisplayedProducts(sorted.slice(0, PRODUCTS_PER_PAGE));
       setCurrentPage(1);
@@ -488,7 +491,7 @@ setSuggestions([]);
       
       // Solo filtrar por supermercado
       const filtered = allProducts.filter(product => selectedStores.has(product.store));
-      const sorted = [...filtered].sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
+      const sorted = [...filtered].sort((a, b) => parsePrice(a.currentPrice) - parsePrice(b.currentPrice));
       setFilteredProducts(filtered);
       setDisplayedProducts(sorted.slice(0, PRODUCTS_PER_PAGE));
     } else {
@@ -517,99 +520,201 @@ setSuggestions([]);
     setIsLoadingMore(false);
   };
 
-  // FUNCION DE CARRITO (prioriza marca y cantidad, añade link)
-
-  const handleAddToCart = (product) => {
-    const stores = ["unimarc", "tottus", "jumbo", "acuenta"];
-    const stopWords = ["de", "con", "sin", "y", "el", "la", "los", "las", "para", "n°", "fideos", "pasta"];
+//Funcion carrito zotizador
 
 
-    // Normalizar títulos
-    const normalizeTitle = (title) =>
-      title
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/n\s*°\s*\d+/gi, "") // elimina "N°87", "N° 5"
-        .split(/\s+/)
-        .filter((w) => w.length > 2 && !stopWords.includes(w));
+const handleAddToCart = (product) => {
+  const stores = ["unimarc", "tottus", "jumbo", "acuenta"];
+  const stopWords = ["de","con","sin","y","el","la","los","las","para","n°","fideos","pasta","por","del","al","en"];
 
+  // Normaliza título y remueve palabras irrelevantes y cantidades
+  const normalizeTitle = (title) => {
+    return title.toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g,"")
+                .replace(/n\s*°\s*\d+/gi,"")
+                .replace(/(\d+(?:[.,]?\d+)?)\s?(ml|l|kg|g|grs?)/gi,"") // remover cantidades
+                .split(/\s+/)
+                .filter(w => w.length>2 && !stopWords.includes(w));
+  }
 
-    // Detectar marca automáticamente del producto clickeado
-    const extractBrand = (title) => {
-      const words = normalizeTitle(title);
-      // Tomamos la última palabra que no sea cantidad (g/ml/kg/l) como posible marca
-      const regexQty = /^\d+(g|kg|ml|l|grs?)$/;
-      return words.reverse().find((w) => !regexQty.test(w)) || null;
-    };
+  // Extrae marca (última palabra significativa)
+  const extractBrand = (title) => {
+    const words = normalizeTitle(title);
+    return words.reverse().find(w => w) || null;
+  }
 
-    
-    // Extraer cantidad
-    const extractQty = (title) => {
-      const regex = /(\d+(?:[.,]?\d+)?)\s?(ml|l|kg|g|grs?)/i;
-      const match = title.match(regex);
-      if (!match) return null;
-      let value = parseFloat(match[1].replace(",", "."));
-      let unit = match[2].toLowerCase();
-      if (unit === "l") value *= 1000;
-      if (unit === "kg") value *= 1000;
-      return value;
-    };
+  // Extrae cantidad y la convierte a gramos/ml
+  const extractQty = (title) => {
+    const regex = /(\d+(?:[.,]?\d+)?)\s?(ml|l|kg|g|grs?)/i;
+    const match = title.match(regex);
+    if(!match) return null;
+    let value = parseFloat(match[1].replace(",","."));
+    let unit = match[2].toLowerCase();
+    if(unit === "l") value *= 1000; // litros a ml
+    if(unit === "kg") value *= 1000; // kg a g
+    return value;
+  }
 
-    const productWords = normalizeTitle(product.title);
-    const productQty = extractQty(product.title);
-    const productBrand = extractBrand(product.title);
+  const extractDisplayPrice = (prod) => prod.formattedPrice || prod.currentPrice;
 
+  const productWords = normalizeTitle(product.title);
+  const productQty = extractQty(product.title);
+  const productBrand = extractBrand(product.title);
 
-    stores.forEach((store) => {
-      const candidates = allProducts.filter((p) => p.store === store);
+  stores.forEach((store) => {
+    const candidates = allProducts.filter(p => p.store.toLowerCase() === store);
 
-      let bestMatch = null;
-      let bestScore = -Infinity;
+    let bestMatch = null;
+    let bestScore = -Infinity;
 
-      candidates.forEach((cand) => {
-        const candWords = normalizeTitle(cand.title);
-        const candQty = extractQty(cand.title);
+    candidates.forEach((cand) => {
+      const candWords = normalizeTitle(cand.title);
+      const candQty = extractQty(cand.title);
 
+      // Coincidencia de palabras sin importar el orden
+      const commonWords = productWords.filter(w => candWords.includes(w));
+      const minWordsMatch = Math.min(6, productWords.length); // mínimo 6 palabras o menos si el nombre es corto
+      const wordScore = commonWords.length / minWordsMatch;
 
-        // Coincidencia de palabras
-        const commonWords = productWords.filter((w) => candWords.includes(w));
-        const wordScore = commonWords.length / productWords.length;
+      // Penalización por diferencia de cantidad (prioridad máxima)
+      const qtyPenalty = productQty && candQty ? Math.abs(productQty - candQty)/Math.max(productQty, candQty) : 0;
+      const qtyScore = 1 - qtyPenalty; // mayor peso si la cantidad coincide
 
+      // Bonus por marca
+      const brandBonus = productBrand && candWords.includes(productBrand.toLowerCase()) ? 0.5 : 0;
 
-        // Penalización por cantidad
-        const qtyPenalty =
-          productQty && candQty ? Math.abs(productQty - candQty) / Math.max(productQty, candQty) : 0;
+      // Score final
+      const finalScore = wordScore * 0.5 + qtyScore * 0.4 + brandBonus * 0.1;
 
-
-        // Bonus por coincidencia de marca detectada
-        const brandBonus =
-          productBrand && candWords.includes(productBrand.toLowerCase()) ? 1 : 0;
-
-
-        // Score final
-        const finalScore = wordScore - qtyPenalty + brandBonus;
-
-        if (finalScore > bestScore) {
-          bestScore = finalScore;
-          bestMatch = cand;
-        }
-      });
-
-
-      // Item final
-      const item =
-        bestScore >= 0.3 && bestMatch
-          ? { ...bestMatch, quantity: 1, link: bestMatch.link || bestMatch.url || "#" }
-          : { title: `No hay ${product.title} en ${store}`, price: "-", quantity: "-", image: null, store, link: "#" };
-
-      // Reemplazar en carrito
-      if (store === "unimarc") setCarritoUnimarc([item]);
-      if (store === "tottus") setCarritoTottus([item]);
-      if (store === "jumbo") setCarritoJumbo([item]);
-      if (store === "acuenta") setCarritoAcuenta([item]);
+      if(finalScore > bestScore){
+        bestScore = finalScore;
+        bestMatch = cand;
+      }
     });
+
+    // Si no hay coincidencia suficiente, agregar el producto seleccionado tal cual
+    const item = bestMatch
+      ? {
+          ...bestMatch,
+          quantity: 1,
+          displayPrice: extractDisplayPrice(bestMatch),
+          link: bestMatch.link || "#"
+        }
+      : {
+          ...product,
+          quantity: 1,
+          displayPrice: extractDisplayPrice(product),
+          link: product.link || "#"
+        };
+
+    // Actualizar carrito
+    if(store === "unimarc") setCarritoUnimarc([item]);
+    if(store === "tottus") setCarritoTottus([item]);
+    if(store === "jumbo") setCarritoJumbo([item]);
+    if(store === "acuenta") setCarritoAcuenta([item]);
+  });
+}
+
+    // Función para agregar al carrito lateral
+
+const handleAddToLateralCart = (product) => {
+  // --- parser robusto para extraer el precio correcto ---
+  const parseUnitPrice = (prod) => {
+    // 1) si currentPrice ya es razonable (>= 50), úsalo
+    const cp = Number(prod.currentPrice);
+    if (!isNaN(cp) && cp >= 50) return cp;
+
+    // 2) armar un texto de donde parsear
+    const text = [
+      prod.formattedPrice,
+      prod.price,
+      prod.displayPriceStr,
+      prod.title
+    ].filter(Boolean).join(" ");
+
+    // Buscar TODOS los números con o sin $, ejemplo: "2 x $2.000", "$1.490", "Precio: 3.590"
+    const regex = /\$?\s*([\d]{1,3}(?:[.\s]\d{3})+|\d+(?:[.,]\d+)?)/g;
+    const matches = [...text.matchAll(regex)];
+
+    if (matches.length === 0) return cp || 0;
+
+    // Separar en dos grupos: con $ y sin $
+    const withDollar = [];
+    const withoutDollar = [];
+    for (const m of matches) {
+      const full = m[0];     // ej: "$2.000" o "2.000" o "2"
+      const num = m[1];      // parte numérica capturada
+      const raw = (num || full).toString().trim();
+
+      // normalizar separadores chilenos: "." de miles, "," (si apareciera) se ignora
+      const normalized = raw.replace(/\./g, "").replace(/,/g, "");
+      const val = parseInt(normalized, 10);
+
+      if (!isNaN(val)) {
+        if (/\$/.test(full)) withDollar.push(val);
+        else withoutDollar.push(val);
+      }
+    }
+
+    // Preferimos los que tienen $, si no hay, usamos los otros
+    const candidates = withDollar.length ? withDollar : withoutDollar;
+
+    if (candidates.length === 0) return cp || 0;
+
+    // TOMAMOS EL ÚLTIMO candidato (en "2 x $2.000" el último es 2000, que queremos)
+    const chosen = candidates[candidates.length - 1];
+
+    // Si chosen es demasiado chico (1..49), probablemente es la cantidad "2" — intenta usar el mayor
+    if (chosen < 50) {
+      const maxCandidate = Math.max(...candidates);
+      if (maxCandidate >= 50) return maxCandidate;
+    }
+
+    return chosen;
   };
+
+  setCarritoLateral((prev) => {
+    const updated = { ...prev };
+
+    const store = (product.store || "").toLowerCase();
+    if (!updated[store]) updated[store] = [];
+
+    const unitPrice = parseUnitPrice(product);
+    const unitPriceFormatted = `$${unitPrice.toLocaleString()}`;
+
+    const idx = updated[store].findIndex((it) => it.title === product.title);
+
+    if (idx !== -1) {
+      const arr = [...updated[store]];
+      arr[idx] = {
+        ...arr[idx],
+        quantity: (arr[idx].quantity || 0) + 1,
+        displayPrice: unitPrice,                     // numérico para cálculos
+        formattedPrice: unitPriceFormatted,          // texto para mostrar
+      };
+      updated[store] = arr;
+    } else {
+      updated[store] = [
+        ...updated[store],
+        {
+          ...product,
+          quantity: 1,
+          displayPrice: unitPrice,
+          formattedPrice: unitPriceFormatted,
+        },
+      ];
+    }
+
+    // Debug útil:
+    console.log("🛒 Agregado:", product.title, "| Detectado:", unitPrice, unitPriceFormatted);
+    return updated;
+  });
+};
+
+
+
+
 
 
   return (
@@ -711,114 +816,196 @@ setSuggestions([]);
         </div>
       )}
 
-      {/* Contenedor principal: grilla + carrito */}
-      <div className="App_main-content">
-        {/* Panel izquierdo de filtros - solo visible después de búsqueda */}
-        {hasSearch && (
-          <div className="App_filters-panel">
-            <h3>Filtrar por Supermercado</h3>
-            <div className="App_store-filters">
-              {['Unimarc', 'Tottus', 'Jumbo', 'Acuenta'].map(store => (
-                <label key={store} className="App_store-filter-item">
-                  <input
-                    type="checkbox"
-                    checked={selectedStores.has(store.toLowerCase())}
-                    onChange={() => {
-                      setSelectedStores(prev => {
-                        const newSet = new Set(prev);
-                        if (newSet.has(store.toLowerCase())) {
-                          newSet.delete(store.toLowerCase());
-                        } else {
-                          newSet.add(store.toLowerCase());
-                        }
-                        return newSet;
-                      });
-                    }}
+{/* Contenedor principal: filtros + grilla + carrito rápido */}
+<div className="App_main-content">
+
+  {/* === PANEL IZQUIERDO === */}
+  <div className="App_sidebar">
+
+    {/* FILTROS */}
+{hasSearch && (
+  <div className="App_filters-panel">
+    <h3 className="App_filters-title">Filtrar por Supermercado</h3>
+    <div className="App_store-filters">
+      {['Unimarc', 'Tottus', 'Jumbo', 'Acuenta'].map(store => (
+        <label key={store} className="App_store-filter-item">
+          <input
+            type="checkbox"
+            checked={selectedStores.has(store.toLowerCase())}
+            onChange={() => {
+              setSelectedStores(prev => {
+                const newSet = new Set(prev);
+                if (newSet.has(store.toLowerCase())) newSet.delete(store.toLowerCase());
+                else newSet.add(store.toLowerCase());
+                return newSet;
+              });
+            }}
+          />
+          <span className="App_store-filter-label">{store}</span>
+        </label>
+      ))}
+    </div>
+  </div>
+)}
+
+
+{/* CARRITO LATERAL */}
+<div className="carrito-lateral">
+  <h3 className="carrito-lateral__titulo">Carrito Lateral</h3>
+
+  {Object.keys(carritoLateral).length === 0 ? (
+    <p className="carrito-lateral__vacio">No hay productos agregados.</p>
+  ) : (
+    <>
+      {Object.keys(carritoLateral).map((store) => (
+        <div key={store} className="carrito-lateral__store-section">
+          <h4 className="carrito-lateral__store-name">{store}</h4>
+          <div className="carrito-lateral__items">
+            {carritoLateral[store].map((item, i) => (
+              <div key={`lc-${store}-${i}`} className="carrito-lateral__item">
+                {item.image && (
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="carrito-lateral__item-img"
                   />
-                  <span className="App_store-filter-label">{store}</span>
-                </label>
-              ))}
-            </div>
-            
-
-          </div>
-        )}
-
-        {/* Grilla de productos */}
-        <div className="App_products-grid">
-          {displayedProducts.length > 0 ? (
-            <>
-              {displayedProducts.map((product, index) => (
-                <ProductCard
-                  key={`App-${product.store}-${index}`}
-                  product={product}
-                  onAdd={handleAddToCart}
-                />
-              ))}
-              {isLoadingMore && (
-                <div className="App_loading-more">
-                  Cargando más productos...
+                )}
+                <div className="carrito-lateral__item-info">
+                  <p className="carrito-lateral__item-title">{item.title}</p>
+                  <p className="carrito-lateral__item-precio">
+                    {item.quantity} x ${item.displayPrice?.toLocaleString() || item.currentPrice?.toLocaleString()}
+                  </p>
+                  {item.link && (
+                    <a
+                      href={item.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="carrito-lateral__item-link"
+                    >
+                      Ver producto
+                    </a>
+                  )}
                 </div>
-              )}
-            </>
-          ) : (
-            <p className="App_no-results">No se encontraron productos.</p>
-          )}
+              </div>
+            ))}
+          </div>
+
+          <p className="carrito-lateral__subtotal">
+            <strong>Subtotal {store}:</strong> $
+            {carritoLateral[store].reduce(
+              (acc, item) => acc + (item.displayPrice || item.currentPrice) * item.quantity,
+              0
+            ).toLocaleString()}
+          </p>
+
+          <hr className="carrito-lateral__divider" />
         </div>
+      ))}
 
-        {/* Carrito lateral flotante */}
-        <div className="App_cart">
-          <h2>Carrito Cotizador</h2>
+      {/* Total general */}
+      <p className="carrito-lateral__total">
+        <strong>Total:</strong> $
+        {Object.values(carritoLateral).flat().reduce(
+          (acc, item) => acc + (item.displayPrice || item.currentPrice) * item.quantity,
+          0
+        ).toLocaleString()}
+      </p>
+    </>
+  )}
+</div>
 
-          <div>
-            <h3>Unimarc</h3>
-            {carritoUnimarc.map((item, i) => (
-              <div key={`u-${i}`} className="App_cart-item">
-                {item.image && <img src={item.image} alt={item.title} />}
-                <p>{item.title}</p>
-                <p>Precio: {item.price} | Cant: {item.quantity}</p>
-                <a href={item.link} target="_blank" rel="noopener noreferrer">Ver producto</a>
-              </div>
-            ))}
-          </div>
 
-          <div>
-            <h3>Tottus</h3>
-            {carritoTottus.map((item, i) => (
-              <div key={`t-${i}`} className="App_cart-item">
-                {item.image && <img src={item.image} alt={item.title} />}
-                <p>{item.title}</p>
-                <p>Precio: {item.price} | Cant: {item.quantity}</p>
-                <a href={item.link} target="_blank" rel="noopener noreferrer">Ver producto</a>
-              </div>
-            ))}
-          </div>
 
-          <div>
-            <h3>Jumbo</h3>
-            {carritoJumbo.map((item, i) => (
-              <div key={`j-${i}`} className="App_cart-item">
-                {item.image && <img src={item.image} alt={item.title} />}
-                <p>{item.title}</p>
-                <p>Precio: {item.price} | Cant: {item.quantity}</p>
-                <a href={item.link} target="_blank" rel="noopener noreferrer">Ver producto</a>
-              </div>
-            ))}
-          </div>
+  </div>
 
-          <div>
-            <h3>Acuenta</h3>
-            {carritoAcuenta.map((item, i) => (
-              <div key={`a-${i}`} className="App_cart-item">
-                {item.image && <img src={item.image} alt={item.title} />}
-                <p>{item.title}</p>
-                <p>Precio: {item.price} | Cant: {item.quantity}</p>
-                <a href={item.link} target="_blank" rel="noopener noreferrer">Ver producto</a>
-              </div>
-            ))}
-          </div>
+  {/* === GRILLA DE PRODUCTOS === */}
+  <div className="App_products-grid">
+    {displayedProducts.length > 0 ? (
+      <>
+        {displayedProducts.map((product, index) => (
+          <ProductCard
+            key={`App-${product.store}-${index}`}
+            product={product}
+            onAdd={handleAddToCart}
+            onAddToClientCart={handleAddToLateralCart}
+          />
+        ))}
+        {isLoadingMore && (
+          <div className="App_loading-more">Cargando más productos...</div>
+        )}
+      </>
+    ) : (
+      <p className="App_no-results">No se encontraron productos.</p>
+    )}
+  </div>
+
+  {/* === CARRITO COTIZADOR RÁPIDO (DERECHA) === */}
+  <div className="App_cart">
+    <h2 className="App_cart-title">Carrito Cotizador Rápido</h2>
+
+    {/* UNIMARC */}
+    <div>
+      <h3>Unimarc</h3>
+      {carritoUnimarc.map((item, i) => (
+        <div key={`u-${i}`} className="App_cart-item">
+          {item.image && <img src={item.image} alt={item.title} />}
+          <p>{item.title}</p>
+          <p>Precio: {item.displayPrice || item.currentPrice} | Cant: {item.quantity}</p>
+          <a href={item.link} target="_blank" rel="noopener noreferrer">Ver producto</a>
         </div>
-      </div>
+      ))}
+    </div>
+
+    {/* TOTTUS */}
+    <div>
+      <h3>Tottus</h3>
+      {carritoTottus.map((item, i) => (
+        <div key={`t-${i}`} className="App_cart-item">
+          {item.image && <img src={item.image} alt={item.title} />}
+          <p>{item.title}</p>
+          <p>Precio: {item.displayPrice || item.currentPrice} | Cant: {item.quantity}</p>
+          <a href={item.link} target="_blank" rel="noopener noreferrer">Ver producto</a>
+        </div>
+      ))}
+    </div>
+
+    {/* JUMBO */}
+    <div>
+      <h3>Jumbo</h3>
+      {carritoJumbo.map((item, i) => (
+        <div key={`j-${i}`} className="App_cart-item">
+          {item.image && <img src={item.image} alt={item.title} />}
+          <p>{item.title}</p>
+          <p>Precio: {item.displayPrice || item.currentPrice} | Cant: {item.quantity}</p>
+          <a href={item.link} target="_blank" rel="noopener noreferrer">Ver producto</a>
+        </div>
+      ))}
+    </div>
+
+    {/* ACUENTA */}
+    <div>
+      <h3>Acuenta</h3>
+      {carritoAcuenta.map((item, i) => (
+        <div key={`a-${i}`} className="App_cart-item">
+          {item.image && <img src={item.image} alt={item.title} />}
+          <p>{item.title}</p>
+          <p>Precio: {item.displayPrice || item.currentPrice} | Cant: {item.quantity}</p>
+          <a href={item.link} target="_blank" rel="noopener noreferrer">Ver producto</a>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+
+<div className="App_sidebar">
+  <div className="App_filters">
+    {/* Aquí van tus filtros */}
+  </div>
+</div>
+
+
+
 
         {/* Ventana emergente registro */}
         {!isLoggedIn && showModal && (
