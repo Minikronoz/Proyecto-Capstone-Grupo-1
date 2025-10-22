@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
-import { Server } from 'socket.io';
+import { Server as SocketServer } from 'socket.io';
 import { spawn } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -19,7 +19,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const http = createServer(app);
-const io = new Server(http, {
+const io = new SocketServer(http, {
   cors: { origin: "http://localhost:5173", methods: ["GET", "POST"] }
 });
 
@@ -282,8 +282,11 @@ app.get('/api/firebase/users', async (req, res) => {
    🔹 Socket.IO
    ============================================================= */
 io.on('connection', (socket) => {
-  console.log('Cliente conectado');
-  socket.on('disconnect', () => console.log('Cliente desconectado'));
+  console.log('Cliente conectado para monitoreo de scraping');
+  
+  socket.on('disconnect', () => {
+    console.log('Cliente desconectado');
+  });
 });
 
 /* =============================================================
@@ -291,5 +294,157 @@ io.on('connection', (socket) => {
    ============================================================= */
 const PORT = process.env.PORT || 3000;
 http.listen(PORT, () => {
-  console.log(` Servidor corriendo en puerto ${PORT}`);
+  console.log(`Servidor corriendo en puerto ${PORT}`);
+});
+
+/* =============================================================
+   RUTAS DE API PARA SCRAPING
+   ============================================================= */
+
+// Mapa para controlar los procesos de scraping activos
+const scrapingProcesses = {
+  tottus: { running: false },
+  jumbo: { running: false },
+  unimarc: { running: false },
+  acuenta: { running: false }
+};
+
+// Función simulada de scraping (para demostración)
+const runScraping = (store) => {
+  return new Promise((resolve, reject) => {
+    console.log(`Iniciando scraping real para ${store}...`);
+    
+    // Mapear tiendas a sus respectivos archivos de script
+    const scriptPath = {
+      'tottus': './catalogo-tottus/tottus-despensa.mjs',
+      'jumbo': './catalogo-jumbo/jumbo-despensa.mjs',
+      'unimarc': './catalogo-unimarc/unimarc-despensa.mjs',
+      'acuenta': './catalogo-acuenta/acuenta-despensa.mjs'
+    }[store];
+    
+    if (!scriptPath) {
+      reject(new Error(`No se encontró un script para la tienda ${store}`));
+      return;
+    }
+    
+    // Notificar al cliente que el proceso está iniciando
+    io.emit("scrape-progress", {
+      store,
+      message: "Iniciando proceso de scraping..."
+    });
+    
+    // Ejecutar el script como proceso hijo
+    const process = spawn('node', [scriptPath], { 
+      stdio: ['ignore', 'pipe', 'pipe'],
+      shell: true
+    });
+    
+    // Capturar la salida estándar del proceso (console.log)
+    process.stdout.on('data', (data) => {
+      const message = data.toString().trim();
+      console.log(`[${store}] ${message}`);
+      
+      // Enviar al cliente a través de Socket.IO
+      io.emit("scrape-progress", {
+        store,
+        message: message
+      });
+    });
+    
+    // Capturar la salida de error del proceso (console.error)
+    process.stderr.on('data', (data) => {
+      const message = data.toString().trim();
+      console.error(`[${store} ERROR] ${message}`);
+      
+      // Enviar al cliente como error
+      io.emit("scrape-progress", {
+        store,
+        message: `ERROR: ${message}`,
+        type: "error"
+      });
+    });
+    
+    // Manejar finalización del proceso
+    process.on('close', (code) => {
+      console.log(`Proceso de scraping de ${store} terminado con código ${code}`);
+      scrapingProcesses[store].running = false;
+      
+      if (code === 0) {
+        io.emit("scrape-complete", {
+          store,
+          success: true,
+          message: `Proceso completado con éxito`
+        });
+        resolve(true);
+      } else {
+        io.emit("scrape-error", {
+          store,
+          message: `El proceso terminó con código de error: ${code}`
+        });
+        reject(new Error(`Proceso terminó con código ${code}`));
+      }
+    });
+    
+    // Manejar errores del proceso
+    process.on('error', (err) => {
+      console.error(`Error al ejecutar el script de ${store}:`, err);
+      scrapingProcesses[store].running = false;
+      io.emit("scrape-error", {
+        store,
+        message: err.message
+      });
+      reject(err);
+    });
+  });
+};
+
+// Endpoints para iniciar scraping
+app.post('/api/scrape/:store', async (req, res) => {
+  const { store } = req.params;
+  
+  // Verificar que sea una tienda válida
+  if (!['tottus', 'jumbo', 'unimarc', 'acuenta'].includes(store)) {
+    return res.status(400).json({ error: 'Tienda no válida' });
+  }
+  
+  // Verificar si ya hay un proceso en ejecución
+  if (scrapingProcesses[store].running) {
+    return res.status(409).json({ error: 'Ya hay un proceso de scraping en ejecución para esta tienda' });
+  }
+  
+  // Marcar como en ejecución
+  scrapingProcesses[store].running = true;
+  
+  try {
+    // Responder inmediatamente para no bloquear el cliente
+    res.status(202).json({ message: `Scraping de ${store} iniciado` });
+    
+    // Iniciar el proceso de scraping en segundo plano
+    runScraping(store).catch(error => {
+      console.error(`Error en scraping de ${store}:`, error);
+      scrapingProcesses[store].running = false;
+      io.emit("scrape-error", {
+        store,
+        message: error.message || "Error desconocido"
+      });
+    });
+  } catch (error) {
+    console.error(`Error al iniciar scraping de ${store}:`, error);
+    scrapingProcesses[store].running = false;
+    res.status(500).json({ error: `Error al iniciar scraping: ${error.message}` });
+  }
+});
+
+// Endpoint para verificar estado del scraping
+app.get('/api/scrape/status/:store', (req, res) => {
+  const { store } = req.params;
+  
+  if (!['tottus', 'jumbo', 'unimarc', 'acuenta'].includes(store)) {
+    return res.status(400).json({ error: 'Tienda no válida' });
+  }
+  
+  res.json({
+    store,
+    running: scrapingProcesses[store].running
+  });
 });
