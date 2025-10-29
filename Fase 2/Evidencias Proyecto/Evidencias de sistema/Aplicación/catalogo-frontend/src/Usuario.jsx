@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { auth, db } from "./firebase";
-import { collection, query, where, getDocs, updateDoc, doc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import "./App.css";
 
@@ -12,31 +10,35 @@ function Usuario() {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const user = auth.currentUser;
-      if (!user) {
-        navigate("/login");
-        return;
-      }
-
       try {
-        const usuariosRef = collection(db, "usuarios");
-        const q = query(usuariosRef, where("email", "==", user.email));
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-          const docSnap = querySnapshot.docs[0];
-          const data = docSnap.data();
-
-          // Asegurarse que "negocios" siempre sea un array
-          if (!Array.isArray(data.negocios)) data.negocios = [];
-
-          setUsuario({ id: docSnap.id, ...data });
-          setFormData(data);
-        } else {
-          console.error("No se encontró el documento del usuario");
+        // Obtener el token del localStorage
+        const token = localStorage.getItem('token');
+        if (!token) {
+          navigate("/login");
+          return;
         }
+
+        // Obtener los datos del usuario
+        const response = await fetch('http://localhost:3000/api/auth/', {
+          headers: {
+            'x-auth-token': token
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al obtener datos del usuario');
+        }
+
+        const data = await response.json();
+        
+        // Asegurarse que "negocios" siempre sea un array
+        if (!Array.isArray(data.negocios)) data.negocios = [];
+
+        setUsuario(data);
+        setFormData(data);
       } catch (error) {
         console.error("Error al obtener datos del usuario:", error);
+        navigate("/login");
       } finally {
         setCargando(false);
       }
@@ -66,13 +68,31 @@ function Usuario() {
     try {
       if (!usuario) return;
 
-      const userRef = doc(db, "usuarios", usuario.id);
-      await updateDoc(userRef, formData);
-      alert("Datos actualizados correctamente ");
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      const response = await fetch('http://localhost:3000/api/auth/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.msg || 'Error al actualizar los datos');
+      }
+
+      alert("Datos actualizados correctamente");
       navigate("/");
     } catch (error) {
       console.error("Error al actualizar datos:", error);
-      alert("Error al actualizar los datos ");
+      alert(error.message || "Error al actualizar los datos");
     }
   };
 

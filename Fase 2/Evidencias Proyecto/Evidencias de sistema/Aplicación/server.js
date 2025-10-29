@@ -10,8 +10,11 @@ import Product from './models/Product.js';
 import PriceHistory from './models/PriceHistory.js';
 import Busqueda from './models/Busqueda.js';
 import Click from './models/Click.js';
-import { db } from './firebase-admin-config.js'; //  Firestore con credenciales correctas
+import Usuario from './models/Usuario.js';
 import dotenv from 'dotenv';
+import authRouter from './routes/auth.js';
+import authMiddleware from './middleware/auth.js';
+
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -30,8 +33,11 @@ conectarDB();
 app.use(cors());
 app.use(express.json());
 
+app.use('/api/auth', authRouter);
+
+
 /* =============================================================
-    NUEVA RUTA: Guardar clics con datos de usuario desde Firestore
+    NUEVA RUTA: Guardar clics con datos de usuario desde MongoDB
    ============================================================= */
 app.post('/api/clicks', async (req, res) => {
   try {
@@ -40,30 +46,19 @@ app.post('/api/clicks', async (req, res) => {
 
     // Validar campos mínimos
     if (!title || !store || !link || !userEmail) {
-      return res.status(400).json({ msg: "Faltan datos (title, store, link, userEmail)" });
+      return res.status(400).json({ error: 'Faltan campos requeridos' });
     }
 
-    // 🔍 Buscar usuario en Firestore
-    const snapshot = await db.collection("usuarios").where("email", "==", userEmail).limit(1).get();
-
-    if (snapshot.empty) {
-      console.warn(" Usuario no encontrado en Firestore, se guardará sin usuarioInfo");
+    // Buscar usuario en MongoDB
+    const usuario = await Usuario.findOne({ email: userEmail });
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
     }
 
-    const userData = snapshot.empty ? {} : snapshot.docs[0].data();
+    // Obtener la edad del campo virtual
+    const edadCalculada = usuario.edad;
 
-    //  Calcular edad si existe fecha de nacimiento
-    let edadCalculada = null;
-    if (userData.fechaNacimiento) {
-      const nacimiento = new Date(userData.fechaNacimiento);
-      const hoy = new Date();
-      let edad = hoy.getFullYear() - nacimiento.getFullYear();
-      const mes = hoy.getMonth() - nacimiento.getMonth();
-      if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) edad--;
-      edadCalculada = edad;
-    }
-
-    //  Crear documento en MongoDB
+    // Crear documento de clic en MongoDB
     const nuevoClick = new Click({
       title,
       store,
@@ -72,14 +67,14 @@ app.post('/api/clicks', async (req, res) => {
       image,
       link,
       usuarioInfo: {
-        usuarioRut: userData.rut || "",
-        nombre: userData.nombre || "",
-        apellido: userData.apellido || "",
+        usuarioRut: usuario.rut || "",
+        nombre: usuario.nombre || "",
+        apellido: usuario.apellido || "",
         edad: edadCalculada,
-        sexo: userData.sexo || "",
-        region: userData.region || "",
-        comuna: userData.comuna || "",
-        sector: userData.sector || ""
+        sexo: usuario.sexo || "",
+        region: usuario.region || "",
+        comuna: usuario.comuna || "",
+        sector: usuario.sector || ""
       }
     });
 
@@ -220,7 +215,10 @@ app.get('/api/dashboard/data', async (req, res) => {
     // 1. Obtener todas las búsquedas de MongoDB
     const busquedas = await Busqueda.find().lean();
     
-    // 2. Extraer usuarios únicos de las búsquedas (información básica de MongoDB)
+    // 2. Obtener todos los usuarios con su información
+    const usuarios = await Usuario.find().lean();
+    
+    // Crear un Map con la información de usuarios incluyendo la edad calculada
     const usuariosSet = new Map();
     busquedas.forEach(b => {
       if (b.usuarioInfo && b.usuarioInfo.usuarioRut) {
@@ -252,34 +250,25 @@ app.get('/api/dashboard/data', async (req, res) => {
   }
 });
 
-// También necesitamos esta ruta para obtener usuarios de Firebase
-app.get('/api/firebase/users', async (req, res) => {
+// Ruta para obtener usuarios (protegida, solo admin)
+app.get('/api/users', authMiddleware, async (req, res) => {
   try {
-    // Obtener usuarios de Firebase (solo metadatos básicos)
-    const snapshot = await db.collection("usuarios").get();
+    // Verificar si el usuario es admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ msg: 'No autorizado' });
+    }
     
-    const usuarios = snapshot.docs.map(doc => ({
-      id: doc.id,
-      email: doc.data().email,
-      nombre: doc.data().nombre || '',
-      apellido: doc.data().apellido || '',
-      sexo: doc.data().sexo || 'Otro',
-      edad: doc.data().edad || null,
-      region: doc.data().region || '',
-      comuna: doc.data().comuna || '',
-      sector: doc.data().sector || '',
-      tieneNegocio: !!doc.data().tieneNegocio
-    }));
-    
-    res.json(usuarios);
+    // Obtener usuarios de MongoDB
+    const users = await Usuario.find().select('-password');
+    res.json(users);
   } catch (error) {
-    console.error('Error obteniendo usuarios de Firebase:', error);
+    console.error('Error al obtener usuarios:', error);
     res.status(500).json({ error: 'Error al obtener usuarios' });
   }
 });
 
 /* =============================================================
-   🔹 Socket.IO
+   Socket.IO
    ============================================================= */
 io.on('connection', (socket) => {
   console.log('Cliente conectado para monitoreo de scraping');

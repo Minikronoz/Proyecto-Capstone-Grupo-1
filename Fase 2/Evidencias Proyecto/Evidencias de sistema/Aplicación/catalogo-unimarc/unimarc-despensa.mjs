@@ -5,7 +5,6 @@ import mongoose from 'mongoose';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
-// Usamos '../' para "subir un nivel" y encontrar las carpetas correctas
 import conectarDB from '../config/db.js';
 import Product from '../models/Product.js';
 import PriceHistory from '../models/PriceHistory.js';
@@ -15,13 +14,23 @@ const __dirname = dirname(__filename);
 
 const parsePrice = (priceString) => {
   if (!priceString) return null;
-  return parseInt(priceString.replace(/\$|\./g, '').trim(), 10);
+  // Remover $, puntos, espacios y c/u
+  const cleanPrice = priceString.replace(/\$|\.|\s*c\/u/gi, '').trim();
+  // Si es una oferta tipo "2 x $3.180", tomar solo el precio unitario
+  if (cleanPrice.includes('x')) {
+    const parts = cleanPrice.split('x');
+    if (parts.length === 2) {
+      const total = parseInt(parts[1], 10);
+      const quantity = parseInt(parts[0], 10);
+      return Math.round(total / quantity);
+    }
+  }
+  return parseInt(cleanPrice, 10);
 };
 
-// Esta es la función principal que se ejecutará
 async function main() {
   console.log('Iniciando script de scraping para Unimarc...');
-  await conectarDB(); // Se conecta a la base de datos
+  await conectarDB();
 
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
@@ -29,6 +38,7 @@ async function main() {
   
   let productosNuevos = 0;
   let productosActualizados = 0;
+  let errores = 0;
 
   try {
     await page.goto('https://www.unimarc.cl/category/despensa', { waitUntil: 'domcontentloaded' });
@@ -38,8 +48,6 @@ async function main() {
       Math.max(...els.map(el => parseInt(el.innerText)).filter(n => !isNaN(n)))
     );
 
-
-    // const pagesToScrape = 2; // Aumenté a 2 páginas para prueba
     const pagesToScrape = lastPage;
     for (let pageNumber = 1; pageNumber <= pagesToScrape; pageNumber++) {
       console.log(`Procesando página: ${pageNumber}`);
@@ -49,62 +57,118 @@ async function main() {
       const productsInPage = await page.$$eval('a[href^="/product/"]', (links) => {
         const seen = new Set();
         return links.map(link => {
+          const href = link.getAttribute('href');
+          if (!href || seen.has(href)) return null;
+          seen.add(href);
+
           const container = link.closest('div[style*="min-height: 300px"]');
           if (!container) return null;
-          const title = container.querySelector('.Shelf_nameProduct__CXI5M')?.innerText.trim() || '';
-          const brand = container.querySelector('.Shelf_brand__CXI5M')?.innerText.trim() || null;
-          const price = container.querySelector('.Text_text--primary__OoK0C')?.innerText.trim() || '';
+
+          const title = container.querySelector('p.Shelf_nameProduct__CXI5M')?.innerText.trim() || '';
+          const brand = container.querySelector('p.Shelf_brandText__sGfsS')?.innerText.trim() || null;
           const image = container.querySelector('picture img')?.getAttribute('src') || '';
-          const href = link.getAttribute('href');
-          if (!href || seen.has(href) || !title || !price) return null;
-          seen.add(href);
-          return { title, brand, price, image, link: `https://www.unimarc.cl${href}`, store: "unimarc" };
+
+          // Precio normal (siempre existe)
+          const normalPriceElement = container.querySelector('.ListPrice_listPriceMuted__WML1q p');
+          const normalPriceText = normalPriceElement?.innerText.trim().replace(/\s*c\/u/, '') || null;
+
+          // Precio de oferta (puede no existir)
+          const offerPriceElement = container.querySelector('p[id^="listPrice__offerPrice--discountprice-"]');
+          const offerPriceText = offerPriceElement?.innerText.trim() || null;
+
+          // Si no hay título o precios, ignorar el producto
+          if (!title || (!normalPriceText && !offerPriceText)) return null;
+
+          return {
+            title,
+            brand,
+            price: normalPriceText,
+            offerDescription: offerPriceText,
+            image,
+            link: `https://www.unimarc.cl${href}`,
+            store: "unimarc"
+          };
         }).filter(Boolean);
       });
+
       productos.push(...productsInPage);
     }
 
     console.log(`Scraping finalizado. ${productos.length} productos encontrados. Guardando en DB...`);
     
     for (const prod of productos) {
-      const precioNumerico = parsePrice(prod.price);
-      if (isNaN(precioNumerico) || !prod.link) continue;
-
-      const productoExistente = await Product.findOne({ link: prod.link });
-
-      if (productoExistente) {
-        if (productoExistente.currentPrice !== precioNumerico) {
-          productoExistente.currentPrice = precioNumerico;
-          productoExistente.formattedPrice = prod.price;
-          productoExistente.lastUpdate = new Date();
-          await productoExistente.save();
-          
-          const historial = new PriceHistory({ productId: productoExistente._id, price: precioNumerico });
-          await historial.save();
-          productosActualizados++;
-        }
-      } else {
-        const nuevoProducto = new Product({
-          title: prod.title, 
-          brand: prod.brand, 
-          store: prod.store,
-          currentPrice: precioNumerico, 
-          formattedPrice: prod.price,
-          image: prod.image, 
-          link: prod.link, 
-          lastUpdate: new Date()
-        });
-        const productoGuardado = await nuevoProducto.save();
+      try {
+        const precioNumerico = parsePrice(prod.price);
         
-        const historial = new PriceHistory({ productId: productoGuardado._id, price: precioNumerico });
-        await historial.save();
-        productosNuevos++;
+        // Validación explícita del precio
+        if (!precioNumerico || isNaN(precioNumerico) || precioNumerico <= 0) {
+          console.log(`Saltando producto con precio inválido: ${prod.title} (${prod.price})`);
+          errores++;
+          continue;
+        }
+
+        if (!prod.link) {
+          console.log(`Saltando producto sin link: ${prod.title}`);
+          errores++;
+          continue;
+        }
+
+        const productoExistente = await Product.findOne({ link: prod.link });
+
+        if (productoExistente) {
+          if (productoExistente.currentPrice !== precioNumerico) {
+            productoExistente.currentPrice = precioNumerico;
+            productoExistente.formattedPrice = prod.price;
+            productoExistente.offerDescription = prod.offerDescription;
+            productoExistente.lastUpdate = new Date();
+            await productoExistente.save();
+            
+            // Validar precio antes de crear historial
+            if (precioNumerico > 0) {
+              const historial = new PriceHistory({ 
+                productId: productoExistente._id, 
+                price: precioNumerico,
+                date: new Date()  // Aseguramos que tenga fecha
+              });
+              await historial.save();
+              productosActualizados++;
+            }
+          }
+        } else {
+          const nuevoProducto = new Product({
+            title: prod.title,
+            brand: prod.brand,
+            store: prod.store,
+            currentPrice: precioNumerico,
+            formattedPrice: prod.price,
+            offerDescription: prod.offerDescription,
+            image: prod.image,
+            link: prod.link,
+            lastUpdate: new Date()
+          });
+          const productoGuardado = await nuevoProducto.save();
+          
+          // Validar precio antes de crear historial
+          if (precioNumerico > 0) {
+            const historial = new PriceHistory({ 
+              productId: productoGuardado._id, 
+              price: precioNumerico,
+              date: new Date()  // Aseguramos que tenga fecha
+            });
+            await historial.save();
+            productosNuevos++;
+          }
+        }
+      } catch (error) {
+        console.error(`Error procesando producto ${prod.title}:`, error.message);
+        errores++;
       }
     }
 
     console.log(`\n--- RESULTADO ---`);
     console.log(`Productos nuevos: ${productosNuevos}`);
-    console.log(` Productos actualizados: ${productosActualizados}`);
+    console.log(`Productos actualizados: ${productosActualizados}`);
+    console.log(`Productos con errores: ${errores}`);
     console.log(`-----------------`);
 
   } catch (error) {
