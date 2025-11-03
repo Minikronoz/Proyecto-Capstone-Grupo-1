@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🛒 Catálogo de Productos</title>
+  <link rel="stylesheet" href="/css/catalogo.css" />
+</head>
+
+<body>
+  <!-- 🔹 Barra superior -->
+  <div class="barra-superior">
+    <a href="/dashboard" class="logo-dash">🟢 DashUser</a>
+    <nav>
+      <a href="/catalogo">🏠 Inicio</a>
+      <a href="/editar-perfil">👤 Editar mis datos</a>
+      <a href="/logout" class="logout-btn">🚪 Cerrar sesión</a>
+    </nav>
+  </div>
+
+  <!-- 🔹 Fecha -->
+  <div class="ultima-actualizacion" id="fecha-actualizacion">
+    Última actualización: <strong></strong>
+  </div>
+
+  <!-- 🔹 Filtros supermercados -->
+  <div class="filtro-superior">
+    <label><input type="checkbox" class="filtro-super" value="unimarc" checked><span class="tag unimarc">Unimarc</span></label>
+    <label><input type="checkbox" class="filtro-super" value="tottus" checked><span class="tag tottus">Tottus</span></label>
+    <label><input type="checkbox" class="filtro-super" value="jumbo" checked><span class="tag jumbo">Jumbo</span></label>
+    <label><input type="checkbox" class="filtro-super" value="acuenta" checked><span class="tag acuenta">Acuenta</span></label>
+  </div>
+
+  <!-- 🔹 Contenido principal -->
+  <main class="main">
+    <section class="zona-busqueda">
+      <div class="bloque-busqueda">
+        <div class="buscador">
+          <input type="text" id="busqueda" placeholder="🔍 Buscar producto..." autocomplete="off" />
+          <div id="sugerencias"></div>
+          <button onclick="buscar()">Buscar</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="filtros-peso"></section>
+
+    <section class="productos" id="contenedorProductos">
+      <!-- Productos dinámicos -->
+    </section>
+
+    <!-- 🔹 Carrito rápido -->
+    <div id="carritoRapidoPanel" class="carrito-rapido oculto">
+      <div class="carrito-header">
+        <h3>Carrito rápido</h3>
+        <button id="cerrarCarritoRapido" class="cerrar-btn">✖</button>
+      </div>
+      <div id="carritoRapidoContenido" class="carrito-contenido">
+        <p>Selecciona un producto para comparar precios.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- 🔹 Footer -->
+  <footer>
+    <p>© 2025 Sistema de Reportes — Catálogo Interactivo</p>
+  </footer>
+
+  <!-- 🔹 Fecha dinámica -->
+  <script>
+    const fechaElemento = document.querySelector("#fecha-actualizacion strong");
+    const opciones = { weekday: "long", day: "numeric", month: "long", year: "numeric" };
+    const fechaFormateada = new Date().toLocaleDateString("es-ES", opciones);
+    fechaElemento.textContent = fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1);
+  </script>
+
+  <!-- 🔹 Registro de clic -->
+  <script>
+    async function registrarClickProducto(btn) {
+      const producto = {
+        idProducto: btn.getAttribute("data-id"),
+        titulo: btn.getAttribute("data-titulo"),
+        marca: btn.getAttribute("data-marca"),
+        precio: parseFloat(btn.getAttribute("data-precio")),
+        supermercado: btn.getAttribute("data-supermercado"),
+        link: btn.getAttribute("data-link"),
+        imagen: btn.getAttribute("data-imagen"),
+      };
+
+      try {
+        const res = await fetch("/api/clicks/registrar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ producto }),
+          credentials: "include"
+        });
+        const data = await res.json();
+        console.log("Click guardado:", data.msg);
+      } catch (error) {
+        console.error("Error registrando clic:", error);
+      }
+
+      window.open(producto.link, "_blank");
+    }
+  </script>
+
+  <!-- 🔹 Script principal -->
+  <script src="/js/catalogo.js"></script>
+</body>
+</html>

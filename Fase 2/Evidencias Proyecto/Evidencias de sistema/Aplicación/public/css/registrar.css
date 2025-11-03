@@ -1,0 +1,122 @@
+/* ===========================
+   🎨 Estilo moderno de Registro
+   =========================== */
+
+body {
+  font-family: "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #e8f0fe, #bbdefb);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+/* Contenedor principal */
+.form-container {
+  background: white;
+  padding: 2.5rem 3rem;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  width: 400px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Títulos */
+h2,
+h3 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #0d47a1;
+  font-weight: 600;
+}
+
+/* Inputs y select */
+input,
+select {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  transition: 0.2s;
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: #1976d2;
+  box-shadow: 0 0 4px rgba(25, 118, 210, 0.4);
+}
+
+/* Botón principal */
+button {
+  width: 100%;
+  background: linear-gradient(90deg, #1976d2, #2196f3);
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+
+button:hover {
+  background: linear-gradient(90deg, #1565c0, #1e88e5);
+  transform: translateY(-2px);
+}
+
+/* Checkbox “tiene negocio” */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+  font-size: 14px;
+}
+
+.checkbox-container input {
+  width: auto;
+}
+
+/* Enlaces inferiores */
+.links {
+  text-align: center;
+  margin-top: 1.3rem;
+}
+
+.links a {
+  color: #1565c0;
+  text-decoration: none;
+  display: block;
+  margin-top: 6px;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.links a:hover {
+  color: #0d47a1;
+  text-decoration: underline;
+}
+
+/* Animación */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.logo {
+  display: block;
+  margin: 0 auto 1rem;
+  width: 80px;
+  height: auto;
+}

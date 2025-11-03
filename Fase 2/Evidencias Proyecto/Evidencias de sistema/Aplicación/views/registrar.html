@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Usuario</title>
+  <link rel="stylesheet" href="/css/registrar.css">
+
+  <!-- Cargar primero las regiones -->
+  <script src="/js/regiones.js"></script>
+
+  <script defer>
+    document.addEventListener("DOMContentLoaded", () => {
+      const regionSelect = document.getElementById("region");
+      const comunaSelect = document.getElementById("comuna");
+      const sectorSelect = document.getElementById("sector");
+      const tieneNegocioCheck = document.getElementById("tieneNegocio");
+      const negociosContainer = document.getElementById("negociosContainer");
+      const addNegocioBtn = document.getElementById("addNegocioBtn");
+
+      /* ------------------------------
+         CLIENTE: Región → Comuna → Sector
+      ------------------------------ */
+      Object.keys(regiones).forEach(region => {
+        const opt = document.createElement("option");
+        opt.value = region;
+        opt.textContent = region;
+        regionSelect.appendChild(opt);
+      });
+
+      regionSelect.addEventListener("change", () => {
+        comunaSelect.innerHTML = "<option value=''>Seleccione comuna</option>";
+        sectorSelect.innerHTML = "<option value=''>Seleccione sector</option>";
+
+        const comunaList = regiones[regionSelect.value] || [];
+        comunaList.forEach(c => {
+          const o = document.createElement("option");
+          o.value = c;
+          o.textContent = c;
+          comunaSelect.appendChild(o);
+        });
+      });
+
+      comunaSelect.addEventListener("change", () => {
+        sectorSelect.innerHTML = "<option value=''>Seleccione sector</option>";
+        const sectores = sectoresPorComuna[comunaSelect.value] || [];
+        if (sectores.length === 0) {
+          const opt = document.createElement("option");
+          opt.value = "";
+          opt.textContent = "(Sin sectores disponibles)";
+          sectorSelect.appendChild(opt);
+        } else {
+          sectores.forEach(s => {
+            const o = document.createElement("option");
+            o.value = s;
+            o.textContent = s;
+            sectorSelect.appendChild(o);
+          });
+        }
+      });
+
+      /* ------------------------------
+         NEGOCIOS: Mostrar / Ocultar
+      ------------------------------ */
+      tieneNegocioCheck.addEventListener("change", e => {
+        negociosContainer.style.display = e.target.checked ? "block" : "none";
+      });
+
+      /* ------------------------------
+         NEGOCIOS: Agregar bloque dinámico
+      ------------------------------ */
+      addNegocioBtn.addEventListener("click", () => {
+        const index = negociosContainer.querySelectorAll(".negocio-item").length + 1;
+        const div = document.createElement("div");
+        div.classList.add("negocio-item");
+        div.innerHTML = `
+          <h4>Negocio ${index}</h4>
+          <input type="text" name="nombreNegocio_${index}" placeholder="Nombre del negocio" required>
+          <input type="text" name="rolTributario_${index}" placeholder="Rol Tributario" required>
+          <input type="text" name="giro_${index}" placeholder="Giro del negocio" required>
+          <input type="text" name="telefonoNegocio_${index}" placeholder="Teléfono (opcional)">
+          <input type="email" name="correoNegocio_${index}" placeholder="Correo (opcional)">
+          <input type="text" name="webNegocio_${index}" placeholder="Sitio web (opcional)">
+
+          <select name="regionNegocio_${index}" class="regionNegocio" required>
+            <option value="">Región del negocio</option>
+          </select>
+
+          <select name="comunaNegocio_${index}" class="comunaNegocio" required>
+            <option value="">Comuna del negocio</option>
+          </select>
+
+          <select name="sectorNegocio_${index}" class="sectorNegocio">
+            <option value="">Sector del negocio</option>
+          </select>
+
+          <button type="button" class="removeNegocioBtn">Eliminar negocio</button>
+        `;
+        negociosContainer.appendChild(div);
+
+        // --- Población dinámica para cada negocio
+        const regionSelectNeg = div.querySelector(".regionNegocio");
+        const comunaSelectNeg = div.querySelector(".comunaNegocio");
+        const sectorSelectNeg = div.querySelector(".sectorNegocio");
+
+        Object.keys(regiones).forEach(region => {
+          const opt = document.createElement("option");
+          opt.value = region;
+          opt.textContent = region;
+          regionSelectNeg.appendChild(opt);
+        });
+
+        regionSelectNeg.addEventListener("change", () => {
+          comunaSelectNeg.innerHTML = "<option value=''>Seleccione comuna</option>";
+          sectorSelectNeg.innerHTML = "<option value=''>Seleccione sector</option>";
+          const comunaList = regiones[regionSelectNeg.value] || [];
+          comunaList.forEach(c => {
+            const o = document.createElement("option");
+            o.value = c;
+            o.textContent = c;
+            comunaSelectNeg.appendChild(o);
+          });
+        });
+
+        comunaSelectNeg.addEventListener("change", () => {
+          sectorSelectNeg.innerHTML = "<option value=''>Seleccione sector</option>";
+          const sectores = sectoresPorComuna[comunaSelectNeg.value] || [];
+          if (sectores.length === 0) {
+            const opt = document.createElement("option");
+            opt.value = "";
+            opt.textContent = "(Sin sectores disponibles)";
+            sectorSelectNeg.appendChild(opt);
+          } else {
+            sectores.forEach(s => {
+              const o = document.createElement("option");
+              o.value = s;
+              o.textContent = s;
+              sectorSelectNeg.appendChild(o);
+            });
+          }
+        });
+
+        div.querySelector(".removeNegocioBtn").addEventListener("click", () => {
+          div.remove();
+        });
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <div class="form-container">
+    <img src="/img/logo.png" alt="Logo del Sistema" class="logo" />
+    <h2>Registro de Usuario</h2>
+    <form method="POST" action="/registrar">
+      <input type="text" name="nombre" placeholder="Nombre" required>
+      <input type="text" name="apellido" placeholder="Apellido" required>
+      <input type="text" name="rut" placeholder="RUT" required>
+      <input type="date" name="fechaNacimiento" required>
+
+      <select name="genero" required>
+        <option value="">Seleccione género</option>
+        <option value="Masculino">Masculino</option>
+        <option value="Femenino">Femenino</option>
+        <option value="Otro">Otro</option>
+      </select>
+
+      <select id="region" name="region" required>
+        <option value="">Seleccione región</option>
+      </select>
+
+      <select id="comuna" name="comuna" required>
+        <option value="">Seleccione comuna</option>
+      </select>
+
+      <select id="sector" name="sector" required>
+        <option value="">Seleccione sector</option>
+      </select>
+
+      <input type="email" name="correo" placeholder="Correo electrónico" required>
+      <input type="password" name="contraseña" placeholder="Contraseña" required>
+
+      <label>
+        <input type="checkbox" id="tieneNegocio" name="tieneNegocio"> Tengo un negocio
+      </label>
+
+      <div id="negociosContainer" style="display:none;">
+        <h3>Datos de los Negocios</h3>
+        <button type="button" id="addNegocioBtn" class="btn-secundario">+ Agregar  negocio</button>
+      </div>
+
+      <button type="submit" class="btn-catalogo">Registrar</button>
+
+      <div class="links">
+        <a href="/login">Acceder a mi cuenta</a><br>
+        <a href="/forgot">¿Olvidaste tu contraseña?</a><br>
+
+      </div>
+    </form>
+  </div>
+</body>
+</html>

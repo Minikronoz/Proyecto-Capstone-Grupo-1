@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>📊 Dashboard de Productos</title>
+  <link rel="stylesheet" href="/css/dashboard.css?v=4">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="header-left">
+        <img src="/icons/dashboard-icon.png" alt="Logo" class="logo">
+        <h1>Panel de Analítica de Productos</h1>
+      </div>
+      <div class="filtros">
+        <label for="filtroSuper">Supermercado:</label>
+        <select id="filtroSuper">
+          <option value="">Todos</option>
+          <option value="jumbo">Jumbo</option>
+          <option value="unimarc">Unimarc</option>
+          <option value="tottus">Tottus</option>
+          <option value="acuenta">A Cuenta</option>
+        </select>
+
+        <label for="filtroGenero">Género:</label>
+        <select id="filtroGenero">
+          <option value="">Todos</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Femenino">Femenino</option>
+        </select>
+
+        <label for="filtroFecha">Desde:</label>
+        <input type="date" id="filtroFecha">
+        <button id="btnFiltrar">Filtrar</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h2>Productos más consultados</h2>
+      <div class="chart-container"><canvas id="topProductos"></canvas></div>
+    </section>
+
+    <section>
+      <h2>Productos por supermercado</h2>
+      <div class="chart-container"><canvas id="porSupermercado"></canvas></div>
+    </section>
+
+    <section>
+      <h2>Evolución diaria de consultas</h2>
+      <div class="chart-container"><canvas id="porDia"></canvas></div>
+    </section>
+
+    <section>
+      <h2>Usuarios por edad</h2>
+      <div class="chart-container"><canvas id="porEdad"></canvas></div>
+    </section>
+
+    <section>
+      <h2>Usuarios por género</h2>
+      <div class="chart-container"><canvas id="porGenero"></canvas></div>
+    </section>
+
+    <section>
+      <h2>Usuarios por región</h2>
+      <div class="chart-container"><canvas id="porRegion"></canvas></div>
+    </section>
+
+    <section>
+      <h2>Usuarios por comuna</h2>
+      <div class="chart-container"><canvas id="porComuna"></canvas></div>
+    </section>
+
+    <section>
+      <h2>Productos más consultados por día/mes/año</h2>
+      <div class="chart-container"><canvas id="porTiempo"></canvas></div>
+    </section>
+  </main>
+
+  <footer>
+    © 2025 Sistema de Reportes y Analítica 
+  </footer>
+
+  <script>
+    let charts = {};
+
+    async function fetchData(url, filtros = {}) {
+      const query = new URLSearchParams(filtros).toString();
+      const res = await fetch(`${url}?${query}`);
+      return await res.json();
+    }
+
+    async function renderChart(id, url, label, filtros = {}) {
+      const data = await fetchData(url, filtros);
+      const ctx = document.getElementById(id).getContext("2d");
+
+      if (charts[id]) charts[id].destroy();
+
+      if (!data || data.length === 0) {
+        ctx.font = "16px Arial";
+        ctx.fillStyle = "#555";
+        ctx.fillText("Sin datos suficientes para mostrar.", 50, 50);
+        return;
+      }
+
+      let chartType = "bar";
+      if (["porDia", "porTiempo"].includes(id)) chartType = "line";
+      if (id === "porGenero") chartType = "pie";
+
+      // 🎨 Colores modernos calipso / gris / turquesa
+      const colores = [
+        "#00A7B5CC", "#66D1CCCC", "#89CFF0CC",
+        "#A5D6A7CC", "#4B5563CC", "#9AD0EC", "#B0E0E6CC"
+      ];
+
+      charts[id] = new Chart(ctx, {
+        type: chartType,
+        data: {
+          labels: data.map(d => {
+            if (typeof d._id === "object" && d._id !== null) {
+              const { dia, mes, año } = d._id;
+              return [dia, mes, año].filter(Boolean).join("/") || "Desconocido";
+            }
+            if (d._id === null || d._id === undefined || d._id === "")
+              return "Sin especificar";
+            return d._id;
+          }),
+
+datasets: [{
+  label,
+  data: data.map(d => d.total),
+  borderColor: "#009FB0",
+  borderWidth: 2,
+  pointRadius: 5,
+  pointHoverRadius: 7,
+  pointBackgroundColor: "#007E8C",
+  pointBorderColor: "#FFFFFF",
+  tension: 0.4,
+  fill: true,
+  backgroundColor: (context) => {
+    const chart = context.chart;
+    const { ctx, chartArea } = chart;
+    if (!chartArea) return null;
+    const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+    gradient.addColorStop(0, "rgba(0, 167, 181, 0.1)");
+    gradient.addColorStop(0.5, "rgba(0, 167, 181, 0.25)");
+    gradient.addColorStop(1, "rgba(0, 167, 181, 0.45)");
+    return gradient;
+  },
+}]
+
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: true, grid: { color: "#e5e7eb" } },
+            x: { grid: { color: "transparent" } }
+          },
+          plugins: {
+            legend: { display: id === "porGenero", labels: { color: "#1E293B" } },
+            tooltip: {
+              backgroundColor: "#1E293B",
+              titleColor: "#fff",
+              bodyColor: "#fff",
+              borderWidth: 0,
+              callbacks: {
+                label: ctx => `${label}: ${ctx.formattedValue}`
+              }
+            }
+          }
+        }
+      });
+    }
+
+    async function cargarDashboard(filtros = {}) {
+      await Promise.all([
+        renderChart("topProductos", "/api/estadisticas/productos-mas-clickeados", "Productos", filtros),
+        renderChart("porSupermercado", "/api/estadisticas/clics-por-supermercado", "Productos", filtros),
+        renderChart("porDia", "/api/estadisticas/clics-por-dia", "Productos diarios", filtros),
+        renderChart("porEdad", "/api/estadisticas/usuarios-por-edad", "Usuarios", filtros),
+        renderChart("porGenero", "/api/estadisticas/usuarios-por-genero", "Usuarios", filtros),
+        renderChart("porRegion", "/api/estadisticas/usuarios-por-region", "Usuarios", filtros),
+        renderChart("porComuna", "/api/estadisticas/usuarios-por-comuna", "Usuarios", filtros),
+        renderChart("porTiempo", "/api/estadisticas/productos-por-tiempo", "Productos", filtros),
+      ]);
+    }
+
+    document.getElementById("btnFiltrar").addEventListener("click", () => {
+      const filtros = {
+        supermercado: document.getElementById("filtroSuper").value,
+        genero: document.getElementById("filtroGenero").value,
+        fecha: document.getElementById("filtroFecha").value,
+      };
+      cargarDashboard(filtros);
+    });
+
+    cargarDashboard();
+  </script>
+</body>
+</html>

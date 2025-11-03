@@ -1,0 +1,208 @@
+/* ===== 🎨 PALETA PROFESIONAL CALIPSO/GRIS ===== */
+:root {
+  --color-calipso: #00a7b5;
+  --color-calipso-oscuro: #006b7e;
+  --color-fondo: #f5f7f9;
+  --color-texto: #4b5563;
+  --color-titulos: #1e293b;
+  --color-borde: #d3d8de;
+  --color-blanco: #ffffff;
+  --color-bar1: #00a7b5cc;
+  --color-bar2: #66d1cccc;
+  --color-bar3: #89cff0cc;
+  --color-bar4: #a5d6a7cc;
+  --sombra: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* ===== BASE ===== */
+body {
+  font-family: "Poppins", "Segoe UI", Roboto, Arial, sans-serif;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ===== HEADER ===== */
+header {
+  background: var(--color-calipso);
+  color: var(--color-blanco);
+  padding: 22px 40px;
+  box-shadow: var(--sombra);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  width: 38px;
+  height: 38px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* ===== FILTROS ===== */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px 20px;
+  margin-top: 8px;
+}
+
+.filtros label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.filtros select,
+.filtros input {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-borde);
+  font-size: 14px;
+  background: var(--color-blanco);
+  color: var(--color-texto);
+  transition: all 0.25s;
+}
+
+.filtros select:focus,
+.filtros input:focus {
+  outline: none;
+  border-color: var(--color-calipso);
+  box-shadow: 0 0 0 3px rgba(0, 167, 181, 0.2);
+}
+
+.filtros button {
+  background: var(--color-calipso-oscuro);
+  color: var(--color-blanco);
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filtros button:hover {
+  background: var(--color-calipso);
+  transform: scale(1.05);
+}
+
+/* ===== MAIN ===== */
+main {
+  padding: 50px 9%;
+}
+
+section {
+  margin-bottom: 70px;
+  animation: fadeInUp 0.6s ease;
+}
+
+h2 {
+  color: var(--color-titulos);
+  border-bottom: 3px solid var(--color-calipso);
+  padding-bottom: 6px;
+  margin-bottom: 24px;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+
+/* ===== TARJETAS DE GRÁFICOS ===== */
+.chart-container {
+  background: var(--color-blanco);
+  border-radius: 16px;
+  box-shadow: var(--sombra);
+  padding: 30px;
+  max-width: 1100px;
+  margin: 0 auto;
+  height: 420px;
+  transition: all 0.3s ease;
+}
+
+.chart-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* ===== PIE CHART ===== */
+canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  background: var(--color-blanco);
+  text-align: center;
+  padding: 25px;
+  font-size: 13px;
+  color: #555;
+  border-top: 1px solid var(--color-borde);
+  margin-top: 60px;
+}
+
+/* ===== ANIMACIÓN ===== */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-fondo);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-calipso);
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-calipso-oscuro);
+}
+.btn-scrape {
+  background: #00a7b5;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: 600;
+  padding: 6px 12px;
+  margin: 4px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+.btn-scrape:hover {
+  background: #007a52;
+  transform: scale(1.03);
+}
+.btn-scrape:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

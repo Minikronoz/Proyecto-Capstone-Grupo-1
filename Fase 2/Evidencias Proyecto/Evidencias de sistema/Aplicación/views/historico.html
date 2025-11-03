@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Histórico de Precios</title>
+
+    <!-- 🎨 Estilos -->
+    <link rel="stylesheet" href="/css/catalogo.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      body {
+        background: linear-gradient(to bottom, #f6fafb 0%, #eef4f5 100%);
+        font-family: "Segoe UI", sans-serif;
+        margin: 0;
+        color: #1e1e1e;
+      }
+
+      header {
+        background: linear-gradient(to right, #ffffff, #f8fafa);
+        box-shadow: 0 2px 8px rgba(0, 166, 181, 0.08);
+        padding: 18px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      header h1 {
+        flex: 1;
+        text-align: center;
+        margin: 0;
+        color: #005b66;
+        font-size: 1.5rem;
+        letter-spacing: 0.3px;
+        font-weight: 700;
+      }
+
+      .btn-volver {
+        background-color: #00a7b5;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 18px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 167, 181, 0.2);
+        transition: all 0.25s ease;
+      }
+
+      .btn-volver:hover {
+        background-color: #007c86;
+        transform: translateY(-2px);
+      }
+
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 50px;
+        padding: 50px 20px 100px;
+        min-height: 85vh;
+      }
+
+      .grafico-section {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 8px 22px rgba(0, 166, 181, 0.12);
+        width: 90%;
+        max-width: 1000px;
+        padding: 40px 50px;
+        position: relative;
+        text-align: center;
+        border: 1px solid rgba(0, 166, 181, 0.08);
+      }
+
+      .grafico-section::before {
+        content: "📈 Evolución del Precio";
+        position: absolute;
+        top: -18px;
+        left: 30px;
+        background: linear-gradient(90deg, #00a7b5, #007c86);
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 167, 181, 0.2);
+      }
+
+      .grafico-section canvas {
+        width: 100% !important;
+        height: 380px !important;
+      }
+
+      .historico-card {
+        background: #ffffff;
+        border-radius: 18px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        width: 340px;
+        padding: 28px 20px 35px;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 166, 181, 0.1);
+        animation: fadeIn 0.6s ease;
+      }
+
+      .historico-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 166, 181, 0.25);
+      }
+
+      .historico-card img {
+        width: 100%;
+        max-height: 210px;
+        object-fit: contain;
+        margin-bottom: 14px;
+        transition: transform 0.3s ease;
+      }
+
+      .historico-card:hover img {
+        transform: scale(1.05);
+      }
+
+      .historico-card h3 {
+        font-size: 16px;
+        font-weight: 700;
+        color: #2e3a3f;
+        margin: 10px 0 6px;
+        line-height: 1.3;
+      }
+
+      .historico-card .brand {
+        color: #6b7a86;
+        font-size: 13px;
+        margin-bottom: 8px;
+      }
+
+      .historico-card .store-label {
+        display: inline-block;
+        background: #007c86;
+        color: white;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      .historico-card .price {
+        color: #00a7b5;
+        font-weight: 800;
+        font-size: 19px;
+        margin: 10px 0 12px;
+      }
+
+      .historico-card .btn-ver {
+        background: #00a7b5;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        border: none;
+        text-decoration: none;
+        box-shadow: 0 4px 10px rgba(0, 167, 181, 0.2);
+        transition: all 0.25s ease;
+      }
+
+      .historico-card .btn-ver:hover {
+        background: #007c86;
+        transform: translateY(-2px);
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(15px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 900px) {
+        .grafico-section {
+          width: 95%;
+          padding: 25px 20px 40px;
+        }
+
+        .grafico-section canvas {
+          height: 300px !important;
+        }
+
+        .historico-card {
+          width: 90%;
+          max-width: 340px;
+        }
+
+        header {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .btn-volver {
+          align-self: flex-start;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- 🔹 Encabezado -->
+    <header>
+      <button class="btn-volver" onclick="window.location.href='/catalogo'">← Volver</button>
+      <h1>Histórico de Precios</h1>
+    </header>
+
+    <!-- 🔹 Contenedor principal -->
+    <main>
+      <!-- 📈 Gráfico -->
+      <section class="grafico-section">
+        <canvas id="graficoHistorico"></canvas>
+      </section>
+
+      <!-- 🧾 Tarjeta de producto -->
+      <section id="productoDetalle" class="historico-card">
+        <!-- Contenido dinámico del producto -->
+      </section>
+    </main>
+
+    <!-- JS -->
+    <script src="/js/historico.js"></script>
+  </body>
+</html>

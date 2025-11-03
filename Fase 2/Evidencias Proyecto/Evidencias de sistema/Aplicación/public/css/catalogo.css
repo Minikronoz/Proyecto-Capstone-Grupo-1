@@ -1,0 +1,705 @@
+/* ================================
+   PARTE 1/11 — Paleta + Base + Topbar
+   ================================ */
+
+/* 🌈 PALETA BASE */
+:root {
+  --calipso: #00a7b5;
+  --calipso-50: #e6fbfd;
+  --calipso-100: #c8f4f7;
+  --calipso-200: #9ee7ec;
+  --calipso-300: #74d9e1;
+  --calipso-400: #40c7d2;
+  --calipso-500: #00a7b5;
+  --calipso-600: #008e9a;
+  --calipso-700: #007682;
+
+  --petroleo: #006b7e;
+  --petroleo-600: #075867;
+  --petroleo-700: #0a4853;
+
+  --gris-claro: #f5f7f9;
+  --gris-medio: #d8dee3;
+  --gris-texto: #44505a;
+  --gris-oscuro: #2c3e50;
+  --blanco: #ffffff;
+
+  --radius: 10px;
+  --sombra: 0 4px 12px rgba(0,0,0,0.06);
+  --sombra-strong: 0 8px 24px rgba(0,0,0,0.08);
+  --transition: all 0.25s ease;
+}
+
+/* 🔤 Tipografía y fondo global */
+body {
+  font-family: "Segoe UI", "Inter", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  background-color: var(--gris-claro);
+  color: var(--gris-texto);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ================================
+   🧭 BARRA SUPERIOR (Topbar)
+   ================================ */
+.barra-superior {
+  background: linear-gradient(to right, #ffffff, #f8fafa);
+  color: var(--gris-oscuro);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 22px;
+  box-shadow: 0 2px 8px rgba(0, 166, 181, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+/* ================================
+   PARTE 2/11 — Logo, navegación y fecha
+   ================================ */
+
+.logo-dash {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--petroleo);
+  font-weight: 700;
+  font-size: 18px;
+  text-decoration: none;
+  letter-spacing: .2px;
+  transition: var(--transition);
+}
+.logo-dash:hover {
+  color: var(--calipso-600);
+  transform: translateY(-1px);
+}
+
+/* 🔹 Navegación */
+.barra-superior nav a {
+  color: var(--gris-texto);
+  text-decoration: none;
+  margin-left: 18px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: var(--transition);
+}
+.barra-superior nav a:hover {
+  color: var(--calipso-600);
+  background: var(--calipso-50);
+}
+
+/* 🔹 Fecha actual */
+.ultima-actualizacion {
+  background: linear-gradient(0deg, var(--gris-claro), var(--blanco));
+  padding: 10px 22px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--gris-medio);
+  color: var(--gris-texto);
+}
+.ultima-actualizacion strong {
+  color: var(--petroleo);
+  letter-spacing: .2px;
+}
+/* ================================
+   PARTE 3/11 — Filtro de Supermercados
+   ================================ */
+.filtro-superior {
+  background: linear-gradient(90deg, var(--calipso-50), #f9ffff);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 0;
+  border-bottom: 2px solid var(--calipso-400);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  flex-wrap: wrap;
+}
+
+/* 🔘 Etiquetas */
+.filtro-superior label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--gris-oscuro);
+  background: var(--blanco);
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--gris-medio);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.filtro-superior label:hover {
+  background: var(--calipso-50);
+  border-color: var(--calipso-300);
+  transform: translateY(-1px);
+}
+
+/* ✅ Checkbox */
+.filtro-superior input[type="checkbox"] {
+  transform: scale(1.25);
+  accent-color: var(--calipso);
+  cursor: pointer;
+}
+/* ================================
+   PARTE 4/11 — Tags de Supermercado
+   ================================ */
+.tag {
+  display: inline-block;
+  border-radius: 6px;
+  padding: 4px 9px;
+  font-weight: 600;
+  font-size: 13px;
+  color: white;
+  letter-spacing: 0.2px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+  transition: var(--transition);
+}
+
+.tag.unimarc {
+  background: linear-gradient(145deg, #d53b3b, #b72828);
+}
+.tag.tottus {
+  background: linear-gradient(145deg, #3ca54b, #2c8538);
+}
+.tag.jumbo {
+  background: linear-gradient(145deg, var(--petroleo), #0a4853);
+}
+.tag.acuenta {
+  background: linear-gradient(145deg, #ef6c00, #cc5700);
+}
+
+.tag:hover {
+  filter: brightness(1.1);
+  transform: scale(1.03);
+}
+/* ================================
+   PARTE 5/11 — Zona de búsqueda
+   ================================ */
+.zona-busqueda {
+  display: flex;
+  justify-content: center;
+  padding: 28px 0 18px;
+  background: linear-gradient(180deg, #f9fbfc, #ffffff);
+  box-shadow: inset 0 -1px 0 var(--gris-medio);
+}
+
+.bloque-busqueda {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  max-width: 720px;
+}
+
+/* Campo buscador */
+.buscador {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 520px;
+  gap: 10px;
+  position: relative;
+}
+
+.buscador input {
+  flex: 1;
+  padding: 11px 13px;
+  border: 1px solid var(--gris-medio);
+  border-radius: var(--radius);
+  font-size: 15px;
+  transition: var(--transition);
+  box-shadow: var(--sombra);
+  background: var(--blanco);
+}
+
+.buscador input:focus {
+  border-color: var(--calipso-500);
+  box-shadow: 0 0 0 3px rgba(0,166,181,0.2);
+  outline: none;
+}
+
+.buscador button {
+  background: var(--calipso-600);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+  transition: var(--transition);
+  box-shadow: var(--sombra);
+}
+
+.buscador button:hover {
+  background: var(--calipso-700);
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+/* ================================
+   PARTE 6/11 — Sugerencias y filtros horizontales
+   ================================ */
+
+/* 💬 CONTENEDOR DE SUGERENCIAS */
+#sugerencias {
+  position: absolute;
+  top: 42px;
+  left: 0;
+  width: 100%;
+  background: var(--blanco);
+  border: 1px solid var(--gris-medio);
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  z-index: 1000;
+  max-height: 220px;
+  overflow-y: auto;
+  display: none;
+  animation: fadeIn 0.25s ease;
+}
+
+#sugerencias div {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--gris-oscuro);
+  border-bottom: 1px solid #f0f0f0;
+  transition: var(--transition);
+}
+#sugerencias div:hover {
+  background: #e9f9fb;
+  color: var(--petroleo);
+  font-weight: 600;
+}
+#sugerencias .sin-resultados {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  background: #fafafa;
+}
+
+/* 🧱 FILTROS HORIZONTALES */
+.filtros-peso {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 10px 12px;
+  background: linear-gradient(90deg, #f9fbfc, #ffffff);
+  border-top: 1px solid var(--gris-medio);
+  border-bottom: 1px solid var(--gris-medio);
+  scrollbar-width: thin;
+  scrollbar-color: var(--calipso-400) #eaeaea;
+}
+
+.filtros-peso::-webkit-scrollbar {
+  height: 6px;
+}
+.filtros-peso::-webkit-scrollbar-thumb {
+  background: var(--calipso-400);
+  border-radius: 6px;
+}
+
+.chip-filtro {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  padding: 7px 14px;
+  border: 1px solid var(--gris-medio);
+  border-radius: 20px;
+  background: var(--blanco);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gris-oscuro);
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.chip-filtro:hover {
+  background: var(--calipso-100);
+  color: var(--petroleo);
+  border-color: var(--calipso-400);
+  transform: translateY(-1px);
+}
+
+.btn-limpiar-filtro {
+  flex: 0 0 auto;
+  background: var(--calipso-500);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 7px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: .2px;
+  transition: var(--transition);
+}
+.btn-limpiar-filtro:hover {
+  background: var(--petroleo);
+  transform: translateY(-1px);
+}
+/* ================================
+   PARTE 7/11 — Catálogo de productos
+   ================================ */
+
+.productos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 25px;
+  justify-items: center;
+  padding: 24px;
+  background: linear-gradient(180deg, #f7fbfc, #ffffff);
+}
+
+.producto-card {
+  background: var(--blanco);
+  border-radius: var(--radius);
+  box-shadow: var(--sombra);
+  width: 220px;
+  padding: 16px;
+  text-align: center;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #e3ebee;
+}
+
+.producto-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--sombra-strong);
+  border-color: var(--calipso-200);
+}
+
+.store-label {
+  background: var(--petroleo);
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 5px 9px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.producto-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: contain;
+  margin-bottom: 10px;
+  transition: transform 0.25s ease;
+}
+.producto-card:hover img {
+  transform: scale(1.04);
+}
+
+.producto-card h3 {
+  font-size: 15px;
+  margin: 6px 0;
+  color: var(--gris-oscuro);
+  font-weight: 600;
+  height: 40px;
+  overflow: hidden;
+}
+
+.producto-card .brand {
+  color: #888;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.producto-card .price {
+  font-size: 17px;
+  color: var(--calipso-600);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+/* ================================
+   PARTE 8/11 — Botones + Carrito rápido
+   ================================ */
+
+.btn-ver {
+  background: var(--calipso-500);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  transition: var(--transition);
+}
+.btn-ver:hover {
+  background: var(--petroleo);
+  transform: translateY(-2px);
+}
+
+.carrito-rapido {
+  position: fixed;
+  right: 15px;
+  bottom: 15px;
+  width: 300px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+.carrito-rapido.oculto {
+  display: none;
+}
+
+.carrito-header {
+  background: var(--petroleo);
+  color: white;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.carrito-header h3 {
+  font-size: 15px;
+  margin: 0;
+}
+.cerrar-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+}
+.cerrar-btn:hover {
+  color: #ff6961;
+}
+
+.carrito-contenido {
+  padding: 12px;
+  font-size: 13px;
+  color: #333;
+}
+/* ================================
+   PARTE 9/11 — Footer y Responsive general
+   ================================ */
+
+footer {
+  text-align: center;
+  background: #0a0f10;
+  color: #cbd5d6;
+  padding: 12px;
+  font-size: 13px;
+  border-top: 2px solid #00b894;
+}
+footer p {
+  margin: 0;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .filtro-superior {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 8px;
+  }
+
+  .bloque-busqueda {
+    width: 95%;
+  }
+
+  .carrito-rapido {
+    width: 90%;
+    right: 5%;
+  }
+
+  .productos {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+  }
+  .producto-card img {
+    height: 130px;
+  }
+}
+/* ================================
+   PARTE 10/11 — Histórico de precios
+   ================================ */
+
+.historico-contenedor {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 40px;
+  padding: 40px 20px;
+  background: var(--gris-claro);
+  min-height: 85vh;
+}
+
+.historico-card {
+  background: var(--blanco);
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0, 166, 181, 0.12);
+  width: 300px;
+  padding: 20px;
+  text-align: center;
+  border: 1px solid #e2ecee;
+}
+
+.historico-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: contain;
+  margin-bottom: 12px;
+  border-radius: 10px;
+}
+
+.historico-card h3 {
+  color: var(--gris-oscuro);
+  font-size: 17px;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.historico-card .brand {
+  color: #888;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.historico-chart {
+  flex: 1;
+  min-width: 400px;
+  background: var(--blanco);
+  border-radius: 14px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  padding: 30px;
+  border: 1px solid #e3ecee;
+}
+
+.btn-volver {
+  background-color: var(--calipso);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 20px 0 0 20px;
+  transition: var(--transition);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.btn-volver:hover {
+  background-color: var(--petroleo);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .historico-contenedor {
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+  }
+  .historico-card, .historico-chart {
+    width: 90%;
+  }
+}
+/* ================================
+   PARTE 11/11 — Animaciones y efectos visuales
+   ================================ */
+
+/* ✨ Fade In (entradas suaves) */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 💨 Hover general para interactividad */
+button, a, .producto-card, .chip-filtro, .tag {
+  transition: all 0.25s ease-in-out;
+}
+
+/* 🎯 Enlaces clicables con suave escala */
+a:hover, button:hover {
+  filter: brightness(1.08);
+}
+
+/* 🌫️ Sombras globales sutiles */
+.shadow-sm {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+.shadow-md {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.shadow-lg {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* 🪶 Tarjetas flotantes */
+.card-float:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sombra-strong);
+}
+
+/* 💠 Fondo degradado general (solo si se requiere en alguna vista completa) */
+.bg-gradient {
+  background: linear-gradient(180deg, #ffffff, #f7fbfc);
+}
+
+/* 🔹 Scrollbar personalizado (moderno y minimalista) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--calipso-400);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--calipso-500);
+}
+::-webkit-scrollbar-track {
+  background: #f0f0f0;
+}
+
+/* 💎 Suavizado de interacción */
+input, button, select, textarea {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+/* 🕹️ Botones activos */
+button:active, .btn-ver:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+/* 🌈 Efecto glow sutil para botones principales */
+.btn-ver:hover, .btn-limpiar-filtro:hover, .btn-volver:hover {
+  box-shadow: 0 4px 12px rgba(0, 166, 181, 0.25);
+}
+
+/* 📱 Ajustes menores para móviles */
+@media (max-width: 480px) {
+  .filtro-superior label {
+    font-size: 13px;
+    padding: 5px 8px;
+  }
+
+  .buscador input {
+    font-size: 14px;
+  }
+
+  .producto-card {
+    width: 100%;
+  }
+}
+
+/* ✅ Fin del CSS */
