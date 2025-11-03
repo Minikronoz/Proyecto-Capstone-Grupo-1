@@ -1,0 +1,22 @@
+{
+  "unimarc": {
+    "fecha": "2025-11-02T22:23:47.811Z",
+    "actualizados": 91,
+    "nuevos": 22
+  },
+  "jumbo": {
+    "fecha": "2025-11-02T22:23:57.574Z",
+    "actualizados": 83,
+    "nuevos": 1
+  },
+  "tottus": {
+    "fecha": "2025-11-02T22:03:12.137Z",
+    "actualizados": 100,
+    "nuevos": 29
+  },
+  "acuenta": {
+    "fecha": "2025-11-02T22:04:58.783Z",
+    "actualizados": 68,
+    "nuevos": 28
+  }
+}
