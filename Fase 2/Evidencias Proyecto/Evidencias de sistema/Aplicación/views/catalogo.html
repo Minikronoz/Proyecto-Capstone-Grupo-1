@@ -5,6 +5,87 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🛒 Catálogo de Productos</title>
   <link rel="stylesheet" href="/css/catalogo.css" />
+  <style>
+  /* ==============================
+     🔹 Estilos del popup emergente
+     ============================== */
+  .popup.oculto {
+    display: none;
+  }
+
+  .popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+  }
+
+  .popup-contenido {
+    background: #fff;
+    color: #333;
+    border-radius: 14px;
+    padding: 25px 35px;
+    text-align: center;
+    max-width: 400px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    animation: aparecer 0.4s ease;
+  }
+
+  .popup-contenido h3 {
+    margin-bottom: 10px;
+    color: #00a7b5;
+  }
+
+  .popup-botones {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .popup-botones .btn {
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: white;
+    background-color: #00a7b5;
+    transition: background 0.2s;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .popup-botones .btn:hover {
+    background-color: #008e9a;
+  }
+
+  .popup-botones .btn.secundario {
+    background-color: #777;
+  }
+
+  .popup-botones .btn.secundario:hover {
+    background-color: #555;
+  }
+
+  .popup-botones .btn.omitir {
+    background-color: #e0e0e0;
+    color: #333;
+  }
+
+  .popup-botones .btn.omitir:hover {
+    background-color: #ccc;
+  }
+
+  @keyframes aparecer {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+</style>
+
 </head>
 
 <body>
@@ -12,7 +93,6 @@
   <div class="barra-superior">
     <a href="/dashboard" class="logo-dash">🟢 DashUser</a>
     <nav>
-      <a href="/catalogo">🏠 Inicio</a>
       <a href="/editar-perfil">👤 Editar mis datos</a>
       <a href="/logout" class="logout-btn">🚪 Cerrar sesión</a>
     </nav>
@@ -31,17 +111,21 @@
     <label><input type="checkbox" class="filtro-super" value="acuenta" checked><span class="tag acuenta">Acuenta</span></label>
   </div>
 
-  <!-- 🔹 Contenido principal -->
-  <main class="main">
-    <section class="zona-busqueda">
-      <div class="bloque-busqueda">
-        <div class="buscador">
-          <input type="text" id="busqueda" placeholder="🔍 Buscar producto..." autocomplete="off" />
-          <div id="sugerencias"></div>
-          <button onclick="buscar()">Buscar</button>
-        </div>
-      </div>
-    </section>
+<section class="zona-busqueda">
+  <div class="bloque-busqueda">
+    <div class="buscador">
+      <input
+        type="text"
+        id="busqueda"
+        placeholder="🔍 Buscar producto..."
+        autocomplete="off"
+      />
+      <div id="sugerencias" class="sugerencias"></div>
+      <button onclick="buscar()">Buscar</button>
+    </div>
+  </div>
+</section>
+
 
     <section class="filtros-peso"></section>
 
@@ -65,6 +149,19 @@
   <footer>
     <p>© 2025 Sistema de Reportes — Catálogo Interactivo</p>
   </footer>
+
+<!-- 🔹 Ventana emergente -->
+<div id="popupRegistro" class="popup oculto">
+  <div class="popup-contenido">
+    <h3>✨ Mejora tu experiencia ✨</h3>
+    <p>Regístrate o inicia sesión para disfrutar de funciones personalizadas y guardar tus productos favoritos.</p>
+    <div class="popup-botones">
+      <a href="/login" class="btn">🔑 Iniciar sesión</a>
+      <a href="/registro" class="btn secundario">📝 Registrarme</a>
+      <button class="btn omitir" onclick="omitirPopup()">⏳ Omitir</button>
+    </div>
+  </div>
+</div>
 
   <!-- 🔹 Fecha dinámica -->
   <script>
@@ -106,5 +203,59 @@
 
   <!-- 🔹 Script principal -->
   <script src="/js/catalogo.js"></script>
+
+  <!-- 🔹 Verificar sesión cada 1 minuto -->
+<script>
+  let sesionActiva = false;
+  let omitidoTemporalmente = false;
+
+  async function verificarSesion() {
+    try {
+      const res = await fetch("/api/usuarios/actual", { credentials: "include" });
+      const data = await res.json();
+
+      // ✅ Si el usuario está logueado, no mostrar nunca más el popup
+      if (data.usuario) {
+        sesionActiva = true;
+        ocultarPopup();
+        return;
+      }
+
+      // 🚫 Si se omitió temporalmente, no mostrar aún
+      if (omitidoTemporalmente || sesionActiva) return;
+
+      // ⚠️ Mostrar si no hay sesión
+      mostrarPopup();
+    } catch (error) {
+      console.error("Error verificando sesión:", error);
+      if (!omitidoTemporalmente && !sesionActiva) mostrarPopup();
+    }
+  }
+
+  function mostrarPopup() {
+    const popup = document.getElementById("popupRegistro");
+    popup.classList.remove("oculto");
+  }
+
+  function ocultarPopup() {
+    const popup = document.getElementById("popupRegistro");
+    popup.classList.add("oculto");
+  }
+
+  function omitirPopup() {
+    ocultarPopup();
+    omitidoTemporalmente = true;
+    // ⏳ Reaparecerá después de 2 minutos
+    setTimeout(() => {
+      omitidoTemporalmente = false;
+    }, 120000);
+  }
+
+  // ⏱️ Ejecutar verificación cada 60 segundos
+  setInterval(verificarSesion, 60000);
+
+  // ✅ Primera verificación al cargar
+  document.addEventListener("DOMContentLoaded", verificarSesion);
+</script>
 </body>
 </html>

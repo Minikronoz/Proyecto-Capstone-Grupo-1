@@ -1,4 +1,3 @@
-// scripts/acuenta-despensa.mjs
 import { firefox } from "playwright";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
@@ -11,67 +10,132 @@ import PriceHistory from "../models/PriceHistory.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const parsePrice = (priceStr) => {
-  if (!priceStr) return null;
-  return parseInt(priceStr.replace(/[^0-9]/g, ""), 10);
-};
+const parsePrice = (priceStr) => (priceStr ? parseInt(priceStr.replace(/[^0-9]/g, ""), 10) : null);
 
-// 🔹 Lista completa de marcas conocidas
+
 const MARCAS_CONOCIDAS = [
-  "Gourmet", "Nestlé", "Colún", "Soprole", "Watts", "Carozzi",
-  "Lucchetti", "Ideal", "Coca-Cola", "Pepsi", "Costa", "Loncoleche",
-  "Savory", "Ambrosoli", "PF", "Nescafé", "Hellmann’s", "Livean",
-  "Maggi", "Daily", "Natura", "Dos Caballos", "Tres Montes", "Knorr",
-  "Maruchan", "Nature Valley", "Portal del Sur", "Nuestra Cocina",
-  "Lipton", "Pancho Villa", "Arcor", "Acuenta", "Lider",
-  "Bimbo", "Oroweat", "Parmalat", "San José", "Agrosuper", "Carozzi Selecta",
-  "Winny", "Nova", "Svelty", "Danone", "Kellogg’s", "Hershey’s",
-  "Maruchan", "Quaker", "Bonafide", "Danko", "Vital", "Kraf-Foods",
-  "Unilever", "Soprole", "Colombina", "La Serenisima", "La Lechera",
-  "Dolce", "Savoy", "Cremochoco", "Oreo", "ChipsAhoy", "Flynn",
-  "Galletas Santiago", "Castaño", "Grido", "Anglo", "Mott’s", "Del Monte",
-  "Santiago", "Bonafide", "Bresler", "Milka", "Lays", "Pringles"
-];
+    // 🥫 Alimentos y abarrotes
+    "Gourmet","Nestlé","Colún","Soprole","Watts","Carozzi","Lucchetti","Ideal","Loncoleche",
+    "PF","Soprole","Quillayes","Natura","Savory","Tres Montes","Bonafide","Ambrosoli",
+    "Maggi","Knorr","Arcor","Costa","Fruna","Trencito","Sahne Nuss","Livean","Sello Rojo",
+    "Dos Caballos","Tucapel","Tottus","Unimarc","Acuenta","Iansa","Miraflores","Malloa",
+    "San Jorge","La Preferida","Chef","Cisne","La Fama","Luigi","Dos Alamos","Carmen",
+    "Sol del Valle","Anita","Maruchan","Nissin","Maggi","Don Vittorio","Ravioli",
+    "Pancho Villa","Deyco","Ideal","BredenMaster","Super Pollo","Agrosuper","San Remo",
+    "Surlat","Natura","Hellmann’s","Girasol","Pampero","Tres Ositos","Loncofrut","Caricia",
+    "Dominó","Supremo","Universal","Noble","Nissin","Marco Polo","Dos Caballos","Maravilla",
+    "Havanna","Nature Valley","Tronky","Marinela","Bimbo","Negrita","Costa","Super 8",
+    "Super Cerdo","Serrano","Cecinas Llanquihue","PF Listo","Pronto","Wasil","Caserita",
+    "Maruchan","Nissin","Knorr","Aji-no-men","Yungay","Don Juan","San José","San Jorge",
+    "Artesanos del Sur","Santa Rosa","Kunstmann","Valdivia","Baltica","Royal Guard",
+    "Heineken","Cristal","Escudo","Budweiser","Corona","Becker","Bavaria","Sol",
+    "Cusqueña","Andes","Coca-Cola","Pepsi","Fanta","Sprite","Bilz","Pap","Kem","Ginger Ale",
+    "Canada Dry","Red Bull","Monster","Watts Life","Ades","Watts Natural","Cola Cao",
+    "Milo","Nescafé","Dolca","Café Gold","Café Do Brasil","Juan Valdez","Starbucks",
+    "Té Supremo","Té Twinings","Té Lipton","Té McKay","Té Hornimans","Cruz de Malta",
+    "Taragüi","La Virginia","Dos Caballos","Selecta","Campanario","Mistral","Capel","Alto del Carmen",
+    "Piscola","Ron Barceló","Bacardi","Absolut","Smirnoff","Baileys","Casillero del Diablo",
+    "Santa Rita","Concha y Toro","Undurraga","Misiones de Rengo","Gato","Frontera","Toro de Piedra",
+    "Montes","Chilensis","120","Tarapacá","Santa Carolina","Emilia","Clos de Pirque","Valdivieso",
+  
+    // 🍪 Snacks y dulces
+    "Evercrisp","Lay’s","Doritos","Cheetos","Ramitas","Kryzpo","Pringles","Super 8","Negrita",
+    "Trencito","Costa","Morocha","Chocman","Mckay","Fruna","Milo","Bon o Bon",
+    "Sonrisa","Chiky","Oreo","Club Social","Mini Chips Ahoy","Tofi","Tronky","Tita","Manjarate",
+  
+    // 🧀 Lácteos, embutidos, refrigerados
+    "Soprole","Colún","Quillayes","Loncoleche","Natura","Nido","Surlat","Parmalat",
+    "Soprole Light","Yoplait","La Vaquita","Danone","Yoghito",
+    "Kraft","Philadelphia","Soprole Kids","Livean Yogurt","Yoghurt Griego","Delisur",
+    "Cecinas Llanquihue","PF","Serrano","Receta del Abuelo","Receta Artesanal","Agrosuper",
+    "Super Cerdo","Receta Sureña","San Jorge","Don Juan","La Crianza","Luchetti Ready",
+  
+    // 🧽 Aseo hogar y limpieza
+    "Omo","Ariel","Ace","Drive","Tide","BioLimpio","Poett","Lysol","Mr Músculo",
+    "Virutex","Elite","Confort","Nova","Scott","Cotidian","Sussex","Dove","Rexona",
+    "Palmolive","Protex","Nivea","Eucerin","Colgate","Signal","Oral-B","Listerine",
+    "Harpic","Glade","Raid","Baygon","Off","Poett","Fabuloso","Clorox","Virutex Pro",
+    "Brasso","Cif","Comfort","Soft","Downy","Vanish","Lisoform","Limpiol","Sapolio",
+    "Duracell","Energizer","Tork","Elite Professional",
+  
+    // 🍞 Panadería y congelados
+    "Ideal","BredenMaster","Marraqueta","Santa Isabel Pan","Tottus Bakery","Doña Isidora",
+    "Emporio Natural","Rosenberg","Mister Bread","Granja del Sol","La Crianza","Agrosuper",
+    "PF Listo","Soprole Ready","LoncoSur","Miraflores Congelados",
+  
+    // 🧴 Cuidado personal
+    "Pantene","Head & Shoulders","Sedal","Tresemmé","Dove","Nivea","Rexona","Axe","Old Spice",
+    "Gillette","Always","Kotex","Nosotras","Carefree","Pampers","Huggies",
+    "Babysec","Simond’s","Neutrogena","Protex","Colgate","Listerine","Sensodyne",
+  
+    // 🐾 Mascotas
+    "Master Dog","Master Cat","Champion Dog","Champion Cat","Purina","Dog Chow","Cat Chow",
+    "Pro Plan","Pedigree","Whiskas","Nutrique","Fancy Feast","Equilibrio","Dogourmet"
+  ];
+
+// 🔹 Barra de progreso
+function renderProgressBar(current, total, prefix = "💾 Guardando productos") {
+  const width = 30;
+  const progress = Math.round((current / total) * width);
+  const bar = "█".repeat(progress) + "░".repeat(width - progress);
+  const percent = ((current / total) * 100).toFixed(1).padStart(5);
+  process.stdout.write(`\r[${prefix}] [${bar}] ${percent}% (${current}/${total})`);
+  if (current === total) process.stdout.write("\n");
+}
 
 async function main() {
   const store = "acuenta";
-  console.log(`[${store}] [${store}] Iniciando scraping...`);
-  await conectarDB();
+  console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+  console.log(`🛒 Iniciando scraping: ${store.toUpperCase()}`);
+  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+
+  // 🔹 Conexión a MongoDB
+  try {
+    await conectarDB();
+    console.log(`[${store}] ✅ Conectado correctamente a MongoDB Atlas`);
+  } catch (err) {
+    console.error(`[${store}] ❌ Error al conectar con MongoDB:`, err.message);
+    return;
+  }
 
   const browser = await firefox.launch({ headless: true });
   const context = await browser.newContext({
     viewport: { width: 1920, height: 1080 },
     userAgent:
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125 Safari/537.36",
   });
   const page = await context.newPage();
   await page.setDefaultTimeout(120000);
 
-  let productosNuevos = 0;
-  let productosActualizados = 0;
+  let nuevos = 0;
+  let actualizados = 0;
+  let revisados = 0;
   const productos = [];
 
   try {
-    console.log(`[${store}] [${store}] Cargando página de Despensa...`);
-    await page.goto("https://www.acuenta.cl/ca/despensa/05", {
-      waitUntil: "domcontentloaded",
-      timeout: 120000,
-    });
+    const url = "https://www.acuenta.cl/ca/despensa/05";
+    console.log(`[${store}] 🌐 Navegando a: ${url}`);
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 120000 });
 
+    console.log(`[${store}] ⏳ Esperando render de productos...`);
     await page.waitForSelector(".card-product-vertical", { timeout: 60000 });
+    console.log(`[${store}] ✅ Productos visibles detectados.`);
 
-    console.log(`[${store}] [${store}] Cargando todos los productos (scroll)...`);
-    let prevHeight = 0;
-    let retries = 0;
+    console.log(`[${store}] 🔄 Scrolleando para cargar todos los productos...`);
+    let prevHeight = 0, retries = 0, iter = 1;
+
     while (retries < 5) {
       await page.evaluate(() => window.scrollBy(0, window.innerHeight));
-      await page.waitForTimeout(2000);
+      await page.waitForTimeout(1500);
       const newHeight = await page.evaluate(() => document.body.scrollHeight);
       if (newHeight === prevHeight) retries++;
       else retries = 0;
       prevHeight = newHeight;
+      console.log(`[${store}] ⏳ Scroll ${iter}/10 completado...`);
+      iter++;
     }
 
+    console.log(`[${store}] 🔍 Extrayendo información de productos...`);
     const pageProducts = await page.$$eval(".card-product-vertical", (items, MARCAS_CONOCIDAS) =>
       items
         .map((item) => {
@@ -82,57 +146,36 @@ async function main() {
             let brand =
               item.querySelector(".prod__brand")?.innerText?.trim() ||
               item.querySelector(".prod__brand-name")?.innerText?.trim() ||
-              item.querySelector(".prod__header span")?.innerText?.trim() ||
-              item.querySelector(".prod__name strong")?.innerText?.trim() ||
               null;
 
-            // 🧠 1️⃣ Si no hay brand explícito, buscar si el título termina con una marca conocida
             if (!brand) {
-              const matchFinal = MARCAS_CONOCIDAS.find((m) =>
-                title.toLowerCase().endsWith(m.toLowerCase())
-              );
-              if (matchFinal) brand = matchFinal;
-            }
-
-            // 🧠 2️⃣ Si no termina, buscar cualquier coincidencia dentro del título
-            if (!brand) {
-              const matchInterno = MARCAS_CONOCIDAS.find((m) =>
+              const found = MARCAS_CONOCIDAS.find((m) =>
                 title.toLowerCase().includes(m.toLowerCase())
               );
-              if (matchInterno) brand = matchInterno;
-            }
-
-            // 🧠 3️⃣ Si no hay marca, tomar la primera palabra con mayúscula significativa
-            if (!brand) {
-              const palabras = title.split(" ");
-              const capitalizada = palabras.find(
-                (p) => /^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+$/.test(p)
-              );
-              if (capitalizada && !["Base", "Producto", "Bolsa", "Botella", "Endulzante"].includes(capitalizada))
-                brand = capitalizada;
+              brand = found || "Sin marca";
             }
 
             const priceStr = item.querySelector(".base__price")?.innerText?.trim() || "";
-            const image = item.querySelector("img")?.getAttribute("src") || "";
+            const image = item.querySelector("img")?.src || "";
+
             if (!priceStr || !image) return null;
 
-            const productCode = image.match(/productos\/(\d+)/)?.[1];
+            const productCode = image.match(/productos\/(\d+)/)?.[1] || "";
             const link = productCode
               ? `https://www.acuenta.cl/p/${title
                   .toLowerCase()
                   .replace(/\s+/g, "-")
                   .replace(/[^a-z0-9\-]/g, "")}-${productCode}`
-              : "";
+              : "https://www.acuenta.cl/";
 
-            let pricePerUnit = null;
             const priceUnitEl = Array.from(item.querySelectorAll("p span")).find((span) =>
               /\/(kg|g|l|ml)/i.test(span.innerText)
             );
-            if (priceUnitEl) pricePerUnit = priceUnitEl.innerText.trim();
+            const pricePerUnit = priceUnitEl?.innerText?.trim() || null;
 
             return {
               title,
-              brand: brand || "Sin marca",
+              brand,
               price: priceStr,
               image,
               link,
@@ -149,50 +192,78 @@ async function main() {
 
     if (!pageProducts.length) throw new Error("No se encontraron productos.");
     productos.push(...pageProducts);
-    console.log(`[${store}] [${store}] Total recolectados: ${productos.length}`);
 
-    for (const prod of productos) {
-      const precioNumerico = parsePrice(prod.price);
-      if (isNaN(precioNumerico) || !prod.link) continue;
+    console.log(`[${store}] 📦 Productos recolectados: ${productos.length}`);
+    console.log(`[${store}] 💾 Guardando información en la base de datos...`);
 
-      const productoExistente = await Producto.findOne({ link: prod.link });
-      if (productoExistente) {
-        if (productoExistente.currentPrice !== precioNumerico) {
-          productoExistente.currentPrice = precioNumerico;
-          productoExistente.formattedPrice = prod.price;
-          productoExistente.lastUpdate = new Date();
-          await productoExistente.save();
-          await PriceHistory.create({ productId: productoExistente._id, price: precioNumerico });
-          productosActualizados++;
+    // 🔹 Guardar productos
+    for (const [i, prod] of productos.entries()) {
+      const precioNum = parsePrice(prod.price);
+      if (!precioNum || isNaN(precioNum)) continue;
+
+      const existente = await Producto.findOne({ link: prod.link, store });
+      if (existente) {
+        if (existente.currentPrice !== precioNum) {
+          existente.currentPrice = precioNum;
+          existente.formattedPrice = prod.price;
+          existente.lastUpdate = new Date();
+          await existente.save();
+          await PriceHistory.create({ productId: existente._id, price: precioNum });
+          actualizados++;
         }
-        continue;
+      } else {
+        await Producto.create({
+          ...prod,
+          currentPrice: precioNum,
+          formattedPrice: prod.price,
+          lastUpdate: new Date(),
+          categoria: "Despensa",
+        });
+        nuevos++;
       }
 
-      await Producto.create({
-        title: prod.title,
-        brand: prod.brand,
-        store: prod.store,
-        currentPrice: precioNumerico,
-        formattedPrice: prod.price,
-        image: prod.image,
-        link: prod.link,
-        lastUpdate: new Date(),
-      });
-
-      productosNuevos++;
+      revisados++;
+      renderProgressBar(revisados, productos.length);
     }
 
-    console.log(
-      `[${store}] [${store}] Nuevos: ${productosNuevos} | Actualizados: ${productosActualizados}`
-    );
-    console.log(`[${store}] [${store}] Proceso finalizado correctamente.`);
+    // 📊 Total actual
+    const totalDB = await Producto.countDocuments({ store });
+    console.log(`\n[${store}] 📦 Total actual en MongoDB (${store}): ${totalDB} productos`);
+
+    console.log(`\n[${store}] 📈 RESULTADOS`);
+    console.log(`[${store}] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+    console.log(`Nuevos: ${nuevos}, Actualizados: ${actualizados}`);
+    console.log(`👁️ Revisados hoy: ${revisados}`);
+    console.log(`✅ Scraping completado con éxito.`);
   } catch (err) {
-    console.error(`[${store}] [${store}] ERROR:`, err.message);
-    await page.screenshot({ path: join(__dirname, "error-acuenta.png"), fullPage: true });
+    console.error(`[${store}] ❌ ERROR durante el scraping:`, err.message);
+    try {
+      await page.screenshot({ path: join(__dirname, "error-acuenta.png"), fullPage: true });
+      console.log(`[${store}] 📸 Screenshot guardado: error-acuenta.png`);
+    } catch (e) {
+      console.error(`[${store}] ⚠️ No se pudo capturar screenshot:`, e.message);
+    }
   } finally {
+    // ✅ Guardar resumen del scraping
+    try {
+      const totalProductos = await Producto.countDocuments({ store });
+      await actualizarScrapingArchivo({
+        store,
+        nuevos,
+        actualizados,
+        totalProductos,
+      });
+    } catch (err) {
+      console.error(`[${store}] ⚠️ No se pudo registrar scraping:`, err.message);
+    }
+
     await browser.close();
     await mongoose.disconnect();
+    console.log(`[${store}] 🔒 Conexión cerrada correctamente.`);
+    console.log(`[${store}] 🚀 Proceso finalizado (${store.toUpperCase()})`);
   }
 }
 
-main().catch((err) => console.error("[acuenta ERROR GLOBAL]", err));
+main()
+  .then(() => console.log("[acuenta] ✅ Script completado sin reinicio."))
+  .catch((err) => console.error("[acuenta ERROR GLOBAL]", err));

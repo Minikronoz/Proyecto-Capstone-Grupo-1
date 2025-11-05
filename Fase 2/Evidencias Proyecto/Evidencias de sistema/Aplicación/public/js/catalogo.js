@@ -258,73 +258,135 @@ async function cargarProductos(busqueda = "") {
 }
 
 
-// ---------- Búsqueda ----------
-async function buscar() {
-  const input = document.getElementById("busqueda");
-  const query = input?.value?.trim() || "";
-  await cargarProductos(query);
-}
+// =======================================
+// 🔍 BUSCADOR + SUGERENCIAS + TRACKING
+// =======================================
 
-/// ==============================
-// 🔍 SUGERENCIAS DE BÚSQUEDA
-// ==============================
-document.addEventListener("DOMContentLoaded", () => {
-  const input = document.getElementById("busqueda");
-  const cont = document.getElementById("sugerencias");
-  if (!input || !cont) return;
+const inputBusqueda = document.getElementById("busqueda");
+const contenedorSugerencias = document.getElementById("sugerencias");
+let sugerenciasTimeout = null;
 
-  let timer;
+// Nos aseguramos de que existan en el DOM
+if (inputBusqueda && contenedorSugerencias) {
 
-  input.addEventListener("input", () => {
-    clearTimeout(timer);
-    const q = input.value.trim();
+  // ==========================
+  // 🧠 ESCUCHAR ESCRITURA
+  // ==========================
+  inputBusqueda.addEventListener("input", () => {
+    const texto = inputBusqueda.value.trim();
 
-    if (q.length < 2) {
-      cont.innerHTML = "";
-      cont.style.display = "none";
+    // Si el usuario borra → limpiamos
+    if (!texto) {
+      contenedorSugerencias.innerHTML = "";
+      contenedorSugerencias.style.display = "none";
       return;
     }
 
-    timer = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/catalogo/sugerencias?q=${encodeURIComponent(q)}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const sugerencias = await res.json();
+    // Si tiene menos de 3 caracteres → solo mostramos hint
+    if (texto.length < 3) {
+      contenedorSugerencias.innerHTML =
+        "<div class='sin-sugerencias'>Escribe al menos 3 caracteres…</div>";
+      contenedorSugerencias.style.display = "block";
+      return;
+    }
 
-        cont.innerHTML = "";
+    // Delay para no spamear al servidor
+    clearTimeout(sugerenciasTimeout);
+    sugerenciasTimeout = setTimeout(async () => {
+      try {
+        const resp = await fetch(
+          `/api/productos/sugerencias?q=${encodeURIComponent(texto)}`
+        );
+        if (!resp.ok) throw new Error("Error al obtener sugerencias");
+        const sugerencias = await resp.json();
+
         if (!sugerencias.length) {
-          cont.style.display = "none";
+          contenedorSugerencias.innerHTML =
+            "<div class='sin-sugerencias'>Sin resultados</div>";
+          contenedorSugerencias.style.display = "block";
           return;
         }
 
-        cont.innerHTML = sugerencias.slice(0, 8).map(t => `
-          <div>${t}</div>
-        `).join("");
+        // Render de sugerencias
+        contenedorSugerencias.innerHTML = sugerencias
+          .map(
+            (s) =>
+              `<div class="item-sugerencia" onclick="seleccionarSugerencia('${s
+                .replace(/'/g, "\\'")
+                .replace(/"/g, "&quot;")}')">${s}</div>`
+          )
+          .join("");
 
-        cont.querySelectorAll("div").forEach(div => {
-          div.addEventListener("click", () => {
-            input.value = div.textContent;
-            cont.style.display = "none";
-            buscar();
-          });
-        });
-
-        cont.style.display = "block";
-      } catch (e) {
-        console.error("❌ Error sugerencias:", e);
-        cont.style.display = "none";
+        contenedorSugerencias.style.display = "block";
+      } catch (err) {
+        console.error("❌ Error sugerencias:", err);
+        contenedorSugerencias.style.display = "none";
       }
     }, 300);
   });
 
-  // cerrar al hacer clic fuera
+  // ==========================
+  // ❌ CERRAR SUGERENCIAS AL HACER CLIC FUERA
+  // ==========================
   document.addEventListener("click", (e) => {
-    if (e.target !== input && !cont.contains(e.target)) {
-      cont.innerHTML = "";
-      cont.style.display = "none";
+    if (!e.target.closest(".buscador")) {
+      contenedorSugerencias.innerHTML = "";
+      contenedorSugerencias.style.display = "none";
     }
   });
-});
+}
+
+// ==========================
+// 🖱️ CLIC EN UNA SUGERENCIA
+// ==========================
+function seleccionarSugerencia(valor) {
+  if (!inputBusqueda) return;
+  inputBusqueda.value = valor;
+  contenedorSugerencias.innerHTML = "";
+  contenedorSugerencias.style.display = "none";
+  buscar(); // reutilizamos la misma función
+}
+
+// ==========================
+// 🔎 FUNCIÓN BUSCAR (ÚNICA)
+// ==========================
+async function buscar() {
+  if (!inputBusqueda) return;
+  const termino = inputBusqueda.value.trim();
+
+  // No hacemos nada si es muy corto
+  if (termino.length < 3) {
+    alert("Escribe al menos 3 caracteres para buscar.");
+    return;
+  }
+
+  // 1) Guardar la búsqueda en Mongo
+  try {
+    await fetch("/api/busquedas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ termino }),
+    });
+    console.log("✅ Búsqueda registrada:", termino);
+  } catch (e) {
+    console.warn("⚠️ No se pudo registrar la búsqueda:", e.message);
+  }
+
+  // 2) Usar tu flujo normal para cargar productos
+  //    IMPORTANTE: esta función ya existe en tu código original
+  try {
+    await cargarProductos(termino);
+  } catch (e) {
+    console.error("❌ Error al cargar productos:", e);
+  }
+
+  // 3) Cerrar sugerencias
+  if (contenedorSugerencias) {
+    contenedorSugerencias.innerHTML = "";
+    contenedorSugerencias.style.display = "none";
+  }
+}
+
 
 
 

@@ -26,12 +26,13 @@ function leerFechas() {
 function guardarScraping(supermercado, { actualizados = 0, nuevos = 0 }) {
   const data = leerFechas();
   data[supermercado] = {
-    fecha: new Date().toISOString(),
+    fecha: new Date().toLocaleString("es-CL", { hour12: false }),
     actualizados,
     nuevos,
   };
+
   fs.writeFileSync(scrapingFile, JSON.stringify(data, null, 2));
-  console.log(`💾 Registro scraping actualizado: ${supermercado}`);
+  console.log(`💾 Registro actualizado: ${supermercado} → ${nuevos} nuevos / ${actualizados} actualizados`);
 }
 
 /**

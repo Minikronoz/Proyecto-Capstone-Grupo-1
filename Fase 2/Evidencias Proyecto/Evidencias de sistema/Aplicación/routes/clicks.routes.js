@@ -1,10 +1,15 @@
+// ==============================
 // routes/clicks.routes.js
+// ==============================
 import express from "express";
 import { getDB } from "../config/db.js";
 import { ObjectId } from "mongodb";
 
 const router = express.Router();
 
+// =============================================
+// 🔹 REGISTRO DE CLICKS (ACTUALIZADO)
+// =============================================
 router.post("/registrar", async (req, res) => {
   try {
     const db = getDB();
@@ -15,7 +20,7 @@ router.post("/registrar", async (req, res) => {
       return res.status(400).json({ error: "Faltan datos del producto" });
     }
 
-    // 🔹 Intentar convertir el precio si llega en texto
+    // 🔹 Limpieza y validación de precio
     let precioFinal = 0;
     if (typeof producto.precio === "number" && !isNaN(producto.precio)) {
       precioFinal = producto.precio;
@@ -24,12 +29,12 @@ router.post("/registrar", async (req, res) => {
       precioFinal = parseFloat(limpio) || 0;
     }
 
-    // 🔹 Si sigue siendo 0, intentar buscar el precio real desde la colección productos
+    // 🔹 Buscar precio real en Mongo si falta
     let pricePerUnit = producto.pricePerUnit || null;
     if (!precioFinal || precioFinal === 0 || !pricePerUnit) {
       let prodDB = null;
 
-      // Buscar por _id
+      // Buscar por ID
       if (ObjectId.isValid(producto.idProducto)) {
         prodDB = await db
           .collection("productos")
@@ -39,7 +44,7 @@ router.post("/registrar", async (req, res) => {
           );
       }
 
-      // Si no lo encontró por _id, buscar por link
+      // Buscar por link si no se encontró por ID
       if (!prodDB && producto.link) {
         prodDB = await db
           .collection("productos")
@@ -49,14 +54,14 @@ router.post("/registrar", async (req, res) => {
           );
       }
 
-      // Si lo encontró, usar sus precios
+      // Si se encontró el producto, usar su precio
       if (prodDB) {
         if (prodDB.currentPrice) precioFinal = Number(prodDB.currentPrice) || 0;
         if (prodDB.pricePerUnit) pricePerUnit = prodDB.pricePerUnit;
       }
     }
 
-    // 🔹 Buscar usuario activo por sesión
+    // 🔹 Datos del usuario logueado
     const sesion = req.session?.user || null;
     let userData = null;
 
@@ -64,7 +69,7 @@ router.post("/registrar", async (req, res) => {
       userData = await db.collection("users").findOne({ correo: sesion.correo });
     }
 
-    // 🔹 Calcular edad actual si tiene fechaNacimiento
+    // 🔹 Calcular edad si tiene fecha de nacimiento
     let edadCalculada = null;
     if (userData?.fechaNacimiento) {
       const nacimiento = new Date(userData.fechaNacimiento);
@@ -74,6 +79,7 @@ router.post("/registrar", async (req, res) => {
       if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) edadCalculada--;
     }
 
+    // 🔹 Fechas consistentes (tipo Date)
     const now = new Date();
 
     const clickDoc = {
@@ -86,7 +92,7 @@ router.post("/registrar", async (req, res) => {
       link: producto.link || "",
       imagen: producto.imagen || "",
 
-      // ✅ Datos del usuario logueado
+      // ✅ Datos del usuario
       userId: userData?._id?.toString() || sesion?.id || null,
       userCorreo: userData?.correo || sesion?.correo || null,
       userNombre: userData?.nombre || null,
@@ -100,15 +106,18 @@ router.post("/registrar", async (req, res) => {
       userEdad: edadCalculada || null,
       negocios: userData?.negocios || [],
 
+      // ✅ Fechas correctas para análisis temporal
       createdAt: now,
-      fecha: now.toISOString().slice(0, 10),
+      fecha: now, // ← AHORA SE GUARDA COMO Date, NO STRING
+
+      // ✅ Datos técnicos
       ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress || null,
       ua: req.headers["user-agent"] || null,
     };
 
     await db.collection("clicks").insertOne(clickDoc);
 
-    console.log(" Click guardado correctamente");
+    console.log(`🟢 Click guardado correctamente: ${clickDoc.titulo}`);
 
     return res.json({
       ok: true,
@@ -117,7 +126,7 @@ router.post("/registrar", async (req, res) => {
       precioPorUnidad: clickDoc.precioPorUnidad,
     });
   } catch (error) {
-    console.error(" Error al registrar click:", error);
+    console.error("❌ Error al registrar click:", error);
     return res.status(500).json({ error: "No se pudo registrar el click" });
   }
 });

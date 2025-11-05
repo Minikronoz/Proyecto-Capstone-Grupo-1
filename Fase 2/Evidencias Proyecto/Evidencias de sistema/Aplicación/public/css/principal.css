@@ -842,3 +842,25 @@ tr:nth-child(even) { background: #f9fbfc; }
 .btn-accion i {
   font-size: 0.9em;
 }
+canvas {
+  transition: transform 0.3s ease;
+}
+
+canvas:hover {
+  transform: scale(1.02);
+}
+
+.chart-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: 12px;
+}
+/* 🔹 Botón Catálogo — sutil realce */
+.nav__item i.fa-store {
+  color: var(--calipso);
+}
+
+.nav__item:hover i.fa-store {
+  color: var(--blanco);
+}

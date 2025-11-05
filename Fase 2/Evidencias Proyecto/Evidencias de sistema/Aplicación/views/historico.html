@@ -4,8 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Histórico de Precios</title>
-
-    <!-- 🎨 Estilos -->
     <link rel="stylesheet" href="/css/catalogo.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -104,76 +102,22 @@
         text-align: center;
         transition: all 0.3s ease;
         border: 1px solid rgba(0, 166, 181, 0.1);
-        animation: fadeIn 0.6s ease;
       }
 
-      .historico-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0, 166, 181, 0.25);
-      }
-
-      .historico-card img {
-        width: 100%;
-        max-height: 210px;
-        object-fit: contain;
-        margin-bottom: 14px;
-        transition: transform 0.3s ease;
-      }
-
-      .historico-card:hover img {
-        transform: scale(1.05);
-      }
-
-      .historico-card h3 {
-        font-size: 16px;
-        font-weight: 700;
-        color: #2e3a3f;
-        margin: 10px 0 6px;
-        line-height: 1.3;
-      }
-
-      .historico-card .brand {
-        color: #6b7a86;
-        font-size: 13px;
-        margin-bottom: 8px;
-      }
-
-      .historico-card .store-label {
+      .historico-card .price-change {
         display: inline-block;
-        background: #007c86;
-        color: white;
+        margin-left: 6px;
         font-size: 13px;
         font-weight: 600;
-        padding: 6px 12px;
-        border-radius: 6px;
-        margin-bottom: 10px;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
       }
-
-      .historico-card .price {
-        color: #00a7b5;
-        font-weight: 800;
-        font-size: 19px;
-        margin: 10px 0 12px;
+      .price-change.up {
+        color: #2e7d32;
       }
-
-      .historico-card .btn-ver {
-        background: #00a7b5;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 10px;
-        font-size: 14px;
-        font-weight: 600;
-        border: none;
-        text-decoration: none;
-        box-shadow: 0 4px 10px rgba(0, 167, 181, 0.2);
-        transition: all 0.25s ease;
+      .price-change.down {
+        color: #c62828;
       }
-
-      .historico-card .btn-ver:hover {
-        background: #007c86;
-        transform: translateY(-2px);
+      .price-change.same {
+        color: #6b7280;
       }
 
       @keyframes fadeIn {
@@ -215,26 +159,20 @@
   </head>
 
   <body>
-    <!-- 🔹 Encabezado -->
     <header>
-      <button class="btn-volver" onclick="window.location.href='/catalogo'">← Volver</button>
+      <button class="btn-volver" onclick="window.location.href='/catalogo'">
+        ← Volver
+      </button>
       <h1>Histórico de Precios</h1>
     </header>
 
-    <!-- 🔹 Contenedor principal -->
     <main>
-      <!-- 📈 Gráfico -->
       <section class="grafico-section">
         <canvas id="graficoHistorico"></canvas>
       </section>
-
-      <!-- 🧾 Tarjeta de producto -->
-      <section id="productoDetalle" class="historico-card">
-        <!-- Contenido dinámico del producto -->
-      </section>
+      <section id="productoDetalle" class="historico-card"></section>
     </main>
 
-    <!-- JS -->
     <script src="/js/historico.js"></script>
   </body>
 </html>

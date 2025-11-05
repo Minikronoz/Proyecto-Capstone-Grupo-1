@@ -283,6 +283,13 @@ body {
   background: #fafafa;
 }
 
+
+
+.item-sugerencia:hover {
+  background: #e6f7f8;
+}
+
+
 /* 🧱 FILTROS HORIZONTALES */
 .filtros-peso {
   display: flex;

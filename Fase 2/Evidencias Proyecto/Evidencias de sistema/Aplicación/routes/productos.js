@@ -13,7 +13,6 @@ router.get("/:id/historico", async (req, res) => {
 
     // Detectar si el ID es un ObjectId válido
     const esObjectIdValido = /^[0-9a-fA-F]{24}$/.test(id);
-
     // Buscar producto
     const filtroProducto = esObjectIdValido ? { _id: new ObjectId(id) } : { _id: id };
     const producto = await db.collection("productos").findOne(filtroProducto);
@@ -37,5 +36,29 @@ router.get("/:id/historico", async (req, res) => {
     res.status(500).json({ error: "No se pudo obtener el historial" });
   }
 });
+
+
+router.get("/sugerencias", async (req, res) => {
+  try {
+    const q = req.query.q?.trim() || "";
+    const db = getDB();
+
+    if (!q) return res.json([]);
+
+    const productos = await db
+      .collection("productos")
+      .find({ title: { $regex: q, $options: "i" } })
+      .project({ title: 1 })
+      .limit(8)
+      .toArray();
+
+    res.json(productos.map(p => p.title));
+  } catch (err) {
+    console.error("[productos] Error al obtener sugerencias:", err);
+    res.status(500).json({ error: "Error cargando sugerencias" });
+  }
+});
+
+
 
 export default router;

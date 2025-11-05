@@ -1,5 +1,5 @@
 // ==============================
-// 📦 DEPENDENCIAS BASE
+// 🧩 DEPENDENCIAS BASE
 // ==============================
 import express from "express";
 import http from "http";
@@ -10,11 +10,15 @@ import { Server } from "socket.io";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
-
-// 🔹 Conexión a BD
+import { spawn } from "child_process";
+import fs from "fs";
 import { connectDB } from "./config/db.js";
 
-// 🔹 Rutas
+dotenv.config(); // ✅ Cargar variables de entorno primero
+
+// ==============================
+// 📦 IMPORTACIÓN DE RUTAS
+// ==============================
 import scrapeRoutes from "./routes/scrape.routes.js";
 import usersRoutes from "./routes/users.routes.js";
 import productosRoutes from "./routes/productos.js";
@@ -22,14 +26,16 @@ import catalogoRouter from "./routes/catalogo.js";
 import clicksRoutes from "./routes/clicks.routes.js";
 import estadisticasRoutes from "./routes/estadisticas.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
+import busquedasRoutes from "./routes/busquedas.routes.js"; // ✅ Ruta de búsquedas
 
-dotenv.config();
-
+// ==============================
+// 📁 RUTAS Y ARCHIVOS BASE
+// ==============================
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // ==============================
-// Inicialización
+// 🚀 APP / SERVER / SOCKET.IO
 // ==============================
 const app = express();
 const server = http.createServer(app);
@@ -37,15 +43,20 @@ const io = new Server(server, { cors: { origin: "*" } });
 app.set("io", io);
 
 // ==============================
-// Middleware / Sesiones
+// 🧠 CONEXIÓN A MONGODB ATLAS
 // ==============================
-app.set("trust proxy", 1);
-app.use(
-  cors({
-    origin: "*", // abierto para desarrollo
-    credentials: true,
-  })
-);
+try {
+  await connectDB();
+  console.log("✅ Conectado correctamente a MongoDB Atlas → Base de datos: duoc_user");
+} catch (error) {
+  console.error("❌ Error al conectar con la base de datos:", error.message);
+  process.exit(1);
+}
+
+// ==============================
+// ⚙️ MIDDLEWARES GLOBALES
+// ==============================
+app.use(cors({ origin: "*", credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -60,7 +71,7 @@ app.use(
         "mongodb+srv://duoc_user:7OtcjHwo0BDDcqih@cluster0.lkz5yof.mongodb.net/duoc_user",
       dbName: "duoc_user",
       collectionName: "sesiones",
-      ttl: 60 * 60 * 2,
+      ttl: 60 * 60 * 2, // 2 horas
     }),
     cookie: {
       httpOnly: true,
@@ -72,76 +83,91 @@ app.use(
 );
 
 // ==============================
-// Conexión a la Base de Datos
-// ==============================
-try {
-  await connectDB();
-  console.log("✅ Conectado correctamente a MongoDB Atlas → Base de datos: duoc_user");
-} catch (error) {
-  console.error("❌ Error al conectar con la base de datos:", error.message);
-  process.exit(1);
-}
-
-// ==============================
-// RUTAS API (ORDEN CORRECTO)
+// 🔹 RUTAS API
 // ==============================
 
-// ⚡️ Scraping primero
-app.use("/api/scrape", scrapeRoutes);
-
-// Luego las demás APIs
-app.use("/api/productos", productosRoutes);
-
-// ✅ Catálogo ajustado correctamente
-app.use("/api/catalogo", catalogoRouter);
-
-app.use("/api/clicks", clicksRoutes);
-app.use("/api/estadisticas", estadisticasRoutes);
+// 🔸 Dashboard general
 app.use("/api/dashboard", dashboardRoutes);
 
-// Usuarios al final (para no interceptar /api)
+// 🔸 Scraping manual
+app.use("/api/scrape", scrapeRoutes);
+
+// 🔸 Productos, catálogo, clics, analítica y búsquedas
+app.use("/api/productos", productosRoutes);
+app.use("/api/catalogo", catalogoRouter);
+app.use("/api/clicks", clicksRoutes);
+app.use("/api/estadisticas", estadisticasRoutes);
+app.use("/api/busquedas", busquedasRoutes); // ✅ Activa los endpoints de búsquedas
+
+// 🔸 Usuarios y autenticación
 app.use("/", usersRoutes);
 
 // ==============================
-// Archivos estáticos
+// 🧰 SCRAPING MANUAL CON LOGS
 // ==============================
-app.use(express.static(path.join(__dirname, "public")));
+app.post("/api/scrape/:supermercado", (req, res) => {
+  const { supermercado } = req.params;
+  const script = `scripts/${supermercado}-despensa.mjs`;
 
-// ==============================
-// Vistas HTML
-// ==============================
-app.get("/", (req, res) => res.redirect("/catalogo"));
+  if (!fs.existsSync(script)) {
+    io.emit("scraping-log", `❌ Script no encontrado: ${script}`);
+    return res.status(404).json({ message: "Script no encontrado" });
+  }
 
-app.get("/catalogo", (req, res) =>
-  res.sendFile(path.join(__dirname, "views", "catalogo.html"))
-);
+  io.emit(
+    "scraping-log",
+    `[${new Date().toLocaleTimeString("es-CL", { hour12: false })}] 🟢 Iniciando scraping de ${supermercado}...`
+  );
 
-app.get("/editar-perfil", (req, res) =>
-  res.sendFile(path.join(__dirname, "views", "editar-perfil.html"))
-);
+  const proceso = spawn("node", [script]);
 
-app.get("/historico", (req, res) =>
-  res.sendFile(path.join(__dirname, "views", "historico.html"))
-);
+  proceso.stdout.on("data", (data) => {
+    const line = data.toString().trim();
+    console.log(`[${supermercado}] ${line}`);
+    io.emit("scraping-log", `[${supermercado}] ${line}`);
+  });
 
-app.get("/principal", (req, res) =>
-  res.sendFile(path.join(__dirname, "views", "principal.html"))
-);
+  proceso.stderr.on("data", (data) => {
+    const err = data.toString().trim();
+    console.error(`[${supermercado}] ❌ ${err}`);
+    io.emit("scraping-log", `[${supermercado}] ❌ ${err}`);
+  });
 
-app.get("/dashboard", (req, res) =>
-  res.sendFile(path.join(__dirname, "views", "dashboard.html"))
-);
+  proceso.on("close", (code) => {
+    const msg = `[${supermercado}] 🚀 Proceso finalizado (código ${code})`;
+    console.log(msg);
+    io.emit("scraping-log", msg);
+  });
 
-// ==============================
-// Socket.io
-// ==============================
-io.on("connection", (socket) => {
-  console.log("🟢 Cliente conectado vía Socket.io");
-  socket.on("disconnect", () => console.log("🔴 Cliente desconectado"));
+  res.json({ message: `Scraping de ${supermercado} iniciado.` });
 });
 
 // ==============================
-// Servidor
+// 🌐 ARCHIVOS ESTÁTICOS / VISTAS
+// ==============================
+app.use(express.static(path.join(__dirname, "public")));
+
+app.get("/", (req, res) => res.redirect("/catalogo"));
+app.get("/catalogo", (req, res) => res.sendFile(path.join(__dirname, "views", "catalogo.html")));
+app.get("/editar-perfil", (req, res) => res.sendFile(path.join(__dirname, "views", "editar-perfil.html")));
+app.get("/historico", (req, res) => res.sendFile(path.join(__dirname, "views", "historico.html")));
+app.get("/principal", (req, res) => res.sendFile(path.join(__dirname, "views", "principal.html")));
+app.get("/dashboard", (req, res) => res.sendFile(path.join(__dirname, "views", "dashboard.html")));
+
+// ==============================
+// 💬 SOCKET.IO (LOGS EN TIEMPO REAL)
+// ==============================
+io.on("connection", (socket) => {
+  console.log("🟢 Cliente conectado vía Socket.io");
+  socket.emit("scraping-log", "📡 Conexión establecida con el servidor.");
+
+  socket.on("disconnect", () => {
+    console.log("🔴 Cliente desconectado");
+  });
+});
+
+// ==============================
+// 🚀 SERVIDOR EN EJECUCIÓN
 // ==============================
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
