@@ -10,9 +10,10 @@
     <h2>Recuperar Contraseña</h2>
     <p>Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.</p>
 
-    <form method="POST" action="/olvide-password" class="form-forgot">
-      <input type="email" name="correo" placeholder="Correo electrónico" required>
+    <form id="formRecuperar" method="POST" action="/olvide-password" class="form-forgot">
+      <input type="email" name="correo" id="correo" placeholder="Correo electrónico" required>
       <button type="submit" class="btn-principal">Enviar enlace</button>
+      <p id="msg" class="mensaje"></p>
 
       <div class="extra-links">
         <a href="/login">⬅ Volver al login</a>
@@ -20,5 +21,29 @@
       </div>
     </form>
   </div>
+
+  <script>
+    document.getElementById("formRecuperar").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById("msg");
+      msg.textContent = "Procesando solicitud...";
+      msg.className = "mensaje cargando";
+
+      try {
+        const correo = document.getElementById("correo").value;
+        const res = await fetch("/olvide-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ correo })
+        });
+        const data = await res.text();
+        msg.textContent = data || "Solicitud enviada correctamente.";
+        msg.className = "mensaje exito";
+      } catch {
+        msg.textContent = "Error al enviar solicitud. Intenta nuevamente.";
+        msg.className = "mensaje error";
+      }
+    });
+  </script>
 </body>
 </html>

@@ -22,7 +22,7 @@
 /* ===== BASE ===== */
 body {
   font-family: "Poppins", "Segoe UI", Roboto, Arial, sans-serif;
-  background: var(--color-fondo);
+  background: linear-gradient(180deg, #f8fafc 0%, #eef3f6 100%);
   color: var(--color-texto);
   margin: 0;
   line-height: 1.6;
@@ -115,12 +115,33 @@ h1 {
 
 /* ===== MAIN ===== */
 main {
-  padding: 50px 9%;
+  padding-right: 360px; /* deja espacio suficiente para el panel */
+  box-sizing: border-box;
+}
+/* Título centrado con línea elegante */
+section h2 {
+  text-align: center;
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 20px;
+  position: relative;
+  margin-bottom: 20px;
+}
+section h2::after {
+  content: "";
+  display: block;
+  width: 180px;
+  height: 3px;
+  background: #00a7b5;
+  margin: 6px auto 0 auto;
+  border-radius: 10px;
 }
 
 section {
-  margin-bottom: 70px;
-  animation: fadeInUp 0.6s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 60px;
 }
 
 h2 {
@@ -134,27 +155,53 @@ h2 {
 }
 
 /* ===== TARJETAS DE GRÁFICOS ===== */
+#chartGenero {
+  width: 230px !important;
+  height: 230px !important;
+  margin: 0 auto;
+}
+
+/* ===== AJUSTES VISUALES DE GRÁFICOS ===== */
 .chart-container {
-  background: var(--color-blanco);
-  border-radius: 16px;
-  box-shadow: var(--sombra);
-  padding: 30px;
+  width: 85%;
   max-width: 1100px;
   margin: 0 auto;
-  height: 420px;
-  transition: all 0.3s ease;
-  border: 1px solid var(--color-borde);
+  border: 1.5px solid #d1d5db;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  padding: 25px 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.25s ease;
 }
 
 .chart-container:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+  transform: scale(1.02);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+}
+#chartRegiones {
+  width: 100%;
+  height: 380px;
 }
 
+.chart-panel {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease-in-out;
+}
+
+.chart-panel:hover {
+  transform: scale(1.01);
+}
 /* ===== PIE CHART ===== */
 canvas {
-  width: 100%;
-  height: 100%;
+  width: 100% !important;
+  height: auto !important;
+  max-height: 420px; /* más grandes pero no invasivos */
 }
 
 /* ===== FOOTER ===== */
@@ -357,3 +404,176 @@ footer {
     height: 32px;
 }
 
+
+/* ===== 📊 Panel lateral fijo — Distribución de usuarios por región ===== */
+.panel-lateral {
+  position: fixed;
+  top: 180px;                /* Mantiene la posición un poco más abajo del header */
+  right: 25px;               /* Margen derecho elegante */
+  width: 320px;
+  background: #f9fafb;
+  border: 2px solid #00a7b5;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 16px 14px;
+  overflow: hidden;
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+/* 🔹 Ajusta el fondo y espaciado del contenido interno */
+.panel-lateral .mapa-chile {
+  background: linear-gradient(180deg, #a47c48, #b89254, #c8bb72, #a2d3a8, #4ab58c);
+  border-radius: 12px;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.08);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* 🔹 Título centrado */
+.panel-lateral h2 {
+  font-size: 17px;
+  text-align: center;
+  color: #006b7e;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #00a7b5;
+  padding-bottom: 6px;
+}
+
+.mapa-chile {
+  background: linear-gradient(to bottom, #a47c48, #d3b47a, #bfe3b4, #eaf8f0);
+  border-radius: 18px;                /* 🔹 Bordes redondeados */
+  padding: 12px;
+  margin: 10px 0 20px 0;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  border: 1.5px solid rgba(0, 167, 181, 0.3);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  transition: transform 0.2s ease;
+  position: relative;
+}
+
+.mapa-chile:hover {
+  transform: scale(1.01);
+}
+
+/* 🔹 Regiones internas — dejan espacio en los bordes */
+.mapa-chile .bloque-region {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  font-size: 13px;
+  padding: 6px 10px;
+  transition: all 0.25s ease;
+  width: 95%;                     /* 🔹 deja margen para mostrar las esquinas redondeadas */
+  margin: 0 auto;                 /* 🔹 centra las franjas */
+  border-radius: 6px;             /* 🔹 redondeo interno suave */
+}
+
+/* Hover */
+.mapa-chile .bloque-region:hover {
+  background-color: rgba(0, 167, 181, 0.3);
+  cursor: pointer;
+}
+
+/* Región activa */
+.region-activa {
+  background-color: rgba(0, 167, 181, 0.75) !important;
+}
+
+/* Regiones activas (verde brillante cuando hay usuarios) */
+.region-activa {
+  background-color: rgba(0,167,181,0.6);
+  box-shadow: 0 0 10px rgba(0,167,181,0.8);
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+/* Mini gráficas */
+.mini-insight {
+  margin-top: 25px;
+  text-align: center;
+}
+
+.engagement-score {
+  font-size: 2em;
+  color: #009FB0;
+  font-weight: bold;
+}
+#tooltipRegion {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+
+.lista-precios {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.card-precio {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  padding: 10px;
+  transition: transform 0.2s;
+}
+
+.card-precio:hover { transform: translateY(-3px); }
+
+.card-precio img {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.card-precio .info {
+  flex: 1;
+}
+
+.card-precio .nombre {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.card-precio .store {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.card-precio .variacion {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.card-precio.baja .variacion { color: #16a34a; }
+.card-precio.subida .variacion { color: #dc2626; }
+
+
+/* 🔹 Responsivo */
+@media (max-width: 1024px) {
+  .panel-lateral {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: 100%;
+    margin-top: 25px;
+  }
+  main {
+    padding-right: 0;
+  }
+}

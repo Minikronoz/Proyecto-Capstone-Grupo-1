@@ -1,3 +1,6 @@
+// ===============================================
+// 📁 routes/scrape.routes.js
+// ===============================================
 import express from "express";
 import {
   scrapeAcuenta,
@@ -5,17 +8,21 @@ import {
   scrapeJumbo,
   scrapeUnimarc,
   obtenerUltimosScraping,
+  obtenerActividadSemanal,
 } from "../controllers/scrape.controller.js";
 
 const router = express.Router();
 
-// Scrapers reales
+// Rutas de scraping reales
 router.post("/acuenta", scrapeAcuenta);
 router.post("/tottus", scrapeTottus);
 router.post("/jumbo", scrapeJumbo);
 router.post("/unimarc", scrapeUnimarc);
 
-// Endpoint para el dashboard
+// Últimos registros
 router.get("/ultimos", obtenerUltimosScraping);
+
+// 📅 Actividad semanal (usa la del controlador)
+router.get("/actividad-semanal", obtenerActividadSemanal);
 
 export default router;

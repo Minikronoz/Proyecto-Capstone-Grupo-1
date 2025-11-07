@@ -1,5 +1,9 @@
+// =============================================================
+// 🧩 PANEL DE ADMINISTRACIÓN — Usuarios y Negocios
+// =============================================================
+
 // =============================
-// 🧩 CARGAR USUARIOS
+// 📋 CARGAR USUARIOS
 // =============================
 async function cargarUsuarios() {
   const tbody = document.getElementById("usuariosBody");
@@ -7,7 +11,6 @@ async function cargarUsuarios() {
   tbody.innerHTML = "<tr><td colspan='7'>Cargando usuarios...</td></tr>";
 
   try {
-    // Usa la API directa de usuarios (tu controlador ya la expone)
     const resp = await fetch("/api/usuarios");
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const usuarios = await resp.json();
@@ -17,41 +20,34 @@ async function cargarUsuarios() {
       return;
     }
 
-    const filas = usuarios.map((u) => {
-      // Detectar negocios del usuario (array "negocios", objeto "negocio" o string)
-      let negociosTexto = "—";
-      if (Array.isArray(u.negocios) && u.negocios.length > 0) {
-        negociosTexto = u.negocios
-          .map(n => (n && (n.nombre || n.giro)) ? (n.nombre || n.giro) : "(sin nombre)")
-          .join(", ");
-      } else if (u.negocio) {
-        if (typeof u.negocio === "object") {
-          negociosTexto = u.negocio.nombre || u.negocio.giro || "(sin nombre)";
-        } else if (typeof u.negocio === "string") {
-          negociosTexto = u.negocio;
-        }
-      }
+    tbody.innerHTML = usuarios
+      .map((u) => {
+        const negociosTexto = Array.isArray(u.negocios)
+          ? u.negocios.map((n) => n?.nombre || n?.giro || "(sin nombre)").join(", ")
+          : u.negocio
+          ? typeof u.negocio === "object"
+            ? u.negocio.nombre || u.negocio.giro || "(sin nombre)"
+            : u.negocio
+          : "—";
 
-      const nombre = [u.nombre, u.apellido].filter(Boolean).join(" ");
-      const correo = u.email || u.correo || "—";
+        const nombre = [u.nombre, u.apellido].filter(Boolean).join(" ") || "—";
+        const correo = u.email || u.correo || "—";
 
-      return `
-        <tr>
-          <td>${nombre || "—"}</td>
-          <td>${correo}</td>
-          <td>${u.genero || "—"}</td>
-          <td>${u.region || "—"}</td>
-          <td>${u.comuna || "—"}</td>
-          <td>${negociosTexto}</td>
-          <td>
-            <button class="btn-editar" onclick="abrirModalUsuario('${u._id}')">✏️</button>
-            <button class="btn-eliminar" onclick="eliminarUsuario('${u._id}')">🗑️</button>
-          </td>
-        </tr>`;
-    }).join("");
-
-    // 🔹 Solo filas: NO metas <tbody> dentro del <tbody id="usuariosBody">
-    tbody.innerHTML = filas;
+        return `
+          <tr>
+            <td>${nombre}</td>
+            <td>${correo}</td>
+            <td>${u.genero || "—"}</td>
+            <td>${u.region || "—"}</td>
+            <td>${u.comuna || "—"}</td>
+            <td>${negociosTexto}</td>
+            <td>
+              <button class="btn-editar" onclick="abrirModalUsuario('${u._id}')">✏️</button>
+              <button class="btn-eliminar" onclick="eliminarUsuario('${u._id}')">🗑️</button>
+            </td>
+          </tr>`;
+      })
+      .join("");
   } catch (err) {
     tbody.innerHTML = `<tr><td colspan='7' style='color:red;'>Error cargando usuarios: ${err.message}</td></tr>`;
   }
@@ -67,7 +63,7 @@ async function abrirModalUsuario(id) {
     const user = await res.json();
 
     const modal = document.getElementById("modal-editar");
-    if (!modal) { alert("Modal de edición no existe en el HTML."); return; }
+    if (!modal) return alert("Modal de edición no existe en el HTML.");
 
     modal.style.display = "flex";
     document.getElementById("edit-id").value = id;
@@ -81,9 +77,9 @@ async function abrirModalUsuario(id) {
 
 async function guardarCambiosUsuario() {
   const id = document.getElementById("edit-id")?.value;
-  const nombre = document.getElementById("edit-nombre")?.value;
-  const apellido = document.getElementById("edit-apellido")?.value;
-  const comuna = document.getElementById("edit-comuna")?.value;
+  const nombre = document.getElementById("edit-nombre")?.value.trim();
+  const apellido = document.getElementById("edit-apellido")?.value.trim();
+  const comuna = document.getElementById("edit-comuna")?.value.trim();
 
   if (!id) return alert("Falta ID de usuario.");
 
@@ -94,19 +90,22 @@ async function guardarCambiosUsuario() {
       body: JSON.stringify({ nombre, apellido, comuna }),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
     alert("✅ Usuario actualizado correctamente");
     cerrarModal();
     cargarUsuarios();
   } catch (err) {
-    alert("❌ " + err.message);
+    alert("❌ Error al guardar: " + err.message);
   }
 }
 
 async function eliminarUsuario(id) {
   if (!confirm("¿Seguro que deseas eliminar este usuario?")) return;
+
   try {
     const res = await fetch(`/api/usuarios/${id}`, { method: "DELETE" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
     alert("🗑️ Usuario eliminado correctamente");
     cargarUsuarios();
   } catch (err) {
@@ -115,12 +114,11 @@ async function eliminarUsuario(id) {
 }
 
 // =============================
-// 🧩 CARGAR NEGOCIOS CON DUEÑO
+// 🏪 CARGAR NEGOCIOS
 // =============================
 async function cargarNegocios() {
   const contenedor = document.getElementById("tablaNegocios");
   if (!contenedor) return;
-
   contenedor.innerHTML = "<p>Cargando negocios...</p>";
 
   try {
@@ -133,22 +131,23 @@ async function cargarNegocios() {
       return;
     }
 
-    // Armamos tabla COMPLETA dentro del contenedor (aquí sí corresponde)
-    const filas = negocios.map((n) => `
-      <tr>
-        <td>${n.nombre || "-"}</td>
-        <td>${n.giro || "-"}</td>
-        <td>${n.comuna || "-"}</td>
-        <td>${n.sector || "-"}</td>
-        <td>${n.duenioNombre || "-"}</td>
-        <td>${n.duenioCorreo || "-"}</td>
-        <td>
-          <button class="btn-editar" onclick="abrirModalNegocio('${encodeURIComponent(n.nombre || "")}')">✏️</button>
-          <button class="btn-eliminar" onclick="eliminarNegocio('${encodeURIComponent(n.nombre || "")}')">🗑️</button>
-          ${n.duenioId ? `<button class="btn-eliminar" onclick="eliminarUsuario('${n.duenioId}')">🧍‍♂️</button>` : ""}
-        </td>
-      </tr>
-    `).join("");
+    const filas = negocios
+      .map((n) => `
+        <tr>
+          <td>${n.nombre || "-"}</td>
+          <td>${n.giro || "-"}</td>
+          <td>${n.comuna || "-"}</td>
+          <td>${n.sector || "-"}</td>
+          <td>${n.duenioNombre || "-"}</td>
+          <td>${n.duenioCorreo || "-"}</td>
+          <td>
+            <button class="btn-editar" onclick="abrirModalNegocio('${encodeURIComponent(n.nombre || "")}')">✏️</button>
+            <button class="btn-eliminar" onclick="eliminarNegocio('${encodeURIComponent(n.nombre || "")}')">🗑️</button>
+            ${n.duenioId ? `<button class="btn-eliminar" onclick="eliminarUsuario('${n.duenioId}')">🧍‍♂️</button>` : ""}
+          </td>
+        </tr>
+      `)
+      .join("");
 
     contenedor.innerHTML = `
       <table>
@@ -165,13 +164,13 @@ async function cargarNegocios() {
         </thead>
         <tbody>${filas}</tbody>
       </table>`;
-  } catch (error) {
-    contenedor.innerHTML = `<p style="color:red;">Error al cargar negocios: ${error.message}</p>`;
+  } catch (err) {
+    contenedor.innerHTML = `<p style="color:red;">Error al cargar negocios: ${err.message}</p>`;
   }
 }
 
 // =============================
-// 🧩 ABRIR / GUARDAR / ELIMINAR NEGOCIO
+// 🧩 EDITAR / GUARDAR / ELIMINAR NEGOCIOS
 // =============================
 async function abrirModalNegocio(nombreCodificado) {
   const nombre = decodeURIComponent(nombreCodificado || "");
@@ -181,7 +180,7 @@ async function abrirModalNegocio(nombreCodificado) {
     const n = await res.json();
 
     const modal = document.getElementById("modal-editar-negocio");
-    if (!modal) { alert("Modal de negocio no existe en el HTML."); return; }
+    if (!modal) return alert("Modal de negocio no existe en el HTML.");
 
     document.getElementById("edit-nombre-negocio").value = n.nombre || "";
     document.getElementById("edit-giro").value = n.giro || "";
@@ -194,10 +193,10 @@ async function abrirModalNegocio(nombreCodificado) {
 }
 
 async function guardarCambiosNegocio() {
-  const nombre = document.getElementById("edit-nombre-negocio")?.value || "";
-  const giro = document.getElementById("edit-giro")?.value || "";
-  const comuna = document.getElementById("edit-comuna-negocio")?.value || "";
-  const sector = document.getElementById("edit-sector")?.value || "";
+  const nombre = document.getElementById("edit-nombre-negocio")?.value.trim() || "";
+  const giro = document.getElementById("edit-giro")?.value.trim() || "";
+  const comuna = document.getElementById("edit-comuna-negocio")?.value.trim() || "";
+  const sector = document.getElementById("edit-sector")?.value.trim() || "";
 
   if (!nombre) return alert("Falta el nombre del negocio.");
 
@@ -221,13 +220,10 @@ async function guardarCambiosNegocio() {
 async function eliminarNegocio(nombreCodificado) {
   const nombre = decodeURIComponent(nombreCodificado || "");
   if (!nombre) return;
-
   if (!confirm(`¿Seguro que deseas eliminar el negocio "${nombre}"?`)) return;
 
   try {
-    const res = await fetch(`/api/negocios/nombre/${encodeURIComponent(nombre)}`, {
-      method: "DELETE",
-    });
+    const res = await fetch(`/api/negocios/nombre/${encodeURIComponent(nombre)}`, { method: "DELETE" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     alert("🗑️ Negocio eliminado correctamente");
     cargarNegocios();
@@ -240,12 +236,10 @@ async function eliminarNegocio(nombreCodificado) {
 // 🧩 MODALES Y SECCIONES
 // =============================
 function cerrarModal() {
-  const m = document.getElementById("modal-editar");
-  if (m) m.style.display = "none";
+  document.getElementById("modal-editar")?.style.setProperty("display", "none");
 }
 function cerrarModalNegocio() {
-  const m = document.getElementById("modal-editar-negocio");
-  if (m) m.style.display = "none";
+  document.getElementById("modal-editar-negocio")?.style.setProperty("display", "none");
 }
 
 function mostrarSeccion(id) {
@@ -257,10 +251,9 @@ function mostrarSeccion(id) {
 }
 
 // =============================
-// 🚀 Inicialización
+// 🚀 INICIALIZACIÓN
 // =============================
 document.addEventListener("DOMContentLoaded", () => {
-  // Si tienes botones de navegación, puedes engancharlos aquí también
   cargarUsuarios();
   cargarNegocios();
 });

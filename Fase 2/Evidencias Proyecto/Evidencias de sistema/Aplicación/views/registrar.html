@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Registro de Usuario</title>
-  <link rel="stylesheet" href="/css/registrar.css">
-
-  <!-- Cargar primero las regiones -->
+  <link rel="stylesheet" href="/css/registrar.css" />
   <script src="/js/regiones.js"></script>
 
   <script defer>
     document.addEventListener("DOMContentLoaded", () => {
+      const form = document.querySelector("form");
+      const mensaje = document.createElement("p");
+      mensaje.id = "mensaje";
+      form.appendChild(mensaje);
+
       const regionSelect = document.getElementById("region");
       const comunaSelect = document.getElementById("comuna");
       const sectorSelect = document.getElementById("sector");
@@ -18,9 +21,9 @@
       const negociosContainer = document.getElementById("negociosContainer");
       const addNegocioBtn = document.getElementById("addNegocioBtn");
 
-      /* ------------------------------
-         CLIENTE: Región → Comuna → Sector
-      ------------------------------ */
+      // ==============================
+      // 🌎 REGIÓN → COMUNA → SECTOR
+      // ==============================
       Object.keys(regiones).forEach(region => {
         const opt = document.createElement("option");
         opt.value = region;
@@ -30,8 +33,6 @@
 
       regionSelect.addEventListener("change", () => {
         comunaSelect.innerHTML = "<option value=''>Seleccione comuna</option>";
-        sectorSelect.innerHTML = "<option value=''>Seleccione sector</option>";
-
         const comunaList = regiones[regionSelect.value] || [];
         comunaList.forEach(c => {
           const o = document.createElement("option");
@@ -44,31 +45,21 @@
       comunaSelect.addEventListener("change", () => {
         sectorSelect.innerHTML = "<option value=''>Seleccione sector</option>";
         const sectores = sectoresPorComuna[comunaSelect.value] || [];
-        if (sectores.length === 0) {
-          const opt = document.createElement("option");
-          opt.value = "";
-          opt.textContent = "(Sin sectores disponibles)";
-          sectorSelect.appendChild(opt);
-        } else {
-          sectores.forEach(s => {
-            const o = document.createElement("option");
-            o.value = s;
-            o.textContent = s;
-            sectorSelect.appendChild(o);
-          });
-        }
+        sectores.forEach(s => {
+          const o = document.createElement("option");
+          o.value = s;
+          o.textContent = s;
+          sectorSelect.appendChild(o);
+        });
       });
 
-      /* ------------------------------
-         NEGOCIOS: Mostrar / Ocultar
-      ------------------------------ */
+      // ==============================
+      // 🏪 NEGOCIOS DINÁMICOS
+      // ==============================
       tieneNegocioCheck.addEventListener("change", e => {
         negociosContainer.style.display = e.target.checked ? "block" : "none";
       });
 
-      /* ------------------------------
-         NEGOCIOS: Agregar bloque dinámico
-      ------------------------------ */
       addNegocioBtn.addEventListener("click", () => {
         const index = negociosContainer.querySelectorAll(".negocio-item").length + 1;
         const div = document.createElement("div");
@@ -81,68 +72,44 @@
           <input type="text" name="telefonoNegocio_${index}" placeholder="Teléfono (opcional)">
           <input type="email" name="correoNegocio_${index}" placeholder="Correo (opcional)">
           <input type="text" name="webNegocio_${index}" placeholder="Sitio web (opcional)">
-
-          <select name="regionNegocio_${index}" class="regionNegocio" required>
-            <option value="">Región del negocio</option>
-          </select>
-
-          <select name="comunaNegocio_${index}" class="comunaNegocio" required>
-            <option value="">Comuna del negocio</option>
-          </select>
-
-          <select name="sectorNegocio_${index}" class="sectorNegocio">
-            <option value="">Sector del negocio</option>
-          </select>
-
-          <button type="button" class="removeNegocioBtn">Eliminar negocio</button>
+          <button type="button" class="removeNegocioBtn">🗑️ Eliminar</button>
         `;
         negociosContainer.appendChild(div);
+        div.querySelector(".removeNegocioBtn").addEventListener("click", () => div.remove());
+      });
 
-        // --- Población dinámica para cada negocio
-        const regionSelectNeg = div.querySelector(".regionNegocio");
-        const comunaSelectNeg = div.querySelector(".comunaNegocio");
-        const sectorSelectNeg = div.querySelector(".sectorNegocio");
+      // ==============================
+      // 🧩 REGISTRO CON FETCH (JSON)
+      // ==============================
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-        Object.keys(regiones).forEach(region => {
-          const opt = document.createElement("option");
-          opt.value = region;
-          opt.textContent = region;
-          regionSelectNeg.appendChild(opt);
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => {
+          data[key] = value;
         });
 
-        regionSelectNeg.addEventListener("change", () => {
-          comunaSelectNeg.innerHTML = "<option value=''>Seleccione comuna</option>";
-          sectorSelectNeg.innerHTML = "<option value=''>Seleccione sector</option>";
-          const comunaList = regiones[regionSelectNeg.value] || [];
-          comunaList.forEach(c => {
-            const o = document.createElement("option");
-            o.value = c;
-            o.textContent = c;
-            comunaSelectNeg.appendChild(o);
+        try {
+          const res = await fetch("/registrar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
           });
-        });
 
-        comunaSelectNeg.addEventListener("change", () => {
-          sectorSelectNeg.innerHTML = "<option value=''>Seleccione sector</option>";
-          const sectores = sectoresPorComuna[comunaSelectNeg.value] || [];
-          if (sectores.length === 0) {
-            const opt = document.createElement("option");
-            opt.value = "";
-            opt.textContent = "(Sin sectores disponibles)";
-            sectorSelectNeg.appendChild(opt);
+          const text = await res.text();
+          if (res.ok) {
+            mensaje.textContent = "✅ Registro exitoso. Redirigiendo...";
+            mensaje.style.color = "green";
+            setTimeout(() => (window.location.href = "/login"), 1500);
           } else {
-            sectores.forEach(s => {
-              const o = document.createElement("option");
-              o.value = s;
-              o.textContent = s;
-              sectorSelectNeg.appendChild(o);
-            });
+            mensaje.textContent = `❌ ${text}`;
+            mensaje.style.color = "red";
           }
-        });
-
-        div.querySelector(".removeNegocioBtn").addEventListener("click", () => {
-          div.remove();
-        });
+        } catch (err) {
+          mensaje.textContent = `⚠️ Error: ${err.message}`;
+          mensaje.style.color = "red";
+        }
       });
     });
   </script>
@@ -152,11 +119,12 @@
   <div class="form-container">
     <img src="/img/logo.png" alt="Logo del Sistema" class="logo" />
     <h2>Registro de Usuario</h2>
-    <form method="POST" action="/registrar">
-      <input type="text" name="nombre" placeholder="Nombre" required>
-      <input type="text" name="apellido" placeholder="Apellido" required>
-      <input type="text" name="rut" placeholder="RUT" required>
-      <input type="date" name="fechaNacimiento" required>
+
+    <form>
+      <input type="text" name="nombre" placeholder="Nombre" required />
+      <input type="text" name="apellido" placeholder="Apellido" required />
+      <input type="text" name="rut" placeholder="RUT" required />
+      <input type="date" name="fechaNacimiento" required />
 
       <select name="genero" required>
         <option value="">Seleccione género</option>
@@ -177,23 +145,23 @@
         <option value="">Seleccione sector</option>
       </select>
 
-      <input type="email" name="correo" placeholder="Correo electrónico" required>
-      <input type="password" name="contraseña" placeholder="Contraseña" required>
+      <input type="email" name="correo" placeholder="Correo electrónico" required />
+      <input type="password" name="contraseña" placeholder="Contraseña" required />
 
       <label>
-        <input type="checkbox" id="tieneNegocio" name="tieneNegocio"> Tengo un negocio
+        <input type="checkbox" id="tieneNegocio" name="tieneNegocio" /> Tengo un negocio
       </label>
 
-      <div id="negociosContainer" style="display:none;">
+      <div id="negociosContainer" style="display: none;">
         <h3>Datos de los Negocios</h3>
-        <button type="button" id="addNegocioBtn" class="btn-secundario">+ Agregar  negocio</button>
+        <button type="button" id="addNegocioBtn" class="btn-secundario">+ Agregar negocio</button>
       </div>
 
       <button type="submit" class="btn-catalogo">Registrar</button>
 
       <div class="links">
-        <a href="/login">Acceder a mi cuenta</a><br>
-        <a href="/forgot">¿Olvidaste tu contraseña?</a><br>
+        <a href="/login">Acceder a mi cuenta</a><br />
+        <a href="/olvide-password">¿Olvidaste tu contraseña?</a><br />
 
       </div>
     </form>

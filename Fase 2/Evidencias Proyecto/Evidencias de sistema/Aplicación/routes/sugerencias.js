@@ -1,55 +1,96 @@
+// =======================================================
+// 🔍 Buscador con sugerencias dinámicas (autocompletado)
+// =======================================================
 const inputBusqueda = document.getElementById("busqueda");
 const contenedorSugerencias = document.querySelector(".sugerencias");
-
 let timeout = null;
 
-// Escuchar escritura del usuario
+// =======================================================
+// ✏️ Evento: cada vez que el usuario escribe
+// =======================================================
 inputBusqueda.addEventListener("input", async (e) => {
   const texto = e.target.value.trim();
 
-  // Si el usuario borra todo → limpiar
+  // 🧹 Si el usuario borra todo → limpiar sugerencias
   if (!texto) {
-    contenedorSugerencias.innerHTML = "";
-    contenedorSugerencias.style.display = "none";
+    limpiarSugerencias();
     return;
   }
 
-  // Retrasar para no saturar el servidor
+  // 🕓 Evita múltiples peticiones seguidas (debounce)
   clearTimeout(timeout);
   timeout = setTimeout(async () => {
     try {
-      const resp = await fetch(`/api/productos/sugerencias?q=${encodeURIComponent(texto)}`);
+      const url = `/api/productos/sugerencias?q=${encodeURIComponent(texto)}`;
+      const resp = await fetch(url);
+
       if (!resp.ok) throw new Error("Error al obtener sugerencias");
       const sugerencias = await resp.json();
 
+      // 🚫 Sin resultados
       if (!sugerencias.length) {
-        contenedorSugerencias.innerHTML = "<div class='sin-sugerencias'>Sin resultados</div>";
+        contenedorSugerencias.innerHTML =
+          "<div class='sin-sugerencias'>Sin resultados</div>";
         contenedorSugerencias.style.display = "block";
         return;
       }
 
-      // Generar sugerencias dinámicas
+      // 🧩 Generar lista de sugerencias dinámicas
       contenedorSugerencias.innerHTML = sugerencias
-        .map(s => `<div class="item-sugerencia" onclick="seleccionarSugerencia('${s}')">${s}</div>`)
+        .map(
+          (s) => `
+            <div class="item-sugerencia" data-valor="${s}">
+              🔎 ${s}
+            </div>
+          `
+        )
         .join("");
+
       contenedorSugerencias.style.display = "block";
     } catch (err) {
-      console.error(err);
+      console.error("❌ Error cargando sugerencias:", err);
+      limpiarSugerencias();
     }
-  }, 300);
+  }, 250); // ⚡ respuesta rápida sin saturar
 });
 
-// Al hacer clic en una sugerencia
+// =======================================================
+// 🖱️ Selección de una sugerencia (delegación de eventos)
+// =======================================================
+contenedorSugerencias.addEventListener("click", (e) => {
+  const item = e.target.closest(".item-sugerencia");
+  if (!item) return;
+
+  const valor = item.getAttribute("data-valor");
+  seleccionarSugerencia(valor);
+});
+
+// =======================================================
+// 🧠 Función: aplicar la sugerencia seleccionada
+// =======================================================
 function seleccionarSugerencia(valor) {
   inputBusqueda.value = valor;
-  contenedorSugerencias.innerHTML = "";
-  contenedorSugerencias.style.display = "none";
-  buscar();
+  limpiarSugerencias();
+  if (typeof buscar === "function") {
+    buscar(); // ejecuta la búsqueda principal
+  } else {
+    console.warn("⚠️ La función 'buscar()' no está definida todavía.");
+  }
 }
 
-// Cerrar sugerencias al hacer clic fuera
+// =======================================================
+// 🚪 Cerrar sugerencias al hacer clic fuera del buscador
+// =======================================================
 document.addEventListener("click", (e) => {
   if (!e.target.closest(".buscador")) {
     contenedorSugerencias.style.display = "none";
   }
 });
+
+// =======================================================
+// 🧹 Helper: limpiar contenedor de sugerencias
+// =======================================================
+function limpiarSugerencias() {
+  contenedorSugerencias.innerHTML = "";
+  contenedorSugerencias.style.display = "none";
+}

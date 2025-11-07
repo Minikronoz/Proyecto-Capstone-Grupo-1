@@ -1,6 +1,10 @@
-// public/js/regiones.js
+// =============================================================
+// 🌎 Catálogo de Regiones, Comunas y Sectores de Chile
+// =============================================================
 
-// 🗺️ Catálogo de regiones y comunas de Chile
+// -------------------------------------------------------------
+// 🗺️ Regiones → Comunas
+// -------------------------------------------------------------
 const regiones = {
   "Arica y Parinacota": ["Arica", "Camarones", "Putre", "General Lagos"],
   "Tarapacá": ["Iquique", "Alto Hospicio", "Pozo Almonte", "Camiña", "Colchane", "Huara", "Pica"],
@@ -23,7 +27,9 @@ const regiones = {
   "Magallanes": ["Punta Arenas", "Puerto Natales", "Porvenir", "Torres del Paine"]
 };
 
-// 📍 Catálogo de sectores por comuna
+// -------------------------------------------------------------
+// 🧭 Comunas → Sectores
+// -------------------------------------------------------------
 const sectoresPorComuna = {
   // Región Metropolitana
   "Santiago": ["Centro", "Barrio Brasil", "Lastarria", "Yungay", "Franklin", "Patronato", "Bellavista"],
@@ -62,11 +68,19 @@ const sectoresPorComuna = {
   "Punta Arenas": ["Centro", "Zona Franca", "Barrio Prat", "Costanera"]
 };
 
-// 🧩 Fallback automático: asigna sectores genéricos a comunas sin definir
-Object.keys(regiones).forEach(region => {
-  regiones[region].forEach(comuna => {
+// -------------------------------------------------------------
+// 🧩 Fallback: genera sectores genéricos si faltan
+// -------------------------------------------------------------
+Object.entries(regiones).forEach(([region, comunas]) => {
+  comunas.forEach((comuna) => {
     if (!sectoresPorComuna[comuna]) {
       sectoresPorComuna[comuna] = ["Centro", "Norte", "Sur", "Oriente", "Poniente"];
     }
   });
 });
+
+// -------------------------------------------------------------
+// 🌐 Exportar para compatibilidad con formularios o módulos
+// -------------------------------------------------------------
+window.regiones = regiones;
+window.sectoresPorComuna = sectoresPorComuna;

@@ -6,6 +6,7 @@ import http from "http";
 import cors from "cors";
 import session from "express-session";
 import MongoStore from "connect-mongo";
+import { MongoClient } from "mongodb";
 import { Server } from "socket.io";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -14,7 +15,7 @@ import { spawn } from "child_process";
 import fs from "fs";
 import { connectDB } from "./config/db.js";
 
-dotenv.config(); // ✅ Cargar variables de entorno primero
+dotenv.config(); // ✅ Cargar variables de entorno
 
 // ==============================
 // 📦 IMPORTACIÓN DE RUTAS
@@ -26,7 +27,9 @@ import catalogoRouter from "./routes/catalogo.js";
 import clicksRoutes from "./routes/clicks.routes.js";
 import estadisticasRoutes from "./routes/estadisticas.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
-import busquedasRoutes from "./routes/busquedas.routes.js"; // ✅ Ruta de búsquedas
+import busquedasRoutes from "./routes/busquedas.routes.js";
+import historicoRoutes from "./routes/historico.routes.js";
+import negociosRoutes from "./routes/negocios.routes.js";
 
 // ==============================
 // 📁 RUTAS Y ARCHIVOS BASE
@@ -45,9 +48,27 @@ app.set("io", io);
 // ==============================
 // 🧠 CONEXIÓN A MONGODB ATLAS
 // ==============================
+const mongoUri =
+  process.env.MONGODB_URI ||
+  "mongodb+srv://duoc_user:7OtcjHwo0BDDcqih@cluster0.lkz5yof.mongodb.net/?retryWrites=true&w=majority";
+
+let client;
 try {
+  // Conexión para operaciones normales (getDB)
   await connectDB();
-  console.log("✅ Conectado correctamente a MongoDB Atlas → Base de datos: duoc_user");
+
+  // Conexión separada para sesiones (reutiliza el mismo cluster)
+  client = new MongoClient(mongoUri);
+  await client.connect();
+
+  console.log("✅ Conectado correctamente a MongoDB Atlas → duoc_user");
+  try {
+  const db = (await import("./config/db.js")).getDB();
+  await db.collection("productos").createIndex({ title: "text", brand: "text" });
+  console.log("✅ Índice de texto creado correctamente en 'productos'");
+} catch (err) {
+  console.warn("⚠️ No se pudo crear índice de texto:", err.message);
+}
 } catch (error) {
   console.error("❌ Error al conectar con la base de datos:", error.message);
   process.exit(1);
@@ -66,9 +87,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl:
-        process.env.MONGODB_URI ||
-        "mongodb+srv://duoc_user:7OtcjHwo0BDDcqih@cluster0.lkz5yof.mongodb.net/duoc_user",
+      client, // 👈 Usa la conexión Atlas ya abierta
       dbName: "duoc_user",
       collectionName: "sesiones",
       ttl: 60 * 60 * 2, // 2 horas
@@ -85,22 +104,16 @@ app.use(
 // ==============================
 // 🔹 RUTAS API
 // ==============================
-
-// 🔸 Dashboard general
+app.use("/", usersRoutes); // ✅ Usuarios, login y registro
 app.use("/api/dashboard", dashboardRoutes);
-
-// 🔸 Scraping manual
 app.use("/api/scrape", scrapeRoutes);
-
-// 🔸 Productos, catálogo, clics, analítica y búsquedas
 app.use("/api/productos", productosRoutes);
 app.use("/api/catalogo", catalogoRouter);
 app.use("/api/clicks", clicksRoutes);
 app.use("/api/estadisticas", estadisticasRoutes);
-app.use("/api/busquedas", busquedasRoutes); // ✅ Activa los endpoints de búsquedas
-
-// 🔸 Usuarios y autenticación
-app.use("/", usersRoutes);
+app.use("/api/busquedas", busquedasRoutes);
+app.use("/api", negociosRoutes);
+app.use("/api/historico", historicoRoutes);
 
 // ==============================
 // 🧰 SCRAPING MANUAL CON LOGS
@@ -148,22 +161,24 @@ app.post("/api/scrape/:supermercado", (req, res) => {
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => res.redirect("/catalogo"));
-app.get("/catalogo", (req, res) => res.sendFile(path.join(__dirname, "views", "catalogo.html")));
-app.get("/editar-perfil", (req, res) => res.sendFile(path.join(__dirname, "views", "editar-perfil.html")));
-app.get("/historico", (req, res) => res.sendFile(path.join(__dirname, "views", "historico.html")));
-app.get("/principal", (req, res) => res.sendFile(path.join(__dirname, "views", "principal.html")));
-app.get("/dashboard", (req, res) => res.sendFile(path.join(__dirname, "views", "dashboard.html")));
 
+app.get("/catalogo", (req, res) =>
+  res.sendFile(path.join(__dirname, "views", "catalogo.html"))
+);
+app.get("/principal", (req, res) =>
+  res.sendFile(path.join(__dirname, "views", "principal.html"))
+);
+
+app.get("/dashboard", (req, res) =>
+  res.sendFile(path.join(__dirname, "views", "dashboard.html"))
+);
 // ==============================
 // 💬 SOCKET.IO (LOGS EN TIEMPO REAL)
 // ==============================
 io.on("connection", (socket) => {
   console.log("🟢 Cliente conectado vía Socket.io");
   socket.emit("scraping-log", "📡 Conexión establecida con el servidor.");
-
-  socket.on("disconnect", () => {
-    console.log("🔴 Cliente desconectado");
-  });
+  socket.on("disconnect", () => console.log("🔴 Cliente desconectado"));
 });
 
 // ==============================

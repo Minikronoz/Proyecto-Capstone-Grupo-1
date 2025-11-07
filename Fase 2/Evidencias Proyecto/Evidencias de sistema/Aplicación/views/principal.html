@@ -13,6 +13,8 @@
   />
   <link rel="stylesheet" href="/css/principal.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+
   <script src="/socket.io/socket.io.js"></script>
 
   <style>
@@ -35,6 +37,7 @@
     .botones-scraping .btn { padding: 0.5rem 0.9rem; font-size: 0.85rem; border-radius: 999px; }
     .badge--error { background: #fee2e2; color: #b91c1c; }
     .badge--ok { background: #dcfce7; color: #15803d; }
+
   </style>
 </head>
 <body>
@@ -80,136 +83,214 @@
         <span class="badge badge--ok" id="estado-backend">API Online</span>
       </div>
     </header>
+<main class="app-main">
+  <!-- DASHBOARD -->
+<section id="dashboard" class="seccion activa">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-chart-line"></i> Resumen General</h2>
+    <p class="descripcion">Monitorea la actividad del sistema en tiempo real.</p>
+  </div>
 
-    <main class="app-main">
-      <!-- DASHBOARD -->
-      <section id="dashboard" class="seccion activa">
-        <div class="section-header">
-          <h2><i class="fa-solid fa-chart-line"></i> Resumen General</h2>
-          <p class="descripcion">Monitorea la actividad del sistema en tiempo real.</p>
+  <div class="kpis">
+    <article class="kpi-card">
+      <div class="kpi__top">
+        <span class="kpi__label">Productos actualizados (24h)</span>
+        <i class="fa-solid fa-box-archive kpi__icon"></i>
+      </div>
+      <div class="kpi__value" id="kpi-productos">—</div>
+    </article>
+
+    <article class="kpi-card">
+      <div class="kpi__top">
+        <span class="kpi__label">Usuarios registrados</span>
+        <i class="fa-solid fa-user-check kpi__icon"></i>
+      </div>
+      <div class="kpi__value" id="kpi-usuarios">—</div>
+    </article>
+
+    <article class="kpi-card">
+      <div class="kpi__top">
+        <span class="kpi__label">Negocios activos</span>
+        <i class="fa-solid fa-store kpi__icon"></i>
+      </div>
+      <div class="kpi__value" id="kpi-negocios">—</div>
+    </article>
+
+    <article class="kpi-card">
+      <div class="kpi__top">
+        <span class="kpi__label">Último scraping</span>
+        <i class="fa-solid fa-clock-rotate-left kpi__icon"></i>
+      </div>
+      <div class="kpi__value" id="kpi-ultimo-scraping">—</div>
+    </article>
+  </div>
+
+<!-- ==========================
+📅 BLOQUE: ACTIVIDAD SEMANAL DE SCRAPING
+========================== -->
+<div class="charts-grid">
+  <div class="chart-card card-scraping">
+    <div class="chart-card__header">
+      <h3>📅 Actividad semanal de scraping</h3>
+    </div>
+    <div class="chart-card__body">
+      <div id="tablaScrapingSemanal" class="tabla-semanal">
+        <p style="color:#6b7280;">🕐 Cargando actividad semanal...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+  <!-- ==========================
+  📊 GRÁFICOS INFERIORES
+  ========================== -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-card__header">
+        <h3>Distribución por Región</h3>
+      </div>
+      <div class="chart-card__body">
+        <canvas id="chartRegiones" width="400" height="300"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-card__header">
+        <h3>Género de Usuarios</h3>
+      </div>
+      <div class="chart-card__body">
+        <canvas id="chartGenero"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  <!-- SCRAPING -->
+  <section id="scraping" class="seccion">
+    <div class="section-header">
+      <h2><i class="fa-solid fa-cloud-arrow-down"></i> Ejecución de Scraping</h2>
+      <p class="descripcion">Ejecuta los scripts para actualizar precios de supermercados.</p>
+    </div>
+
+    <div class="card scraping-card">
+      <div class="botones-scraping">
+        <button onclick="ejecutarScraping('unimarc')" class="btn btn-unimarc">Unimarc</button>
+        <button onclick="ejecutarScraping('tottus')" class="btn btn-tottus">Tottus</button>
+        <button onclick="ejecutarScraping('jumbo')" class="btn btn-jumbo">Jumbo</button>
+        <button onclick="ejecutarScraping('acuenta')" class="btn btn-acuenta">A Cuenta</button>
+      </div>
+
+      <div id="logScraping" class="log-contenedor">
+        <div class="log-header">
+          <h3><i class="fa-regular fa-clipboard"></i> Registro de scraping</h3>
+          <button class="btn btn-outline" id="limpiar-log">
+            <i class="fa-regular fa-trash-can"></i> Limpiar
+          </button>
         </div>
+        <pre id="scrapingOutput" class="log-output">Esperando ejecución...</pre>
+      </div>
+    </div>
+  </section>
+<!-- USUARIOS -->
+<section id="usuarios" class="seccion">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-users"></i> Gestión de Usuarios</h2>
+    <p class="descripcion">Visualiza, filtra y edita la información de los usuarios registrados.</p>
+  </div>
 
-        <div class="kpis">
-          <article class="kpi-card">
-            <div class="kpi__top">
-              <span class="kpi__label">Productos actualizados (24h)</span>
-              <i class="fa-solid fa-box-archive kpi__icon"></i>
-            </div>
-            <div class="kpi__value" id="kpi-productos">—</div>
-          </article>
+  <div class="card">
+    <div class="tabla-header">
+      <input type="text" id="busquedaUsuario" placeholder="Buscar por nombre o correo..." class="input-busqueda" />
+      <button id="recargarUsuarios" class="btn btn-outline">
+        <i class="fa-solid fa-rotate"></i> Recargar
+      </button>
+    </div>
 
-          <article class="kpi-card">
-            <div class="kpi__top">
-              <span class="kpi__label">Usuarios registrados</span>
-              <i class="fa-solid fa-user-check kpi__icon"></i>
-            </div>
-            <div class="kpi__value" id="kpi-usuarios">—</div>
-          </article>
+    <div id="tablaUsuarios" class="tabla-contenedor">
+      <table id="tablaUsuariosBody">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Género</th>
+            <th>Región</th>
+            <th>Comuna</th>
+            <th>Negocio</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="usuariosBody">
+          <tr>
+            <td colspan="7" style="text-align:center; color:#888;">Cargando usuarios...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
 
-          <article class="kpi-card">
-            <div class="kpi__top">
-              <span class="kpi__label">Negocios activos</span>
-              <i class="fa-solid fa-store kpi__icon"></i>
-            </div>
-            <div class="kpi__value" id="kpi-negocios">—</div>
-          </article>
+<style>
+  #usuarios .card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.1);
+  }
+  #usuarios table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  #usuarios th, #usuarios td {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 8px;
+    text-align: left;
+    font-size: 0.9rem;
+  }
+  #usuarios th {
+    background: #f9fafb;
+    font-weight: 600;
+  }
+  .btn-editar, .btn-eliminar {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  .btn-editar { color: #0ea5e9; }
+  .btn-eliminar { color: #dc2626; }
+  .tabla-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .input-busqueda {
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 6px 10px;
+    width: 220px;
+  }
+</style>
 
-          <article class="kpi-card">
-            <div class="kpi__top">
-              <span class="kpi__label">Último scraping</span>
-              <i class="fa-solid fa-clock-rotate-left kpi__icon"></i>
-            </div>
-            <div class="kpi__value" id="kpi-ultimo-scraping">—</div>
-          </article>
-        </div>
-        <div class="charts-grid">
-          <div class="chart-card">
-            <div class="chart-card__header">
-              <h3>Distribución por Región</h3>
-            </div>
-            <div class="chart-card__body">
-              <canvas id="chartRegiones"></canvas>
-            </div>
-          </div>
 
-          <div class="chart-card">
-            <div class="chart-card__header">
-              <h3>Género de Usuarios</h3>
-            </div>
-            <div class="chart-card__body">
-              <canvas id="chartGenero"></canvas>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <!-- SCRAPING -->
-      <section id="scraping" class="seccion">
-        <div class="section-header">
-          <h2><i class="fa-solid fa-cloud-arrow-down"></i> Ejecución de Scraping</h2>
-          <p class="descripcion">Ejecuta los scripts para actualizar precios de supermercados.</p>
-        </div>
+  <!-- NEGOCIOS -->
+  <section id="negocios" class="seccion">
+    <div class="section-header">
+      <h2><i class="fa-solid fa-shop"></i> Gestión de Negocios</h2>
+      <p class="descripcion">Visualiza y administra los negocios registrados en el sistema.</p>
+    </div>
 
-        <div class="card scraping-card">
-          <div class="botones-scraping">
-            <button onclick="ejecutarScraping('unimarc')" class="btn btn-unimarc">Unimarc</button>
-            <button onclick="ejecutarScraping('tottus')" class="btn btn-tottus">Tottus</button>
-            <button onclick="ejecutarScraping('jumbo')" class="btn btn-jumbo">Jumbo</button>
-            <button onclick="ejecutarScraping('acuenta')" class="btn btn-acuenta">A Cuenta</button>
-          </div>
+    <div id="tablaNegocios" class="tabla-contenedor">
+      <p style="text-align:center; color:#888;">Cargando negocios...</p>
+    </div>
+  </section>
+</main>
 
-          <div id="logScraping" class="log-contenedor">
-            <div class="log-header">
-              <h3><i class="fa-regular fa-clipboard"></i> Registro de scraping</h3>
-              <button class="btn btn-outline" id="limpiar-log">
-                <i class="fa-regular fa-trash-can"></i> Limpiar
-              </button>
-            </div>
-            <pre id="scrapingOutput" class="log-output">Esperando ejecución...</pre>
-          </div>
-        </div>
-      </section>
-      <!-- USUARIOS -->
-      <section id="usuarios" class="seccion">
-        <div class="section-header">
-          <h2><i class="fa-solid fa-users"></i> Gestión de Usuarios</h2>
-          <p class="descripcion">Visualiza, filtra y edita la información de los usuarios registrados.</p>
-        </div>
-
-        <div class="card">
-          <div class="tabla-header">
-            <input type="text" id="busquedaUsuario" placeholder="Buscar por nombre o correo..." class="input-busqueda"/>
-            <button id="recargarUsuarios" class="btn btn-outline"><i class="fa-solid fa-rotate"></i> Recargar</button>
-          </div>
-
-          <div id="tablaUsuarios" class="tabla-contenedor">
-            <table id="tablaUsuariosBody">
-              <thead>
-                <tr>
-                  <th>Nombre</th><th>Correo</th><th>Género</th>
-                  <th>Región</th><th>Comuna</th><th>Negocio</th><th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody id="usuariosBody">
-                <tr><td colspan="7" style="text-align:center; color:#888;">Cargando usuarios...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- NEGOCIOS -->
-      <section id="negocios" class="seccion">
-        <div class="section-header">
-          <h2><i class="fa-solid fa-shop"></i> Gestión de Negocios</h2>
-          <p class="descripcion">Visualiza y administra los negocios registrados en el sistema.</p>
-        </div>
-
-        <div id="tablaNegocios" class="tabla-contenedor">
-          <p style="text-align:center; color:#888;">Cargando negocios...</p>
-        </div>
-      </section>
-    </main>
 
     <footer class="app-footer">
       <p>© 2025 Sistema de Reportes — Todos los derechos reservados</p>
@@ -255,14 +336,21 @@
       btn.classList.add("active");
       const target = btn.getAttribute("data-target");
       secciones.forEach((sec) => sec.classList.toggle("activa", sec.id === target));
-      if (target === "dashboard") cargarDatosDashboard();
+      if (target === "dashboard") {
+              cargarDatosDashboard();
+              cargarActividadSemanal(); // ✅ fuerza actualización del bloque semanal
+            }
       if (target === "usuarios") cargarUsuarios();
       if (target === "negocios") cargarNegocios();
+
     });
   });
- // ===== Dashboard refinado =====
+
+
+// ===== Dashboard refinado =====
 async function cargarDatosDashboard() {
   try {
+    // --- 1️⃣ Cargar datos principales del dashboard ---
     const resp = await fetch("/api/dashboard");
     const data = await resp.json();
     const kpis = data.kpis || {};
@@ -272,38 +360,68 @@ async function cargarDatosDashboard() {
     document.getElementById("kpi-usuarios").textContent = kpis.total_usuarios ?? "—";
     document.getElementById("kpi-negocios").textContent = kpis.total_negocios ?? "—";
 
-    // === Productos actualizados ===
-    let totalActualizados = 0;
-    const scrapingData = data.scraping || {};
+    // --- 2️⃣ Cargar datos reales del scraping desde tu endpoint ---
+    const resScraping = await fetch("/api/scrape/ultimos");
+    const scrapingData = await resScraping.json();
 
+    // === Productos actualizados ===
+    let totalProductos = 0;
     Object.values(scrapingData).forEach((v) => {
-      totalActualizados += v.actualizados ?? 0;
+      const nuevos = v.nuevos ?? 0;
+      const actualizados = v.actualizados ?? 0;
+      const revisados = v.revisados ?? 0;
+      totalProductos += nuevos + actualizados + revisados;
     });
 
     document.getElementById("kpi-productos").innerHTML = `
-      <div class="kpi-total">${totalActualizados}</div>
-      <div class="kpi-subtitle">Productos actualizados (últimas 24h)</div>
+      <div class="kpi-total">${totalProductos}</div>
+      <div class="kpi-subtitle">Productos cargados (último scraping)</div>
     `;
 
-    // === Último scraping ===
+    // --- 3️⃣ Renderizar tarjetas de scraping ---
     const scrapingItems = Object.entries(scrapingData)
       .map(([nombre, info]) => {
-        const fecha = new Date(info.fecha).toLocaleString("es-CL", {
-          hour12: false,
-        });
-        return `<div><b>${nombre.toUpperCase()}:</b> ${fecha}</div>`;
+        const fechaObj = new Date(info.fecha);
+        const fecha = isNaN(fechaObj)
+          ? "—"
+          : fechaObj.toLocaleString("es-CL", { hour12: false });
+
+        const nuevos = info.nuevos ?? 0;
+        const actualizados = info.actualizados ?? 0;
+        const revisados = info.revisados ?? 0;
+
+        // Indicador visual de frescura (🟢, 🟡, 🔴)
+        const horas = Math.floor((Date.now() - fechaObj) / (1000 * 60 * 60));
+        let estado = "🟢";
+        if (horas > 24) estado = "🔴";
+        else if (horas > 12) estado = "🟡";
+
+        return `
+          <div class="item-card" data-store="${nombre.toLowerCase()}">
+            <h4>${estado} ${nombre.toUpperCase()}</h4>
+            <div class="datos">
+              <span><b>${fecha}</b></span>
+              <span><b>${nuevos}</b> nuevos</span>
+              <span><b>${actualizados}</b> actualizados</span>
+              ${revisados ? `<span><b>${revisados}</b> revisados</span>` : ""}
+            </div>
+          </div>
+        `;
       })
       .join("");
 
     document.getElementById("kpi-ultimo-scraping").innerHTML =
-      scrapingItems || "—";
+      scrapingItems || "<div>No hay registros recientes</div>";
 
     // === Renderizar gráficos ===
     renderGraficosDashboard(charts);
   } catch (err) {
-    console.error("Error al cargar dashboard:", err);
+    console.error("❌ Error al cargar dashboard:", err);
+    document.getElementById("kpi-ultimo-scraping").innerHTML =
+      "<div>Error al cargar los datos del scraping</div>";
   }
 }
+
 
   // ===== Scraping manual =====
   async function ejecutarScraping(supermercado) {
@@ -342,105 +460,163 @@ function renderGraficosDashboard(charts) {
     lila: "#9C27B0",
     celeste: "#4FC3F7",
   };
+// ✅ Registrar plugin de etiquetas si aún no está
+if (typeof ChartDataLabels !== "undefined") {
+  Chart.register(ChartDataLabels);
+}
 
-  // === 📊 DISTRIBUCIÓN POR REGIÓN ===
-  const regiones = charts.region || {};
-  const ctxReg = document.getElementById("chartRegiones")?.getContext("2d");
+// === 📊 DISTRIBUCIÓN POR REGIÓN ===
+const regiones = charts.region || {};
+const ctxReg = document.getElementById("chartRegiones")?.getContext("2d");
 
-  if (ctxReg && Object.keys(regiones).length > 0) {
-    window.graficoRegiones = new Chart(ctxReg, {
-      type: "bar",
-      data: {
-        labels: Object.keys(regiones),
-        datasets: [
-          {
-            label: "Usuarios por Región",
-            data: Object.values(regiones),
-            backgroundColor: [
+if (ctxReg && Object.keys(regiones).length > 0) {
+  if (window.graficoRegiones) window.graficoRegiones.destroy(); // evita duplicados
+
+  const labels = Object.keys(regiones);
+  const values = Object.values(regiones);
+
+  window.graficoRegiones = new Chart(ctxReg, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Usuarios por Región",
+          data: values,
+          backgroundColor: labels.map(
+            (_, i) => [
               palette.calipso,
-              palette.azul,
+              palette.verde,
+              palette.celeste,
               palette.petroleo,
-              palette.celeste,
-              palette.verde,
               palette.lila,
-            ],
-            borderRadius: 10,
-          },
-        ],
+              "#64748b",
+              "#94a3b8",
+            ][i % 7]
+          ),
+          borderRadius: 8,
+          borderSkipped: false,
+          hoverBackgroundColor: "#0ea5e9",
+        },
+      ],
+    },
+    options: {
+      indexAxis: "y", // barras horizontales
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: {
+        padding: { top: 10, bottom: 10, left: 10, right: 10 },
       },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false },
-          title: {
-            display: false,
-          },
-          tooltip: {
-            backgroundColor: "#1E293B",
-            titleColor: "#E0E6E9",
-            bodyColor: "#E0E6E9",
-            cornerRadius: 6,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: "#0F172A",
+          titleColor: "#E2E8F0",
+          bodyColor: "#E2E8F0",
+          cornerRadius: 8,
+          padding: 10,
+          callbacks: {
+            label: (ctx) => ` ${ctx.raw} usuarios`,
           },
         },
-        scales: {
-          x: {
-            ticks: { color: "#334155", font: { weight: "500" } },
-            grid: { display: false },
+        datalabels: {
+          color: "#fff",
+          anchor: "end",
+          align: "left",
+          formatter: (v) => v.toLocaleString("es-CL"),
+          font: { weight: "600", size: 12 },
+        },
+      },
+      scales: {
+        x: {
+          beginAtZero: true,
+          grid: { color: "rgba(0,0,0,0.05)" },
+          ticks: {
+            color: "#475569",
+            font: { size: 12 },
           },
-          y: {
-            ticks: { color: "#475569" },
-            grid: { color: "rgba(0,0,0,0.05)" },
-            beginAtZero: true,
+        },
+        y: {
+          grid: { display: false },
+          ticks: {
+            color: "#1E293B",
+            font: { weight: "600" },
           },
         },
       },
-    });
-  }
+    },
+    plugins: [ChartDataLabels],
+  });
+}
 
-  // === ⚧ GÉNERO DE USUARIOS ===
-  const genero = charts.genero || {};
-  const ctxGen = document.getElementById("chartGenero")?.getContext("2d");
+// === ⚧ GÉNERO DE USUARIOS ===
+const genero = charts.genero || {};
+const ctxGen = document.getElementById("chartGenero")?.getContext("2d");
 
-  if (ctxGen && Object.keys(genero).length > 0) {
-    window.graficoGenero = new Chart(ctxGen, {
-      type: "doughnut",
-      data: {
-        labels: Object.keys(genero),
-        datasets: [
-          {
-            data: Object.values(genero),
-            backgroundColor: [
-              palette.calipso,
-              palette.verde,
-              palette.celeste,
-            ],
-            borderWidth: 2,
-            borderColor: "#fff",
-            hoverOffset: 12,
+if (ctxGen && Object.keys(genero).length > 0) {
+  if (window.graficoGenero) window.graficoGenero.destroy();
+
+  window.graficoGenero = new Chart(ctxGen, {
+    type: "doughnut",
+    data: {
+      labels: Object.keys(genero),
+      datasets: [
+        {
+          data: Object.values(genero),
+          backgroundColor: [
+            palette.calipso,
+            palette.verde,
+            palette.celeste,
+            "#94a3b8",
+          ],
+          borderWidth: 3,
+          borderColor: "#F8FAFC",
+          hoverOffset: 10,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "75%",
+      layout: { padding: 5 },
+      plugins: {
+        legend: {
+          position: "bottom",
+          labels: {
+            color: "#1E293B",
+            font: { size: 12, weight: "500" },
+            boxWidth: 12,
+            boxHeight: 12,
+            padding: 14,
+            usePointStyle: true,
           },
-        ],
-      },
-      options: {
-        cutout: "70%", // Donut más elegante
-        plugins: {
-          legend: {
-            position: "bottom",
-            labels: {
-              color: "#334155",
-              font: { size: 13, weight: "500" },
-              usePointStyle: true,
+        },
+        tooltip: {
+          backgroundColor: "#0F172A",
+          titleColor: "#E2E8F0",
+          bodyColor: "#E2E8F0",
+          cornerRadius: 8,
+          padding: 10,
+          bodyFont: { size: 13 },
+          callbacks: {
+            label: function (ctx) {
+              const label = ctx.label || "";
+              const value = ctx.raw;
+              const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+              const pct = ((value / total) * 100).toFixed(1);
+              return ` ${label}: ${value} usuarios (${pct}%)`;
             },
           },
-          tooltip: {
-            backgroundColor: "#1E293B",
-            titleColor: "#E0E6E9",
-            bodyColor: "#E0E6E9",
-            cornerRadius: 6,
-          },
         },
       },
-    });
-  }
+    },
+  });
+}
+
+
+
+
 }
 
 
@@ -473,33 +649,119 @@ function renderGraficosDashboard(charts) {
       tabla.innerHTML = `<tr><td colspan='7' style='color:red;'>Error cargando usuarios: ${err.message}</td></tr>`;
     }
   }
-  // ===== Negocios =====
-  async function cargarNegocios() {
-    const contenedor = document.getElementById("tablaNegocios");
-    contenedor.innerHTML = "<p>Cargando negocios...</p>";
-    try {
-      const res = await fetch("/api/negocios-con-duenio");
-      const negocios = await res.json();
-      if (!Array.isArray(negocios) || negocios.length === 0) {
-        contenedor.innerHTML = "<p>(No hay negocios registrados)</p>";
-        return;
-      }
-      let html = `<table class="tabla-negocios"><thead><tr>
-        <th>Nombre</th><th>Giro</th><th>Comuna</th><th>Sector</th>
-        <th>Dueño</th><th>Correo Dueño</th><th>Acciones</th></tr></thead><tbody>`;
-      negocios.forEach(n => {
-        html += `<tr><td>${n.nombre || "-"}</td><td>${n.giro || "-"}</td>
-          <td>${n.comuna || "-"}</td><td>${n.sector || "-"}</td>
-          <td>${n.duenioNombre || "-"}</td><td>${n.duenioCorreo || "-"}</td>
-          <td><button class="btn-editar" onclick="editarNegocio('${n._id}')">✏️</button>
-              <button class="btn-eliminar" onclick="eliminarNegocio('${n._id}')">🗑️</button></td></tr>`;
-      });
-      html += "</tbody></table>";
-      contenedor.innerHTML = html;
-    } catch (err) {
-      contenedor.innerHTML = `<p style="color:red;">Error al cargar negocios: ${err.message}</p>`;
-    }
+  // ============================================================
+// ✏️ Abrir modal de edición de usuario
+// ============================================================
+function editarUsuario(index) {
+  const u = window.usuariosCache[index];
+  if (!u) return alert("Usuario no encontrado");
+
+  document.getElementById("editId").value = u._id;
+  document.getElementById("editNombre").value = u.nombre || "";
+  document.getElementById("editApellido").value = u.apellido || "";
+  document.getElementById("editGenero").value = u.genero || "";
+  document.getElementById("editRegion").value = u.region || "";
+  document.getElementById("editComuna").value = u.comuna || "";
+  document.getElementById("editSector").value = u.sector || "";
+  document.getElementById("editTieneNegocio").checked = !!u.tieneNegocio;
+
+  document.getElementById("modalEditarUsuario").classList.remove("oculto");
+}
+
+// ============================================================
+// ❌ Cerrar modal
+// ============================================================
+function cerrarModal() {
+  document.getElementById("modalEditarUsuario").classList.add("oculto");
+}
+
+// ============================================================
+// 💾 Guardar cambios (PUT /api/usuarios/:id)
+// ============================================================
+document.getElementById("formEditarUsuario").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const id = document.getElementById("editId").value;
+  const datos = {
+    nombre: document.getElementById("editNombre").value,
+    apellido: document.getElementById("editApellido").value,
+    genero: document.getElementById("editGenero").value,
+    region: document.getElementById("editRegion").value,
+    comuna: document.getElementById("editComuna").value,
+    sector: document.getElementById("editSector").value,
+    tieneNegocio: document.getElementById("editTieneNegocio").checked,
+  };
+
+  try {
+    const res = await fetch(`/api/usuarios/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(datos),
+    });
+
+    if (!res.ok) throw new Error(await res.text());
+
+    alert("✅ Usuario actualizado correctamente");
+    cerrarModal();
+    cargarUsuarios();
+  } catch (err) {
+    alert("❌ Error al actualizar: " + err.message);
   }
+});
+
+// ===== Negocios =====
+async function cargarNegocios() {
+  const contenedor = document.getElementById("tablaNegocios");
+  contenedor.innerHTML = "<p>Cargando negocios...</p>";
+  try {
+    const res = await fetch("/api/negocios-con-duenio");
+    const negocios = await res.json();
+
+    if (!Array.isArray(negocios) || negocios.length === 0) {
+      contenedor.innerHTML = "<p>(No hay negocios registrados)</p>";
+      return;
+    }
+
+    let html = `
+      <table class="tabla-negocios">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Giro</th>
+            <th>Comuna</th>
+            <th>Sector</th>
+            <th>Dueño</th>
+            <th>Correo Dueño</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    negocios.forEach(n => {
+      html += `
+        <tr>
+          <td>${n.nombre || "-"}</td>
+          <td>${n.giro || "-"}</td>
+          <td>${n.comuna || "-"}</td>
+          <td>${n.sector || "-"}</td>
+          <td>${n.duenioNombre || "-"}</td>
+          <td>${n.duenioCorreo || "-"}</td>
+          <td>
+            <button class="btn-editar" onclick="editarNegocio('${n._id}')">✏️</button>
+            <button class="btn-eliminar" onclick="eliminarNegocio('${n._id}')">🗑️</button>
+          </td>
+        </tr>`;
+    });
+
+    html += "</tbody></table>";
+    contenedor.innerHTML = html;
+  } catch (err) {
+    contenedor.innerHTML = `<p style="color:red;">Error al cargar negocios: ${err.message}</p>`;
+    console.error("❌ Error cargarNegocios:", err);
+  }
+}
+
 
   async function eliminarNegocio(id) {
     if (!confirm("¿Estás seguro de eliminar este negocio?")) return;
@@ -524,12 +786,150 @@ function renderGraficosDashboard(charts) {
     } catch (err) { alert("Error al editar: " + err.message); }
   }
 
-  // ===== Inicialización =====
-  document.addEventListener("DOMContentLoaded", () => {
-    cargarDatosDashboard();
-    cargarUsuarios();
-    cargarNegocios();
-  });
+document.addEventListener("DOMContentLoaded", () => {
+  cargarDatosDashboard();
+  cargarActividadSemanal(); // ✅ que se ejecute junto al dashboard
+  cargarUsuarios();
+  cargarNegocios();
+  cargarVariaciones();
+});
+
+
+
+
+
+async function cargarVariaciones() {
+  try {
+    const resp = await fetch("/api/historico/acuenta?dias=7"); // puedes cambiar 'acuenta' por otro
+    const data = await resp.json();
+
+    const bajas = data.filter(p => p.variation < 0).slice(0, 10);
+    const subidas = data.filter(p => p.variation > 0).slice(0, 10);
+
+    const renderCard = (p, tipo) => `
+      <div class="card-precio ${tipo}">
+        <img src="${p.imagen || '/img/no-image.png'}" alt="img">
+        <div class="info">
+          <div class="nombre">${p.nombre}</div>
+          <div class="store">${p.store.toUpperCase()}</div>
+        </div>
+        <div class="variacion">
+          ${tipo === 'baja' ? '⬇️' : '⬆️'}
+          ${p.variation.toFixed(1)}%
+        </div>
+      </div>
+    `;
+
+    document.getElementById("listaBajas").innerHTML = bajas.length
+      ? bajas.map(p => renderCard(p, "baja")).join("")
+      : "<p style='color:#94a3b8;'>No hay bajadas recientes.</p>";
+
+    document.getElementById("listaSubidas").innerHTML = subidas.length
+      ? subidas.map(p => renderCard(p, "subida")).join("")
+      : "<p style='color:#94a3b8;'>No hay subidas recientes.</p>";
+  } catch (err) {
+    console.error("Error cargando variaciones:", err);
+  }
+}
+
+
+
+// ==========================
+// 📅 ACTIVIDAD SEMANAL — versión profesional (lunes → domingo)
+// ==========================
+async function cargarActividadSemanal() {
+  const contenedor = document.getElementById("tablaScrapingSemanal");
+  if (!contenedor) return console.warn("⚠️ No se encontró #tablaScrapingSemanal");
+
+  contenedor.innerHTML = "<p style='color:#6b7280;'>🕐 Cargando actividad semanal...</p>";
+
+  try {
+    const url = `${window.location.protocol}//${window.location.hostname}:4000/api/scrape/actividad-semanal`;
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+    const { actividad } = await resp.json();
+
+    // 🔹 Generar semana actual (lunes → domingo)
+    const hoy = new Date();
+    const primerDia = new Date(hoy);
+    primerDia.setDate(hoy.getDate() - ((hoy.getDay() + 6) % 7)); // lunes
+    const semana = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(primerDia);
+      d.setDate(primerDia.getDate() + i);
+      return d;
+    });
+
+    // 🔹 Encabezados con día completo + fecha completa
+    const encabezados = semana.map(d => {
+      const nombre = d.toLocaleDateString("es-CL", { weekday: "long" });
+      const fecha = d.toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric" });
+      return `<div style="font-weight:600; text-transform:capitalize;">${nombre}</div>
+              <div style="font-size:0.8rem; color:#64748b;">${fecha}</div>`;
+    });
+
+    // 🔹 Tabla elegante
+    let html = `
+      <table style="width:100%; border-collapse:separate; border-spacing:0; text-align:center; font-size:0.9rem; border-radius:10px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.1);">
+        <thead style="background:#f1f5f9;">
+          <tr>
+            <th style="padding:12px; border-bottom:2px solid #e2e8f0; background:#f8fafc;">Supermercado</th>
+            ${encabezados.map(h => `<th style="padding:12px; border-bottom:2px solid #e2e8f0;">${h}</th>`).join("")}
+          </tr>
+        </thead>
+        <tbody style="background:white;">
+    `;
+
+    const supermercados = ["unimarc", "tottus", "jumbo", "acuenta"];
+    const colores = {
+      success: "#22c55e",
+      warning: "#facc15",
+      fail: "#ef4444",
+    };
+    const iconos = {
+      success: "✔️",
+      warning: "⚠️",
+      fail: "❌",
+    };
+
+    supermercados.forEach(store => {
+      html += `<tr>
+        <td style="padding:10px; border-bottom:1px solid #e5e7eb; font-weight:600; text-transform:uppercase; background:#f8fafc;">${store}</td>`;
+
+      semana.forEach(d => {
+        const fechaISO = d.toISOString().split("T")[0];
+        const estado = actividad?.[store]?.[fechaISO] || "fail";
+        const color = colores[estado];
+        const icono = iconos[estado];
+
+        html += `
+          <td style="padding:10px; border-bottom:1px solid #f1f5f9;">
+            <div style="
+              width:28px; height:28px; margin:auto; border-radius:8px;
+              background:${color}; display:flex; align-items:center; justify-content:center;
+              color:white; font-size:0.9rem; box-shadow:0 1px 3px rgba(0,0,0,0.15);
+              transition:transform 0.2s ease;
+            " title="${estado}">
+              ${icono}
+            </div>
+          </td>`;
+      });
+
+      html += "</tr>";
+    });
+
+    html += "</tbody></table>";
+    contenedor.innerHTML = html;
+
+  } catch (err) {
+    console.error("❌ Error en cargarActividadSemanal:", err);
+    contenedor.innerHTML = `<p style='color:red;'>Error al cargar la actividad semanal: ${err.message}</p>`;
+  }
+}
+
+
+
 </script>
+
 </body>
 </html>

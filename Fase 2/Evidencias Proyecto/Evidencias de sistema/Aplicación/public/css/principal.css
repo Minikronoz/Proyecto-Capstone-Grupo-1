@@ -864,3 +864,145 @@ canvas:hover {
 .nav__item:hover i.fa-store {
   color: var(--blanco);
 }
+/* === 🔹 Tarjeta Último Scraping (mejor presentación) === */
+#kpi-ultimo-scraping {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+#kpi-ultimo-scraping .item-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-left: 5px solid var(--calipso, #00a7b5);
+  border-radius: 0.6rem;
+  padding: 0.6rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#kpi-ultimo-scraping .item-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+#kpi-ultimo-scraping .item-card h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: 0.3px;
+}
+
+#kpi-ultimo-scraping .datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  color: #334155;
+}
+
+#kpi-ultimo-scraping .datos span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  padding: 0.25rem 0.6rem;
+  font-weight: 500;
+  color: #0f172a;
+}
+
+#kpi-ultimo-scraping .datos span b {
+  color: #00a7b5;
+}
+
+/* === Colores específicos según tienda === */
+#kpi-ultimo-scraping .item-card[data-store="unimarc"] { border-left-color: #ff4d4f; }
+#kpi-ultimo-scraping .item-card[data-store="jumbo"] { border-left-color: #007a33; }
+#kpi-ultimo-scraping .item-card[data-store="tottus"] { border-left-color: #00a86b; }
+#kpi-ultimo-scraping .item-card[data-store="acuenta"] { border-left-color: #f97316; }
+.card-scraping-semana {
+  background: #fff;
+  padding: 16px;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.tabla-semanal { display: flex; flex-direction: column; gap: 4px; }
+.fila { display: grid; grid-template-columns: 130px repeat(7, 1fr); align-items: center; }
+.fila .nombre { font-weight: 600; color: #0f172a; }
+
+
+ .card-scraping {
+    margin-bottom: 25px;
+  }
+
+  .tabla-semanal {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .fila {
+    display: grid;
+    grid-template-columns: 150px repeat(7, 1fr);
+    align-items: center;
+  }
+
+  .fila.header .col-dia {
+    text-align: center;
+  }
+
+  .nombre-dia {
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  .fecha-dia {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  .fila .nombre {
+    font-weight: 600;
+    color: #0f172a;
+  }
+
+  .dia {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    margin: auto;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+  }
+
+  .dia:hover {
+    transform: scale(1.1);
+  }
+
+  .success {
+    background: #22c55e;
+  }
+
+  .fail {
+    background: #ef4444;
+  }
+
+  .warning {
+    background: #facc15;
+  }
+
+  /* 🔹 Columna del día actual resaltada */
+  .col-dia.hoy-col {
+    background: rgba(56, 189, 248, 0.12);
+    border-radius: 8px;
+    padding: 4px 0;
+  }
+
+  .dia.hoy-dia {
+    box-shadow: 0 0 0 2px #0ea5e9;
+  }

@@ -1,6 +1,19 @@
-// routes/estadisticas.routes.js
+// ==============================
+// 📁 routes/estadisticas.routes.js
+// ==============================
 import express from "express";
 import { getDB } from "../config/db.js";
+import { buildMatchFilters } from "../utils/buildMatchFilters.js";
+import {
+  rankingProductosNuevos,
+  indiceCompetitividad,
+  cruceGeneroRegion,
+  usuariosNuevosRecurrentes,
+  productosCrecimiento,
+  insights ,
+  palabrasTendencia,
+  distribucionUsuariosRegion,
+} from "../controllers/estadisticas.controller.js";
 
 const router = express.Router();
 
@@ -17,43 +30,35 @@ async function aggregateClicks(pipeline) {
 // ======================================
 router.get("/productos-mas-clickeados", async (req, res) => {
   try {
-    const { supermercado, genero, fecha } = req.query;
-    const match = {};
-
-    if (supermercado) match.supermercado = supermercado;
-    if (genero) match.userGenero = genero;
-    if (fecha) match.fecha = fecha;
-
+    const match = buildMatchFilters(req.query);
     const data = await aggregateClicks([
-      { $match: match },
-      { $group: { _id: "$titulo", total: { $sum: 1 } } },
+      { $match: { ...match, titulo: { $exists: true, $ne: "" } } },
+      {
+        $group: {
+          _id: { $toUpper: { $trim: { input: "$titulo", chars: " " } } },
+          total: { $sum: 1 },
+        },
+      },
       { $sort: { total: -1 } },
       { $limit: 10 },
     ]);
-
     res.json(data);
   } catch (err) {
     console.error("❌ Error en /productos-mas-clickeados:", err);
     res.status(500).json({ error: err.message });
   }
 });
-
 // ======================================
 // 2️⃣ CLICS POR SUPERMERCADO
 // ======================================
 router.get("/clics-por-supermercado", async (req, res) => {
   try {
-    const { genero, fecha } = req.query;
-    const match = {};
-    if (genero) match.userGenero = genero;
-    if (fecha) match.fecha = fecha;
-
+    const match = buildMatchFilters(req.query);
     const data = await aggregateClicks([
       { $match: match },
       { $group: { _id: "$supermercado", total: { $sum: 1 } } },
       { $sort: { total: -1 } },
     ]);
-
     res.json(data);
   } catch (err) {
     console.error("❌ Error en /clics-por-supermercado:", err);
@@ -62,21 +67,16 @@ router.get("/clics-por-supermercado", async (req, res) => {
 });
 
 // ======================================
-// 3️⃣ CLICS POR DÍA (EVOLUCIÓN DIARIA)
+// 3️⃣ CLICS POR DÍA
 // ======================================
 router.get("/clics-por-dia", async (req, res) => {
   try {
-    const { supermercado, genero } = req.query;
-    const match = {};
-    if (supermercado) match.supermercado = supermercado;
-    if (genero) match.userGenero = genero;
-
+    const match = buildMatchFilters(req.query);
     const data = await aggregateClicks([
       { $match: match },
       { $group: { _id: "$fecha", total: { $sum: 1 } } },
       { $sort: { _id: 1 } },
     ]);
-
     res.json(data);
   } catch (err) {
     console.error("❌ Error en /clics-por-dia:", err);
@@ -89,40 +89,29 @@ router.get("/clics-por-dia", async (req, res) => {
 // ======================================
 router.get("/usuarios-por-edad", async (req, res) => {
   try {
-    const { supermercado, genero } = req.query;
-    const match = { userEdad: { $ne: null } };
-    if (supermercado) match.supermercado = supermercado;
-    if (genero) match.userGenero = genero;
-
+    const match = buildMatchFilters(req.query);
     const data = await aggregateClicks([
       { $match: match },
       { $group: { _id: "$userEdad", total: { $sum: 1 } } },
       { $sort: { _id: 1 } },
     ]);
-
     res.json(data);
   } catch (err) {
     console.error("❌ Error en /usuarios-por-edad:", err);
     res.status(500).json({ error: err.message });
   }
 });
-
 // ======================================
 // 5️⃣ USUARIOS POR GÉNERO
 // ======================================
 router.get("/usuarios-por-genero", async (req, res) => {
   try {
-    const { supermercado, fecha } = req.query;
-    const match = { userGenero: { $exists: true, $ne: "" } };
-    if (supermercado) match.supermercado = supermercado;
-    if (fecha) match.fecha = fecha;
-
+    const match = buildMatchFilters(req.query);
     const data = await aggregateClicks([
       { $match: match },
       { $group: { _id: "$userGenero", total: { $sum: 1 } } },
       { $sort: { total: -1 } },
     ]);
-
     res.json(data);
   } catch (err) {
     console.error("❌ Error en /usuarios-por-genero:", err);
@@ -131,20 +120,38 @@ router.get("/usuarios-por-genero", async (req, res) => {
 });
 
 // ======================================
-// 6️⃣ USUARIOS POR REGIÓN
+// 6️⃣ USUARIOS POR REGIÓN (desde colección de usuarios, no clicks)
 // ======================================
 router.get("/usuarios-por-region", async (req, res) => {
   try {
-    const { supermercado, genero } = req.query;
-    const match = { userRegion: { $exists: true, $ne: "" } };
-    if (supermercado) match.supermercado = supermercado;
-    if (genero) match.userGenero = genero;
+    const db = getDB();
 
-    const data = await aggregateClicks([
-      { $match: match },
-      { $group: { _id: "$userRegion", total: { $sum: 1 } } },
-      { $sort: { total: -1 } },
-    ]);
+    // Detectar nombre real de la colección de usuarios
+    const colecciones = await db.listCollections().toArray();
+    const nombreColeccion = colecciones.some(c => c.name === "usuarios")
+      ? "usuarios"
+      : "users"; // por si en Atlas se llama distinto
+
+    // Filtros simples opcionales (por si usas género / región en los filtros)
+    const match = {};
+    if (req.query.genero) match.genero = req.query.genero;
+    if (req.query.region) match.region = req.query.region;
+
+    const data = await db.collection(nombreColeccion).aggregate([
+      {
+        $match: {
+          ...match,
+          region: { $exists: true, $ne: "" }
+        }
+      },
+      {
+        $group: {
+          _id: "$region",
+          total: { $sum: 1 }
+        }
+      },
+      { $sort: { total: -1 } }
+    ]).toArray();
 
     res.json(data);
   } catch (err) {
@@ -153,40 +160,32 @@ router.get("/usuarios-por-region", async (req, res) => {
   }
 });
 
+
 // ======================================
 // 7️⃣ USUARIOS POR COMUNA
 // ======================================
 router.get("/usuarios-por-comuna", async (req, res) => {
   try {
-    const { supermercado, genero } = req.query;
-    const match = { userComuna: { $exists: true, $ne: "" } };
-    if (supermercado) match.supermercado = supermercado;
-    if (genero) match.userGenero = genero;
-
+    const match = buildMatchFilters(req.query);
     const data = await aggregateClicks([
       { $match: match },
       { $group: { _id: "$userComuna", total: { $sum: 1 } } },
       { $sort: { total: -1 } },
       { $limit: 15 },
     ]);
-
     res.json(data);
   } catch (err) {
     console.error("❌ Error en /usuarios-por-comuna:", err);
     res.status(500).json({ error: err.message });
   }
 });
-
 // ======================================
-// 8️⃣ PRODUCTOS POR DÍA / MES / AÑO
+// 🕒 PRODUCTOS POR TIEMPO (día / mes / año)
 // ======================================
 router.get("/productos-por-tiempo", async (req, res) => {
   try {
     const db = getDB();
-    const { supermercado, genero } = req.query;
-    const match = {};
-    if (supermercado) match.supermercado = supermercado;
-    if (genero) match.userGenero = genero;
+    const match = buildMatchFilters(req.query);
 
     const data = await db.collection("clicks").aggregate([
       { $match: { ...match, createdAt: { $exists: true } } },
@@ -201,7 +200,7 @@ router.get("/productos-por-tiempo", async (req, res) => {
           total: { $sum: 1 },
         },
       },
-      { $sort: { "_id.año": 1, "_id.mes": 1, "_id.dia": 1, total: -1 } },
+      { $sort: { "_id.año": 1, "_id.mes": 1, "_id.dia": 1 } },
     ]).toArray();
 
     const agrupado = {};
@@ -229,11 +228,7 @@ router.get("/productos-por-tiempo", async (req, res) => {
 router.get("/tendencia-semanal", async (req, res) => {
   try {
     const db = getDB();
-    const { supermercado, genero } = req.query;
-    const match = {};
-    if (supermercado) match.supermercado = supermercado;
-    if (genero) match.userGenero = genero;
-
+    const match = buildMatchFilters(req.query);
     const data = await db.collection("clicks").aggregate([
       { $match: { ...match, createdAt: { $exists: true } } },
       {
@@ -259,8 +254,6 @@ router.get("/tendencia-semanal", async (req, res) => {
       { $sort: { "_id.año": 1, "_id.semana": 1 } },
     ]).toArray();
 
-    if (!data.length) return res.json([{ _id: "Sin datos", total: 0 }]);
-
     const formateado = data.map((d) => ({
       _id: `Semana ${d._id.semana}/${d._id.año}`,
       total: d.total,
@@ -272,18 +265,56 @@ router.get("/tendencia-semanal", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
 // ======================================
-// 🔟 PRODUCTOS CON MAYOR CRECIMIENTO
+// 🕒 PRODUCTOS POR TIEMPO (día / mes / año)
 // ======================================
-router.get("/productos-crecimiento", async (req, res) => {
+router.get("/productos-por-tiempo", async (req, res) => {
   try {
     const db = getDB();
-    const { supermercado, genero } = req.query;
-    const match = {};
-    if (supermercado) match.supermercado = supermercado;
-    if (genero) match.userGenero = genero;
+    const match = buildMatchFilters(req.query);
 
+    const data = await db.collection("clicks").aggregate([
+      { $match: { ...match, createdAt: { $exists: true } } },
+      {
+        $group: {
+          _id: {
+            titulo: "$titulo",
+            dia: { $dayOfMonth: "$createdAt" },
+            mes: { $month: "$createdAt" },
+            año: { $year: "$createdAt" },
+          },
+          total: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id.año": 1, "_id.mes": 1, "_id.dia": 1 } },
+    ]).toArray();
+
+    const agrupado = {};
+    data.forEach((d) => {
+      const fecha = `${d._id.dia}/${d._id.mes}/${d._id.año}`;
+      if (!agrupado[fecha]) agrupado[fecha] = [];
+      agrupado[fecha].push({ producto: d._id.titulo, total: d.total });
+    });
+
+    const topPorDia = Object.entries(agrupado).map(([fecha, productos]) => {
+      const top = productos.sort((a, b) => b.total - a.total)[0];
+      return { _id: fecha, producto: top.producto, total: top.total };
+    });
+
+    res.json(topPorDia);
+  } catch (err) {
+    console.error("❌ Error en /productos-por-tiempo:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ======================================
+// 9️⃣ TENDENCIA SEMANAL
+// ======================================
+router.get("/tendencia-semanal", async (req, res) => {
+  try {
+    const db = getDB();
+    const match = buildMatchFilters(req.query);
     const data = await db.collection("clicks").aggregate([
       { $match: { ...match, createdAt: { $exists: true } } },
       {
@@ -300,101 +331,35 @@ router.get("/productos-crecimiento", async (req, res) => {
       {
         $group: {
           _id: {
-            titulo: "$titulo",
-            año: { $year: "$createdAtDate" },
-            mes: { $month: "$createdAtDate" },
+            año: { $isoWeekYear: "$createdAtDate" },
+            semana: { $isoWeek: "$createdAtDate" },
           },
           total: { $sum: 1 },
         },
       },
-      { $sort: { "_id.titulo": 1, "_id.año": 1, "_id.mes": 1 } },
+      { $sort: { "_id.año": 1, "_id.semana": 1 } },
     ]).toArray();
 
-    const series = {};
-    data.forEach((d) => {
-      const titulo = d._id.titulo || "Sin título";
-      if (!series[titulo]) series[titulo] = [];
-      series[titulo].push(d.total);
-    });
+    const formateado = data.map((d) => ({
+      _id: `Semana ${d._id.semana}/${d._id.año}`,
+      total: d.total,
+    }));
 
-    const crecimiento = Object.entries(series)
-      .map(([titulo, valores]) => {
-        if (valores.length < 2) return { _id: titulo, crecimiento: 0, porcentaje: 0 };
-        const diff = valores[valores.length - 1] - valores[0];
-        const porc = valores[0] > 0 ? ((diff / valores[0]) * 100).toFixed(1) : 0;
-        return { _id: titulo, crecimiento: diff, porcentaje: Number(porc) };
-      })
-      .filter((x) => x.crecimiento > 0)
-      .sort((a, b) => b.crecimiento - a.crecimiento)
-      .slice(0, 10);
-
-    res.json(crecimiento.length ? crecimiento : [{ _id: "Sin crecimiento detectado", crecimiento: 0, porcentaje: 0 }]);
+    res.json(formateado);
   } catch (err) {
-    console.error("❌ Error en /productos-crecimiento:", err);
+    console.error("❌ Error en /tendencia-semanal:", err);
     res.status(500).json({ error: err.message });
   }
 });
-
 // ======================================
-// 1️⃣1️⃣ INSIGHTS DEL SISTEMA
+// 🔍 TÉRMINOS DE BÚSQUEDA MÁS USADOS
 // ======================================
-router.get("/insights", async (req, res) => {
-  try {
-    const db = getDB();
-
-    const totalClicks = await db.collection("clicks").countDocuments();
-    const usuariosUnicos = await db.collection("clicks").distinct("userCorreo");
-    const topProducto = await db.collection("clicks").aggregate([
-      { $group: { _id: "$titulo", total: { $sum: 1 } } },
-      { $sort: { total: -1 } },
-      { $limit: 1 },
-    ]).toArray();
-    const topSuper = await db.collection("clicks").aggregate([
-      { $group: { _id: "$supermercado", total: { $sum: 1 } } },
-      { $sort: { total: -1 } },
-      { $limit: 1 },
-    ]).toArray();
-    const topRegion = await db.collection("clicks").aggregate([
-      { $group: { _id: "$userRegion", total: { $sum: 1 } } },
-      { $sort: { total: -1 } },
-      { $limit: 1 },
-    ]).toArray();
-
-    // 🔍 Integración: término más buscado
-    const topBusqueda = await db.collection("busquedas").aggregate([
-      { $group: { _id: "$termino", total: { $sum: 1 } } },
-      { $sort: { total: -1 } },
-      { $limit: 1 },
-    ]).toArray();
-
-    const promedio = usuariosUnicos.length
-      ? Number((totalClicks / usuariosUnicos.length).toFixed(1))
-      : 0;
-
-    res.json({
-      totalClicks,
-      usuariosUnicos: usuariosUnicos.length,
-      promedioClicksPorUsuario: promedio,
-      topProducto: topProducto[0]?._id || "Sin datos",
-      topSupermercado: topSuper[0]?._id || "Sin datos",
-      topRegion: topRegion[0]?._id || "Sin datos",
-      topBusqueda: topBusqueda[0]?._id || "Sin datos",
-    });
-  } catch (err) {
-    console.error("❌ Error en /insights:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ======================================
-// 🔍 NUEVOS ENDPOINTS DE BÚSQUEDAS
-// ======================================
-
-// 🔹 Términos de búsqueda más usados
 router.get("/busquedas-top", async (req, res) => {
   try {
     const db = getDB();
+    const match = buildMatchFilters(req.query);
     const data = await db.collection("busquedas").aggregate([
+      { $match: { ...match, termino: { $exists: true, $ne: "" } } },
       { $group: { _id: "$termino", total: { $sum: 1 } } },
       { $sort: { total: -1 } },
       { $limit: 10 },
@@ -406,11 +371,15 @@ router.get("/busquedas-top", async (req, res) => {
   }
 });
 
-// 🔹 Búsquedas por día
+// ======================================
+// 📅 BÚSQUEDAS POR DÍA
+// ======================================
 router.get("/busquedas-por-dia", async (req, res) => {
   try {
     const db = getDB();
+    const match = buildMatchFilters(req.query);
     const data = await db.collection("busquedas").aggregate([
+      { $match: { ...match, fecha: { $exists: true } } },
       {
         $group: {
           _id: { $dateToString: { format: "%Y-%m-%d", date: "$fecha" } },
@@ -426,12 +395,15 @@ router.get("/busquedas-por-dia", async (req, res) => {
   }
 });
 
-// 🔹 Búsquedas por región
+// ======================================
+// 🗺️ BÚSQUEDAS POR REGIÓN
+// ======================================
 router.get("/busquedas-por-region", async (req, res) => {
   try {
     const db = getDB();
+    const match = buildMatchFilters(req.query);
     const data = await db.collection("busquedas").aggregate([
-      { $match: { userRegion: { $exists: true, $ne: "" } } },
+      { $match: { ...match, userRegion: { $exists: true, $ne: "" } } },
       { $group: { _id: "$userRegion", total: { $sum: 1 } } },
       { $sort: { total: -1 } },
     ]).toArray();
@@ -441,54 +413,39 @@ router.get("/busquedas-por-region", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-// 🔹 Comparativa entre consultas (clicks) y búsquedas
+// ======================================
+// 📊 COMPARATIVA ENTRE CONSULTAS Y BÚSQUEDAS
+// ======================================
 router.get("/comparativa", async (req, res) => {
   try {
     const db = getDB();
+    const match = buildMatchFilters(req.query);
 
     const clics = await db.collection("clicks").aggregate([
-      {
-        $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
-          total: { $sum: 1 },
-        },
-      },
+      { $match: match },
+      { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, total: { $sum: 1 } } },
     ]).toArray();
 
     const busquedas = await db.collection("busquedas").aggregate([
-      {
-        $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$fecha" } },
-          total: { $sum: 1 },
-        },
-      },
+      { $match: match },
+      { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$fecha" } }, total: { $sum: 1 } } },
     ]).toArray();
 
-    // Combinar ambos datasets por fecha
     const mapa = {};
-
-    clics.forEach((c) => {
-      mapa[c._id] = { fecha: c._id, clics: c.total, busquedas: 0 };
-    });
-
+    clics.forEach((c) => (mapa[c._id] = { fecha: c._id, clics: c.total, busquedas: 0 }));
     busquedas.forEach((b) => {
       if (!mapa[b._id]) mapa[b._id] = { fecha: b._id, clics: 0, busquedas: 0 };
       mapa[b._id].busquedas = b.total;
     });
 
-    // Convertir a array ordenado por fecha
-    const combinado = Object.values(mapa).sort((a, b) =>
-      a.fecha.localeCompare(b.fecha)
-    );
-
-    // Formato compatible con Chart.js
-    const data = combinado.map((d) => ({
-      _id: d.fecha,
-      total: d.clics + d.busquedas,
-      clics: d.clics,
-      busquedas: d.busquedas,
-    }));
+    const data = Object.values(mapa)
+      .sort((a, b) => a.fecha.localeCompare(b.fecha))
+      .map((d) => ({
+        _id: d.fecha,
+        total: d.clics + d.busquedas,
+        clics: d.clics,
+        busquedas: d.busquedas,
+      }));
 
     res.json(data);
   } catch (err) {
@@ -496,5 +453,136 @@ router.get("/comparativa", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+/// ======================================
+// 1️⃣ USUARIOS ACTIVOS POR DÍA
+// ======================================
+router.get("/usuarios-activos-dia", async (req, res) => {
+  try {
+    const db = getDB();
+    const match = buildMatchFilters(req.query);
+    const data = await db.collection("clicks").aggregate([
+      { $match: match },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          usuariosUnicos: { $addToSet: "$userCorreo" },
+        },
+      },
+      { $project: { _id: 1, totalUsuarios: { $size: "$usuariosUnicos" } } },
+      { $sort: { _id: 1 } },
+    ]).toArray();
+    res.json(data);
+  } catch (err) {
+    console.error("❌ Error en /usuarios-activos-dia:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+// ======================================
+// 2️⃣ ACTIVIDAD POR HORA DEL DÍA
+// ======================================
+router.get("/actividad-por-hora", async (req, res) => {
+  try {
+    const db = getDB();
+    const match = buildMatchFilters(req.query);
+
+    const data = await db.collection("clicks").aggregate([
+      {
+        $match: {
+          ...match,
+          createdAt: { $exists: true }
+        }
+      },
+      {
+        $addFields: {
+          createdAtDate: {
+            $cond: [
+              { $isNumber: "$createdAt" },
+              { $toDate: "$createdAt" },
+              "$createdAt"
+            ]
+          }
+        }
+      },
+      {
+        $group: {
+          _id: { $hour: "$createdAtDate" }, // 0–23
+          total: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]).toArray();
+
+    res.json(data);
+  } catch (err) {
+    console.error("❌ Error en /actividad-por-hora:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ======================================
+// 2️⃣ TOP PRODUCTOS POR GÉNERO
+// ======================================
+router.get("/top-productos-genero", async (req, res) => {
+  try {
+    const db = getDB();
+    const match = buildMatchFilters(req.query);
+    const data = await db.collection("clicks").aggregate([
+      { $match: { ...match, userGenero: { $exists: true, $ne: "" }, titulo: { $exists: true, $ne: "" } } },
+      { $group: { _id: { genero: "$userGenero", producto: "$titulo" }, total: { $sum: 1 } } },
+      { $sort: { total: -1 } },
+      {
+        $group: {
+          _id: "$_id.genero",
+          productos: { $push: { producto: "$_id.producto", total: "$total" } },
+        },
+      },
+      { $project: { productos: { $slice: ["$productos", 5] } } },
+    ]).toArray();
+    res.json(data);
+  } catch (err) {
+    console.error("❌ Error en /top-productos-genero:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ======================================
+// 3️⃣ TOP SUPERMERCADOS POR REGIÓN
+// ======================================
+router.get("/top-supermercados-region", async (req, res) => {
+  try {
+    const db = getDB();
+    const match = buildMatchFilters(req.query);
+    const data = await db.collection("clicks").aggregate([
+      { $match: { ...match, userRegion: { $exists: true, $ne: "" }, supermercado: { $exists: true, $ne: "" } } },
+      { $group: { _id: { region: "$userRegion", supermercado: "$supermercado" }, total: { $sum: 1 } } },
+      { $sort: { "_id.region": 1, total: -1 } },
+      {
+        $group: {
+          _id: "$_id.region",
+          topSupermercado: { $first: "$_id.supermercado" },
+          total: { $first: "$total" },
+        },
+      },
+      { $sort: { total: -1 } },
+    ]).toArray();
+    res.json(data);
+  } catch (err) {
+    console.error("❌ Error en /top-supermercados-region:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ======================================
+// 🔚 Exportación de rutas principales
+// ======================================
+router.get("/productos-crecimiento", productosCrecimiento);
+router.get("/palabras-tendencia", palabrasTendencia);
+router.get("/ranking-productos-nuevos", rankingProductosNuevos);
+router.get("/indice-competitividad", indiceCompetitividad);
+router.get("/cruce-genero-region", cruceGeneroRegion);
+router.get("/usuarios-nuevos-recurrentes", usuariosNuevosRecurrentes);
+router.get("/insights", insights);
+router.get("/distribucion-usuarios-region", distribucionUsuariosRegion);
 
 export default router;

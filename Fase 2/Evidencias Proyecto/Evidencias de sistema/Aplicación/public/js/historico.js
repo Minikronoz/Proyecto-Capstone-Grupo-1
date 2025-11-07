@@ -1,73 +1,67 @@
-// ================================
+// =============================================================
 // 📊 Cargar datos del producto e historial
-// ================================
+// =============================================================
 document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
   const contenedor = document.getElementById("productoDetalle");
-  const graficoSection = document.querySelector(".grafico-section");
-  const ctx = document.getElementById("graficoHistorico").getContext("2d");
+  const ctx = document.getElementById("graficoHistorico")?.getContext("2d");
 
-  if (!id) {
-    mostrarMensaje("❌ No se proporcionó ID del producto.");
-    return;
-  }
+  if (!id) return mostrarMensaje("❌ No se proporcionó ID del producto.");
+  if (!ctx) return mostrarMensaje("❌ No se pudo inicializar el gráfico.");
 
   try {
     const res = await fetch(`/api/productos/${id}/historico`);
-    if (!res.ok) throw new Error("Error al obtener datos");
+    if (!res.ok) throw new Error("Error al obtener datos del producto");
 
     const { producto, historial } = await res.json();
+    if (!producto) return mostrarMensaje("Producto no encontrado.");
 
-    if (!producto) {
-      mostrarMensaje("Producto no encontrado.");
-      return;
-    }
-
-    // ================================
+    // =============================
     // 💰 Calcular cambio de precio
-    // ================================
+    // =============================
     let cambioTexto = "";
-    if (historial && historial.length >= 2) {
-      const ultimo = historial[historial.length - 1].price;
-      const anterior = historial[historial.length - 2].price;
+    const historialValido = (historial || []).filter(h => h && h.price != null);
+
+    if (historialValido.length >= 2) {
+      const ultimo = parseFloat(historialValido.at(-1).price);
+      const anterior = parseFloat(historialValido.at(-2).price);
       const cambio = ((ultimo - anterior) / anterior) * 100;
 
       if (cambio > 0)
-        cambioTexto = `<span class="price-change up">▲ +${cambio.toFixed(
-          1
-        )}%</span>`;
+        cambioTexto = `<span class="price-change up">▲ +${cambio.toFixed(1)}%</span>`;
       else if (cambio < 0)
-        cambioTexto = `<span class="price-change down">▼ ${cambio.toFixed(
-          1
-        )}%</span>`;
+        cambioTexto = `<span class="price-change down">▼ ${cambio.toFixed(1)}%</span>`;
       else cambioTexto = `<span class="price-change same">— 0%</span>`;
     } else {
       cambioTexto = `<span class="price-change same">— Sin variaciones</span>`;
     }
 
-    // ================================
+    // =============================
     // 🧾 Mostrar información del producto
-    // ================================
+    // =============================
+    const colorTienda =
+      producto.store === "jumbo"
+        ? "#00695c"
+        : producto.store === "tottus"
+        ? "#388e3c"
+        : producto.store === "unimarc"
+        ? "#d32f2f"
+        : "#f57c00";
+
     contenedor.innerHTML = `
       <div class="store-container">
-        <span class="store-label" style="background:${
-          producto.store === "jumbo"
-            ? "#00695c"
-            : producto.store === "tottus"
-            ? "#388e3c"
-            : producto.store === "unimarc"
-            ? "#d32f2f"
-            : "#f57c00"
-        }">${producto.store?.toUpperCase() || "DESCONOCIDO"}</span>
+        <span class="store-label" style="background:${colorTienda}">
+          ${producto.store?.toUpperCase() || "DESCONOCIDO"}
+        </span>
       </div>
-      <img src="${producto.image}" alt="${producto.title}" loading="lazy" />
+      <img src="${producto.image || '/img/no-image.png'}" alt="${producto.title}" loading="lazy" />
       <h3>${producto.title}</h3>
       <p class="brand">${producto.brand || ""}</p>
       <p class="price">
         ${
           producto.currentPrice
-            ? "$" + producto.currentPrice.toLocaleString("es-CL")
+            ? "$" + parseFloat(producto.currentPrice).toLocaleString("es-CL")
             : "<span style='color:#9CA3AF;'>Sin precio disponible</span>"
         }
         ${cambioTexto}
@@ -79,22 +73,22 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     `;
 
-    // ================================
+    // =============================
     // 📅 Preparar datos del gráfico
-    // ================================
+    // =============================
     let labels = [];
     let precios = [];
 
-    if (historial && historial.length > 0) {
-      labels = historial.map((h) =>
+    if (historialValido.length > 0) {
+      labels = historialValido.map((h) =>
         new Date(h.date).toLocaleDateString("es-CL", {
           day: "2-digit",
           month: "2-digit",
         })
       );
-      precios = historial.map((h) => h.price);
+      precios = historialValido.map((h) => parseFloat(h.price) || 0);
     } else {
-      // Si no hay historial: generar 7 días con el mismo precio
+      // Si no hay historial: generar 7 días con el mismo valor
       const hoy = new Date();
       for (let i = 6; i >= 0; i--) {
         const fecha = new Date(hoy);
@@ -105,13 +99,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             month: "2-digit",
           })
         );
-        precios.push(producto.currentPrice || 0);
+        precios.push(parseFloat(producto.currentPrice) || 0);
       }
     }
 
-    // ================================
+    // =============================
     // 📈 Crear gráfico con Chart.js
-    // ================================
+    // =============================
     const gradiente = ctx.createLinearGradient(0, 0, 0, 300);
     gradiente.addColorStop(0, "#00A7B5");
     gradiente.addColorStop(1, "#005B66");
@@ -164,11 +158,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-// ================================
+// =============================================================
 // 🧩 Función auxiliar
-// ================================
+// =============================================================
 function mostrarMensaje(mensaje) {
-  document.querySelector(".grafico-section").innerHTML = `
-    <p style='color:#005b66; font-weight:500; text-align:center;'>${mensaje}</p>
+  const graficoSection = document.querySelector(".grafico-section");
+  graficoSection.innerHTML = `
+    <p style="color:#005b66; font-weight:500; text-align:center;">${mensaje}</p>
   `;
 }

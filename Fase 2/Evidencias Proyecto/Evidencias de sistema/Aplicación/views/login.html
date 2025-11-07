@@ -4,19 +4,78 @@
   <meta charset="utf-8">
   <title>Iniciar Sesión</title>
   <link rel="stylesheet" href="/css/login.css">
+  <script defer>
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.querySelector(".form-login");
+      const msg = document.createElement("p");
+      msg.id = "msg";
+      form.appendChild(msg);
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        msg.textContent = "⏳ Verificando credenciales...";
+        msg.className = "info";
+
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+          const res = await fetch("/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+            credentials: "include"
+          });
+
+          if (res.status === 404) {
+            msg.textContent = "❌ Usuario no encontrado";
+            msg.className = "error";
+            return;
+          }
+
+          if (res.status === 401) {
+            msg.textContent = "⚠️ Contraseña incorrecta";
+            msg.className = "error";
+            return;
+          }
+
+          if (!res.ok) {
+            msg.textContent = "⚠️ Error al iniciar sesión";
+            msg.className = "error";
+            return;
+          }
+
+          const result = await res.json();
+
+          msg.textContent = "✅ Inicio de sesión exitoso";
+          msg.className = "exito";
+
+          // Redirigir según rol
+          setTimeout(() => {
+            window.location.href = result.redirect || "/catalogo";
+          }, 1000);
+        } catch (err) {
+          console.error("Error:", err);
+          msg.textContent = "❌ Error de conexión con el servidor";
+          msg.className = "error";
+        }
+      });
+    });
+  </script>
 </head>
+
 <body>
   <div class="container">
     <img src="/img/logo.png" alt="Logo del Sistema" class="logo" />
-
     <h2>Acceder a mi cuenta</h2>
-    <form method="POST" action="/login" class="form-login">
+
+    <form class="form-login">
       <input type="email" name="correo" placeholder="Correo electrónico" required>
       <input type="password" name="contraseña" placeholder="Contraseña" required>
       <button type="submit" class="btn-catalogo">Ingresar</button>
 
       <div class="extra-links">
-        <a href="/olvide-password">¿Olvidaste tu contraseña?</a>
+        <a href="/olvide-password">¿Olvidaste tu contraseña?</a><br />
         <a href="/registrar">Crear una cuenta nueva</a>
         <a href="/catalogo">⬅ Volver al inicio</a>
       </div>

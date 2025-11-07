@@ -1,92 +1,94 @@
+// =======================================================
+// 📁 routes/users.routes.js — compatible con MongoDB Atlas
+// =======================================================
 import express from "express";
 import path from "path";
+import { fileURLToPath } from "url";
+
 import {
-  listUsers,
   registrarUsuario,
-  mostrarFormularioRegistro,
-  mostrarLogin,
   iniciarSesion,
-  mostrarOlvidePassword,
-  enviarResetPassword,
-  mostrarPrincipal,
-  obtenerUsuarios,
-  obtenerNegocios,
   obtenerUsuarioPorId,
   actualizarUsuario,
-  obtenerNegocioPorNombre,
-  actualizarNegocio,
-  eliminarUsuario,
-  eliminarNegocio,
-  obtenerNegociosConDuenio
+  mostrarOlvidePassword,
+  enviarResetPassword,
+  obtenerUsuarios
 } from "../controllers/users.controller.js";
-import { verificarAdmin } from "../middlewares/authAdmin.js";
-import { verificarSesionUsuario } from "../middlewares/authUser.js";
 
 const router = express.Router();
 
-// ============================
-// Páginas HTML
-// ============================
-router.get("/", (req, res) => {
-  res.redirect("/catalogo");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// =======================================================
+// 🌐 Vistas
+// =======================================================
+
+// ✅ Página de login
+router.get("/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/login.html"));
 });
 
-router.get("/login", mostrarLogin);
-router.post("/login", iniciarSesion);
-router.get("/registrar", mostrarFormularioRegistro);
-router.post("/registrar", registrarUsuario);
-router.get("/olvide", mostrarOlvidePassword);
-router.post("/olvide", enviarResetPassword);
-router.get("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      console.error("❌ Error al cerrar sesión:", err);
-      return res.status(500).send("Error al cerrar sesión");
-    }
-
-    // Eliminar cookie de sesión
-    res.clearCookie("connect.sid");
-
-    // Redirigir al login
-    res.redirect("/login");
-  });
-});
-// Solo el ADMIN puede entrar al panel principal
-router.get("/principal", verificarAdmin, mostrarPrincipal);
-
-// Solo usuarios logueados (cualquier rol) pueden editar perfil
-router.get("/editar-perfil", verificarSesionUsuario, (req, res) => {
-  res.sendFile(path.resolve("views/editar-perfil.html"));
+// ✅ Página de registro
+router.get("/registrar", (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/registrar.html"));
 });
 
-// ============================
-// API REST JSON
-// ============================
-
-// Verificar sesión activa
-router.get("/api/sesion-activa", (req, res) => {
-  if (req.session && req.session.user) {
-    return res.json({ user: req.session.user });
-  } else {
-    return res.status(401).json({ message: "No hay sesión activa" });
-  }
+// ✅ Página de edición de perfil
+router.get("/editar-perfil", (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/editar-perfil.html"));
 });
 
-router.get("/api/usuarios", obtenerUsuarios);
-router.get("/api/negocios", obtenerNegocios);
-router.get("/api/negocios-con-duenio", obtenerNegociosConDuenio);
-router.get("/api/usuarios/:id", obtenerUsuarioPorId);
-router.put("/api/usuarios/:id", actualizarUsuario);
-router.put("/api/negocios/nombre/:nombre", actualizarNegocio);
-router.delete("/api/usuarios/:id", eliminarUsuario);
-router.delete("/api/negocios/nombre/:nombre", eliminarNegocio);
-router.get("/api/negocios/nombre/:nombre", obtenerNegocioPorNombre);
-
-// ============================
-// Página catálogo
-// ============================
+// ✅ Página catálogo
 router.get("/catalogo", (req, res) => {
-  res.sendFile(path.resolve("views/catalogo.html"));
+  res.sendFile(path.join(__dirname, "../views/catalogo.html"));
 });
+
+// ✅ Página catálogo
+router.get("/principal", (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/principal.html"));
+});
+// =======================================================
+// 🔐 API de autenticación y usuarios
+// =======================================================
+
+// Iniciar sesión
+router.post("/login", iniciarSesion);
+
+// Registrar nuevo usuario
+router.post("/registrar", registrarUsuario);
+
+// Obtener sesión activa
+router.get("/api/sesion-activa", (req, res) => {
+  if (!req.session.user)
+    return res.status(401).json({ message: "No hay sesión activa" });
+  res.json({ user: req.session.user });
+});
+
+// Obtener usuario por ID
+router.get("/api/usuarios/:id", obtenerUsuarioPorId);
+// ✅ Obtener todos los usuarios
+router.get("/api/usuarios", obtenerUsuarios);
+// Actualizar perfil de usuario
+router.put("/api/usuarios/:id", actualizarUsuario);
+
+
+// ✅ Middleware para proteger el acceso
+function verificarSesion(req, res, next) {
+  if (!req.session.user) {
+    return res.redirect("/login"); // redirige si no hay sesión
+  }
+  next();
+}
+
+// ✅ Página del dashboard
+router.get("/dashboard", verificarSesion, (req, res) => {
+  res.sendFile(path.join(__dirname, "../views/dashboard.html"));
+});
+// =======================================================
+// 🧠 Recuperar Contraseña
+// =======================================================
+router.get("/olvide-password", mostrarOlvidePassword);
+router.post("/olvide-password", enviarResetPassword);
 
 export default router;

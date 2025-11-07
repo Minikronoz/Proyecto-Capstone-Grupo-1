@@ -1,27 +1,34 @@
-// routes/productos.js
+// ===============================================
+// 📁 routes/productos.js
+// ===============================================
 import express from "express";
 import { getDB } from "../config/db.js";
 import { ObjectId } from "mongodb";
 
 const router = express.Router();
 
-// 🔹 Obtener producto + historial
+/**
+ * ==========================================================
+ * 🔹 1. Obtener producto + historial de precios
+ * Ejemplo: GET /api/productos/6789abc123/historico
+ * ==========================================================
+ */
 router.get("/:id/historico", async (req, res) => {
   try {
     const db = getDB();
-    const id = req.params.id;
+    const { id } = req.params;
 
-    // Detectar si el ID es un ObjectId válido
+    // 🧩 Verificar si el ID es un ObjectId válido
     const esObjectIdValido = /^[0-9a-fA-F]{24}$/.test(id);
-    // Buscar producto
     const filtroProducto = esObjectIdValido ? { _id: new ObjectId(id) } : { _id: id };
-    const producto = await db.collection("productos").findOne(filtroProducto);
 
+    // 🛒 Buscar producto principal
+    const producto = await db.collection("productos").findOne(filtroProducto);
     if (!producto) {
       return res.status(404).json({ error: "Producto no encontrado" });
     }
 
-    // Buscar historial asociado
+    // 📈 Buscar historial de precios asociado
     const filtroHistorial = esObjectIdValido ? { productId: new ObjectId(id) } : { productId: id };
     const historial = await db
       .collection("pricehistories")
@@ -29,36 +36,63 @@ router.get("/:id/historico", async (req, res) => {
       .sort({ date: 1 })
       .toArray();
 
-    // ✅ Respuesta correcta
-    res.json({ producto, historial });
+    // ✅ Enviar respuesta
+    res.json({
+      producto,
+      historial,
+      totalRegistros: historial.length,
+    });
   } catch (error) {
-    console.error("❌ Error al obtener historial:", error);
-    res.status(500).json({ error: "No se pudo obtener el historial" });
+    console.error("❌ Error en GET /productos/:id/historico:", error);
+    res.status(500).json({ error: "Error al obtener historial del producto" });
   }
 });
 
-
+/**
+ * ==========================================================
+ * 🔹 2. Sugerencias de productos para autocompletado
+ * Ejemplo: GET /api/productos/sugerencias?q=leche
+ * ==========================================================
+ */
 router.get("/sugerencias", async (req, res) => {
   try {
-    const q = req.query.q?.trim() || "";
     const db = getDB();
+    const q = req.query.q?.trim() || "";
 
-    if (!q) return res.json([]);
+    if (q.length < 2) {
+      return res.json([]); // Evita búsquedas innecesarias
+    }
 
     const productos = await db
       .collection("productos")
       .find({ title: { $regex: q, $options: "i" } })
       .project({ title: 1 })
-      .limit(8)
+      .limit(10)
       .toArray();
 
-    res.json(productos.map(p => p.title));
+    const sugerencias = productos.map((p) => p.title);
+
+    res.json(sugerencias);
   } catch (err) {
-    console.error("[productos] Error al obtener sugerencias:", err);
-    res.status(500).json({ error: "Error cargando sugerencias" });
+    console.error("❌ Error en GET /productos/sugerencias:", err);
+    res.status(500).json({ error: "Error al obtener sugerencias" });
   }
 });
 
-
+/**
+ * ==========================================================
+ * 🔹 3. Obtener lista general de productos (opcional)
+ * ==========================================================
+ */
+router.get("/", async (req, res) => {
+  try {
+    const db = getDB();
+    const productos = await db.collection("productos").find().limit(100).toArray();
+    res.json(productos);
+  } catch (err) {
+    console.error("❌ Error en GET /productos:", err);
+    res.status(500).json({ error: "Error al obtener productos" });
+  }
+});
 
 export default router;

@@ -7,28 +7,53 @@ async function actualizarAdmin() {
     await connectDB();
     const db = getDB();
 
-    const nuevaPassword = "123456"; // la nueva contraseña del admin
+    const correoAdmin = "admin@sistema.com";
+    const nuevaPassword = "123456"; // 🔑 Contraseña nueva (puedes cambiarla)
     const hash = await bcrypt.hash(nuevaPassword, 10);
 
-    // ✅ Asegura que el admin exista y tenga rol "admin"
-    const resultado = await db.collection("users").updateOne(
-      { correo: "admin@sistema.com" },
-      {
-        $set: {
-          contraseña: hash,
-          role: "admin",
-          nombre: "Administrador",
-          actualizadoEn: new Date(),
-        },
-      },
-      { upsert: true } // 🔹 si no existe, lo crea
-    );
+    // ✅ Buscar tanto por "correo" como por "email"
+    const existente = await db.collection("users").findOne({
+      $or: [{ correo: correoAdmin }, { email: correoAdmin }]
+    });
 
-    console.log("✅ Contraseña del admin actualizada o creada con éxito");
-    console.log("📧 Correo: admin@sistema.com");
-    console.log("🔑 Contraseña: 123456");
-    console.log(`📦 Resultado: ${resultado.modifiedCount || resultado.upsertedCount} documento modificado o creado`);
+    if (existente) {
+      // 🔹 Si existe → actualizamos
+      await db.collection("users").updateOne(
+        { _id: existente._id },
+        {
+          $set: {
+            correo: correoAdmin,
+            contraseña: hash,
+            role: "admin",
+            nombre: "Administrador",
+            apellido: "",
+            actualizadoEn: new Date(),
+          },
+        }
+      );
+      console.log("🔄 Admin actualizado correctamente.");
+    } else {
+      // 🔹 Si no existe → lo creamos
+      await db.collection("users").insertOne({
+        correo: correoAdmin,
+        contraseña: hash,
+        role: "admin",
+        nombre: "Administrador",
+        apellido: "",
+        genero: "—",
+        region: "Biobío",
+        comuna: "Concepción",
+        sector: "Centro",
+        tieneNegocio: false,
+        negocios: [],
+        creadoEn: new Date(),
+      });
+      console.log("🆕 Admin creado correctamente.");
+    }
 
+    console.log("📧 Correo:", correoAdmin);
+    console.log("🔑 Contraseña:", nuevaPassword);
+    console.log("✅ Listo para iniciar sesión como admin.");
     process.exit();
   } catch (err) {
     console.error("❌ Error al actualizar admin:", err);

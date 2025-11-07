@@ -94,7 +94,7 @@
     <a href="/dashboard" class="logo-dash">🟢 DashUser</a>
     <nav>
       <a href="/editar-perfil">👤 Editar mis datos</a>
-      <a href="/logout" class="logout-btn">🚪 Cerrar sesión</a>
+      <a href="/login" class="logout-btn">🚪 Cerrar sesión</a>
     </nav>
   </div>
 
@@ -154,10 +154,12 @@
 <div id="popupRegistro" class="popup oculto">
   <div class="popup-contenido">
     <h3>✨ Mejora tu experiencia ✨</h3>
-    <p>Regístrate o inicia sesión para disfrutar de funciones personalizadas y guardar tus productos favoritos.</p>
+    <p>
+      Regístrate o inicia sesión para disfrutar de funciones personalizadas y guardar tus productos favoritos.
+    </p>
     <div class="popup-botones">
       <a href="/login" class="btn">🔑 Iniciar sesión</a>
-      <a href="/registro" class="btn secundario">📝 Registrarme</a>
+      <a href="/registrar" class="btn secundario">📝 Registrarme</a>
       <button class="btn omitir" onclick="omitirPopup()">⏳ Omitir</button>
     </div>
   </div>
@@ -204,30 +206,33 @@
   <!-- 🔹 Script principal -->
   <script src="/js/catalogo.js"></script>
 
-  <!-- 🔹 Verificar sesión cada 1 minuto -->
+<!-- 🔹 Verificar sesión cada 1 minuto -->
 <script>
   let sesionActiva = false;
   let omitidoTemporalmente = false;
 
   async function verificarSesion() {
     try {
-      const res = await fetch("/api/usuarios/actual", { credentials: "include" });
-      const data = await res.json();
+      const res = await fetch("/api/sesion-activa", { credentials: "include" });
 
-      // ✅ Si el usuario está logueado, no mostrar nunca más el popup
-      if (data.usuario) {
-        sesionActiva = true;
-        ocultarPopup();
-        return;
+      // ✅ Usuario con sesión activa → ocultar popup
+      if (res.ok) {
+        const data = await res.json();
+        if (data.user) {
+          sesionActiva = true;
+          ocultarPopup();
+          return;
+        }
       }
 
       // 🚫 Si se omitió temporalmente, no mostrar aún
       if (omitidoTemporalmente || sesionActiva) return;
 
-      // ⚠️ Mostrar si no hay sesión
+      // ⚠️ Mostrar popup si no hay sesión
       mostrarPopup();
+
     } catch (error) {
-      console.error("Error verificando sesión:", error);
+      console.error("❌ Error verificando sesión:", error);
       if (!omitidoTemporalmente && !sesionActiva) mostrarPopup();
     }
   }
@@ -245,17 +250,18 @@
   function omitirPopup() {
     ocultarPopup();
     omitidoTemporalmente = true;
-    // ⏳ Reaparecerá después de 2 minutos
+    // ⏳ Reaparece después de 2 minutos
     setTimeout(() => {
       omitidoTemporalmente = false;
     }, 120000);
   }
 
-  // ⏱️ Ejecutar verificación cada 60 segundos
+  // ⏱️ Ejecutar verificación cada 60 s
   setInterval(verificarSesion, 60000);
 
   // ✅ Primera verificación al cargar
   document.addEventListener("DOMContentLoaded", verificarSesion);
 </script>
+
 </body>
 </html>

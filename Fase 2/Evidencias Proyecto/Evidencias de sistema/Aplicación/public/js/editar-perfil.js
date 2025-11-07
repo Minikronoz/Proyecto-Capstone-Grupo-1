@@ -1,40 +1,45 @@
-// public/js/editar-perfil.js
+// =============================================================
+// 👤 EDITAR PERFIL DE USUARIO — Versión Limpia Atlas
+// =============================================================
 
+// ---------- Utilidades ----------
 function getUserId() {
-  const p = new URLSearchParams(location.search).get("id");
-  if (p) return p;
-  return localStorage.getItem("userId"); // úsalo si lo guardas al iniciar sesión
+  const idParam = new URLSearchParams(location.search).get("id");
+  return idParam || localStorage.getItem("userId") || null;
 }
 
 const $ = (id) => document.getElementById(id);
 const userId = getUserId();
 const msg = $("mensaje");
 
+// ---------- Validación inicial ----------
 if (!userId) {
-  msg.textContent = "No se encontró el usuario actual. Inicia sesión nuevamente.";
+  msg.textContent = "⚠️ No se encontró el usuario actual. Inicia sesión nuevamente.";
   msg.className = "msg err";
 }
 
+// ---------- Cargar datos del usuario ----------
 async function cargarUsuario() {
   try {
-    const res = await fetch(`/api/usuarios/${userId}`, {
-      credentials: "include"
-    });
+    const res = await fetch(`/api/usuarios/${userId}`, { credentials: "include" });
     if (!res.ok) throw new Error("No se pudo cargar el usuario");
-    const u = await res.json();
 
+    const u = await res.json();
     $("email").value = u.email || "";
     $("nombre").value = u.nombre || "";
     $("apellido").value = u.apellido || "";
     $("region").value = u.region || "";
     $("comuna").value = u.comuna || "";
     $("telefono").value = u.telefono || "";
+
   } catch (e) {
-    msg.textContent = "Error cargando datos del usuario.";
+    console.error("❌ Error cargando usuario:", e);
+    msg.textContent = "Error al cargar los datos del usuario.";
     msg.className = "msg err";
   }
 }
 
+// ---------- Guardar cambios ----------
 $("formEditar").addEventListener("submit", async (e) => {
   e.preventDefault();
   msg.textContent = "";
@@ -47,33 +52,41 @@ $("formEditar").addEventListener("submit", async (e) => {
     telefono: $("telefono").value.trim(),
   };
 
+  // Validación simple antes de enviar
+  if (!body.nombre || !body.apellido) {
+    msg.textContent = "Por favor, completa al menos nombre y apellido.";
+    msg.className = "msg err";
+    return;
+  }
+
   try {
     const res = await fetch(`/api/usuarios/${userId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
-      credentials: "include"
+      credentials: "include",
     });
 
-    if (!res.ok) throw new Error("Fallo actualización");
+    if (!res.ok) throw new Error("Error en actualización");
 
-    msg.textContent = "Datos actualizados correctamente.";
+    msg.textContent = "✅ Datos actualizados correctamente.";
     msg.className = "msg ok";
 
-    // Redirigir al catálogo después de 1 segundo
+    // Redirigir tras confirmación
     setTimeout(() => {
       window.location.href = "/catalogo";
-    }, 1000);
-
+    }, 1200);
   } catch (e) {
+    console.error("❌ Error guardando usuario:", e);
     msg.textContent = "No se pudo actualizar. Inténtalo más tarde.";
     msg.className = "msg err";
   }
 });
 
+// ---------- Botón cancelar ----------
 $("btnCancelar").addEventListener("click", () => {
   history.length > 1 ? history.back() : (location.href = "/principal");
 });
 
-// inicio
+// ---------- Inicio ----------
 if (userId) cargarUsuario();
