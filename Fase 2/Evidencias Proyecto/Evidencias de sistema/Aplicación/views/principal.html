@@ -168,6 +168,86 @@
   </div>
 </section>
 
+<div class="modal oculto" id="modalEditarUsuario">
+  <div class="modal__backdrop" onclick="cerrarModal()"></div>
+  <div class="modal__dialog">
+    <form id="formEditarUsuario">
+      <div class="modal__header">
+        <h3>✏️ Editar Usuario</h3>
+      </div>
+      <div class="modal__body">
+        <div class="form-grid">
+          <input type="hidden" id="editId" name="id">
+          
+          <div>
+            <label for="editNombre">Nombre</label>
+            <input type="text" id="editNombre" name="nombre">
+          </div>
+          <div>
+            <label for="editApellido">Apellido</label>
+            <input type="text" id="editApellido" name="apellido">
+          </div>
+          <div>
+            <label for="editGenero">Género</label>
+            <input type="text" id="editGenero" name="genero">
+          </div>
+          <div>
+            <label for="editRegion">Región</label>
+            <input type="text" id="editRegion" name="region">
+          </div>
+          <div>
+            <label for="editComuna">Comuna</label>
+            <input type="text" id="editComuna" name="comuna">
+          </div>
+          <div>
+            <label for="editSector">Sector</label>
+            <input type="text" id="editSector" name="sector">
+          </div>
+          <div>
+            <label>
+              <input type="checkbox" id="editTieneNegocio" name="tieneNegocio">
+              ¿Tiene negocio?
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button type="button" class="btn btn-outline" onclick="cerrarModal()">Cancelar</button>
+        <button type="submit" class="btn btn-jumbo">Guardar Cambios</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .modal.oculto { display: none; }
+  .modal__backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+    z-index: 100;
+  }
+  .modal__dialog {
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: white; border-radius: 14px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    z-index: 101;
+    width: 90%;
+    max-width: 500px;
+  }
+  .modal__header { padding: 12px 16px; border-bottom: 1px solid #e5e7eb; }
+  .modal__header h3 { margin: 0; color: var(--petroleo); }
+  .modal__body { padding: 16px; }
+  .modal__footer { padding: 12px 16px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 10px; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-grid label { display: block; font-size: 12px; color: #6b7280; margin-bottom: 4px; }
+  .form-grid input[type="text"] {
+    width: 100%; padding: 8px 10px; border: 1px solid var(--gris-medio);
+    border-radius: 8px;
+  }
+</style>
+
+
 
   <!-- SCRAPING -->
   <section id="scraping" class="seccion">
@@ -791,7 +871,6 @@ document.addEventListener("DOMContentLoaded", () => {
   cargarActividadSemanal(); // ✅ que se ejecute junto al dashboard
   cargarUsuarios();
   cargarNegocios();
-  cargarVariaciones();
 });
 
 

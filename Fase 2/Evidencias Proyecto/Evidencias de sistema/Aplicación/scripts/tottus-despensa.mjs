@@ -1,5 +1,5 @@
 // ===============================================
-// 🛒 Scraper Tottus — versión estable 2025
+// 🛒 Scraper Tottus — versión estable 2025 (CORREGIDA)
 // ===============================================
 import { firefox } from "playwright";
 import { join, dirname } from "path";
@@ -63,7 +63,7 @@ const MARCAS_CONOCIDAS = [
   "Plenitud","Listerine","Sensodyne","Colgate Total","Pepsodent","Signal","Asepxia","Clear","Tío Nacho","Bioexpert",
   "Pantene Pro-V","L’Oréal Paris","Revlon","Maybelline","Natura","Avon","Ésika","Cyzone","Belcorp","Simonds","Davene",
 
-  // 🧹 LIMPIEZA Y HOGAR
+  // 🧹 LIMPIEZAS Y HOGAR
   "Omo","Ace","Drive","Ariel","Magia Blanca","Quix","Cif","Poett","Lysoform","Lysol","Mr. Músculo","Clorox",
   "Virutex","VirutexPro","Elite Professional","Confort","Scott","Nova","Babysec","Higienol","Softy","Sapolio",
   "Virutex Home","Sapolio Multiuso","Limpiol","Chispa","Poett Sensaciones","Lustrasol","Patito","Raid","Baygon",
@@ -177,7 +177,10 @@ while (true) {
 
   await page.waitForTimeout(2000);
 
-  // 🔹 Capturar productos en la página actual
+  // ✅ =============================================================
+  // 🧹 FIX 1: Volver al selector original ('.pod.pod-4_GRID')
+  //    PERO con una lógica de extracción de links corregida.
+  // ✅ =============================================================
   const pageProducts = await page.$$eval(".pod.pod-4_GRID", (cards, MARCAS) =>
     cards.map((item) => {
       try {
@@ -204,8 +207,20 @@ while (true) {
         if (image.startsWith("//")) image = "https:" + image;
         if (image.startsWith("/")) image = "https://www.tottus.cl" + image;
 
-        const href = item.querySelector("a[href]")?.getAttribute("href") || "";
+        // ✅ CORRECCIÓN DEL LINK: Buscar el link en el título o en la imagen
+        // Esto evita tomar links genéricos de la tarjeta.
+        let href = item.querySelector(".pod-subTitle a")?.getAttribute("href") || "";
+        if (!href) {
+            href = item.querySelector("img[src]")?.closest('a')?.getAttribute("href") || "";
+        }
+        // Fallback al selector genérico (que era el problemático)
+        if (!href) {
+            href = item.querySelector("a[href]")?.getAttribute("href") || "";
+        }
+        
         const link = href.startsWith("http") ? href : `https://www.tottus.cl${href}`;
+        // Filtro para links malos
+        if (link === "https://www.tottus.cl") return null;
 
         return { title, brand, price, priceNormal, pricePerUnit, offerDescription, image, link };
       } catch {
@@ -232,12 +247,13 @@ while (true) {
   if (hayBoton > 0 && (await next.isEnabled())) {
 
     // 🔹 Cerrar pop-up de encuesta (Tottus)
-await page.evaluate(() => {
-  const popup = document.querySelector("#kampyleInviteContainer");
-  if (popup) popup.remove();
-  const overlay = document.querySelector("#MDigitalInvitationWrapper");
-  if (overlay) overlay.remove();
-});
+    await page.evaluate(() => {
+      const popup = document.querySelector("#kampyleInviteContainer");
+      if (popup) popup.remove();
+      const overlay = document.querySelector("#MDigitalInvitationWrapper");
+      if (overlay) overlay.remove();
+    });
+    
     await next.scrollIntoViewIfNeeded();
     await next.click();
     pagina++;
@@ -252,12 +268,19 @@ await page.evaluate(() => {
 
   console.log(`[${STORE}] 🧾 Total detectados en "${categoria}": ${productos.length}`);
 
+  // ✅ =============================================================
+  // 🧹 FIX 2: Filtrar duplicados ANTES de guardar
+  // ✅ =============================================================
+  const productosUnicos = [...new Map(productos.map(p => [p.link, p])).values()];
+  console.log(`[${STORE}] 🧹 Total únicos en "${categoria}": ${productosUnicos.length}`);
+
+
 // =============================================================
 // 💾 Guardar / Actualizar en Atlas (versión robusta con normalización)
 // =============================================================
 let nuevos = 0, actualizados = 0, revisados = 0;
 
-for (const prod of productos) {
+for (const prod of productosUnicos) { // ✅ Usar productosUnicos
   // 🧩 Normalizar link
   let linkNormalizado = prod.link?.trim();
   if (linkNormalizado && !linkNormalizado.startsWith("http")) {
@@ -265,7 +288,9 @@ for (const prod of productos) {
   }
 
   const precioNum = parsePriceUnitario(prod.price);
-  if (!precioNum || !linkNormalizado) continue;
+  if (!precioNum || !linkNormalizado || linkNormalizado === "https://www.tottus.cl") {
+    continue; // Omitir productos sin precio o sin link válido
+  }
 
   // 🔍 Buscar producto existente con link normalizado
   const existente = await colProductos.findOne({ link: linkNormalizado, store: STORE });
@@ -277,11 +302,14 @@ for (const prod of productos) {
         { _id: existente._id },
         {
           $set: {
+            title: prod.title?.trim() || "Sin título", // ✅ Asegurar que el título también se actualice
+            brand: prod.brand || detectarMarca(prod.title), // ✅ Asegurar que la marca se actualice
             currentPrice: precioNum,
             formattedPrice: prod.price,
             priceNormal: prod.priceNormal || null,
             pricePerUnit: prod.pricePerUnit || null,
             offerDescription: prod.offerDescription || null,
+            image: prod.image, // ✅ Asegurar que la imagen se actualice
             lastUpdate: new Date(),
             categoria
           }
@@ -300,6 +328,14 @@ for (const prod of productos) {
         fecha: new Date()
       });
       actualizados++;
+    } else {
+      // ✅ =============================================================
+      // 🧹 FIX 3: Actualizar 'lastUpdate' aunque el precio no cambie
+      // ✅ =============================================================
+      await colProductos.updateOne(
+        { _id: existente._id },
+        { $set: { lastUpdate: new Date() } }
+      );
     }
   } else {
     // ✅ Insertar nuevo producto (link limpio garantizado)
@@ -336,7 +372,7 @@ for (const prod of productos) {
   }
 
   revisados++;
-  renderProgressBar(revisados, productos.length, `[${STORE}] Guardando "${categoria}"`);
+  renderProgressBar(revisados, productosUnicos.length, `[${STORE}] Guardando "${categoria}"`);
 }
 
 
@@ -365,14 +401,15 @@ async function main() {
   });
   const page = await context.newPage();
 
-  let totalNuevos = 0, totalActualizados = 0;
+  let totalNuevos = 0, totalActualizados = 0, totalRevisados = 0; // ✅ Añadido
 
   try {
     for (const categoriaArr of CATEGORIAS) {
-      const [url, categoria] = categoriaArr; // ✅ extracción correcta
+      const [url, categoria] = categoriaArr;
       const stats = await scrapeCategoria(page, url, categoria, colProductos, colPriceHistory);
       totalNuevos += stats.nuevos;
       totalActualizados += stats.actualizados;
+      totalRevisados += stats.revisados; // ✅ Añadido
     }
   } catch (err) {
     console.error(`[${STORE}] ❌ Error global:`, err.message);
@@ -387,11 +424,13 @@ async function main() {
   console.log(`\n[${STORE}] 🧮 Resumen final`);
   console.log(`Nuevos: ${totalNuevos}`);
   console.log(`Actualizados: ${totalActualizados}`);
+  console.log(`Revisados: ${totalRevisados}`); // ✅ Añadido
 
   await actualizarScrapingArchivo({
     store: STORE,
     nuevos: totalNuevos,
     actualizados: totalActualizados,
+    revisados: totalRevisados, // ✅ Pasar 'revisados' al log
     totalProductos: totalDB
   });
 

@@ -6,7 +6,7 @@ import { dirname } from "path";
 import dotenv from "dotenv";
 
 import { connectDB, getDB, closeDB } from "../config/db.js";
-import { PriceHistory } from "../models/PriceHistory.js";
+// Removido import de PriceHistory ya que usamos MongoDB nativo
 import { actualizarScrapingArchivo } from "../utils/actualizarScraping.js";
 
 dotenv.config();
@@ -18,7 +18,7 @@ const STORE = "unimarc";
 // =============================================================
 // 🏷️ MARCAS CONOCIDAS (igual que antes)
 // =============================================================
-MARCAS_CONOCIDAS = [
+const MARCAS_CONOCIDAS = [
   // 🥦 FRUTAS Y VERDURAS
   "Hass","Dole","Chiquita","Del Monte","Clementina","Zespri","Royal Gala","Granny Smith","Fuji",
   "Pink Lady","Honeycrisp","Perales del Sur","Agrícola Garcés","Rucaray","San Clemente","Valle Frutal","Prunesco","Agrozzi",
@@ -213,55 +213,43 @@ for (const [url, categoria] of CATEGORIAS) {
     await page.waitForTimeout(4000);
 
     let productosCategoria = [];
-    let totalPrevio = 0;
+    let paginaActual = 1;
 
-    // 🔁 Scroll infinito profundo para cargar todos los productos
+    // � Procesar todas las páginas
     while (true) {
-      const nuevosScroll = await page.evaluate(async () => {
-        const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-        let prevCount = document.querySelectorAll(
-          "div.ProductCard, section[id^='shelf__vertical']"
-        ).length;
-        let intentosSinCambio = 0;
+      console.log(`[${STORE}] 📄 Procesando página ${paginaActual}`);
+      
+      // Esperar a que los productos se carguen
+      try {
+        await page.waitForSelector("section[id^='shelf__vertical']", { timeout: 30000 });
+        
+        // Esperar un momento adicional para asegurar que todo se cargue
+        await page.waitForTimeout(3000);
+        
+        // Extraer productos de la página actual
+        const productosPagina = await extraerProductos(page, STORE, MARCAS_CONOCIDAS);
+        productosCategoria.push(...productosPagina);
+        
+        console.log(`[${STORE}] ✅ Página ${paginaActual}: ${productosPagina.length} productos encontrados`);
+        console.log(`[${STORE}] 📊 Total acumulado: ${productosCategoria.length} productos`);
 
-        for (let i = 0; i < 60; i++) { // scrollea profundo (60 veces)
-          window.scrollBy(0, window.innerHeight);
-          await delay(700);
-
-          const nuevos = document.querySelectorAll(
-            "div.ProductCard, section[id^='shelf__vertical']"
-          ).length;
-
-          if (nuevos > prevCount) {
-            prevCount = nuevos;
-            intentosSinCambio = 0;
-          } else {
-            intentosSinCambio++;
-          }
-
-          // si no aparecen nuevos productos en 6 ciclos → detener
-          if (intentosSinCambio > 6) break;
+        // Verificar si hay más páginas
+        const siguientePagina = await page.$(`a[href*='page=${paginaActual + 1}']`);
+        
+        if (siguientePagina) {
+          // Ir a la siguiente página
+          await siguientePagina.click();
+          console.log(`[${STORE}] ➡️ Navegando a página ${paginaActual + 1}...`);
+          await page.waitForTimeout(5000); // Esperar a que la nueva página cargue
+          paginaActual++;
+        } else {
+          console.log(`[${STORE}] 🏁 Última página alcanzada`);
+          break;
         }
-
-        return document.querySelectorAll(
-          "div.ProductCard, section[id^='shelf__vertical']"
-        ).length;
-      });
-
-      await page.waitForTimeout(3000);
-
-      const nuevos = await extraerProductos(page, STORE, MARCAS_CONOCIDAS);
-
-      if (nuevos.length === totalPrevio) {
-        console.log(
-          `[${STORE}] 🔚 Fin del scroll detectado (${nuevos.length} productos).`
-        );
+      } catch (error) {
+        console.error(`[${STORE}] ⚠️ Error en página ${paginaActual}:`, error.message);
         break;
       }
-
-      totalPrevio = nuevos.length;
-      productosCategoria = nuevos;
-      console.log(`[${STORE}] 🔁 Productos visibles ahora: ${productosCategoria.length}`);
     }
 
     console.log(
@@ -277,8 +265,8 @@ for (const [url, categoria] of CATEGORIAS) {
       const priceNum = parsePrice(prod.formattedPrice);
       if (isNaN(priceNum)) continue;
 
-      const existente = await Producto.findOne({
-        title: prod.title,
+      const existente = await colProductos.findOne({
+        link: prod.link,
         store: STORE,
       });
 
@@ -286,18 +274,24 @@ for (const [url, categoria] of CATEGORIAS) {
         const precioAnterior = existente.currentPrice;
         const cambio = precioAnterior !== priceNum;
 
-        existente.formattedPrice = prod.formattedPrice;
-        existente.priceNormal = prod.priceNormal;
-        existente.pricePerUnit = prod.pricePerUnit;
-        existente.quantity = prod.quantity;
-        existente.image = prod.image;
-        existente.link = prod.link;
-        existente.lastUpdate = new Date();
-
         if (cambio) {
-          existente.currentPrice = priceNum;
+          await colProductos.updateOne(
+            { _id: existente._id },
+            {
+              $set: {
+                formattedPrice: prod.formattedPrice,
+                priceNormal: prod.priceNormal,
+                pricePerUnit: prod.pricePerUnit,
+                quantity: prod.quantity,
+                image: prod.image,
+                link: prod.link,
+                lastUpdate: new Date(),
+                currentPrice: priceNum
+              }
+            }
+          );
 
-          await PriceHistory.create({
+          await db.collection("priceHistory").insertOne({
             productId: existente._id,
             store: STORE,
             price: priceNum,
@@ -311,19 +305,38 @@ for (const [url, categoria] of CATEGORIAS) {
                 )
               : 0,
             offerDescription: prod.offerDescription || null,
-            date: new Date(),
+            fecha: new Date(),
           });
 
           actualizados++;
         }
-
-        await existente.save();
       } else {
-        await Producto.create({
-          ...prod,
+        const resultado = await colProductos.insertOne({
+          title: prod.title,
+          brand: prod.brand,
+          store: STORE,
           currentPrice: priceNum,
+          formattedPrice: prod.formattedPrice,
+          priceNormal: prod.priceNormal,
+          pricePerUnit: prod.pricePerUnit,
+          quantity: prod.quantity,
+          image: prod.image,
+          link: prod.link,
+          categoria: categoria,
           lastUpdate: new Date(),
+          createdAt: new Date()
         });
+
+        await db.collection("priceHistory").insertOne({
+          productId: resultado.insertedId,
+          store: STORE,
+          price: priceNum,
+          previousPrice: null,
+          variation: 0,
+          offerDescription: prod.offerDescription || null,
+          fecha: new Date(),
+        });
+
         nuevos++;
       }
 
