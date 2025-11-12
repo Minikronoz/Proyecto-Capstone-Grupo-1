@@ -1,22 +1,23 @@
 {
   "unimarc": {
-    "fecha": "09-11-2025, 17:14:05",
-    "nuevos": 0,
-    "actualizados": 0,
-    "revisados": 0
+    "fecha": "2025-11-12T00:14:25.236Z",
+    "fechaLocal": "11-11-2025, 9:14:25 p. m.",
+    "nuevos": 3,
+    "actualizados": 96,
+    "total": 1608
   },
   "jumbo": {
-    "fecha": "2025-11-09T19:45:43.938Z",
-    "fechaLocal": "09-11-2025, 4:45:43 p. m.",
-    "nuevos": 3664,
-    "actualizados": 0,
-    "total": 3664
+    "fecha": "2025-11-12T00:48:32.364Z",
+    "fechaLocal": "11-11-2025, 9:48:32 p. m.",
+    "nuevos": 126,
+    "actualizados": 116,
+    "total": 3790
   },
   "tottus": {
-    "fecha": "09-11-2025, 15:37:49",
-    "nuevos": 1472,
-    "actualizados": 0,
-    "revisados": 1472
+    "fecha": "11-11-2025, 21:25:42",
+    "nuevos": 407,
+    "actualizados": 28,
+    "revisados": 1401
   },
   "acuenta": {
     "fecha": "2025-11-09T20:16:06.239Z",
