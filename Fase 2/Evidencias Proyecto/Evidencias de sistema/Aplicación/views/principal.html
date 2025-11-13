@@ -31,8 +31,49 @@
     .log-contenedor { margin-top: 1rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; background: #f8fafc; }
     .log-header { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem;
       border-bottom: 1px solid #e5e7eb; }
-    .log-output { padding: 0.75rem 1rem; background: #020617; color: #e5e7eb; font-family: "Fira Code", monospace;
-      font-size: 0.8rem; border-radius: 0 0 0.75rem 0.75rem; max-height: 260px; overflow-y: auto; white-space: pre-wrap; }
+    .log-output {
+      padding: 0.75rem 1rem;
+      background: #020617;
+      color: #e5e7eb;
+      font-family: "Fira Code", "Courier New", monospace;
+      font-size: 0.75rem;
+      line-height: 1.4;
+      border-radius: 0 0 0.75rem 0.75rem;
+      max-height: 400px;
+      overflow-y: auto;
+      white-space: pre-wrap; /* Cambiado de pre a pre-wrap */
+      overflow-wrap: break-word;
+    }
+
+    .log-output .log-line {
+      margin: 0;
+      padding: 2px 0;
+      font-family: inherit;
+      white-space: pre-wrap; /* Mantener formato pero permitir wrap */
+    }
+
+    .log-output .log-error {
+      color: #ef4444;
+    }
+
+    .log-output .log-success {
+      color: #22c55e;
+    }
+
+    .log-output .log-warning {
+      color: #f59e0b;
+    }
+
+    .log-output .log-info {
+      color: #3b82f6;
+    }
+
+    /* Animación para barras de progreso */
+    .log-output .progress-bar {
+      color: #60a5fa;
+      font-weight: bold;
+    }
+
     .botones-scraping { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.75rem; }
     .botones-scraping .btn { padding: 0.5rem 0.9rem; font-size: 0.85rem; border-radius: 999px; }
     .badge--error { background: #fee2e2; color: #b91c1c; }
@@ -264,14 +305,48 @@
         <button onclick="ejecutarScraping('acuenta')" class="btn btn-acuenta">A Cuenta</button>
       </div>
 
-      <div id="logScraping" class="log-contenedor">
-        <div class="log-header">
-          <h3><i class="fa-regular fa-clipboard"></i> Registro de scraping</h3>
-          <button class="btn btn-outline" id="limpiar-log">
-            <i class="fa-regular fa-trash-can"></i> Limpiar
-          </button>
+      <div class="multi-log-container">
+
+        <div id="log-unimarc" class="log-contenedor">
+          <div class="log-header">
+            <h3><i class="fa-regular fa-clipboard"></i> UNIMARC</h3>
+            <button class="btn btn-outline" onclick="limpiarLog('unimarc')">
+              <i class="fa-regular fa-trash-can"></i> Limpiar
+            </button>
+          </div>
+          <div class="log-output">Esperando ejecución...</div>
         </div>
-        <pre id="scrapingOutput" class="log-output">Esperando ejecución...</pre>
+
+        <div id="log-tottus" class="log-contenedor">
+          <div class="log-header">
+            <h3><i class="fa-regular fa-clipboard"></i> TOTTUS</h3>
+            <button class="btn btn-outline" onclick="limpiarLog('tottus')">
+              <i class="fa-regular fa-trash-can"></i> Limpiar
+            </button>
+          </div>
+          <div class="log-output">Esperando ejecución...</div>
+        </div>
+
+        <div id="log-jumbo" class="log-contenedor">
+          <div class="log-header">
+            <h3><i class="fa-regular fa-clipboard"></i> JUMBO</h3>
+            <button class="btn btn-outline" onclick="limpiarLog('jumbo')">
+              <i class="fa-regular fa-trash-can"></i> Limpiar
+            </button>
+          </div>
+          <div class="log-output">Esperando ejecución...</div>
+        </div>
+
+        <div id="log-acuenta" class="log-contenedor">
+          <div class="log-header">
+            <h3><i class="fa-regular fa-clipboard"></i> A CUENTA</h3>
+            <button class="btn btn-outline" onclick="limpiarLog('acuenta')">
+              <i class="fa-regular fa-trash-can"></i> Limpiar
+            </button>
+          </div>
+          <div class="log-output">Esperando ejecución...</div>
+        </div>
+
       </div>
     </div>
   </section>
@@ -377,16 +452,14 @@
     </footer>
   </div>
 <script>
-  // ===== Socket.io: logs y estado backend =====
+  // ===== Socket.io: logs mejorados =====
   const socket = io();
   const estadoBackend = document.getElementById("estado-backend");
-  const scrapingOutput = document.getElementById("scrapingOutput");
 
   socket.on("connect", () => {
     estadoBackend.textContent = "API Online";
     estadoBackend.classList.remove("badge--error");
     estadoBackend.classList.add("badge--ok");
-    if (scrapingOutput.textContent === "Esperando ejecución...") scrapingOutput.textContent = "";
   });
 
   socket.on("disconnect", () => {
@@ -395,11 +468,120 @@
     estadoBackend.classList.add("badge--error");
   });
 
-  socket.on("scraping-log", (msg) => {
-    const line = typeof msg === "string" ? msg.trim() : JSON.stringify(msg);
-    if (!line) return;
-    scrapingOutput.textContent = line + "\n" + scrapingOutput.textContent;
+  // ✅ NUEVO: Esta función ahora dirige el log a la consola correcta
+  function appendLog(store, message, type = "log-line") {
+    if (!store) {
+      console.warn("⚠️ appendLog: no se especificó store");
+      return;
+    }
+
+    const logContainer = document.querySelector(`#log-${store}`);
+    if (!logContainer) {
+      console.warn(`⚠️ appendLog: no existe #log-${store}`);
+      return;
+    }
+
+    // Mostrar la consola si está oculta
+    logContainer.classList.add("activo");
+
+    const outputDiv = logContainer.querySelector(".log-output");
+    if (!outputDiv) {
+      console.warn(`⚠️ appendLog: no existe .log-output en #log-${store}`);
+      return;
+    }
+    
+    // Limpiar el mensaje "Esperando ejecución..."
+    if (outputDiv.textContent.trim() === "Esperando ejecución...") {
+      outputDiv.innerHTML = "";
+    }
+
+    // Determinar clase de estilo
+    let className = "log-line";
+    if (type === "error" || message.includes("❌") || message.includes("ERROR")) {
+      className += " log-error";
+    } else if (type === "success" || message.includes("✅") || message.includes("completado")) {
+      className += " log-success";
+    } else if (message.includes("⚠️") || message.includes("warning")) {
+      className += " log-warning";
+    } else if (message.includes("🟢") || message.includes("📊") || message.includes("🚀")) {
+      className += " log-info";
+    } else if (message.includes("█") || message.includes("%")) {
+      className += " progress-bar";
+    }
+
+    const lineDiv = document.createElement("div");
+    lineDiv.className = className;
+    lineDiv.textContent = message;
+    
+    // Si es una barra de progreso, reemplazar la última línea
+    const lastLine = outputDiv.lastElementChild;
+    if (className.includes("progress-bar") && lastLine && lastLine.className.includes("progress-bar")) {
+      outputDiv.removeChild(lastLine);
+    }
+
+    outputDiv.appendChild(lineDiv);
+    outputDiv.scrollTop = outputDiv.scrollHeight;
+
+    // Limitar a 500 líneas
+    while (outputDiv.children.length > 500) {
+      outputDiv.removeChild(outputDiv.firstChild);
+    }
+  }
+
+  // ✅ Escuchar evento de progreso
+  socket.on("scrape-progress", (data) => {
+    console.log("📡 Recibido scrape-progress:", data); // Debug
+    appendLog(data.store, data.message);
   });
+
+  // ✅ Escuchar errores
+  socket.on("scrape-error", (data) => {
+    console.log("📡 Recibido scrape-error:", data); // Debug
+    appendLog(data.store, `❌ ERROR: ${data.message}`, "error");
+  });
+
+  // ✅ Escuchar completado
+  socket.on("scrape-complete", (data) => {
+    console.log("📡 Recibido scrape-complete:", data); // Debug
+    const message = data.success 
+      ? "✅ Scraping completado con éxito." 
+      : "❌ Scraping finalizado con errores.";
+    appendLog(data.store, message, data.success ? "success" : "error");
+    
+    cargarDatosDashboard();
+    cargarActividadSemanal();
+  });
+
+  // ✅ NUEVO: Limpiar un log individual
+  function limpiarLog(supermercado) {
+    const outputDiv = document.querySelector(`#log-${supermercado} .log-output`);
+    if (outputDiv) {
+      outputDiv.innerHTML = `<div class="log-line">Esperando ejecución...</div>`;
+    }
+  }
+
+  // ===== Scraping manual mejorado =====
+  async function ejecutarScraping(supermercado) {
+    // Mostrar y limpiar la consola específica
+    const logContainer = document.querySelector(`#log-${supermercado}`);
+    if (logContainer) {
+      logContainer.classList.add("activo");
+      limpiarLog(supermercado);
+      appendLog(supermercado, `🚀 Iniciando scraping de ${supermercado}...`, "info");
+    }
+    
+    try {
+      const resp = await fetch(`/api/scrape/${supermercado}`, { method: "POST" });
+      const data = await resp.json();
+      
+      if (!resp.ok) {
+        throw new Error(data.message || "Error desconocido");
+      }
+      // El log de éxito o error ahora lo maneja "scrape-complete"
+    } catch (err) {
+      appendLog(supermercado, `❌ Error al *iniciar* el proceso: ${err.message}`, "error");
+    }
+  }
 
   // ===== Sidebar =====
   const sidebar = document.getElementById("sidebar");
@@ -412,13 +594,18 @@
   const secciones = document.querySelectorAll(".seccion");
   navItems.forEach((btn) => {
     btn.addEventListener("click", () => {
+      // Ignorar botones que solo navegan (los que no tienen data-target)
+      const target = btn.getAttribute("data-target");
+      if (!target) return;
+
       navItems.forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
-      const target = btn.getAttribute("data-target");
+      
       secciones.forEach((sec) => sec.classList.toggle("activa", sec.id === target));
+      
       if (target === "dashboard") {
               cargarDatosDashboard();
-              cargarActividadSemanal(); // ✅ fuerza actualización del bloque semanal
+              cargarActividadSemanal(); // ✅ fuerza actualización
             }
       if (target === "usuarios") cargarUsuarios();
       if (target === "negocios") cargarNegocios();
@@ -447,15 +634,15 @@ async function cargarDatosDashboard() {
     // === Productos actualizados ===
     let totalProductos = 0;
     Object.values(scrapingData).forEach((v) => {
-      const nuevos = v.nuevos ?? 0;
-      const actualizados = v.actualizados ?? 0;
+      // Usar 'total' si existe (de jumbo, acuenta), o sumar nuevos/revisados (de tottus, unimarc)
+      const total = v.total ?? 0;
       const revisados = v.revisados ?? 0;
-      totalProductos += nuevos + actualizados + revisados;
+      totalProductos += (total > 0) ? total : revisados;
     });
 
     document.getElementById("kpi-productos").innerHTML = `
       <div class="kpi-total">${totalProductos}</div>
-      <div class="kpi-subtitle">Productos cargados (último scraping)</div>
+      <div class="kpi-subtitle">Productos en Base de Datos</div>
     `;
 
     // --- 3️⃣ Renderizar tarjetas de scraping ---
@@ -463,12 +650,13 @@ async function cargarDatosDashboard() {
       .map(([nombre, info]) => {
         const fechaObj = new Date(info.fecha);
         const fecha = isNaN(fechaObj)
-          ? "—"
+          ? (info.fechaLocal || "—") // Usar fechaLocal si ISO falla
           : fechaObj.toLocaleString("es-CL", { hour12: false });
 
         const nuevos = info.nuevos ?? 0;
         const actualizados = info.actualizados ?? 0;
         const revisados = info.revisados ?? 0;
+        const total = info.total ?? 0;
 
         // Indicador visual de frescura (🟢, 🟡, 🔴)
         const horas = Math.floor((Date.now() - fechaObj) / (1000 * 60 * 60));
@@ -483,7 +671,7 @@ async function cargarDatosDashboard() {
               <span><b>${fecha}</b></span>
               <span><b>${nuevos}</b> nuevos</span>
               <span><b>${actualizados}</b> actualizados</span>
-              ${revisados ? `<span><b>${revisados}</b> revisados</span>` : ""}
+              ${revisados ? `<span><b>${revisados}</b> revisados</span>` : (total ? `<span><b>${total}</b> total</span>` : "")}
             </div>
           </div>
         `;
@@ -502,28 +690,6 @@ async function cargarDatosDashboard() {
   }
 }
 
-
-  // ===== Scraping manual =====
-  async function ejecutarScraping(supermercado) {
-    const now = new Date().toLocaleString("es-CL", { hour12: false });
-    scrapingOutput.textContent = `[${now}] Ejecutando scraping de ${supermercado}...\n` + scrapingOutput.textContent;
-    try {
-      const resp = await fetch(`/api/scrape/${supermercado}`, { method: "POST" });
-      const data = await resp.json();
-      scrapingOutput.textContent =
-        `[${new Date().toLocaleString("es-CL", { hour12: false })}] ✅ ${data.message}\n` +
-        scrapingOutput.textContent;
-      await cargarDatosDashboard();
-    } catch (err) {
-      scrapingOutput.textContent =
-        `[${new Date().toLocaleString("es-CL", { hour12: false })}] ❌ Error: ${err.message}\n` +
-        scrapingOutput.textContent;
-    }
-  }
-
-  document.getElementById("limpiar-log").addEventListener("click", () => {
-    scrapingOutput.textContent = "Esperando ejecución...";
-  });
 // ===== Renderizar gráficos =====
 function renderGraficosDashboard(charts) {
   // 🔹 Limpiar gráficos previos
@@ -693,10 +859,6 @@ if (ctxGen && Object.keys(genero).length > 0) {
     },
   });
 }
-
-
-
-
 }
 
 
@@ -873,46 +1035,6 @@ document.addEventListener("DOMContentLoaded", () => {
   cargarNegocios();
 });
 
-
-
-
-
-async function cargarVariaciones() {
-  try {
-    const resp = await fetch("/api/historico/acuenta?dias=7"); // puedes cambiar 'acuenta' por otro
-    const data = await resp.json();
-
-    const bajas = data.filter(p => p.variation < 0).slice(0, 10);
-    const subidas = data.filter(p => p.variation > 0).slice(0, 10);
-
-    const renderCard = (p, tipo) => `
-      <div class="card-precio ${tipo}">
-        <img src="${p.imagen || '/img/no-image.png'}" alt="img">
-        <div class="info">
-          <div class="nombre">${p.nombre}</div>
-          <div class="store">${p.store.toUpperCase()}</div>
-        </div>
-        <div class="variacion">
-          ${tipo === 'baja' ? '⬇️' : '⬆️'}
-          ${p.variation.toFixed(1)}%
-        </div>
-      </div>
-    `;
-
-    document.getElementById("listaBajas").innerHTML = bajas.length
-      ? bajas.map(p => renderCard(p, "baja")).join("")
-      : "<p style='color:#94a3b8;'>No hay bajadas recientes.</p>";
-
-    document.getElementById("listaSubidas").innerHTML = subidas.length
-      ? subidas.map(p => renderCard(p, "subida")).join("")
-      : "<p style='color:#94a3b8;'>No hay subidas recientes.</p>";
-  } catch (err) {
-    console.error("Error cargando variaciones:", err);
-  }
-}
-
-
-
 // ==========================
 // 📅 ACTIVIDAD SEMANAL — versión profesional (lunes → domingo)
 // ==========================
@@ -923,7 +1045,7 @@ async function cargarActividadSemanal() {
   contenedor.innerHTML = "<p style='color:#6b7280;'>🕐 Cargando actividad semanal...</p>";
 
   try {
-    const url = `${window.location.protocol}//${window.location.hostname}:4000/api/scrape/actividad-semanal`;
+    const url = `/api/scrape/actividad-semanal`; // Removido el puerto harcodeado
     const resp = await fetch(url);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 
@@ -1005,9 +1127,6 @@ async function cargarActividadSemanal() {
     contenedor.innerHTML = `<p style='color:red;'>Error al cargar la actividad semanal: ${err.message}</p>`;
   }
 }
-
-
-
 </script>
 
 </body>

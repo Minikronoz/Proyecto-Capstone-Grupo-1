@@ -1006,3 +1006,37 @@ canvas:hover {
   .dia.hoy-dia {
     box-shadow: 0 0 0 2px #0ea5e9;
   }
+
+  /* ==============================
+   NUEVO: Estilos para Multi-Consola
+   ============================== */
+
+.multi-log-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.log-contenedor {
+  /* Ocultar consolas por defecto */
+  display: none; 
+}
+
+.log-contenedor.activo {
+  /* Mostrar solo la consola activa */
+  display: block; 
+}
+
+/* Ajustar altura del log-output */
+.log-output {
+  max-height: 350px;
+  overflow-y: auto;
+  font-size: 0.75rem; /* Letra un poco más pequeña */
+}
+
+/* Responsivo para móviles */
+@media (max-width: 768px) {
+  .multi-log-container {
+    grid-template-columns: 1fr; /* Una columna en móviles */
+  }
+}

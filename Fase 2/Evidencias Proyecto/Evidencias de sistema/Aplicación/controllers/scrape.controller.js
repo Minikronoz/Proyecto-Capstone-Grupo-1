@@ -77,7 +77,12 @@ function ejecutarScraping(nombreScript, io) {
     }
 
     console.log(`▶ Ejecutando scraping: ${scriptPath}`);
-    io.emit("scrape-log", { store: nombreScript, message: `▶ Ejecutando scraping: ${nombreScript}` });
+    
+    // ✅ Enviar mensaje de inicio al cliente
+    io.emit("scrape-progress", { 
+      store: nombreScript, 
+      message: `🚀 Iniciando scraping de ${nombreScript}...` 
+    });
 
     const proceso = exec(`node "${scriptPath}"`, { cwd: process.cwd() });
 
@@ -85,36 +90,54 @@ function ejecutarScraping(nombreScript, io) {
     let actualizados = 0;
     let revisados = 0;
 
+    // ✅ Capturar STDOUT línea por línea
     proceso.stdout.on("data", (data) => {
-      const msg = data.toString().trim();
-      console.log(`[${nombreScript}] ${msg}`);
-
-      io.emit("scrape-progress", { store: nombreScript, message: msg });
+      const msg = data.toString();
+      console.log(msg); // Log en consola del servidor
+      
+      // ✅ Enviar cada línea al cliente web
+      const lineas = msg.split('\n').filter(l => l.trim());
+      lineas.forEach(linea => {
+        // ✅ Enviar con el evento correcto
+        io.emit("scrape-progress", { 
+          store: nombreScript, 
+          message: linea 
+        });
+      });
 
       // Detectar conteos en logs
-      const match = msg.match(/Nuevos:\s*(\d+).*Actualizados:\s*(\d+).*Revisados:\s*(\d+)/i);
+      const match = msg.match(/Nuevos:\s*(\d+).*Actualizados:\s*(\d+).*Revisados.*?:\s*(\d+)/i);
       if (match) {
         nuevos = parseInt(match[1], 10);
         actualizados = parseInt(match[2], 10);
         revisados = parseInt(match[3], 10);
-      } else {
-        const altMatch = msg.match(/Nuevos:\s*(\d+).*Actualizados:\s*(\d+)/i);
-        if (altMatch) {
-          nuevos = parseInt(altMatch[1], 10);
-          actualizados = parseInt(altMatch[2], 10);
-        }
       }
     });
 
+    // ✅ Capturar STDERR
     proceso.stderr.on("data", (data) => {
-      const msg = data.toString().trim();
+      const msg = data.toString();
       console.error(`[${nombreScript} ERROR] ${msg}`);
-      io.emit("scrape-error", { store: nombreScript, message: msg });
+      io.emit("scrape-error", { 
+        store: nombreScript, 
+        message: msg 
+      });
     });
 
+    // ✅ Capturar finalización
     proceso.on("exit", (code) => {
       const success = code === 0;
-      io.emit("scrape-complete", { store: nombreScript, success });
+      const mensaje = success 
+        ? `✅ Scraping de ${nombreScript} completado exitosamente` 
+        : `❌ Scraping de ${nombreScript} terminó con código ${code}`;
+      
+      console.log(mensaje);
+      
+      io.emit("scrape-complete", { 
+        store: nombreScript, 
+        success, 
+        message: mensaje 
+      });
 
       if (success) {
         guardarScraping(nombreScript, { nuevos, actualizados, revisados });
@@ -122,6 +145,16 @@ function ejecutarScraping(nombreScript, io) {
       } else {
         reject(new Error(`${nombreScript} terminó con código ${code}`));
       }
+    });
+
+    // ✅ Capturar errores del proceso
+    proceso.on("error", (err) => {
+      console.error(`[${nombreScript}] Error al ejecutar proceso:`, err);
+      io.emit("scrape-error", { 
+        store: nombreScript, 
+        message: `Error al ejecutar: ${err.message}` 
+      });
+      reject(err);
     });
   });
 }
