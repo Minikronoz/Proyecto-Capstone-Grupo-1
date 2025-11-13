@@ -5,84 +5,39 @@
   <title>Panel Administrativo — Sistema de Reportes</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <link rel="stylesheet" href="/css/principal.css" />
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
-
   <script src="/socket.io/socket.io.js"></script>
+  <base href="/" />
 
   <style>
-    .kpi__value.grid-kpi { display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.9rem; }
-    .kpi__value .kpi-total { font-size: 2.4rem; font-weight: 700; }
-    .kpi__value .kpi-subtitle { font-size: 0.85rem; color: #64748b; margin-bottom: 0.4rem; }
-    .item-card { display: flex; align-items: center; justify-content: space-between; background: #f9fafb;
-      border-radius: 0.6rem; padding: 0.45rem 0.75rem; border-left: 4px solid #e5e7eb; }
-    .item-card h4 { font-size: 0.9rem; margin: 0; }
-    .item-card .datos { display: flex; gap: 0.75rem; font-size: 0.8rem; color: #334155; }
-    #kpi-ultimo-scraping.grid-kpi { display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.85rem; }
-    #kpi-ultimo-scraping .hora { font-size: 0.8rem; color: #4b5563; }
-    #kpi-ultimo-scraping .hora b { font-weight: 600; }
-    .log-contenedor { margin-top: 1rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; background: #f8fafc; }
-    .log-header { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem;
-      border-bottom: 1px solid #e5e7eb; }
+    .kpi__value.grid-kpi { 
+      display:flex; flex-direction:column; 
+      gap:.6rem; font-size:.9rem; 
+    }
+    .item-card { 
+      display:flex; align-items:center; justify-content:space-between; 
+      background:#f9fafb; padding:.45rem .75rem;
+      border-left:4px solid #e5e7eb; border-radius:.6rem;
+    }
+    .item-card h4 { margin:0; font-size:.9rem; }
+    .item-card .datos { display:flex; gap:.75rem; font-size:.8rem; color:#334155; }
     .log-output {
-      padding: 0.75rem 1rem;
-      background: #020617;
-      color: #e5e7eb;
-      font-family: "Fira Code", "Courier New", monospace;
-      font-size: 0.75rem;
-      line-height: 1.4;
-      border-radius: 0 0 0.75rem 0.75rem;
-      max-height: 400px;
-      overflow-y: auto;
-      white-space: pre-wrap; /* Cambiado de pre a pre-wrap */
-      overflow-wrap: break-word;
+      padding:.75rem 1rem; background:#020617;
+      color:#e5e7eb; font-family:"Fira Code", monospace;
+      font-size:.75rem; max-height:400px; overflow-y:auto;
     }
-
-    .log-output .log-line {
-      margin: 0;
-      padding: 2px 0;
-      font-family: inherit;
-      white-space: pre-wrap; /* Mantener formato pero permitir wrap */
-    }
-
-    .log-output .log-error {
-      color: #ef4444;
-    }
-
-    .log-output .log-success {
-      color: #22c55e;
-    }
-
-    .log-output .log-warning {
-      color: #f59e0b;
-    }
-
-    .log-output .log-info {
-      color: #3b82f6;
-    }
-
-    /* Animación para barras de progreso */
-    .log-output .progress-bar {
-      color: #60a5fa;
-      font-weight: bold;
-    }
-
-    .botones-scraping { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.75rem; }
-    .botones-scraping .btn { padding: 0.5rem 0.9rem; font-size: 0.85rem; border-radius: 999px; }
-    .badge--error { background: #fee2e2; color: #b91c1c; }
-    .badge--ok { background: #dcfce7; color: #15803d; }
-
+    .badge--error { background:#fee2e2; color:#b91c1c; }
+    .badge--ok { background:#dcfce7; color:#15803d; }
   </style>
 </head>
+
 <body>
-  <!-- Sidebar -->
+
+  <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar__brand">
       <span class="brand__dot"></span>
@@ -90,1044 +45,227 @@
     </div>
 
     <nav class="sidebar__nav">
-      <button class="nav__item active" data-target="dashboard">
-        <i class="fa-solid fa-chart-line"></i><span>Dashboard</span>
-      </button>
-      <button class="nav__item" data-target="scraping">
-        <i class="fa-solid fa-cloud-arrow-down"></i><span>Scraping</span>
-      </button>
-      <button class="nav__item" data-target="usuarios">
-        <i class="fa-solid fa-users"></i><span>Usuarios</span>
-      </button>
-      <button class="nav__item" data-target="negocios">
-        <i class="fa-solid fa-shop"></i><span>Negocios</span>
-      </button>
-      <button class="nav__item" onclick="window.location.href='/dashboard'">
-        <i class="fa-solid fa-chart-pie"></i><span>Dashboard Analítico</span>
-      </button>
-      <button class="nav__item" onclick="window.location.href='/catalogo'">
-        <i class="fa-solid fa-store"></i><span>Catálogo</span>
-      </button>
-
+      <button class="nav__item active" data-target="dashboard"><i class="fa-solid fa-chart-line"></i><span>Dashboard</span></button>
+      <button class="nav__item" data-target="scraping"><i class="fa-solid fa-cloud-arrow-down"></i><span>Scraping</span></button>
+      <button class="nav__item" data-target="usuarios"><i class="fa-solid fa-users"></i><span>Usuarios</span></button>
+      <button class="nav__item" data-target="negocios"><i class="fa-solid fa-shop"></i><span>Negocios</span></button>
+      <button class="nav__item" onclick="window.location.href='/dashboard'"><i class="fa-solid fa-chart-pie"></i><span>Dashboard Analítico</span></button>
+      <button class="nav__item" onclick="window.location.href='/catalogo'"><i class="fa-solid fa-store"></i><span>Catálogo</span></button>
     </nav>
 
     <div class="sidebar__footer">
-      <a class="logout-btn" href="/login">
-        <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
-      </a>
+      <a class="logout-btn" href="/login"><i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión</a>
     </div>
   </aside>
+
   <div class="layout">
+
+    <!-- HEADER -->
     <header class="app-header">
       <button id="menuToggle" class="menu-toggle"><i class="fa-solid fa-bars"></i></button>
       <div class="header__actions">
         <span class="badge badge--ok" id="estado-backend">API Online</span>
       </div>
     </header>
-<main class="app-main">
-  <!-- DASHBOARD -->
-<section id="dashboard" class="seccion activa">
-  <div class="section-header">
-    <h2><i class="fa-solid fa-chart-line"></i> Resumen General</h2>
-    <p class="descripcion">Monitorea la actividad del sistema en tiempo real.</p>
-  </div>
 
-  <div class="kpis">
-    <article class="kpi-card">
-      <div class="kpi__top">
-        <span class="kpi__label">Productos actualizados (24h)</span>
-        <i class="fa-solid fa-box-archive kpi__icon"></i>
-      </div>
-      <div class="kpi__value" id="kpi-productos">—</div>
-    </article>
+    <!-- CONTENIDO -->
+    <main class="app-main">
 
-    <article class="kpi-card">
-      <div class="kpi__top">
-        <span class="kpi__label">Usuarios registrados</span>
-        <i class="fa-solid fa-user-check kpi__icon"></i>
-      </div>
-      <div class="kpi__value" id="kpi-usuarios">—</div>
-    </article>
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="seccion activa">
 
-    <article class="kpi-card">
-      <div class="kpi__top">
-        <span class="kpi__label">Negocios activos</span>
-        <i class="fa-solid fa-store kpi__icon"></i>
-      </div>
-      <div class="kpi__value" id="kpi-negocios">—</div>
-    </article>
+        <div class="section-header">
+          <h2><i class="fa-solid fa-chart-line"></i> Resumen General</h2>
+          <p class="descripcion">Monitorea la actividad del sistema en tiempo real.</p>
+        </div>
 
-    <article class="kpi-card">
-      <div class="kpi__top">
-        <span class="kpi__label">Último scraping</span>
-        <i class="fa-solid fa-clock-rotate-left kpi__icon"></i>
-      </div>
-      <div class="kpi__value" id="kpi-ultimo-scraping">—</div>
-    </article>
-  </div>
+        <div class="kpis">
+          <article class="kpi-card"><div class="kpi__value" id="kpi-productos">—</div></article>
+          <article class="kpi-card"><div class="kpi__value" id="kpi-usuarios">—</div></article>
+          <article class="kpi-card"><div class="kpi__value" id="kpi-negocios">—</div></article>
+        </div>
 
-<!-- ==========================
-📅 BLOQUE: ACTIVIDAD SEMANAL DE SCRAPING
-========================== -->
-<div class="charts-grid">
-  <div class="chart-card card-scraping">
-    <div class="chart-card__header">
-      <h3>📅 Actividad semanal de scraping</h3>
-    </div>
-    <div class="chart-card__body">
-      <div id="tablaScrapingSemanal" class="tabla-semanal">
-        <p style="color:#6b7280;">🕐 Cargando actividad semanal...</p>
-      </div>
-    </div>
-  </div>
-</div>
+        <div id="kpi-ultimo-scraping" class="scraping-wrapper"></div>
 
+        <div class="charts-grid">
+          <div class="chart-card"><canvas id="chartRegiones"></canvas></div>
+          <div class="chart-card"><canvas id="chartGenero"></canvas></div>
+        </div>
 
+        <div class="card-scraping">
+          <div id="tablaScrapingSemanal" class="tabla-semanal"></div>
+        </div>
+      </section>
 
+      <!-- SCRAPING -->
+      <section id="scraping" class="seccion">
+        <div class="botones-scraping">
+          <button onclick="ejecutarScraping('unimarc')" class="btn btn-unimarc">Unimarc</button>
+          <button onclick="ejecutarScraping('tottus')" class="btn btn-tottus">Tottus</button>
+          <button onclick="ejecutarScraping('jumbo')" class="btn btn-jumbo">Jumbo</button>
+          <button onclick="ejecutarScraping('acuenta')" class="btn btn-acuenta">A Cuenta</button>
+        </div>
 
-  <!-- ==========================
-  📊 GRÁFICOS INFERIORES
-  ========================== -->
-  <div class="charts-grid">
-    <div class="chart-card">
-      <div class="chart-card__header">
-        <h3>Distribución por Región</h3>
-      </div>
-      <div class="chart-card__body">
-        <canvas id="chartRegiones" width="400" height="300"></canvas>
-      </div>
-    </div>
+        <div id="log-unimarc" class="log-contenedor"><div class="log-output">Esperando ejecución...</div></div>
+        <div id="log-tottus" class="log-contenedor"><div class="log-output">Esperando ejecución...</div></div>
+        <div id="log-jumbo" class="log-contenedor"><div class="log-output">Esperando ejecución...</div></div>
+        <div id="log-acuenta" class="log-contenedor"><div class="log-output">Esperando ejecución...</div></div>
+      </section>
 
-    <div class="chart-card">
-      <div class="chart-card__header">
-        <h3>Género de Usuarios</h3>
-      </div>
-      <div class="chart-card__body">
-        <canvas id="chartGenero"></canvas>
-      </div>
-    </div>
-  </div>
-</section>
+      <!-- USUARIOS -->
+      <section id="usuarios" class="seccion">
+        <div class="card">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Género</th>
+                <th>Región</th>
+                <th>Comuna</th>
+                <th>Negocios</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="usuariosBody">
+              <tr><td colspan="7">Cargando usuarios...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
+<!-- MODAL USUARIO COMPLETO -->
 <div class="modal oculto" id="modalEditarUsuario">
   <div class="modal__backdrop" onclick="cerrarModal()"></div>
+
   <div class="modal__dialog">
     <form id="formEditarUsuario">
       <div class="modal__header">
-        <h3>✏️ Editar Usuario</h3>
+        <h3>Editar Usuario</h3>
       </div>
+
       <div class="modal__body">
-        <div class="form-grid">
-          <input type="hidden" id="editId" name="id">
-          
-          <div>
-            <label for="editNombre">Nombre</label>
-            <input type="text" id="editNombre" name="nombre">
-          </div>
-          <div>
-            <label for="editApellido">Apellido</label>
-            <input type="text" id="editApellido" name="apellido">
-          </div>
-          <div>
-            <label for="editGenero">Género</label>
-            <input type="text" id="editGenero" name="genero">
-          </div>
-          <div>
-            <label for="editRegion">Región</label>
-            <input type="text" id="editRegion" name="region">
-          </div>
-          <div>
-            <label for="editComuna">Comuna</label>
-            <input type="text" id="editComuna" name="comuna">
-          </div>
-          <div>
-            <label for="editSector">Sector</label>
-            <input type="text" id="editSector" name="sector">
-          </div>
-          <div>
-            <label>
-              <input type="checkbox" id="editTieneNegocio" name="tieneNegocio">
-              ¿Tiene negocio?
-            </label>
-          </div>
-        </div>
+        <input type="hidden" id="editId">
+
+        <label>Nombre</label>
+        <input type="text" id="editNombre">
+
+        <label>Apellido</label>
+        <input type="text" id="editApellido">
+
+        <label>RUT</label>
+        <input type="text" id="editRut">
+
+        <label>Fecha de nacimiento</label>
+        <input type="date" id="editFechaNacimiento">
+
+        <label>Edad</label>
+        <input type="number" id="editEdad">
+
+        <label>Género</label>
+        <select id="editGenero">
+          <option value="">—</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Femenino">Femenino</option>
+          <option value="Otro">Otro</option>
+        </select>
+
+        <label>Región</label>
+        <input type="text" id="editRegion">
+
+        <label>Comuna</label>
+        <input type="text" id="editComuna">
+
+        <label>Sector</label>
+        <input type="text" id="editSector">
+
+        <label>Correo</label>
+        <input type="email" id="editCorreo">
+
+        <label>Rol</label>
+        <select id="editRole">
+          <option value="usuario">Usuario</option>
+          <option value="admin">Administrador</option>
+        </select>
+
+        <label>¿Tiene negocio?</label>
+        <select id="editTieneNegocio">
+          <option value="false">No</option>
+          <option value="true">Sí</option>
+        </select>
       </div>
+
       <div class="modal__footer">
-        <button type="button" class="btn btn-outline" onclick="cerrarModal()">Cancelar</button>
-        <button type="submit" class="btn btn-jumbo">Guardar Cambios</button>
+        <button type="button" onclick="cerrarModal()">Cancelar</button>
+        <button type="submit">Guardar</button>
       </div>
     </form>
   </div>
 </div>
 
-<style>
-  .modal.oculto { display: none; }
-  .modal__backdrop {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.4);
-    z-index: 100;
-  }
-  .modal__dialog {
-    position: fixed; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    background: white; border-radius: 14px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-    z-index: 101;
-    width: 90%;
-    max-width: 500px;
-  }
-  .modal__header { padding: 12px 16px; border-bottom: 1px solid #e5e7eb; }
-  .modal__header h3 { margin: 0; color: var(--petroleo); }
-  .modal__body { padding: 16px; }
-  .modal__footer { padding: 12px 16px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 10px; }
-
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .form-grid label { display: block; font-size: 12px; color: #6b7280; margin-bottom: 4px; }
-  .form-grid input[type="text"] {
-    width: 100%; padding: 8px 10px; border: 1px solid var(--gris-medio);
-    border-radius: 8px;
-  }
-</style>
 
 
+      <!-- NEGOCIOS -->
+      <section id="negocios" class="seccion">
+        <div class="card">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Giro</th>
+                <th>Comuna</th>
+                <th>Sector</th>
+                <th>Dueño</th>
+                <th>Correo</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
 
-  <!-- SCRAPING -->
-  <section id="scraping" class="seccion">
-    <div class="section-header">
-      <h2><i class="fa-solid fa-cloud-arrow-down"></i> Ejecución de Scraping</h2>
-      <p class="descripcion">Ejecuta los scripts para actualizar precios de supermercados.</p>
-    </div>
+            <tbody id="negociosBody">
+              <tr><td colspan="7">Cargando negocios...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-    <div class="card scraping-card">
-      <div class="botones-scraping">
-        <button onclick="ejecutarScraping('unimarc')" class="btn btn-unimarc">Unimarc</button>
-        <button onclick="ejecutarScraping('tottus')" class="btn btn-tottus">Tottus</button>
-        <button onclick="ejecutarScraping('jumbo')" class="btn btn-jumbo">Jumbo</button>
-        <button onclick="ejecutarScraping('acuenta')" class="btn btn-acuenta">A Cuenta</button>
+      <!-- MODAL NEGOCIO -->
+      <div id="modalEditarNegocio" class="modal oculto">
+        <div class="modal-contenido">
+          <h3>Editar Negocio</h3>
+
+          <input type="hidden" id="negocioId">
+          <label>Nombre del negocio</label><input type="text" id="negocioNombre">
+          <label>Giro</label><input type="text" id="negocioGiro">
+          <label>Comuna</label><input type="text" id="negocioComuna">
+          <label>Sector</label><input type="text" id="negocioSector">
+
+          <div class="modal-botones">
+            <button class="btn-guardar" onclick="guardarNegocio()">Guardar</button>
+            <button class="btn-cerrar" onclick="cerrarModalNegocio()">Cerrar</button>
+          </div>
+        </div>
       </div>
 
-      <div class="multi-log-container">
-
-        <div id="log-unimarc" class="log-contenedor">
-          <div class="log-header">
-            <h3><i class="fa-regular fa-clipboard"></i> UNIMARC</h3>
-            <button class="btn btn-outline" onclick="limpiarLog('unimarc')">
-              <i class="fa-regular fa-trash-can"></i> Limpiar
-            </button>
-          </div>
-          <div class="log-output">Esperando ejecución...</div>
-        </div>
-
-        <div id="log-tottus" class="log-contenedor">
-          <div class="log-header">
-            <h3><i class="fa-regular fa-clipboard"></i> TOTTUS</h3>
-            <button class="btn btn-outline" onclick="limpiarLog('tottus')">
-              <i class="fa-regular fa-trash-can"></i> Limpiar
-            </button>
-          </div>
-          <div class="log-output">Esperando ejecución...</div>
-        </div>
-
-        <div id="log-jumbo" class="log-contenedor">
-          <div class="log-header">
-            <h3><i class="fa-regular fa-clipboard"></i> JUMBO</h3>
-            <button class="btn btn-outline" onclick="limpiarLog('jumbo')">
-              <i class="fa-regular fa-trash-can"></i> Limpiar
-            </button>
-          </div>
-          <div class="log-output">Esperando ejecución...</div>
-        </div>
-
-        <div id="log-acuenta" class="log-contenedor">
-          <div class="log-header">
-            <h3><i class="fa-regular fa-clipboard"></i> A CUENTA</h3>
-            <button class="btn btn-outline" onclick="limpiarLog('acuenta')">
-              <i class="fa-regular fa-trash-can"></i> Limpiar
-            </button>
-          </div>
-          <div class="log-output">Esperando ejecución...</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-<!-- USUARIOS -->
-<section id="usuarios" class="seccion">
-  <div class="section-header">
-    <h2><i class="fa-solid fa-users"></i> Gestión de Usuarios</h2>
-    <p class="descripcion">Visualiza, filtra y edita la información de los usuarios registrados.</p>
+    </main>
   </div>
 
-  <div class="card">
-    <div class="tabla-header">
-      <input type="text" id="busquedaUsuario" placeholder="Buscar por nombre o correo..." class="input-busqueda" />
-      <button id="recargarUsuarios" class="btn btn-outline">
-        <i class="fa-solid fa-rotate"></i> Recargar
-      </button>
-    </div>
+  <!-- JS GLOBAL -->
+<script src="js/dashboard.js"></script>
 
-    <div id="tablaUsuarios" class="tabla-contenedor">
-      <table id="tablaUsuariosBody">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Correo</th>
-            <th>Género</th>
-            <th>Región</th>
-            <th>Comuna</th>
-            <th>Negocio</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="usuariosBody">
-          <tr>
-            <td colspan="7" style="text-align:center; color:#888;">Cargando usuarios...</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<style>
-  #usuarios .card {
-    background: #fff;
-    border-radius: 10px;
-    padding: 15px;
-    box-shadow: 0 0 6px rgba(0,0,0,0.1);
-  }
-  #usuarios table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  #usuarios th, #usuarios td {
-    border-bottom: 1px solid #e5e7eb;
-    padding: 8px;
-    text-align: left;
-    font-size: 0.9rem;
-  }
-  #usuarios th {
-    background: #f9fafb;
-    font-weight: 600;
-  }
-  .btn-editar, .btn-eliminar {
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-size: 1rem;
-  }
-  .btn-editar { color: #0ea5e9; }
-  .btn-eliminar { color: #dc2626; }
-  .tabla-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-  .input-busqueda {
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    padding: 6px 10px;
-    width: 220px;
-  }
-</style>
-
-
-
-  <!-- NEGOCIOS -->
-  <section id="negocios" class="seccion">
-    <div class="section-header">
-      <h2><i class="fa-solid fa-shop"></i> Gestión de Negocios</h2>
-      <p class="descripcion">Visualiza y administra los negocios registrados en el sistema.</p>
-    </div>
-
-    <div id="tablaNegocios" class="tabla-contenedor">
-      <p style="text-align:center; color:#888;">Cargando negocios...</p>
-    </div>
-  </section>
-</main>
-
-
-    <footer class="app-footer">
-      <p>© 2025 Sistema de Reportes — Todos los derechos reservados</p>
-    </footer>
-  </div>
 <script>
-  // ===== Socket.io: logs mejorados =====
-  const socket = io();
-  const estadoBackend = document.getElementById("estado-backend");
-
-  socket.on("connect", () => {
-    estadoBackend.textContent = "API Online";
-    estadoBackend.classList.remove("badge--error");
-    estadoBackend.classList.add("badge--ok");
-  });
-
-  socket.on("disconnect", () => {
-    estadoBackend.textContent = "Sin conexión";
-    estadoBackend.classList.remove("badge--ok");
-    estadoBackend.classList.add("badge--error");
-  });
-
-  // ✅ NUEVO: Esta función ahora dirige el log a la consola correcta
-  function appendLog(store, message, type = "log-line") {
-    if (!store) {
-      console.warn("⚠️ appendLog: no se especificó store");
-      return;
-    }
-
-    const logContainer = document.querySelector(`#log-${store}`);
-    if (!logContainer) {
-      console.warn(`⚠️ appendLog: no existe #log-${store}`);
-      return;
-    }
-
-    // Mostrar la consola si está oculta
-    logContainer.classList.add("activo");
-
-    const outputDiv = logContainer.querySelector(".log-output");
-    if (!outputDiv) {
-      console.warn(`⚠️ appendLog: no existe .log-output en #log-${store}`);
-      return;
-    }
-    
-    // Limpiar el mensaje "Esperando ejecución..."
-    if (outputDiv.textContent.trim() === "Esperando ejecución...") {
-      outputDiv.innerHTML = "";
-    }
-
-    // Determinar clase de estilo
-    let className = "log-line";
-    if (type === "error" || message.includes("❌") || message.includes("ERROR")) {
-      className += " log-error";
-    } else if (type === "success" || message.includes("✅") || message.includes("completado")) {
-      className += " log-success";
-    } else if (message.includes("⚠️") || message.includes("warning")) {
-      className += " log-warning";
-    } else if (message.includes("🟢") || message.includes("📊") || message.includes("🚀")) {
-      className += " log-info";
-    } else if (message.includes("█") || message.includes("%")) {
-      className += " progress-bar";
-    }
-
-    const lineDiv = document.createElement("div");
-    lineDiv.className = className;
-    lineDiv.textContent = message;
-    
-    // Si es una barra de progreso, reemplazar la última línea
-    const lastLine = outputDiv.lastElementChild;
-    if (className.includes("progress-bar") && lastLine && lastLine.className.includes("progress-bar")) {
-      outputDiv.removeChild(lastLine);
-    }
-
-    outputDiv.appendChild(lineDiv);
-    outputDiv.scrollTop = outputDiv.scrollHeight;
-
-    // Limitar a 500 líneas
-    while (outputDiv.children.length > 500) {
-      outputDiv.removeChild(outputDiv.firstChild);
-    }
-  }
-
-  // ✅ Escuchar evento de progreso
-  socket.on("scrape-progress", (data) => {
-    console.log("📡 Recibido scrape-progress:", data); // Debug
-    appendLog(data.store, data.message);
-  });
-
-  // ✅ Escuchar errores
-  socket.on("scrape-error", (data) => {
-    console.log("📡 Recibido scrape-error:", data); // Debug
-    appendLog(data.store, `❌ ERROR: ${data.message}`, "error");
-  });
-
-  // ✅ Escuchar completado
-  socket.on("scrape-complete", (data) => {
-    console.log("📡 Recibido scrape-complete:", data); // Debug
-    const message = data.success 
-      ? "✅ Scraping completado con éxito." 
-      : "❌ Scraping finalizado con errores.";
-    appendLog(data.store, message, data.success ? "success" : "error");
-    
-    cargarDatosDashboard();
-    cargarActividadSemanal();
-  });
-
-  // ✅ NUEVO: Limpiar un log individual
-  function limpiarLog(supermercado) {
-    const outputDiv = document.querySelector(`#log-${supermercado} .log-output`);
-    if (outputDiv) {
-      outputDiv.innerHTML = `<div class="log-line">Esperando ejecución...</div>`;
-    }
-  }
-
-  // ===== Scraping manual mejorado =====
-  async function ejecutarScraping(supermercado) {
-    // Mostrar y limpiar la consola específica
-    const logContainer = document.querySelector(`#log-${supermercado}`);
-    if (logContainer) {
-      logContainer.classList.add("activo");
-      limpiarLog(supermercado);
-      appendLog(supermercado, `🚀 Iniciando scraping de ${supermercado}...`, "info");
-    }
-    
-    try {
-      const resp = await fetch(`/api/scrape/${supermercado}`, { method: "POST" });
-      const data = await resp.json();
-      
-      if (!resp.ok) {
-        throw new Error(data.message || "Error desconocido");
-      }
-      // El log de éxito o error ahora lo maneja "scrape-complete"
-    } catch (err) {
-      appendLog(supermercado, `❌ Error al *iniciar* el proceso: ${err.message}`, "error");
-    }
-  }
-
-  // ===== Sidebar =====
-  const sidebar = document.getElementById("sidebar");
-  document.getElementById("menuToggle").addEventListener("click", () =>
-    sidebar.classList.toggle("sidebar--open")
-  );
-
-  // ===== Navegación =====
-  const navItems = document.querySelectorAll(".nav__item");
-  const secciones = document.querySelectorAll(".seccion");
-  navItems.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      // Ignorar botones que solo navegan (los que no tienen data-target)
-      const target = btn.getAttribute("data-target");
-      if (!target) return;
-
-      navItems.forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      
-      secciones.forEach((sec) => sec.classList.toggle("activa", sec.id === target));
-      
-      if (target === "dashboard") {
-              cargarDatosDashboard();
-              cargarActividadSemanal(); // ✅ fuerza actualización
-            }
-      if (target === "usuarios") cargarUsuarios();
-      if (target === "negocios") cargarNegocios();
-
-    });
-  });
-
-
-// ===== Dashboard refinado =====
-async function cargarDatosDashboard() {
-  try {
-    // --- 1️⃣ Cargar datos principales del dashboard ---
-    const resp = await fetch("/api/dashboard");
-    const data = await resp.json();
-    const kpis = data.kpis || {};
-    const charts = data.charts || {};
-
-    // === KPI Cards ===
-    document.getElementById("kpi-usuarios").textContent = kpis.total_usuarios ?? "—";
-    document.getElementById("kpi-negocios").textContent = kpis.total_negocios ?? "—";
-
-    // --- 2️⃣ Cargar datos reales del scraping desde tu endpoint ---
-    const resScraping = await fetch("/api/scrape/ultimos");
-    const scrapingData = await resScraping.json();
-
-    // === Productos actualizados ===
-    let totalProductos = 0;
-    Object.values(scrapingData).forEach((v) => {
-      // Usar 'total' si existe (de jumbo, acuenta), o sumar nuevos/revisados (de tottus, unimarc)
-      const total = v.total ?? 0;
-      const revisados = v.revisados ?? 0;
-      totalProductos += (total > 0) ? total : revisados;
-    });
-
-    document.getElementById("kpi-productos").innerHTML = `
-      <div class="kpi-total">${totalProductos}</div>
-      <div class="kpi-subtitle">Productos en Base de Datos</div>
-    `;
-
-    // --- 3️⃣ Renderizar tarjetas de scraping ---
-    const scrapingItems = Object.entries(scrapingData)
-      .map(([nombre, info]) => {
-        const fechaObj = new Date(info.fecha);
-        const fecha = isNaN(fechaObj)
-          ? (info.fechaLocal || "—") // Usar fechaLocal si ISO falla
-          : fechaObj.toLocaleString("es-CL", { hour12: false });
-
-        const nuevos = info.nuevos ?? 0;
-        const actualizados = info.actualizados ?? 0;
-        const revisados = info.revisados ?? 0;
-        const total = info.total ?? 0;
-
-        // Indicador visual de frescura (🟢, 🟡, 🔴)
-        const horas = Math.floor((Date.now() - fechaObj) / (1000 * 60 * 60));
-        let estado = "🟢";
-        if (horas > 24) estado = "🔴";
-        else if (horas > 12) estado = "🟡";
-
-        return `
-          <div class="item-card" data-store="${nombre.toLowerCase()}">
-            <h4>${estado} ${nombre.toUpperCase()}</h4>
-            <div class="datos">
-              <span><b>${fecha}</b></span>
-              <span><b>${nuevos}</b> nuevos</span>
-              <span><b>${actualizados}</b> actualizados</span>
-              ${revisados ? `<span><b>${revisados}</b> revisados</span>` : (total ? `<span><b>${total}</b> total</span>` : "")}
-            </div>
-          </div>
-        `;
-      })
-      .join("");
-
-    document.getElementById("kpi-ultimo-scraping").innerHTML =
-      scrapingItems || "<div>No hay registros recientes</div>";
-
-    // === Renderizar gráficos ===
-    renderGraficosDashboard(charts);
-  } catch (err) {
-    console.error("❌ Error al cargar dashboard:", err);
-    document.getElementById("kpi-ultimo-scraping").innerHTML =
-      "<div>Error al cargar los datos del scraping</div>";
-  }
-}
-
-// ===== Renderizar gráficos =====
-function renderGraficosDashboard(charts) {
-  // 🔹 Limpiar gráficos previos
-  if (window.graficoRegiones) window.graficoRegiones.destroy();
-  if (window.graficoGenero) window.graficoGenero.destroy();
-
-  // Paleta moderna y profesional (inspirada en dashboards empresariales)
-  const palette = {
-    calipso: "#00A7B5",
-    petroleo: "#004D61",
-    gris: "#E0E6E9",
-    verde: "#71C562",
-    azul: "#1E88E5",
-    lila: "#9C27B0",
-    celeste: "#4FC3F7",
-  };
-// ✅ Registrar plugin de etiquetas si aún no está
-if (typeof ChartDataLabels !== "undefined") {
-  Chart.register(ChartDataLabels);
-}
-
-// === 📊 DISTRIBUCIÓN POR REGIÓN ===
-const regiones = charts.region || {};
-const ctxReg = document.getElementById("chartRegiones")?.getContext("2d");
-
-if (ctxReg && Object.keys(regiones).length > 0) {
-  if (window.graficoRegiones) window.graficoRegiones.destroy(); // evita duplicados
-
-  const labels = Object.keys(regiones);
-  const values = Object.values(regiones);
-
-  window.graficoRegiones = new Chart(ctxReg, {
-    type: "bar",
-    data: {
-      labels,
-      datasets: [
-        {
-          label: "Usuarios por Región",
-          data: values,
-          backgroundColor: labels.map(
-            (_, i) => [
-              palette.calipso,
-              palette.verde,
-              palette.celeste,
-              palette.petroleo,
-              palette.lila,
-              "#64748b",
-              "#94a3b8",
-            ][i % 7]
-          ),
-          borderRadius: 8,
-          borderSkipped: false,
-          hoverBackgroundColor: "#0ea5e9",
-        },
-      ],
-    },
-    options: {
-      indexAxis: "y", // barras horizontales
-      responsive: true,
-      maintainAspectRatio: false,
-      layout: {
-        padding: { top: 10, bottom: 10, left: 10, right: 10 },
-      },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: "#0F172A",
-          titleColor: "#E2E8F0",
-          bodyColor: "#E2E8F0",
-          cornerRadius: 8,
-          padding: 10,
-          callbacks: {
-            label: (ctx) => ` ${ctx.raw} usuarios`,
-          },
-        },
-        datalabels: {
-          color: "#fff",
-          anchor: "end",
-          align: "left",
-          formatter: (v) => v.toLocaleString("es-CL"),
-          font: { weight: "600", size: 12 },
-        },
-      },
-      scales: {
-        x: {
-          beginAtZero: true,
-          grid: { color: "rgba(0,0,0,0.05)" },
-          ticks: {
-            color: "#475569",
-            font: { size: 12 },
-          },
-        },
-        y: {
-          grid: { display: false },
-          ticks: {
-            color: "#1E293B",
-            font: { weight: "600" },
-          },
-        },
-      },
-    },
-    plugins: [ChartDataLabels],
-  });
-}
-
-// === ⚧ GÉNERO DE USUARIOS ===
-const genero = charts.genero || {};
-const ctxGen = document.getElementById("chartGenero")?.getContext("2d");
-
-if (ctxGen && Object.keys(genero).length > 0) {
-  if (window.graficoGenero) window.graficoGenero.destroy();
-
-  window.graficoGenero = new Chart(ctxGen, {
-    type: "doughnut",
-    data: {
-      labels: Object.keys(genero),
-      datasets: [
-        {
-          data: Object.values(genero),
-          backgroundColor: [
-            palette.calipso,
-            palette.verde,
-            palette.celeste,
-            "#94a3b8",
-          ],
-          borderWidth: 3,
-          borderColor: "#F8FAFC",
-          hoverOffset: 10,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: "75%",
-      layout: { padding: 5 },
-      plugins: {
-        legend: {
-          position: "bottom",
-          labels: {
-            color: "#1E293B",
-            font: { size: 12, weight: "500" },
-            boxWidth: 12,
-            boxHeight: 12,
-            padding: 14,
-            usePointStyle: true,
-          },
-        },
-        tooltip: {
-          backgroundColor: "#0F172A",
-          titleColor: "#E2E8F0",
-          bodyColor: "#E2E8F0",
-          cornerRadius: 8,
-          padding: 10,
-          bodyFont: { size: 13 },
-          callbacks: {
-            label: function (ctx) {
-              const label = ctx.label || "";
-              const value = ctx.raw;
-              const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-              const pct = ((value / total) * 100).toFixed(1);
-              return ` ${label}: ${value} usuarios (${pct}%)`;
-            },
-          },
-        },
-      },
-    },
-  });
-}
-}
-
-
-  // ===== Usuarios =====
-  async function cargarUsuarios() {
-    const tabla = document.getElementById("usuariosBody");
-    tabla.innerHTML = "<tr><td colspan='7'>Cargando usuarios...</td></tr>";
-    try {
-      const resp = await fetch("/api/usuarios");
-      const usuarios = await resp.json();
-      if (!usuarios.length) {
-        tabla.innerHTML = "<tr><td colspan='7'>No hay usuarios registrados.</td></tr>";
-        return;
-      }
-      tabla.innerHTML = usuarios.map((u, i) => `
-        <tr>
-          <td>${u.nombre || ""} ${u.apellido || ""}</td>
-          <td>${u.correo || u.email || ""}</td>
-          <td>${u.genero || "—"}</td>
-          <td>${u.region || "—"}</td>
-          <td>${u.comuna || "—"}</td>
-          <td>${Array.isArray(u.negocios) && u.negocios.length > 0
-              ? u.negocios.map(n => n.nombre).join(", ") : "—"}</td>
-          <td style="display:flex; gap:6px; justify-content:center;">
-            <button class="btn-editar" onclick="editarUsuario(${i})"><i class="fa-solid fa-pen-to-square"></i></button>
-            <button class="btn-eliminar" onclick="eliminarUsuario(${i})"><i class="fa-solid fa-trash"></i></button>
-          </td></tr>`).join("");
-      window.usuariosCache = usuarios;
-    } catch (err) {
-      tabla.innerHTML = `<tr><td colspan='7' style='color:red;'>Error cargando usuarios: ${err.message}</td></tr>`;
-    }
-  }
-  // ============================================================
-// ✏️ Abrir modal de edición de usuario
-// ============================================================
-function editarUsuario(index) {
-  const u = window.usuariosCache[index];
-  if (!u) return alert("Usuario no encontrado");
-
-  document.getElementById("editId").value = u._id;
-  document.getElementById("editNombre").value = u.nombre || "";
-  document.getElementById("editApellido").value = u.apellido || "";
-  document.getElementById("editGenero").value = u.genero || "";
-  document.getElementById("editRegion").value = u.region || "";
-  document.getElementById("editComuna").value = u.comuna || "";
-  document.getElementById("editSector").value = u.sector || "";
-  document.getElementById("editTieneNegocio").checked = !!u.tieneNegocio;
-
-  document.getElementById("modalEditarUsuario").classList.remove("oculto");
-}
-
-// ============================================================
-// ❌ Cerrar modal
-// ============================================================
-function cerrarModal() {
-  document.getElementById("modalEditarUsuario").classList.add("oculto");
-}
-
-// ============================================================
-// 💾 Guardar cambios (PUT /api/usuarios/:id)
-// ============================================================
-document.getElementById("formEditarUsuario").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const id = document.getElementById("editId").value;
-  const datos = {
-    nombre: document.getElementById("editNombre").value,
-    apellido: document.getElementById("editApellido").value,
-    genero: document.getElementById("editGenero").value,
-    region: document.getElementById("editRegion").value,
-    comuna: document.getElementById("editComuna").value,
-    sector: document.getElementById("editSector").value,
-    tieneNegocio: document.getElementById("editTieneNegocio").checked,
-  };
-
-  try {
-    const res = await fetch(`/api/usuarios/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(datos),
-    });
-
-    if (!res.ok) throw new Error(await res.text());
-
-    alert("✅ Usuario actualizado correctamente");
-    cerrarModal();
-    cargarUsuarios();
-  } catch (err) {
-    alert("❌ Error al actualizar: " + err.message);
-  }
-});
-
-// ===== Negocios =====
-async function cargarNegocios() {
-  const contenedor = document.getElementById("tablaNegocios");
-  contenedor.innerHTML = "<p>Cargando negocios...</p>";
-  try {
-    const res = await fetch("/api/negocios-con-duenio");
-    const negocios = await res.json();
-
-    if (!Array.isArray(negocios) || negocios.length === 0) {
-      contenedor.innerHTML = "<p>(No hay negocios registrados)</p>";
-      return;
-    }
-
-    let html = `
-      <table class="tabla-negocios">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Giro</th>
-            <th>Comuna</th>
-            <th>Sector</th>
-            <th>Dueño</th>
-            <th>Correo Dueño</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
-
-    negocios.forEach(n => {
-      html += `
-        <tr>
-          <td>${n.nombre || "-"}</td>
-          <td>${n.giro || "-"}</td>
-          <td>${n.comuna || "-"}</td>
-          <td>${n.sector || "-"}</td>
-          <td>${n.duenioNombre || "-"}</td>
-          <td>${n.duenioCorreo || "-"}</td>
-          <td>
-            <button class="btn-editar" onclick="editarNegocio('${n._id}')">✏️</button>
-            <button class="btn-eliminar" onclick="eliminarNegocio('${n._id}')">🗑️</button>
-          </td>
-        </tr>`;
-    });
-
-    html += "</tbody></table>";
-    contenedor.innerHTML = html;
-  } catch (err) {
-    contenedor.innerHTML = `<p style="color:red;">Error al cargar negocios: ${err.message}</p>`;
-    console.error("❌ Error cargarNegocios:", err);
-  }
-}
-
-
-  async function eliminarNegocio(id) {
-    if (!confirm("¿Estás seguro de eliminar este negocio?")) return;
-    try {
-      await fetch(`/api/negocios/${id}`, { method: "DELETE" });
-      alert("Negocio eliminado correctamente");
-      cargarNegocios();
-    } catch (err) { alert("Error al eliminar: " + err.message); }
-  }
-
-  async function editarNegocio(id) {
-    const nuevoNombre = prompt("Nuevo nombre del negocio:");
-    if (!nuevoNombre) return;
-    try {
-      await fetch(`/api/negocios/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre: nuevoNombre })
-      });
-      alert("Negocio actualizado correctamente");
-      cargarNegocios();
-    } catch (err) { alert("Error al editar: " + err.message); }
-  }
-
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("🔥 dashboard.js listo (DOM cargado)");
+
+  const form = document.getElementById("formEditarUsuario");
+  if (form) form.addEventListener("submit", guardarUsuario);
+
   cargarDatosDashboard();
-  cargarActividadSemanal(); // ✅ que se ejecute junto al dashboard
-  cargarUsuarios();
-  cargarNegocios();
+  cargarActividadSemanal();
 });
 
-// ==========================
-// 📅 ACTIVIDAD SEMANAL — versión profesional (lunes → domingo)
-// ==========================
-async function cargarActividadSemanal() {
-  const contenedor = document.getElementById("tablaScrapingSemanal");
-  if (!contenedor) return console.warn("⚠️ No se encontró #tablaScrapingSemanal");
-
-  contenedor.innerHTML = "<p style='color:#6b7280;'>🕐 Cargando actividad semanal...</p>";
-
-  try {
-    const url = `/api/scrape/actividad-semanal`; // Removido el puerto harcodeado
-    const resp = await fetch(url);
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-
-    const { actividad } = await resp.json();
-
-    // 🔹 Generar semana actual (lunes → domingo)
-    const hoy = new Date();
-    const primerDia = new Date(hoy);
-    primerDia.setDate(hoy.getDate() - ((hoy.getDay() + 6) % 7)); // lunes
-    const semana = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(primerDia);
-      d.setDate(primerDia.getDate() + i);
-      return d;
-    });
-
-    // 🔹 Encabezados con día completo + fecha completa
-    const encabezados = semana.map(d => {
-      const nombre = d.toLocaleDateString("es-CL", { weekday: "long" });
-      const fecha = d.toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric" });
-      return `<div style="font-weight:600; text-transform:capitalize;">${nombre}</div>
-              <div style="font-size:0.8rem; color:#64748b;">${fecha}</div>`;
-    });
-
-    // 🔹 Tabla elegante
-    let html = `
-      <table style="width:100%; border-collapse:separate; border-spacing:0; text-align:center; font-size:0.9rem; border-radius:10px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.1);">
-        <thead style="background:#f1f5f9;">
-          <tr>
-            <th style="padding:12px; border-bottom:2px solid #e2e8f0; background:#f8fafc;">Supermercado</th>
-            ${encabezados.map(h => `<th style="padding:12px; border-bottom:2px solid #e2e8f0;">${h}</th>`).join("")}
-          </tr>
-        </thead>
-        <tbody style="background:white;">
-    `;
-
-    const supermercados = ["unimarc", "tottus", "jumbo", "acuenta"];
-    const colores = {
-      success: "#22c55e",
-      warning: "#facc15",
-      fail: "#ef4444",
-    };
-    const iconos = {
-      success: "✔️",
-      warning: "⚠️",
-      fail: "❌",
-    };
-
-    supermercados.forEach(store => {
-      html += `<tr>
-        <td style="padding:10px; border-bottom:1px solid #e5e7eb; font-weight:600; text-transform:uppercase; background:#f8fafc;">${store}</td>`;
-
-      semana.forEach(d => {
-        const fechaISO = d.toISOString().split("T")[0];
-        const estado = actividad?.[store]?.[fechaISO] || "fail";
-        const color = colores[estado];
-        const icono = iconos[estado];
-
-        html += `
-          <td style="padding:10px; border-bottom:1px solid #f1f5f9;">
-            <div style="
-              width:28px; height:28px; margin:auto; border-radius:8px;
-              background:${color}; display:flex; align-items:center; justify-content:center;
-              color:white; font-size:0.9rem; box-shadow:0 1px 3px rgba(0,0,0,0.15);
-              transition:transform 0.2s ease;
-            " title="${estado}">
-              ${icono}
-            </div>
-          </td>`;
-      });
-
-      html += "</tr>";
-    });
-
-    html += "</tbody></table>";
-    contenedor.innerHTML = html;
-
-  } catch (err) {
-    console.error("❌ Error en cargarActividadSemanal:", err);
-    contenedor.innerHTML = `<p style='color:red;'>Error al cargar la actividad semanal: ${err.message}</p>`;
-  }
-}
 </script>
+
+
 
 </body>
 </html>

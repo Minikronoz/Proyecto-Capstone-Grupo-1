@@ -1,6 +1,6 @@
-// ==============================================
-// 📁 routes/dashboard.routes.js
-// ==============================================
+// =============================================================
+// 📁 routes/dashboard.routes.js — Versión Final Optimizada 2025
+// =============================================================
 import express from "express";
 import fs from "fs";
 import path from "path";
@@ -12,63 +12,31 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const scrapingFile = path.join(__dirname, "../data/ultimoScraping.json");
 
-// ----------------------------------------------------
-// 🧩 Función auxiliar — Leer último scraping
-// ----------------------------------------------------
+// =============================================================
+// 📌 Leer archivo último scraping
+// =============================================================
 function obtenerScrapingData() {
   try {
     if (fs.existsSync(scrapingFile)) {
-      const data = fs.readFileSync(scrapingFile, "utf-8");
-      return JSON.parse(data);
+      return JSON.parse(fs.readFileSync(scrapingFile, "utf-8"));
     }
   } catch (err) {
-    console.error("⚠️ Error leyendo archivo de scraping:", err);
+    console.error("⚠️ Error leyendo archivo scraping:", err);
   }
   return {};
 }
 
-// ----------------------------------------------------
-// 📊 GET /api/dashboard → Datos globales del sistema
-// ----------------------------------------------------
+// =============================================================
+// 📊 GET /api/dashboard → KPIs + Charts + Scraping
+// =============================================================
 router.get("/", async (req, res) => {
   try {
     const db = getDB();
 
-    // 1️⃣ Usuarios
+    // 1️⃣ Usuarios REALES desde MongoDB Atlas
     const usuarios = await db.collection("users").find().toArray();
 
-    // Si no hay usuarios, evita errores posteriores
-    if (!usuarios.length) {
-      return res.json({
-        kpis: { total_usuarios: 0, total_negocios: 0, productos_total: 0 },
-        scraping: obtenerScrapingData(),
-        charts: { region: {}, genero: {} },
-        usuarios: [],
-      });
-    }
-
-    // 2️⃣ Asignar valores por defecto para visualización
-    const regionesDisponibles = [
-      "Biobío", "Metropolitana", "Valparaíso", "Araucanía", "Los Lagos", "Maule",
-      "Ñuble", "Coquimbo", "Los Ríos", "O'Higgins"
-    ];
-    const generosDisponibles = ["Masculino", "Femenino", "Otro"];
-
-    usuarios.forEach((u) => {
-      if (!u.region) {
-        u.region = regionesDisponibles[Math.floor(Math.random() * regionesDisponibles.length)];
-      }
-      if (!u.genero) {
-        u.genero = generosDisponibles[Math.floor(Math.random() * generosDisponibles.length)];
-      }
-    });
-
-    // 3️⃣ Contar negocios asociados
-    const totalNegocios = usuarios.reduce((acc, u) => {
-      return acc + (Array.isArray(u.negocios) ? u.negocios.length : 0);
-    }, 0);
-
-    // 4️⃣ Total de productos disponibles
+    // 2️⃣ Productos totales
     let productosTotal = 0;
     try {
       productosTotal = await db.collection("productos").countDocuments();
@@ -76,10 +44,35 @@ router.get("/", async (req, res) => {
       console.warn("⚠️ No se pudo contar productos:", e.message);
     }
 
-    // 5️⃣ Leer datos del último scraping local
+    // 3️⃣ Scraping data
     const scraping = obtenerScrapingData();
 
-    // 6️⃣ Generar distribuciones
+    // ✔ Si no hay usuarios → responder una estructura mínima
+    if (!usuarios.length) {
+      return res.json({
+        kpis: {
+          total_usuarios: 0,
+          total_negocios: 0,
+          productos_total: productosTotal,
+        },
+        scraping,
+        charts: {
+          region: { "Sin datos": 1 },
+          genero: { "Sin datos": 1 },
+        },
+        usuarios: [],
+      });
+    }
+
+    // 4️⃣ Conteo real de negocios (incrustados)
+    const totalNegocios = usuarios.reduce((acc, u) => {
+      if (Array.isArray(u.negocios) && u.negocios.length > 0) {
+        return acc + u.negocios.length;
+      }
+      return acc;
+    }, 0);
+
+    // 5️⃣ Distribución por región
     const distribucionRegion = {};
     const distribucionGenero = { Masculino: 0, Femenino: 0, Otro: 0 };
 
@@ -93,7 +86,7 @@ router.get("/", async (req, res) => {
       else distribucionGenero.Otro++;
     });
 
-    // 7️⃣ Enviar datos consolidados al frontend
+    // 6️⃣ Respuesta final al dashboard
     res.json({
       kpis: {
         total_usuarios: usuarios.length,
@@ -107,25 +100,24 @@ router.get("/", async (req, res) => {
       },
       usuarios,
     });
+
   } catch (err) {
-    console.error("❌ [dashboard] Error general:", err);
+    console.error("❌ Error en /api/dashboard:", err);
     res.status(500).json({ error: "Error interno al cargar dashboard" });
   }
 });
 
-// ----------------------------------------------------
-// 🗂️ GET /api/dashboard/scrape/ultimos → Último scraping guardado
-// ----------------------------------------------------
+// =============================================================
+// 📂 GET /api/dashboard/scrape/ultimos → Último scraping directo
+// =============================================================
 router.get("/scrape/ultimos", (req, res) => {
   try {
     if (fs.existsSync(scrapingFile)) {
-      const data = fs.readFileSync(scrapingFile, "utf-8");
-      res.json(JSON.parse(data));
-    } else {
-      res.json({});
+      return res.json(JSON.parse(fs.readFileSync(scrapingFile, "utf-8")));
     }
+    res.json({});
   } catch (err) {
-    console.error("❌ [dashboard] Error leyendo scraping:", err);
+    console.error("❌ Error leyendo scraping:", err);
     res.status(500).json({ error: "Error al leer archivo de scraping" });
   }
 });

@@ -1,11 +1,22 @@
 // =============================================================
-// ⚙️ CONTROLADOR: Scraping de Supermercados (versión actualizada)
+// ⚙️ CONTROLADOR: Scraping de Supermercados (MongoClient Only)
 // =============================================================
 import { exec } from "child_process";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { getDB } from "../config/db.js"; // ✅ agrega esta línea
+import { getDB } from "../config/db.js"; // ✔ conexión MongoClient correcta
+
+async function logScraping(store, estado) {
+  const db = getDB();
+
+  await db.collection("scraping_logs").insertOne({
+    store,
+    estado,
+    fecha: new Date()
+  });
+}
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,10 +28,8 @@ if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 const scrapingFile = path.join(dataDir, "ultimoScraping.json");
 
 // =============================================================
-// 📘 UTILIDADES
+// 📘 UTILIDADES PARA REGISTROS LOCALES
 // =============================================================
-
-/** 🔹 Lee el archivo local con las fechas y métricas de scraping previas */
 function leerFechas() {
   try {
     if (fs.existsSync(scrapingFile)) {
@@ -32,7 +41,6 @@ function leerFechas() {
   return {};
 }
 
-/** 🔹 Guarda el resultado de un scraping (fecha, nuevos, actualizados, revisados) */
 function guardarScraping(supermercado, { actualizados = 0, nuevos = 0, revisados = 0 }) {
   const data = leerFechas();
 
@@ -63,8 +71,10 @@ function guardarScraping(supermercado, { actualizados = 0, nuevos = 0, revisados
 }
 
 // =============================================================
-// 🚀 FUNCIÓN CENTRAL: Ejecutar scraping con logs en vivo
+// 🚀 EJECUTAR SCRIPT DE SCRAPING
 // =============================================================
+
+
 function ejecutarScraping(nombreScript, io) {
   return new Promise((resolve, reject) => {
     const scriptPath = path.join(__dirname, `../scripts/${nombreScript}-despensa.mjs`);
@@ -77,11 +87,10 @@ function ejecutarScraping(nombreScript, io) {
     }
 
     console.log(`▶ Ejecutando scraping: ${scriptPath}`);
-    
-    // ✅ Enviar mensaje de inicio al cliente
-    io.emit("scrape-progress", { 
-      store: nombreScript, 
-      message: `🚀 Iniciando scraping de ${nombreScript}...` 
+
+    io.emit("scrape-progress", {
+      store: nombreScript,
+      message: `🚀 Iniciando scraping de ${nombreScript}...`,
     });
 
     const proceso = exec(`node "${scriptPath}"`, { cwd: process.cwd() });
@@ -90,22 +99,14 @@ function ejecutarScraping(nombreScript, io) {
     let actualizados = 0;
     let revisados = 0;
 
-    // ✅ Capturar STDOUT línea por línea
     proceso.stdout.on("data", (data) => {
       const msg = data.toString();
-      console.log(msg); // Log en consola del servidor
-      
-      // ✅ Enviar cada línea al cliente web
-      const lineas = msg.split('\n').filter(l => l.trim());
-      lineas.forEach(linea => {
-        // ✅ Enviar con el evento correcto
-        io.emit("scrape-progress", { 
-          store: nombreScript, 
-          message: linea 
-        });
+
+      const lineas = msg.split("\n").filter((l) => l.trim());
+      lineas.forEach((linea) => {
+        io.emit("scrape-progress", { store: nombreScript, message: linea });
       });
 
-      // Detectar conteos en logs
       const match = msg.match(/Nuevos:\s*(\d+).*Actualizados:\s*(\d+).*Revisados.*?:\s*(\d+)/i);
       if (match) {
         nuevos = parseInt(match[1], 10);
@@ -114,101 +115,95 @@ function ejecutarScraping(nombreScript, io) {
       }
     });
 
-    // ✅ Capturar STDERR
     proceso.stderr.on("data", (data) => {
-      const msg = data.toString();
-      console.error(`[${nombreScript} ERROR] ${msg}`);
-      io.emit("scrape-error", { 
-        store: nombreScript, 
-        message: msg 
+      io.emit("scrape-error", {
+        store: nombreScript,
+        message: data.toString(),
       });
     });
 
-    // ✅ Capturar finalización
-    proceso.on("exit", (code) => {
-      const success = code === 0;
-      const mensaje = success 
-        ? `✅ Scraping de ${nombreScript} completado exitosamente` 
-        : `❌ Scraping de ${nombreScript} terminó con código ${code}`;
-      
-      console.log(mensaje);
-      
-      io.emit("scrape-complete", { 
-        store: nombreScript, 
-        success, 
-        message: mensaje 
-      });
+    // =============================================================
+    // 🔥 AHORA ESTA FUNCIÓN ES async → YA PODEMOS USAR await
+    // =============================================================
+    proceso.on("exit", async (code) => {
+  const success = code === 0;
 
-      if (success) {
-        guardarScraping(nombreScript, { nuevos, actualizados, revisados });
-        resolve();
-      } else {
-        reject(new Error(`${nombreScript} terminó con código ${code}`));
-      }
-    });
+  // Emitimos al frontend
+  io.emit("scrape-complete", {
+    store: nombreScript,
+    success,
+    message: success
+      ? `✅ Scraping de ${nombreScript} completado exitosamente`
+      : `❌ Scraping de ${nombreScript} terminó con código ${code}`,
+  });
 
-    // ✅ Capturar errores del proceso
+  // 🟩 REGISTRO COMPATIBLE CON ACTIVIDAD SEMANAL
+  await logScraping(nombreScript, success ? "success" : "fail");
+
+  // Guardado normal
+  if (success) {
+    guardarScraping(nombreScript, { nuevos, actualizados, revisados });
+    return resolve();
+  } else {
+    return reject(new Error(`${nombreScript} terminó con código ${code}`));
+  }
+});
+
     proceso.on("error", (err) => {
-      console.error(`[${nombreScript}] Error al ejecutar proceso:`, err);
-      io.emit("scrape-error", { 
-        store: nombreScript, 
-        message: `Error al ejecutar: ${err.message}` 
+      io.emit("scrape-error", {
+        store: nombreScript,
+        message: `Error al ejecutar: ${err.message}`,
       });
       reject(err);
     });
   });
 }
 
+export default ejecutarScraping;
+
+
 // =============================================================
-// 📡 HANDLERS API
+// 📡 HANDLERS API (Acuenta / Tottus / Jumbo / Unimarc)
 // =============================================================
-export const scrapeAcuenta = async (req, res) => {
-  const io = req.app.get("io");
-  ejecutarScraping("acuenta", io)
+export const scrapeAcuenta = (req, res) =>
+  ejecutarScraping("acuenta", req.app.get("io"))
     .then(() => res.json({ ok: true, message: "Scraping Acuenta iniciado" }))
     .catch((err) => res.status(500).json({ error: err.message }));
-};
 
-export const scrapeTottus = async (req, res) => {
-  const io = req.app.get("io");
-  ejecutarScraping("tottus", io)
+export const scrapeTottus = (req, res) =>
+  ejecutarScraping("tottus", req.app.get("io"))
     .then(() => res.json({ ok: true, message: "Scraping Tottus iniciado" }))
     .catch((err) => res.status(500).json({ error: err.message }));
-};
 
-export const scrapeJumbo = async (req, res) => {
-  const io = req.app.get("io");
-  ejecutarScraping("jumbo", io)
+export const scrapeJumbo = (req, res) =>
+  ejecutarScraping("jumbo", req.app.get("io"))
     .then(() => res.json({ ok: true, message: "Scraping Jumbo iniciado" }))
     .catch((err) => res.status(500).json({ error: err.message }));
-};
 
-export const scrapeUnimarc = async (req, res) => {
-  const io = req.app.get("io");
-  ejecutarScraping("unimarc", io)
+export const scrapeUnimarc = (req, res) =>
+  ejecutarScraping("unimarc", req.app.get("io"))
     .then(() => res.json({ ok: true, message: "Scraping Unimarc iniciado" }))
     .catch((err) => res.status(500).json({ error: err.message }));
-};
 
 // =============================================================
 // 📅 GET /api/scrape/ultimos
 // =============================================================
 export const obtenerUltimosScraping = (req, res) => {
-  const data = leerFechas();
-  res.json(data || {});
+  res.json(leerFechas());
 };
 
-// ===============================================
-// 📅 ACTIVIDAD SEMANAL (profesional, con fechas reales)
-// ===============================================
+// =============================================================
+// 📊 ACTIVIDAD SEMANAL (MongoClient Only)
+// =============================================================
 export async function obtenerActividadSemanal(req, res) {
   try {
     const db = getDB();
 
-    // 🗓️ Calcular semana actual (lunes → domingo)
     const hoy = new Date();
     const primerDia = new Date(hoy);
     primerDia.setDate(hoy.getDate() - ((hoy.getDay() + 6) % 7));
+    primerDia.setHours(0, 0, 0, 0);
+
     const semana = Array.from({ length: 7 }, (_, i) => {
       const d = new Date(primerDia);
       d.setDate(primerDia.getDate() + i);
@@ -216,13 +211,17 @@ export async function obtenerActividadSemanal(req, res) {
       return d;
     });
 
-    const fechasISO = semana.map(d => d.toISOString().split("T")[0]);
+    const fechasISO = semana.map((d) => d.toISOString().split("T")[0]);
     const tiendas = ["unimarc", "tottus", "jumbo", "acuenta"];
-    const actividad = {};
 
-    // 🧠 Si existe colección scraping_logs, la usamos
+    const actividad = {};
+    tiendas.forEach((store) => {
+      actividad[store] = {};
+      fechasISO.forEach((f) => (actividad[store][f] = "fail"));
+    });
+
     const colecciones = await db.listCollections().toArray();
-    const tieneLogs = colecciones.some(c => c.name === "scraping_logs");
+    const tieneLogs = colecciones.some((c) => c.name === "scraping_logs");
 
     if (tieneLogs) {
       const logs = await db
@@ -230,36 +229,40 @@ export async function obtenerActividadSemanal(req, res) {
         .find({ fecha: { $gte: primerDia } })
         .toArray();
 
-      // Inicializar todas las fechas con "fail"
-      tiendas.forEach(store => {
-        actividad[store] = {};
-        fechasISO.forEach(f => (actividad[store][f] = "fail"));
-      });
-
-      // Marcar los días donde hay scraping exitoso
-      logs.forEach(log => {
-        const fecha = new Date(log.fecha);
-        const fechaISO = fecha.toISOString().split("T")[0];
+      logs.forEach((log) => {
+        const fechaISO = new Date(log.fecha).toISOString().split("T")[0];
         if (actividad[log.store] && actividad[log.store][fechaISO] !== undefined) {
           actividad[log.store][fechaISO] = "success";
         }
       });
-
-      console.log("🟢 Datos enviados desde MongoDB (scraping_logs)");
-      return res.json({ actividad });
     }
 
-    // 🟡 Si no hay colección, devolver todo en rojo
-    tiendas.forEach(store => {
-      actividad[store] = {};
-      fechasISO.forEach(f => (actividad[store][f] = "fail"));
-    });
-
-    console.log("🟡 No hay datos, enviando todo en rojo");
-    return res.json({ actividad });
-
+    res.json({ actividad });
   } catch (err) {
     console.error("❌ Error en obtenerActividadSemanal:", err);
-    return res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 }
+// ===============================================
+// 📌 REGISTRAR ESTADO DEL SCRAPING PARA LA TABLA SEMANAL
+// ===============================================
+export const registrarEstadoScraping = async (req, res) => {
+  try {
+    const { tienda, estado } = req.body;
+
+    // Convertir día actual (0 Domingo → 6, Lunes → 0)
+    const day = (new Date().getDay() + 6) % 7;
+
+    let registro = await ScrapingSemana.findOne({ tienda });
+    if (!registro) {
+      registro = new ScrapingSemana({ tienda });
+    }
+
+    registro.semana[day] = estado;
+    await registro.save();
+
+    res.json({ ok: true, semana: registro.semana });
+  } catch (error) {
+    res.json({ ok: false, error: error.message });
+  }
+};

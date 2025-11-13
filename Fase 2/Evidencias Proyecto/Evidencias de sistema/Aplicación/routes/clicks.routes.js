@@ -15,15 +15,16 @@ router.post("/registrar", async (req, res) => {
     const db = getDB();
     const { producto } = req.body;
 
-    // 🧩 Validar datos mínimos
+    // 🧩 Validación mínima
     if (!producto || !producto.idProducto) {
       return res.status(400).json({ error: "Faltan datos esenciales del producto." });
     }
 
-    // ---------------------------------------------
-    // 💰 Normalización de precio
-    // ---------------------------------------------
+    // =============================================
+    // 💰 NORMALIZACIÓN DEL PRECIO
+    // =============================================
     let precioFinal = 0;
+
     if (typeof producto.precio === "number" && !isNaN(producto.precio)) {
       precioFinal = producto.precio;
     } else if (typeof producto.precio === "string") {
@@ -31,12 +32,16 @@ router.post("/registrar", async (req, res) => {
       precioFinal = parseFloat(limpio) || 0;
     }
 
-    // Si falta info, la buscamos en la colección productos
+    // Normalización del precio por unidad
     let pricePerUnit = producto.pricePerUnit || null;
+
+    // =============================================
+    // 🔍 BUSCAR DATOS EN DB SI FALTAN
+    // =============================================
     if (!precioFinal || precioFinal === 0 || !pricePerUnit) {
       let prodDB = null;
 
-      // Buscar por ID si es válido
+      // Buscar por ID
       if (ObjectId.isValid(producto.idProducto)) {
         prodDB = await db
           .collection("productos")
@@ -46,7 +51,7 @@ router.post("/registrar", async (req, res) => {
           );
       }
 
-      // Buscar por link si no existe el ID
+      // Buscar por link en caso de fallback
       if (!prodDB && producto.link) {
         prodDB = await db
           .collection("productos")
@@ -57,22 +62,22 @@ router.post("/registrar", async (req, res) => {
       }
 
       if (prodDB) {
-        if (prodDB.currentPrice) precioFinal = Number(prodDB.currentPrice) || 0;
-        if (prodDB.pricePerUnit) pricePerUnit = prodDB.pricePerUnit;
+        precioFinal = Number(prodDB.currentPrice) || precioFinal;
+        pricePerUnit = prodDB.pricePerUnit || pricePerUnit;
       }
     }
 
-    // ---------------------------------------------
-    // 👤 Información del usuario (si tiene sesión)
-    // ---------------------------------------------
+    // =============================================
+    // 👤 INFORMACIÓN DEL USUARIO (SI TIENE SESIÓN)
+    // =============================================
     const sesion = req.session?.user || null;
     let userData = null;
 
     if (sesion?.correo) {
-      userData = await db.collection("users").findOne({ correo: sesion.correo });
+      userData = await db.collection("usuarios").findOne({ correo: sesion.correo });
     }
 
-    // Calcular edad si tiene fecha de nacimiento
+    // ✓ Cálculo de edad si existe fecha de nacimiento
     let edadCalculada = null;
     if (userData?.fechaNacimiento) {
       const nacimiento = new Date(userData.fechaNacimiento);
@@ -82,11 +87,13 @@ router.post("/registrar", async (req, res) => {
       if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) edadCalculada--;
     }
 
-    // ---------------------------------------------
-    // 🕒 Estructura final del documento
-    // ---------------------------------------------
+    // =============================================
+    // 🗂️ DOCUMENTO FINAL A GUARDAR
+    // =============================================
     const now = new Date();
+
     const clickDoc = {
+      // 🛒 Producto
       idProducto: producto.idProducto,
       titulo: producto.titulo || "",
       marca: producto.marca || "",
@@ -96,7 +103,7 @@ router.post("/registrar", async (req, res) => {
       link: producto.link || "",
       imagen: producto.imagen || "",
 
-      // 👤 Datos del usuario
+      // 👤 Información del usuario
       userId: userData?._id?.toString() || sesion?.id || null,
       userCorreo: userData?.correo || sesion?.correo || "anonimo@local.cl",
       userNombre: userData?.nombre || null,
@@ -108,19 +115,21 @@ router.post("/registrar", async (req, res) => {
       userEdad: edadCalculada,
       negocios: userData?.negocios || [],
 
-      // 📅 Fechas
+      // 🕒 Fecha
       createdAt: now,
       fecha: now,
 
-      // ⚙️ Datos técnicos
+      // ⚙️ Técnicos
       ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress || null,
       ua: req.headers["user-agent"] || null,
     };
 
-    // Guardar click en Mongo
+    // =============================================
+    // 💾 GUARDAR CLICK
+    // =============================================
     await db.collection("clicks").insertOne(clickDoc);
 
-    console.log(`🟢 Click guardado: ${clickDoc.titulo} (${clickDoc.supermercado})`);
+    console.log(`🟢 Click registrado: ${clickDoc.titulo} (${clickDoc.supermercado})`);
 
     return res.json({
       ok: true,
@@ -135,11 +144,12 @@ router.post("/registrar", async (req, res) => {
 });
 
 // =============================================
-// 📊 (Opcional) Obtener últimos clicks
+// 📊 OBTENER ÚLTIMOS CLICKS
 // =============================================
 router.get("/ultimos", async (req, res) => {
   try {
     const db = getDB();
+
     const clicks = await db
       .collection("clicks")
       .find()

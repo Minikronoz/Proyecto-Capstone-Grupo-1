@@ -1,5 +1,5 @@
 // ==============================================
-// 📁 routes/catalogo.js
+// 📁 routes/catalogo.js — versión MongoClient final
 // ==============================================
 import express from "express";
 import { getDB } from "../config/db.js";
@@ -7,25 +7,27 @@ import { getDB } from "../config/db.js";
 const router = express.Router();
 
 // -------------------------------------------------------------
-// 🔍 1️⃣ Sugerencias de productos (para el autocompletado)
+// 🔍 1️⃣ Sugerencias de productos (autocompletado)
 // -------------------------------------------------------------
 router.get("/sugerencias", async (req, res) => {
   try {
     const q = (req.query.q || "").trim();
-    if (!q || q.length < 2) return res.json([]);
+    if (q.length < 2) return res.json([]);
 
     const db = getDB();
 
-    // Buscar solo en títulos, ignorando mayúsculas/minúsculas
+    // Regex seguro (evita inyecciones y mal rendimiento)
+    const regex = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+
     const productos = await db
       .collection("productos")
-      .find({ title: { $regex: q, $options: "i" } })
+      .find({ title: regex })
       .project({ title: 1 })
       .limit(8)
       .toArray();
 
-    // Evita duplicados (algunos productos pueden tener el mismo nombre)
     const titulosUnicos = [...new Set(productos.map((p) => p.title))];
+
     res.json(titulosUnicos);
   } catch (err) {
     console.error("❌ [catalogo] Error en /sugerencias:", err);
@@ -43,11 +45,12 @@ router.get("/", async (req, res) => {
 
     // Filtro dinámico
     let filtro = {};
-    if (q && q.length >= 2) {
-      filtro = { title: { $regex: q, $options: "i" } };
+
+    if (q.length >= 2) {
+      const regex = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+      filtro = { title: regex };
     }
 
-    // Campos que se devuelven al frontend
     const proyeccion = {
       _id: 1,
       title: 1,
@@ -67,7 +70,7 @@ router.get("/", async (req, res) => {
       .collection("productos")
       .find(filtro)
       .project(proyeccion)
-      .sort({ lastUpdate: -1 })
+      .sort({ lastUpdate: -1 }) // Más recientes primero
       .limit(400)
       .toArray();
 
@@ -79,17 +82,9 @@ router.get("/", async (req, res) => {
 });
 
 // -------------------------------------------------------------
-// 🧠 3️⃣ Sugerencia: Crear índice si no existe (opcional)
+// 🧠 Eliminado: índice duplicado
 // -------------------------------------------------------------
-// Esto mejora el rendimiento de las búsquedas por título
-(async () => {
-  try {
-    const db = getDB();
-    await db.collection("productos").createIndex({ title: "text" });
-    console.log("⚙️ Índice de texto creado en 'productos.title'");
-  } catch (err) {
-    console.warn("⚠️ No se pudo crear índice de texto:", err.message);
-  }
-})();
+// Ya no se crea aquí porque index.js lo crea al iniciar.
+// Mantener aquí causaba warnings y posibles errores en primera carga.
 
 export default router;

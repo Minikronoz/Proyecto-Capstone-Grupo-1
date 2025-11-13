@@ -48,3 +48,16 @@ export function verificarSesionUsuario(req, res, next) {
     res.status(500).send("Error interno al validar sesión.");
   }
 }
+// En auth.routes.js o similar
+router.get("/yo", (req, res) => {
+  if (!req.session || !req.session.user) {
+    return res.json({ ok: false });
+  }
+
+  res.json({
+    ok: true,
+    user: req.session.user
+  });
+});
+
+export default verificarSesionUsuario;

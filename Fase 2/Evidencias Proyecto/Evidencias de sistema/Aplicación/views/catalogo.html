@@ -89,14 +89,13 @@
 </head>
 
 <body>
-  <!-- 🔹 Barra superior -->
-  <div class="barra-superior">
+<div class="barra-superior" id="barra-superior">
     <a href="/dashboard" class="logo-dash">🟢 DashUser</a>
     <nav>
       <a href="/editar-perfil">👤 Editar mis datos</a>
       <a href="/login" class="logout-btn">🚪 Cerrar sesión</a>
     </nav>
-  </div>
+</div>
 
   <!-- 🔹 Fecha -->
   <div class="ultima-actualizacion" id="fecha-actualizacion">
@@ -261,6 +260,56 @@
 
   // ✅ Primera verificación al cargar
   document.addEventListener("DOMContentLoaded", verificarSesion);
+
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const res = await fetch("/api/auth/yo");
+    const data = await res.json();
+
+    const barra = document.getElementById("barra-superior");
+
+    // ❌ Si NO está logueado → ocultar la barra
+    if (!data.ok) {
+      barra.style.display = "none";
+      return;
+    }
+
+    // ✅ Si está logueado → mostrar (igual por si se ocultó en otra página)
+    barra.style.display = "flex";
+
+  } catch (error) {
+    console.error("Error verificando sesión", error);
+  }
+});
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const popup = document.getElementById("popupRegistro");
+
+  try {
+    const res = await fetch("/api/auth/yo");
+    const data = await res.json();
+
+    // ✔️ Si el usuario está logueado → ocultar popup y salir
+    if (data.ok) {
+      popup.style.display = "none";
+      return;
+    }
+
+    // ❌ Si NO está logueado → mostrar popup automáticamente
+    popup.classList.remove("oculto");
+
+  } catch (error) {
+    console.error("Error verificando sesión:", error);
+  }
+});
+
+// Opción para el botón "Omitir"
+function omitirPopup() {
+  const popup = document.getElementById("popupRegistro");
+  popup.style.display = "none";
+}
+
+
 </script>
 
 </body>

@@ -1,275 +1,535 @@
 // =============================================================
-// 📊 DASHBOARD PRINCIPAL — Versión Atlas Limpia
+// 📌 CONFIG GLOBAL
 // =============================================================
+const API = "/api";
+const socket = io();
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const getEl = (id) => document.getElementById(id);
-  const fmt = (n) => (n != null ? n.toLocaleString("es-CL") : "—");
+// =============================================================
+// 🔌 Estado backend
+// =============================================================
+socket.on("connect", () => {
+  const estado = document.getElementById("estado-backend");
+  estado.textContent = "API Online";
+  estado.classList.remove("badge--error");
+  estado.classList.add("badge--ok");
+});
+
+socket.on("disconnect", () => {
+  const estado = document.getElementById("estado-backend");
+  estado.textContent = "Sin conexión";
+  estado.classList.remove("badge--ok");
+  estado.classList.add("badge--error");
+});
+
+// =============================================================
+// 📝 LOGS SCRAPING
+// =============================================================
+function appendLog(store, message, type = "info") {
+  const log = document.querySelector(`#log-${store} .log-output`);
+  if (!log) return;
+
+  if (log.textContent.includes("Esperando ejecución")) {
+    log.innerHTML = "";
+  }
+
+  const line = document.createElement("div");
+  line.classList.add("log-line");
+
+  if (type === "error") line.classList.add("log-error");
+  if (type === "success") line.classList.add("log-success");
+  if (type === "warning") line.classList.add("log-warning");
+
+  line.textContent = message;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+
+function limpiarLog(store) {
+  const log = document.querySelector(`#log-${store} .log-output`);
+  if (log) log.innerHTML = "Esperando ejecución...";
+}
+
+// Eventos Socket.io
+socket.on("scrape-progress", (d) => appendLog(d.store, d.message));
+socket.on("scrape-error", (d) => appendLog(d.store, d.message, "error"));
+
+socket.on("scrape-complete", (d) => {
+  appendLog(
+    d.store,
+    d.success ? "Scraping completado" : "Scraping falló",
+    d.success ? "success" : "error"
+  );
+
+  // ❗ Solo actualizamos datos, NO redibujamos los gráficos aquí
+  cargarDatosDashboard();
+});
+
+// =============================================================
+// 🚀 Ejecutar Scraping
+// =============================================================
+async function ejecutarScraping(store) {
+  limpiarLog(store);
+  appendLog(store, `Iniciando scraping de ${store}...`);
 
   try {
-    const res = await fetch("/api/dashboard");
+    const resp = await fetch(`${API}/scrape/${store}`, { method: "POST" });
+    if (!resp.ok) throw new Error("No se pudo iniciar scraping");
+  } catch (err) {
+    appendLog(store, err.message, "error");
+  }
+}
+
+// =============================================================
+// 📊 DASHBOARD PRINCIPAL — KPIS + GRÁFICOS
+// =============================================================
+async function cargarDatosDashboard() {
+  try {
+    const res = await fetch(`${API}/dashboard`);
     const data = await res.json();
 
-    // =============================
-    // 🔹 KPIs PRINCIPALES
-    // =============================
-    const kpis = data.kpis || {};
-    getEl("totalUsuarios").textContent = fmt(kpis.total_usuarios);
-    getEl("totalNegocios").textContent = fmt(kpis.total_negocios);
-    getEl("totalProductos").textContent = fmt(kpis.productos_total);
+    // KPIs
+    document.getElementById("kpi-productos").textContent =
+      data.kpis?.productos_total ?? "—";
+    document.getElementById("kpi-usuarios").textContent =
+      data.kpis?.total_usuarios ?? "—";
+    document.getElementById("kpi-negocios").textContent =
+      data.kpis?.total_negocios ?? "—";
 
-    // 🕒 Último scraping
-    const scrapingData = kpis.scraping || {};
-    const ultimo = Object.entries(scrapingData)
-      .map(([supermercado, info]) => ({
-        supermercado,
-        fecha: info?.fecha ? new Date(info.fecha) : null,
-      }))
-      .filter((x) => x.fecha)
-      .sort((a, b) => b.fecha - a.fecha)[0];
+    // Último scraping
+    const cont = document.getElementById("kpi-ultimo-scraping");
+    cont.innerHTML = Object.entries(data.scraping || {})
+      .map(
+        ([store, s]) => `
+        <div class="item-card">
+          <h4>${store.toUpperCase()}</h4>
+          <div class="datos">
+            <span>${s.fechaLocal || s.fecha}</span>
+            <span>${s.nuevos} nuevos</span>
+            <span>${s.actualizados} actualizados</span>
+          </div>
+        </div>
+      `
+      )
+      .join("");
 
-    getEl("ultimoScraping").textContent = ultimo
-      ? `${ultimo.supermercado.toUpperCase()} (${ultimo.fecha.toLocaleString("es-CL", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        })})`
-      : "—";
+    // Dibujar gráficos (solo aquí)
+    renderGraficosDashboard(data.charts || {});
+  } catch (err) {
+    console.error("Error dashboard:", err);
+  }
+}
 
-    // =============================
-    // 🎨 CONFIGURACIÓN GLOBAL CHART.JS
-    // =============================
-    Chart.defaults.font.family = "'Poppins','Segoe UI',sans-serif";
-    Chart.defaults.font.size = 13;
-    Chart.defaults.color = "#334155";
-    Chart.defaults.plugins.legend.labels.boxWidth = 14;
+// =============================================================
+// 📊 Gráficos
+// =============================================================
+function renderGraficosDashboard(charts) {
+  // Destruir gráficos previos
+  if (window.graficoRegiones) window.graficoRegiones.destroy();
+  if (window.graficoGenero) window.graficoGenero.destroy();
 
-    const palette = [
-      "#00A7B5", "#009FB0", "#007E8C", "#5BC0BE",
-      "#C5E4E7", "#64748B", "#94A3B8", "#CBD5E1"
-    ];
+  const reg = charts.region || {};
+  const gen = charts.genero || {};
 
-    // Cargar visualizaciones
-    await Promise.all([
-      cargarIndiceCompetitividad(),
-      cargarRankingProductosNuevos(),
-      cargarCruceGeneroRegion(),
-      cargarUsuariosNuevosRecurrentes(),
-      cargarBusquedasPorRegion()
-    ]);
+  // REGIONES
+  const ctxR = document.getElementById("chartRegiones");
+  if (ctxR && Object.keys(reg).length) {
+    window.graficoRegiones = new Chart(ctxR, {
+      type: "bar",
+      data: {
+        labels: Object.keys(reg),
+        datasets: [
+          {
+            data: Object.values(reg),
+            backgroundColor: "#00A7B5AA",
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        animation: false, // ❗ evita rebote visual
+        maintainAspectRatio: false,
+      },
+    });
+  }
 
-    // Render regiones y género
-    renderPorRegion(data.charts?.region, palette);
-    renderPorGenero(data.charts?.genero);
+  // GENERO
+  const ctxG = document.getElementById("chartGenero");
+  if (ctxG && Object.keys(gen).length) {
+    window.graficoGenero = new Chart(ctxG, {
+      type: "doughnut",
+      data: {
+        labels: Object.keys(gen),
+        datasets: [
+          {
+            data: Object.values(gen),
+            backgroundColor: ["#00A7B5", "#71C562", "#004D61"],
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        cutout: "45%",
+        animation: false, // ❗ evita rebote visual
+        maintainAspectRatio: false,
+      },
+    });
+  }
+}
+
+// =============================================================
+// 🗓 ACTIVIDAD SEMANAL
+// =============================================================
+async function cargarActividadSemanal() {
+  const cont = document.getElementById("tablaScrapingSemanal");
+  cont.innerHTML = "Cargando...";
+
+  try {
+    console.log("➡️ Ejecutando cargarActividadSemanal()");
+
+    const res = await fetch("/api/scrape/actividad-semanal");
+
+    console.log("📡 Status:", res.status);
+
+    const json = await res.json();
+
+    console.log("📦 Datos recibidos:", json);
+
+    if (!json.actividad) {
+      console.error("❌ No existe json.actividad");
+      cont.innerHTML = "Error cargando actividad";
+      return;
+    }
+
+    const actividad = json.actividad;
+    const stores = ["unimarc", "tottus", "jumbo", "acuenta"];
+    const hoy = new Date();
+    const inicio = new Date(hoy);
+    inicio.setDate(hoy.getDate() - ((hoy.getDay() + 6) % 7));
+
+    console.log("📅 Inicio de semana:", inicio);
+
+    const dias = [...Array(7)].map((_, i) => {
+      const d = new Date(inicio);
+      d.setDate(inicio.getDate() + i);
+      return d.toISOString().split("T")[0];
+    });
+
+    console.log("🗓️ Días generados:", dias);
+
+    let html = `
+      <table>
+        <thead>
+          <tr><th>Store</th>${dias.map(d => `<th>${d}</th>`).join("")}</tr>
+        </thead>
+        <tbody>
+    `;
+
+    stores.forEach(store => {
+      html += `<tr><td>${store}</td>`;
+      dias.forEach(d => {
+        const st = actividad?.[store]?.[d] || "fail";
+        const icon = st === "success" ? "✔️" : st === "warning" ? "⚠️" : "❌";
+        html += `<td>${icon}</td>`;
+      });
+      html += `</tr>`;
+    });
+
+    html += `</tbody></table>`;
+
+    console.log("🧱 Tabla generada OK");
+
+    cont.innerHTML = html;
 
   } catch (err) {
-    console.error("❌ Error cargando dashboard:", err);
-    const errBox = document.createElement("div");
-    errBox.className = "error-msg";
-    errBox.textContent = "Error al cargar el Dashboard. Intente nuevamente.";
-    document.body.appendChild(errBox);
+    console.error("❌ Error en cargarActividadSemanal:", err);
+    cont.innerHTML = "Error cargando actividad";
   }
+}
+
+
+// =============================================================
+// 👤 USUARIOS
+// =============================================================
+async function cargarUsuarios() {
+  const tbody = document.getElementById("usuariosBody");
+  tbody.innerHTML = "<tr><td colspan='7'>Cargando usuarios...</td></tr>";
+
+  try {
+    const res = await fetch("/api/usuarios");
+    const usuarios = await res.json();
+
+    renderUsuarios(usuarios);
+
+  } catch (err) {
+    console.error("Error:", err);
+    tbody.innerHTML = "<tr><td colspan='7'>Error al cargar usuarios</td></tr>";
+  }
+}
+
+
+
+
+
+function renderUsuarios(lista) {
+  const tbody = document.getElementById("usuariosBody");
+  tbody.innerHTML = "";
+
+  lista.forEach((u) => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${u.nombre} ${u.apellido || ""}</td>
+        <td>${u.correo}</td>
+        <td>${u.genero || "-"}</td>
+        <td>${u.region || "-"}</td>
+        <td>${u.comuna || "-"}</td>
+        <td>${Array.isArray(u.negocios) ? u.negocios.length : 0}</td>
+        <td>
+          <button onclick="editarUsuario('${u._id}')">✏️</button>
+          <button onclick="eliminarUsuarioDef('${u._id}')">🗑️</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+
+
+
+
+async function editarUsuario(id) {
+  console.log("🔥 FUNCION EDITAR USUARIO LLAMADA | ID =", id);
+
+
+  try {
+    const res = await fetch(`/api/usuarios/${id}`);
+
+    if (!res.ok) {
+      console.error("❌ Error HTTP al obtener usuario:", res.status);
+      alert("No se pudo cargar el usuario");
+      return;
+    }
+
+    const u = await res.json();
+    console.log("📦 Usuario cargado:", u);
+
+    document.getElementById("editId").value = u._id;
+    document.getElementById("editNombre").value = u.nombre || "";
+    document.getElementById("editApellido").value = u.apellido || "";
+    document.getElementById("editRut").value = u.rut || "";
+    document.getElementById("editFechaNacimiento").value =
+      u.fechaNacimiento ? u.fechaNacimiento.split("T")[0] : "";
+    document.getElementById("editEdad").value = u.edad || "";
+    document.getElementById("editGenero").value = u.genero || "";
+    document.getElementById("editRegion").value = u.region || "";
+    document.getElementById("editComuna").value = u.comuna || "";
+    document.getElementById("editSector").value = u.sector || "";
+    document.getElementById("editCorreo").value = u.correo || "";
+    document.getElementById("editRole").value = u.role || "usuario";
+    document.getElementById("editTieneNegocio").value =
+      u.tieneNegocio ? "true" : "false";
+
+    document.getElementById("modalEditarUsuario").classList.remove("oculto");
+  } catch (err) {
+    console.error("❌ Error en editarUsuario:", err);
+    alert("Error cargando usuario");
+  }
+}
+
+
+
+function cerrarModal() {
+  document.getElementById("modalEditarUsuario").classList.add("oculto");
+}
+
+// =============================================================
+// 🏪 NEGOCIOS
+// =============================================================
+async function cargarNegocios() {
+  const tbody = document.getElementById("negociosBody");
+  tbody.innerHTML = "<tr><td colspan='7'>Cargando...</td></tr>";
+
+  try {
+    const res = await fetch(`${API}/negocios-con-duenio`);
+    const negocios = await res.json();
+
+    if (!negocios.length) {
+      tbody.innerHTML =
+        "<tr><td colspan='7'>No hay negocios registrados.</td></tr>";
+      return;
+    }
+
+    tbody.innerHTML = negocios
+      .map(
+        (n) => `
+        <tr>
+          <td>${n.nombre}</td>
+          <td>${n.giro}</td>
+          <td>${n.comuna || "—"}</td>
+          <td>${n.sector || "—"}</td>
+          <td>${n.duenioNombre}</td>
+          <td>${n.duenioCorreo}</td>
+          <td>
+            <button onclick="editarNegocio('${n._id}')">✏️</button>
+            <button onclick="eliminarNegocio('${n._id}')">🗑️</button>
+          </td>
+        </tr>
+      `
+      )
+      .join("");
+  } catch (err) {
+    tbody.innerHTML =
+      "<tr><td colspan='7'>Error cargando negocios</td></tr>";
+  }
+}
+
+
+async function guardarUsuario(e) {
+  e.preventDefault();
+
+  const id = document.getElementById("editId").value;
+
+  const data = {
+    nombre: document.getElementById("editNombre").value,
+    apellido: document.getElementById("editApellido").value,
+    rut: document.getElementById("editRut").value,
+    fechaNacimiento: document.getElementById("editFechaNacimiento").value,
+    edad: Number(document.getElementById("editEdad").value),
+    genero: document.getElementById("editGenero").value,
+    region: document.getElementById("editRegion").value,
+    comuna: document.getElementById("editComuna").value,
+    sector: document.getElementById("editSector").value,
+    correo: document.getElementById("editCorreo").value,
+    role: document.getElementById("editRole").value,
+    tieneNegocio: document.getElementById("editTieneNegocio").value === "true",
+  };
+
+  const res = await fetch(`/api/usuarios/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  const resp = await res.json();
+
+  if (!resp.ok) {
+    alert("Error al actualizar usuario");
+    return;
+  }
+
+  cerrarModal();
+  cargarUsuarios();
+}
+
+
+
+async function eliminarUsuarioDef(id) {
+  if (!confirm("¿Seguro que deseas eliminar este usuario?")) return;
+
+  const res = await fetch(`/api/usuarios/${id}`, { method: "DELETE" });
+  const data = await res.json();
+
+  if (data.ok) {
+    cargarUsuarios();
+  } else {
+    alert("No se pudo eliminar el usuario");
+  }
+}
+
+
+
+async function editarNegocio(id) {
+  try {
+    const res = await fetch(`${API}/negocios-con-duenio`);
+    const negocios = await res.json();
+
+    const negocio = negocios.find((n) => n._id === id);
+    if (!negocio) return alert("No se encontró el negocio.");
+
+    document.getElementById("negocioId").value = negocio._id;
+    document.getElementById("negocioNombre").value = negocio.nombre;
+    document.getElementById("negocioGiro").value = negocio.giro;
+    document.getElementById("negocioComuna").value = negocio.comuna;
+    document.getElementById("negocioSector").value = negocio.sector;
+
+    document.getElementById("modalEditarNegocio").classList.remove("oculto");
+  } catch (err) {
+    console.error("Error al cargar negocio:", err);
+  }
+}
+
+async function guardarNegocio() {
+  const id = document.getElementById("negocioId").value;
+
+  const nombre = document.getElementById("negocioNombre").value.trim();
+  const giro = document.getElementById("negocioGiro").value.trim();
+  const comuna = document.getElementById("negocioComuna").value.trim();
+  const sector = document.getElementById("negocioSector").value.trim();
+
+  try {
+    const res = await fetch(`${API}/negocios/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nombre, giro, comuna, sector }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Error al actualizar");
+
+    alert("Negocio actualizado correctamente.");
+    cerrarModalNegocio();
+    cargarNegocios();
+  } catch (err) {
+    alert("❌ Error: " + err.message);
+  }
+}
+
+function cerrarModalNegocio() {
+  document.getElementById("modalEditarNegocio").classList.add("oculto");
+}
+
+// =============================================================
+// 🚀 Navegación
+// =============================================================
+document.querySelectorAll(".nav__item").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const target = btn.getAttribute("data-target");
+
+    document.querySelectorAll(".nav__item").forEach((b) =>
+      b.classList.remove("active")
+    );
+    btn.classList.add("active");
+
+    document.querySelectorAll(".seccion").forEach((sec) => {
+      sec.classList.remove("activa");
+      if (sec.id === target) sec.classList.add("activa");
+    });
+
+    if (target === "dashboard") {
+      cargarDatosDashboard();
+      cargarActividadSemanal();
+    }
+
+    if (target === "usuarios") cargarUsuarios();
+    if (target === "negocios") cargarNegocios();
+  });
 });
-// 💰 Índice de competitividad de precios
-async function cargarIndiceCompetitividad() {
-  const res = await fetch("/api/estadisticas/indice-competitividad");
-  const data = await res.json();
 
-  const labels = data.map(d => d._id);
-  const valores = data.map(d => d.promedio.toFixed(2));
 
-  new Chart(document.getElementById("indiceCompetitividad"), {
-    type: "bar",
-    data: {
-      labels,
-      datasets: [{
-        label: "Precio promedio (menor = más competitivo)",
-        data: valores,
-        backgroundColor: "#00A7B5",
-        borderRadius: 8
-      }]
-    },
-    options: { responsive: true, scales: { y: { beginAtZero: true } } }
-  });
-}
+document.getElementById("formEditarUsuario").addEventListener("submit", guardarUsuario);
+// =============================================================
+// 🚀 Inicialización REAL
+// =============================================================
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("formEditarUsuario");
+  if (form) {
+    form.addEventListener("submit", guardarUsuario);
+  }
 
-// 👥 Usuarios nuevos vs recurrentes
-async function cargarUsuariosNuevosRecurrentes() {
-  const res = await fetch("/api/estadisticas/usuarios-nuevos-recurrentes");
-  const data = await res.json();
+  cargarDatosDashboard();
+  cargarActividadSemanal();
 
-  new Chart(document.getElementById("usuariosNuevosRecurrentes"), {
-    type: "pie",
-    data: {
-      labels: ["Nuevos", "Recurrentes"],
-      datasets: [{
-        data: [data.nuevos, data.recurrentes],
-        backgroundColor: ["#00A7B5", "#CBD5E1"]
-      }]
-    },
-    options: { responsive: true }
-  });
-}
-
-// 🗺️ Búsquedas por región
-async function cargarBusquedasPorRegion() {
-  const res = await fetch("/api/estadisticas/busquedas-por-region");
-  const data = await res.json();
-
-  const labels = data.map(d => d._id);
-  const valores = data.map(d => d.total);
-
-  new Chart(document.getElementById("chartBusquedasRegion"), {
-    type: "bar",
-    data: {
-      labels,
-      datasets: [{
-        label: "Total de búsquedas",
-        data: valores,
-        backgroundColor: "#74b9ff"
-      }]
-    },
-    options: { responsive: true, scales: { y: { beginAtZero: true } } }
-  });
-}
-// 🏪 Ranking de supermercados por productos nuevos
-async function cargarRankingProductosNuevos() {
-  const res = await fetch("/api/estadisticas/ranking-productos-nuevos");
-  const data = await res.json();
-
-  const labels = data.map(d => d._id);
-  const valores = data.map(d => d.total);
-
-  new Chart(document.getElementById("rankingProductosNuevos"), {
-    type: "bar",
-    data: {
-      labels,
-      datasets: [{
-        label: "Productos nuevos (últimos 30 días)",
-        data: valores,
-        backgroundColor: "#5BC0BE",
-        borderRadius: 8
-      }]
-    },
-    options: { responsive: true, scales: { y: { beginAtZero: true } } }
-  });
-}
-
-// 🌎 Cruce entre género y región
-async function cargarCruceGeneroRegion() {
-  const res = await fetch("/api/estadisticas/cruce-genero-region");
-  const data = await res.json();
-
-  const regiones = [...new Set(data.map(d => d.region))];
-  const generos = [...new Set(data.map(d => d.genero))];
-
-  const datasets = generos.map(g => ({
-    label: g || "Sin género",
-    data: regiones.map(r => {
-      const item = data.find(d => d.region === r && d.genero === g);
-      return item ? item.total : 0;
-    }),
-    borderWidth: 1,
-  }));
-
-  new Chart(document.getElementById("cruceGeneroRegion"), {
-    type: "bar",
-    data: { labels: regiones, datasets },
-    options: { responsive: true, scales: { y: { beginAtZero: true } } }
-  });
-}
-// ============================
-// 🌎 Distribución por región
-// ============================
-function renderPorRegion(regionData, palette) {
-  const ctx = document.getElementById("porRegion")?.getContext("2d");
-  if (!regionData || !ctx) return;
-
-  new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: Object.keys(regionData),
-      datasets: [{
-        label: "Usuarios por Región",
-        data: Object.values(regionData),
-        backgroundColor: palette.map((c, i) => palette[i % palette.length] + "CC"),
-        borderRadius: 8,
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: { beginAtZero: true, grid: { color: "#E5E7EB" }, ticks: { stepSize: 1 } },
-        x: { grid: { color: "transparent" } }
-      },
-      plugins: {
-        legend: { display: false },
-        title: {
-          display: true,
-          text: "Distribución de usuarios por región",
-          color: "#1E293B",
-          font: { size: 16, weight: "bold" },
-        },
-        tooltip: {
-          backgroundColor: "#1E293B",
-          titleColor: "#fff",
-          bodyColor: "#fff",
-          padding: 10,
-          cornerRadius: 6,
-          callbacks: {
-            label: (ctx) => ` ${ctx.label}: ${ctx.formattedValue} usuarios`
-          }
-        }
-      }
-    }
-  });
-}
-
-// ============================
-// 👥 Distribución por género
-// ============================
-function renderPorGenero(generoData) {
-  const ctx = document.getElementById("porGenero")?.getContext("2d");
-  if (!generoData || !ctx) return;
-
-  new Chart(ctx, {
-    type: "doughnut",
-    data: {
-      labels: Object.keys(generoData),
-      datasets: [{
-        label: "Usuarios por género",
-        data: Object.values(generoData),
-        backgroundColor: ["#00A7B5", "#8EC9D0", "#D1D5DB"],
-        borderColor: "#FFFFFF",
-        borderWidth: 2,
-        hoverOffset: 10,
-      }]
-    },
-    options: {
-      cutout: "65%",
-      plugins: {
-        legend: {
-          position: "bottom",
-          labels: { padding: 16, color: "#1E293B", font: { size: 14 } }
-        },
-        title: {
-          display: true,
-          text: "Distribución de usuarios por género",
-          color: "#1E293B",
-          font: { size: 16, weight: "bold" },
-          padding: { bottom: 10 },
-        },
-        tooltip: {
-          backgroundColor: "#1E293B",
-          titleColor: "#fff",
-          bodyColor: "#fff",
-          callbacks: {
-            label: (ctx) => `${ctx.label}: ${ctx.formattedValue} usuarios`
-          }
-        }
-      }
-    }
-  });
-}
+window.editarUsuario = editarUsuario;
+window.eliminarUsuarioDef = eliminarUsuarioDef;
+window.guardarUsuario = guardarUsuario;
+window.cerrarModal = cerrarModal;
+});

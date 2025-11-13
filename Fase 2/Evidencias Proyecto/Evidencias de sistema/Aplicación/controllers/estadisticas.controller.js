@@ -238,6 +238,62 @@ export const productosCrecimiento = async (req, res) => {
     res.status(500).json({ error: "Error al calcular productos con mayor crecimiento" });
   }
 };
+
+
+// controllers/estadisticas.controller.js
+
+
+/** 📉 Productos con baja de precio (últimos 7 días) */
+export async function obtenerBajasDePrecio(req, res) {
+  try {
+    const db = getDB();
+    const hace7dias = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+    const data = await db.collection("priceHistory")
+      .aggregate([
+        {
+          $match: {
+            fecha: { $gte: hace7dias },
+            $expr: { $lt: ["$price", "$previousPrice"] } // precio bajó
+          }
+        },
+        {
+          $lookup: {
+            from: "productos",
+            localField: "productId",
+            foreignField: "_id",
+            as: "producto"
+          }
+        },
+        { $unwind: "$producto" },
+        {
+          $project: {
+            _id: 0,
+            productId: 1,
+            store: 1,
+            precioAnterior: "$previousPrice",
+            precioActual: "$price",
+            diferencia: { $subtract: ["$previousPrice", "$price"] },
+            fecha: 1,
+            titulo: "$producto.title",
+            image: "$producto.image",
+            categoria: "$producto.categoria"
+          }
+        },
+        { $sort: { diferencia: -1 } }
+      ])
+      .toArray();
+
+    res.json({ ok: true, data });
+
+  } catch (err) {
+    console.error("❌ Error en obtenerBajasDePrecio:", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+}
+
+
+
 // 🧠 Insights del sistema (Atlas compatible)
 export const insights = async (req, res) => {
   try {

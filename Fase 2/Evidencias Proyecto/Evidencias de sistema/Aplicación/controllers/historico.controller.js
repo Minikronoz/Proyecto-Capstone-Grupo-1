@@ -3,8 +3,7 @@ import { getDB } from "../config/db.js";
 import { ObjectId } from "mongodb";
 
 /**
- * 📊 Devuelve el historial reciente de precios por tienda.
- * Muestra las variaciones de los últimos 7 días (ajustable con ?dias=)
+ * 📊 Historial de precios por tienda (últimos X días)
  */
 export const obtenerHistoricoPorTienda = async (req, res) => {
   try {
@@ -16,7 +15,6 @@ export const obtenerHistoricoPorTienda = async (req, res) => {
 
     const db = getDB();
 
-    // 🔹 Une historial con los datos de producto
     const historial = await db.collection("priceHistory").aggregate([
       {
         $match: {
@@ -25,25 +23,43 @@ export const obtenerHistoricoPorTienda = async (req, res) => {
           variation: { $ne: 0 },
         },
       },
+
+      // 🔥 NORMALIZAR productId → ObjectId si corresponde
+      {
+        $addFields: {
+          productIdObj: {
+            $cond: [
+              { $regexMatch: { input: { $toString: "$productId" }, regex: /^[0-9a-fA-F]{24}$/ } },
+              { $toObjectId: "$productId" },
+              "$productId"
+            ]
+          }
+        }
+      },
+
+      // 🔍 JOIN con productos
       {
         $lookup: {
           from: "productos",
-          localField: "productId",
+          localField: "productIdObj",
           foreignField: "_id",
           as: "producto",
         },
       },
       { $unwind: { path: "$producto", preserveNullAndEmptyArrays: true } },
+
       { $sort: { date: -1 } },
+
+      // 🧹 Formato final limpio
       {
         $project: {
           nombre: { $ifNull: ["$producto.title", "Producto desconocido"] },
           marca: "$producto.brand",
-          store: "$store",
-          price: "$price",
-          previousPrice: "$previousPrice",
-          variation: "$variation",
-          offerDescription: "$offerDescription",
+          store: 1,
+          price: 1,
+          previousPrice: 1,
+          variation: 1,
+          offerDescription: 1,
           fecha: "$date",
           imagen: "$producto.image",
           link: "$producto.link",

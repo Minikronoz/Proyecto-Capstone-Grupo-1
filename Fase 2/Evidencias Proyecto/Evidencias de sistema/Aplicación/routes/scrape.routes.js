@@ -1,5 +1,5 @@
 // ===============================================
-// 📁 routes/scrape.routes.js
+// 📁 routes/scrape.routes.js (VERSIÓN FINAL)
 // ===============================================
 import express from "express";
 import {
@@ -9,20 +9,33 @@ import {
   scrapeUnimarc,
   obtenerUltimosScraping,
   obtenerActividadSemanal,
+  registrarEstadoScraping // 🔥 NUEVO
 } from "../controllers/scrape.controller.js";
 
 const router = express.Router();
 
-// Rutas de scraping reales
+// ================================
+// 🚀 RUTAS DE SCRAPING REALES
+// ================================
 router.post("/acuenta", scrapeAcuenta);
 router.post("/tottus", scrapeTottus);
 router.post("/jumbo", scrapeJumbo);
 router.post("/unimarc", scrapeUnimarc);
 
-// Últimos registros
+// ================================
+// 📊 ÚLTIMOS REGISTROS PARA KPI
+// ================================
 router.get("/ultimos", obtenerUltimosScraping);
 
-// 📅 Actividad semanal (usa la del controlador)
+// ================================
+// 📅 ACTIVIDAD SEMANAL (TABLA 7 DÍAS)
+// ================================
 router.get("/actividad-semanal", obtenerActividadSemanal);
+
+// ================================
+// 🟩 Registrar el estado del scraping del DÍA
+// success | fail | warning
+// ================================
+router.post("/registrar-estado", registrarEstadoScraping);
 
 export default router;

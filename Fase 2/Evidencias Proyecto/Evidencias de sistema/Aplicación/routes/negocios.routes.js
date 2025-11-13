@@ -1,5 +1,5 @@
 // =============================================
-// 📁 routes/negocios.routes.js (versión Atlas nativa)
+// 📁 routes/negocios.routes.js
 // =============================================
 import express from "express";
 import { getDB } from "../config/db.js";
@@ -7,42 +7,58 @@ import { ObjectId } from "mongodb";
 
 const router = express.Router();
 
-// ===================================================
-// 🟢 1. Obtener todos los negocios con datos del dueño
-// ===================================================
+// ==============================================
+// 🟢 OBTENER NEGOCIOS CON DATOS DEL DUEÑO
+// ==============================================
 router.get("/negocios-con-duenio", async (req, res) => {
   try {
     const db = getDB();
     const users = await db.collection("users").find().toArray();
 
-    // 🔹 Aplana los negocios de cada usuario
-    const negocios = users.flatMap((u) =>
-      (u.negocios || []).map((n) => ({
-        _id: n._id || new ObjectId(),
-        nombre: n.nombre || "Negocio sin nombre",
-        giro: n.giro || "—",
-        comuna: n.comuna || "—",
-        sector: n.sector || "—",
-        duenioId: u._id,
-        duenioNombre: u.nombre || "—",
-        duenioCorreo: u.correo || "—",
-      }))
-    );
+    const negocios = [];
+
+    users.forEach((u) => {
+      if (Array.isArray(u.negocios) && u.negocios.length > 0) {
+        u.negocios.forEach((n, i) => {
+
+          // Si no tiene _id → lo creamos y lo guardamos en BD
+          if (!n._id) {
+            n._id = new ObjectId();
+            db.collection("users").updateOne(
+              { _id: u._id },
+              { $set: { [`negocios.${i}._id`]: n._id } }
+            );
+          }
+
+          negocios.push({
+            _id: n._id,
+            nombre: n.nombre || "—",
+            giro: n.giro || "—",
+            comuna: n.comuna || "—",
+            sector: n.sector || "—",
+            duenioNombre: `${u.nombre} ${u.apellido || ""}`.trim(),
+            duenioCorreo: u.correo || u.email || "—",
+            duenioId: u._id,
+          });
+        });
+      }
+    });
 
     res.json(negocios);
   } catch (err) {
-    console.error("❌ Error en GET /negocios-con-duenio:", err);
-    res.status(500).json({ error: "Error al obtener negocios con dueño" });
+    console.error("❌ Error en negocios-con-duenio:", err);
+    res.status(500).json({ error: "Error al obtener negocios" });
   }
 });
 
-// ===================================================
-// 🟡 2. Editar negocio dentro de un usuario
-// ===================================================
+// ==============================================
+// ✏️ EDITAR NEGOCIO
+// ==============================================
 router.put("/negocios/:id", async (req, res) => {
   try {
     const db = getDB();
     const idNegocio = new ObjectId(req.params.id);
+
     const { nombre, giro, comuna, sector } = req.body;
 
     const result = await db.collection("users").updateOne(
@@ -60,16 +76,16 @@ router.put("/negocios/:id", async (req, res) => {
     if (result.matchedCount === 0)
       return res.status(404).json({ error: "Negocio no encontrado" });
 
-    res.json({ ok: true, mensaje: "✅ Negocio actualizado correctamente" });
+    res.json({ ok: true, mensaje: "Negocio actualizado correctamente" });
   } catch (err) {
-    console.error("❌ Error en PUT /negocios/:id:", err);
+    console.error("❌ PUT negocio error:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// ===================================================
-// 🔴 3. Eliminar negocio dentro de un usuario
-// ===================================================
+// ==============================================
+// 🗑 ELIMINAR NEGOCIO
+// ==============================================
 router.delete("/negocios/:id", async (req, res) => {
   try {
     const db = getDB();
@@ -83,9 +99,9 @@ router.delete("/negocios/:id", async (req, res) => {
     if (result.modifiedCount === 0)
       return res.status(404).json({ error: "Negocio no encontrado" });
 
-    res.json({ ok: true, mensaje: "🗑️ Negocio eliminado correctamente" });
+    res.json({ ok: true, mensaje: "Negocio eliminado correctamente" });
   } catch (err) {
-    console.error("❌ Error en DELETE /negocios/:id:", err);
+    console.error("❌ DELETE negocio error:", err);
     res.status(500).json({ error: err.message });
   }
 });

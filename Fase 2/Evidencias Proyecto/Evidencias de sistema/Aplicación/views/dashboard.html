@@ -117,13 +117,22 @@
     </div>
 
     <div class="chart-card">
-      <div class="chart-card__header">
-        <h3>📈 Productos con Subida de Precio (últimos 7 días)</h3>
-      </div>
-      <div class="chart-card__body">
-        <div id="listaSubidas" class="lista-precios"></div>
-      </div>
+<table id="tablaBajas">
+  <thead>
+    <tr>
+      <th>Producto</th>
+      <th>Tienda</th>
+      <th>Antes</th>
+      <th>Ahora</th>
+      <th>Baja</th>
+      <th>Fecha</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
     </div>
+
+
   </div>
   <section>
   <h2>💰 Índice de competitividad de precios</h2>
@@ -374,6 +383,8 @@ async function cargarDashboard(filtros = {}) {
 
 
 
+
+
 async function cargarDashboardBusquedas() {
   await Promise.all([
     renderChart("busquedasTop","/api/estadisticas/busquedas-top","Términos más usados"),
@@ -403,6 +414,8 @@ async function renderTendencia() {
     options: { scales: { y: { beginAtZero: true } } }
   });
 }
+
+
 
 
 // 📈 Productos con mayor crecimiento
@@ -462,6 +475,7 @@ async function initDashboard() {
   await renderActividadPorHora();
   await renderPalabrasTendencia();
   await renderMapaChile();
+  await cargarBajas();
 
 
 }
@@ -668,6 +682,43 @@ async function renderMapaChile() {
   });
 }
 
+async function cargarBajas() {
+  try {
+    const res = await fetch("/api/estadisticas/bajas");
+    const data = await res.json();
+
+    if (!data.ok) {
+      console.error("No ok:", data);
+      return;
+    }
+
+    const tbody = document.querySelector("#tablaBajas tbody");
+    tbody.innerHTML = "";
+
+    data.data.forEach(item => {
+      const fecha = new Date(item.fecha).toLocaleDateString("es-CL");
+
+      tbody.innerHTML += `
+        <tr>
+          <td>
+            <img src="${item.image}" style="width:40px; border-radius:6px; margin-right:6px;">
+            ${item.titulo}
+          </td>
+          <td>${item.store}</td>
+          <td>$${item.precioAnterior.toLocaleString("es-CL")}</td>
+          <td>$${item.precioActual.toLocaleString("es-CL")}</td>
+          <td style="color:red; font-weight:bold;">-$${item.diferencia.toLocaleString("es-CL")}</td>
+          <td>${fecha}</td>
+        </tr>
+      `;
+    });
+
+  } catch (error) {
+    console.error("Error cargando bajas:", error);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", cargarBajas);
 
 </script>
 </body>
