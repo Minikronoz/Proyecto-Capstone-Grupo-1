@@ -854,232 +854,454 @@ tr:nth-child(even) {
 }
 
 .item-card {
-  padding: 1rem;
-  border-radius: 10px;
-  background: #ffffff;
-  border: 1px solid #e3e3e3;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.item-card h4 {
-  margin-bottom: 0.5rem;
-}
-
-.item-card .datos span {
-  display: block;
-  color: #555;
-}
-
-
-/* ============================================================
-   📅 TABLA SCRAPING SEMANAL
-   ============================================================ */
-.card-scraping-semana {
-  background: #fff;
-  padding: 16px;
-  border-radius: 14px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-.tabla-semanal {
-  width: 100%;
-  overflow-x: auto;
-  padding: 1rem;
-}
-
-.tabla-semanal table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-}
-
-.tabla-semanal th, 
-.tabla-semanal td {
-  padding: 8px 10px;
-  text-align: center;
-  border: 1px solid #e2e8f0;
-}
-
-.tabla-semanal th {
-  background: #f1f5f9;
-  font-weight: 600;
-}
-
-.fila {
-  display: grid;
-  grid-template-columns: 150px repeat(7, 1fr);
+  display: flex;
   align-items: center;
-}
-
-.fila.header .col-dia {
-  text-align: center;
-}
-
-.nombre-dia {
-  font-weight: 700;
-  color: #1e293b;
-}
-
-.fecha-dia {
-  font-size: 12px;
-  color: #6b7280;
-}
-
-.fila .nombre {
-  font-weight: 600;
-  color: #0f172a;
-}
-
-.dia {
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
-  margin: auto;
-  cursor: pointer;
-  transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
-}
-
-.dia:hover {
-  transform: scale(1.1);
-}
-
-.success { background: #22c55e; }
-.fail    { background: #ef4444; }
-.warning { background: #facc15; }
-
-.col-dia.hoy-col {
-  background: rgba(56,189,248,0.12);
-  border-radius: 8px;
-  padding: 4px 0;
-}
-
-.dia.hoy-dia {
-  box-shadow: 0 0 0 2px #0ea5e9;
-}
-
-
-/* ============================================================
-   🎨 TARJETAS DE SCRAPING — MULTICONSOLA
-   ============================================================ */
-
-.scraping-wrapper {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 14px;
-  margin-top: 15px;
-}
-
-.scraping-card {
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 12px 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  border-left: 6px solid #cbd5e1;
+  justify-content: space-between;
+  background: #f9fafb;
+  padding: 0.45rem 0.75rem;
+  border-left: 4px solid #e5e7eb;
+  border-radius: 0.6rem;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.scraping-card:hover {
+.item-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.10);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.scraping-title {
-  text-align: center;
-  font-size: 14px;
-  font-weight: 800;
-  color: #0f172a;
-  margin-bottom: 6px;
-}
-
-.scraping-info {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.scraping-date,
-.scraping-badge {
-  font-size: 11px;
-  padding: 4px 10px;
-  border-radius: 999px;
+.item-card h4 {
+  margin: 0;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: white;
 }
 
-/* 🎨 COLORES POR TIENDA */
-.scraping-card.unimarc { border-left-color: #d62828; }
-.scraping-card.unimarc .scraping-date { background: #ef4444; }
-.scraping-card.unimarc .scraping-badge { background: #b91c1c; }
-
-.scraping-card.jumbo { border-left-color: #006d66; }
-.scraping-card.jumbo .scraping-date { background: #0f9a8b; }
-.scraping-card.jumbo .scraping-badge { background: #006d66; }
-
-.scraping-card.tottus { border-left-color: #16a34a; }
-.scraping-card.tottus .scraping-date { background: #22c55e; }
-.scraping-card.tottus .scraping-badge { background: #15803d; }
-
-.scraping-card.acuenta { border-left-color: #f97316; }
-.scraping-card.acuenta .scraping-date { background: #fb923c; }
-.scraping-card.acuenta .scraping-badge { background: #ea580c; }
-
+.item-card .datos {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  color: #334155;
+}
 
 /* ============================================================
-   📈 CHARTS
+   🖥️ LOG OUTPUT COMÚN
    ============================================================ */
-
-.charts-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.3rem;
-  width: 100%;
+.log-output {
+  padding: 0.75rem 1rem;
+  background: #020617;
+  color: #e5e7eb;
+  font-family: "Fira Code", "Courier New", monospace;
+  font-size: 0.75rem;
+  max-height: 400px;
+  overflow-y: auto;
+  line-height: 1.5;
+  white-space: pre-wrap;
 }
 
-.chart-card {
-  background: #fff;
-  padding: 1.3rem;
-  border-radius: 0.8rem;
-  border: 1px solid #e5e7eb;
+/* ============================================================
+   🎨 BADGES DE ESTADO
+   ============================================================ */
+.badge--error {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+
+.badge--ok {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+/* ============================================================
+   📋 MODAL DE USUARIO (ESTRUCTURA COMPLETA)
+   ============================================================ */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  z-index: 9999;
 }
 
-.chart-card canvas {
-  width: 100% !important;
-  height: auto !important;
-  max-height: 350px;
-  transition: transform 0.25s ease;
+.modal.oculto {
+  display: none;
+}
+
+.modal__backdrop {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+}
+
+.modal__dialog {
+  position: relative;
+  background: white;
+  padding: 0;
+  border-radius: 0.75rem;
+  width: 90%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  z-index: 10000;
+}
+
+.modal__header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.modal__header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #1e293b;
+  font-weight: 700;
+}
+
+.modal__body {
+  padding: 1.5rem;
+}
+
+.modal__body label {
   display: block;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #475569;
 }
 
-.chart-card canvas:hover {
-  transform: scale(1.02);
+.modal__body input[type="text"],
+.modal__body input[type="email"],
+.modal__body input[type="number"],
+.modal__body input[type="date"],
+.modal__body select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
 }
 
+.modal__body input:focus,
+.modal__body select:focus {
+  outline: none;
+  border-color: #00A7B5;
+  box-shadow: 0 0 0 3px rgba(0, 167, 181, 0.1);
+}
+
+.modal__footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.modal__footer button {
+  padding: 0.65rem 1.25rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal__footer button[type="submit"] {
+  background: #00A7B5;
+  color: white;
+}
+
+.modal__footer button[type="submit"]:hover {
+  background: #008a95;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 167, 181, 0.3);
+}
+
+.modal__footer button[type="button"] {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.modal__footer button[type="button"]:hover {
+  background: #cbd5e1;
+}
 
 /* ============================================================
-   📱 RESPONSIVE
+   📋 MODAL DE NEGOCIO (VERSIÓN ALTERNATIVA)
    ============================================================ */
-
-@media (max-width: 900px) {
-  .charts-grid { grid-template-columns: 1fr; }
-  .chart-card canvas { max-height: 300px; }
+.modal-contenido {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  z-index: 10000;
 }
 
-@media (max-width: 820px) {
-  :root { --sidebar-w: 80px; }
-  .brand__title,
-  .nav__item span { display: none; }
-  .layout { margin-left: var(--sidebar-w); }
-  .nav__item { justify-content: center; }
-  .form-grid { grid-template-columns: 1fr; }
-  .multi-log-container { grid-template-columns: 1fr; }
+.modal-contenido h3 {
+  margin: 0 0 1.5rem;
+  font-size: 1.5rem;
+  color: #1e293b;
+  font-weight: 700;
 }
 
-@media (max-width: 640px) {
-  .kpis { grid-template-columns: 1fr; }
-  .charts-grid { grid-template-columns: 1fr; }
+.modal-contenido label {
+  display: block;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.modal-contenido input[type="text"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.modal-contenido input[type="text"]:focus {
+  outline: none;
+  border-color: #00A7B5;
+  box-shadow: 0 0 0 3px rgba(0, 167, 181, 0.1);
+}
+
+.modal-botones {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: flex-end;
+}
+
+.modal-botones button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-guardar {
+  background: #00A7B5;
+  color: white;
+}
+
+.btn-guardar:hover {
+  background: #008a95;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 167, 181, 0.3);
+}
+
+.btn-cerrar {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.btn-cerrar:hover {
+  background: #cbd5e1;
+}
+
+/* ============================================================
+   🎯 CONSOLAS SEPARADAS POR TIENDA
+   ============================================================ */
+.consolas-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.consola-individual {
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.consola-individual.activa {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.consola-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+}
+
+.consola-header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.consola-header .estado {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.estado-badge {
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.estado-badge.ejecutando {
+  background: #dbeafe;
+  color: #1e40af;
+  animation: pulse 2s infinite;
+}
+
+.estado-badge.completado {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.estado-badge.error {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.estado-badge.esperando {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.consola-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-consola {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.4rem;
+  transition: background 0.2s;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.btn-consola:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: #0f172a;
+}
+
+.log-output-individual {
+  padding: 1rem;
+  background: #020617;
+  color: #e5e7eb;
+  font-family: "Fira Code", "Courier New", monospace;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  max-height: 450px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.log-output-individual .log-line {
+  margin: 0;
+  padding: 3px 0;
+  font-family: inherit;
+  white-space: pre-wrap;
+}
+
+.log-output-individual .log-error {
+  color: #ef4444;
+  font-weight: 500;
+}
+
+.log-output-individual .log-success {
+  color: #22c55e;
+  font-weight: 500;
+}
+
+.log-output-individual .log-warning {
+  color: #f59e0b;
+}
+
+.log-output-individual .log-info {
+  color: #3b82f6;
+}
+
+.log-output-individual .progress-bar {
+  color: #60a5fa;
+  font-weight: bold;
+}
+
+/* Scroll personalizado para consolas */
+.log-output-individual::-webkit-scrollbar {
+  width: 8px;
+}
+
+.log-output-individual::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+.log-output-individual::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+.log-output-individual::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* ============================================================
+   🎨 COLORES ESPECÍFICOS POR TIENDA (CONSOLAS)
+   ============================================================ */
+.consola-unimarc .consola-header {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+}
+
+.consola-tottus .consola-header {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+}
+
+.consola-jumbo .consola-header {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+}
+
+.consola-acuenta .consola-header {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
 }

@@ -82,18 +82,24 @@ app.use(
 );
 
 // ==============================
-// 🔹 RUTAS API
+// 🔹 RUTAS API (ORDEN IMPORTANTE)
 // ==============================
-app.use("/", usersRoutes);
+
+// Rutas de autenticación y sesión (PRIMERO)
+app.use("/", usersRoutes); // Contiene /api/sesion-activa y /api/auth/yo
+
+// Rutas específicas antes de las genéricas
+app.use("/api/productos", productosRoutes); // Contiene /sugerencias, /:id/historico, etc.
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/scrape", scrapeRoutes);
-app.use("/api/productos", productosRoutes);
 app.use("/api/catalogo", catalogoRouter);
 app.use("/api/clicks", clicksRoutes);
 app.use("/api/estadisticas", estadisticasRoutes);
 app.use("/api/busquedas", busquedasRoutes);
 app.use("/api/negocios", negociosRoutes);
-app.use("/api/historico", historicoRoutes);
+
+// Rutas de vistas HTML
+app.use("/historico", historicoRoutes); 
 
 // ============================================================
 // 🧰 SCRAPING MANUAL

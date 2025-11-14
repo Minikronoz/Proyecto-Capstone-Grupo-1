@@ -41,7 +41,7 @@ body {
 }
 
 /* ================================
-   🧭 BARRA SUPERIOR (Topbar)
+   🧭 BARRA SUPERIOR MEJORADA
    ================================ */
 .barra-superior {
   background: linear-gradient(to right, #ffffff, #f8fafa);
@@ -55,6 +55,127 @@ body {
   top: 0;
   z-index: 50;
 }
+
+.logo-dash {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--petroleo);
+  font-weight: 700;
+  font-size: 18px;
+  text-decoration: none;
+  letter-spacing: .2px;
+  transition: var(--transition);
+}
+
+.logo-dash:hover {
+  color: var(--calipso-600);
+  transform: translateY(-1px);
+}
+
+/* 🔹 Navegación con botones */
+#nav-usuario {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-nav {
+  color: var(--gris-texto);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: var(--transition);
+  background: var(--blanco);
+  border: 1px solid var(--gris-medio);
+  font-size: 14px;
+}
+
+.btn-nav:hover {
+  color: var(--calipso-600);
+  background: var(--calipso-50);
+  border-color: var(--calipso-300);
+  transform: translateY(-1px);
+}
+
+.btn-nav.btn-registro {
+  background: var(--calipso-500);
+  color: white;
+  border-color: var(--calipso-500);
+}
+
+.btn-nav.btn-registro:hover {
+  background: var(--calipso-600);
+  border-color: var(--calipso-600);
+}
+
+/* 🔹 Menú de usuario desplegable */
+.usuario-menu {
+  position: relative;
+}
+
+.btn-usuario {
+  background: linear-gradient(135deg, var(--calipso-500), var(--petroleo));
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 2px 8px rgba(0, 166, 181, 0.2);
+}
+
+.btn-usuario:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 166, 181, 0.3);
+}
+
+.menu-desplegable {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.menu-desplegable.mostrar {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.menu-desplegable a {
+  display: block;
+  padding: 12px 18px;
+  color: var(--gris-oscuro);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: var(--transition);
+  border-bottom: 1px solid var(--gris-medio);
+}
+
+.menu-desplegable a:last-child {
+  border-bottom: none;
+}
+
+.menu-desplegable a:hover {
+  background: var(--calipso-50);
+  color: var(--calipso-600);
+  padding-left: 22px;
+}
+
 /* ================================
    PARTE 2/11 — Logo, navegación y fecha
    ================================ */
@@ -529,6 +650,30 @@ footer p {
   .producto-card img {
     height: 130px;
   }
+
+  .barra-superior {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  #nav-usuario {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .btn-usuario {
+    font-size: 13px;
+    padding: 8px 14px;
+  }
+
+  .menu-desplegable {
+    right: 50%;
+    transform: translateX(50%);
+  }
+
+  .menu-desplegable.mostrar {
+    transform: translateX(50%) translateY(0);
+  }
 }
 /* ================================
    PARTE 10/11 — Histórico de precios
@@ -706,6 +851,168 @@ button:active, .btn-ver:active {
 
   .producto-card {
     width: 100%;
+  }
+}
+
+/* ================================
+   🔔 POPUP REGISTRO
+   ================================ */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+.popup.oculto {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.popup-contenido {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 16px;
+  max-width: 480px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  position: relative;
+  animation: slideUp 0.4s ease;
+  text-align: center;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.popup-cerrar {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #94a3b8;
+  transition: all 0.2s;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-cerrar:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+  transform: rotate(90deg);
+}
+
+.popup-contenido h3 {
+  margin: 0 0 1rem;
+  font-size: 1.75rem;
+  color: var(--petroleo);
+  font-weight: 700;
+}
+
+.popup-contenido p {
+  font-size: 1rem;
+  color: var(--gris-texto);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.popup-botones {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-popup {
+  padding: 14px 24px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-popup.btn-login {
+  background: var(--calipso-500);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 167, 181, 0.3);
+}
+
+.btn-popup.btn-login:hover {
+  background: var(--calipso-600);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 167, 181, 0.4);
+}
+
+.btn-popup.btn-registro {
+  background: white;
+  color: var(--calipso-600);
+  border: 2px solid var(--calipso-500);
+}
+
+.btn-popup.btn-registro:hover {
+  background: var(--calipso-50);
+  border-color: var(--calipso-600);
+  transform: translateY(-2px);
+}
+
+.btn-popup.btn-omitir {
+  background: transparent;
+  color: var(--gris-texto);
+  font-size: 14px;
+  padding: 10px;
+}
+
+.btn-popup.btn-omitir:hover {
+  color: var(--gris-oscuro);
+  background: var(--gris-claro);
+}
+
+/* 📱 Responsive */
+@media (max-width: 576px) {
+  .popup-contenido {
+    padding: 2rem 1.5rem;
+  }
+
+  .popup-contenido h3 {
+    font-size: 1.5rem;
+  }
+
+  .popup-contenido p {
+    font-size: 0.95rem;
   }
 }
 

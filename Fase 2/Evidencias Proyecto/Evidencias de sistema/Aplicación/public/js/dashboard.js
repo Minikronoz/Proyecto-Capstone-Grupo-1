@@ -349,7 +349,7 @@ async function cargarNegocios() {
   tbody.innerHTML = "<tr><td colspan='7'>Cargando...</td></tr>";
 
   try {
-    const res = await fetch(`${API}/negocios-con-duenio`);
+    const res = await fetch(`${API}/usuarios/negocios`); // ← Cambiado de /negocios-con-duenio
     const negocios = await res.json();
 
     if (!negocios.length) {
@@ -369,8 +369,8 @@ async function cargarNegocios() {
           <td>${n.duenioNombre}</td>
           <td>${n.duenioCorreo}</td>
           <td>
-            <button onclick="editarNegocio('${n._id}')">✏️</button>
-            <button onclick="eliminarNegocio('${n._id}')">🗑️</button>
+            <button onclick="editarNegocio('${n._id}', '${n.duenioId}')">✏️</button>
+            <button onclick="eliminarNegocio('${n._id}', '${n.duenioId}')">🗑️</button>
           </td>
         </tr>
       `
@@ -437,55 +437,157 @@ async function eliminarUsuarioDef(id) {
 
 
 
-async function editarNegocio(id) {
+async function editarNegocio(negocioId, duenioId) {
+  console.log("✏️ Editando negocio:", { negocioId, duenioId });
+
   try {
-    const res = await fetch(`${API}/negocios-con-duenio`);
+    const res = await fetch(`${API}/usuarios/negocios`);
+    
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    
     const negocios = await res.json();
+    console.log("📦 Negocios recibidos:", negocios);
 
-    const negocio = negocios.find((n) => n._id === id);
-    if (!negocio) return alert("No se encontró el negocio.");
+    // Buscar el negocio por rolTributario (que ahora es el _id)
+    const negocio = negocios.find((n) => n._id === negocioId);
+    
+    console.log("🔍 Negocio encontrado:", negocio);
 
-    document.getElementById("negocioId").value = negocio._id;
-    document.getElementById("negocioNombre").value = negocio.nombre;
-    document.getElementById("negocioGiro").value = negocio.giro;
-    document.getElementById("negocioComuna").value = negocio.comuna;
-    document.getElementById("negocioSector").value = negocio.sector;
+    if (!negocio) {
+      alert("No se encontró el negocio.");
+      return;
+    }
 
-    document.getElementById("modalEditarNegocio").classList.remove("oculto");
+    // Rellenar el formulario
+    document.getElementById("negocioId").value = negocio._id; // rolTributario
+    document.getElementById("negocioId").setAttribute("data-duenio-id", negocio.duenioId);
+    document.getElementById("negocioNombre").value = negocio.nombre || "";
+    document.getElementById("negocioGiro").value = negocio.giro || "";
+    document.getElementById("negocioComuna").value = negocio.comuna || "";
+    document.getElementById("negocioSector").value = negocio.sector || "";
+
+    console.log("📝 Formulario rellenado");
+
+    // Mostrar el modal
+    const modal = document.getElementById("modalEditarNegocio");
+    modal.classList.remove("oculto");
+    
+    console.log("✅ Modal abierto");
+
   } catch (err) {
-    console.error("Error al cargar negocio:", err);
+    console.error("❌ Error al cargar negocio:", err);
+    alert("Error al cargar negocio: " + err.message);
   }
 }
 
 async function guardarNegocio() {
-  const id = document.getElementById("negocioId").value;
+  console.log("💾 Guardando negocio...");
+
+  const negocioIdInput = document.getElementById("negocioId");
+  const negocioId = negocioIdInput.value; // Este es el rolTributario
+  const duenioId = negocioIdInput.getAttribute("data-duenio-id");
+
+  console.log("📋 Datos a guardar:", { negocioId, duenioId });
+
+  if (!negocioId || !duenioId) {
+    alert("Error: Faltan datos del negocio");
+    return;
+  }
 
   const nombre = document.getElementById("negocioNombre").value.trim();
   const giro = document.getElementById("negocioGiro").value.trim();
   const comuna = document.getElementById("negocioComuna").value.trim();
   const sector = document.getElementById("negocioSector").value.trim();
 
+  if (!nombre || !giro) {
+    alert("El nombre y giro son obligatorios");
+    return;
+  }
+
+  const payload = { nombre, giro, comuna, sector };
+  console.log("📦 Payload:", payload);
+
   try {
-    const res = await fetch(`${API}/negocios/${id}`, {
+    const res = await fetch(`${API}/usuarios/${duenioId}/negocios/${negocioId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nombre, giro, comuna, sector }),
+      body: JSON.stringify(payload),
     });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Error al actualizar");
+    console.log("📡 Response status:", res.status);
 
-    alert("Negocio actualizado correctamente.");
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.error || "Error al actualizar");
+    }
+
+    const result = await res.json();
+    console.log("✅ Resultado:", result);
+
+    alert("✅ Negocio actualizado correctamente.");
     cerrarModalNegocio();
     cargarNegocios();
+
   } catch (err) {
+    console.error("❌ Error guardando negocio:", err);
     alert("❌ Error: " + err.message);
   }
 }
 
 function cerrarModalNegocio() {
+  console.log("❌ Cerrando modal");
   document.getElementById("modalEditarNegocio").classList.add("oculto");
 }
+
+// =============================================================
+// 🗑️ ELIMINAR NEGOCIO
+// =============================================================
+async function eliminarNegocio(negocioId, duenioId) {
+  console.log("🗑️ Intentando eliminar:", { negocioId, duenioId });
+
+  // ✅ Validación mejorada
+  if (!negocioId || !duenioId) {
+    console.error("❌ Datos inválidos:", { negocioId, duenioId });
+    alert("Error: ID de negocio o dueño inválido");
+    return;
+  }
+
+  if (negocioId === "null" || negocioId === "undefined" || 
+      duenioId === "null" || duenioId === "undefined") {
+    console.error("❌ IDs son null/undefined");
+    alert("Error: ID de negocio o dueño inválido");
+    return;
+  }
+
+  if (!confirm("¿Estás seguro de eliminar este negocio?")) return;
+
+  try {
+    const res = await fetch(`${API}/usuarios/${duenioId}/negocios/${negocioId}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.error || "Error al eliminar negocio");
+    }
+
+    alert("Negocio eliminado correctamente");
+    cargarNegocios();
+  } catch (err) {
+    console.error("❌ Error eliminando negocio:", err);
+    alert("Error al eliminar negocio: " + err.message);
+  }
+}
+
+// Exponer funciones globalmente para onclick
+window.eliminarNegocio = eliminarNegocio;
+window.editarNegocio = editarNegocio;
+window.guardarNegocio = guardarNegocio;
+window.cerrarModalNegocio = cerrarModalNegocio;
+window.ejecutarScraping = ejecutarScraping;
+window.limpiarLog = limpiarLog;
 
 // =============================================================
 // 🚀 Navegación
@@ -533,3 +635,222 @@ window.eliminarUsuarioDef = eliminarUsuarioDef;
 window.guardarUsuario = guardarUsuario;
 window.cerrarModal = cerrarModal;
 });
+
+// =============================================================
+// 🚀 SISTEMA DE CONSOLAS SEPARADAS
+// =============================================================
+
+const consolasActivas = new Map();
+
+// ===== Crear consola individual para cada tienda =====
+function crearConsola(store) {
+  if (consolasActivas.has(store)) {
+    const consola = consolasActivas.get(store);
+    consola.element.classList.add('activa');
+    actualizarEstadoConsola(store, 'ejecutando');
+    return consola;
+  }
+
+  const contenedor = document.getElementById('contenedorConsolas');
+  const consolaDiv = document.createElement('div');
+  consolaDiv.className = `consola-individual consola-${store} activa`;
+  consolaDiv.id = `consola-${store}`;
+
+  const iconos = {
+    unimarc: '🔴',
+    tottus: '🟢',
+    jumbo: '🔵',
+    acuenta: '🟡'
+  };
+
+  consolaDiv.innerHTML = `
+    <div class="consola-header">
+      <h3>
+        <span>${iconos[store] || '📦'}</span>
+        <span>${store.toUpperCase()}</span>
+      </h3>
+      <div class="estado">
+        <span class="estado-badge ejecutando" id="estado-${store}">Ejecutando...</span>
+        <div class="consola-actions">
+          <button class="btn-consola" onclick="limpiarConsola('${store}')" title="Limpiar">
+            <i class="fa-solid fa-broom"></i>
+          </button>
+          <button class="btn-consola" onclick="cerrarConsola('${store}')" title="Cerrar">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="log-output-individual" id="log-${store}">
+      <div class="log-line log-info">🚀 Iniciando scraping de ${store}...</div>
+    </div>
+  `;
+
+  contenedor.appendChild(consolaDiv);
+
+  const consola = {
+    element: consolaDiv,
+    output: document.getElementById(`log-${store}`),
+    estado: document.getElementById(`estado-${store}`)
+  };
+
+  consolasActivas.set(store, consola);
+  return consola;
+}
+
+// ===== Actualizar estado de la consola =====
+function actualizarEstadoConsola(store, estado) {
+  const consola = consolasActivas.get(store);
+  if (!consola) return;
+
+  const estadoBadge = consola.estado;
+  estadoBadge.className = 'estado-badge';
+
+  switch (estado) {
+    case 'ejecutando':
+      estadoBadge.classList.add('ejecutando');
+      estadoBadge.textContent = 'Ejecutando...';
+      break;
+    case 'completado':
+      estadoBadge.classList.add('completado');
+      estadoBadge.textContent = 'Completado ✓';
+      consola.element.classList.remove('activa');
+      break;
+    case 'error':
+      estadoBadge.classList.add('error');
+      estadoBadge.textContent = 'Error ✗';
+      consola.element.classList.remove('activa');
+      break;
+    default:
+      estadoBadge.classList.add('esperando');
+      estadoBadge.textContent = 'Esperando';
+  }
+}
+
+// ===== Agregar log a consola específica =====
+function agregarLogAConsola(store, mensaje, tipo = 'info') {
+  let consola = consolasActivas.get(store);
+  if (!consola) {
+    consola = crearConsola(store);
+  }
+
+  const output = consola.output;
+
+  let className = "log-line";
+  if (tipo === 'error' || mensaje.includes("❌") || mensaje.includes("ERROR")) {
+    className += " log-error";
+  } else if (tipo === 'success' || mensaje.includes("✅") || mensaje.includes("completado")) {
+    className += " log-success";
+  } else if (tipo === 'warning' || mensaje.includes("⚠️")) {
+    className += " log-warning";
+  } else if (mensaje.includes("█") || mensaje.includes("%")) {
+    className += " progress-bar";
+  } else if (mensaje.includes("🟢") || mensaje.includes("📊") || mensaje.includes("🚀")) {
+    className += " log-info";
+  }
+
+  const lineDiv = document.createElement("div");
+  lineDiv.className = className;
+  lineDiv.textContent = mensaje;
+
+  const lastLine = output.lastElementChild;
+  if (className.includes("progress-bar") && lastLine && lastLine.className.includes("progress-bar")) {
+    output.removeChild(lastLine);
+  }
+
+  output.appendChild(lineDiv);
+  output.scrollTop = output.scrollHeight;
+
+  while (output.children.length > 500) {
+    output.removeChild(output.firstChild);
+  }
+}
+
+// ===== Funciones de control de consolas =====
+window.limpiarConsola = function(store) {
+  const consola = consolasActivas.get(store);
+  if (!consola) return;
+
+  consola.output.innerHTML = "";
+  const lineDiv = document.createElement("div");
+  lineDiv.className = "log-line";
+  lineDiv.textContent = "Esperando ejecución...";
+  consola.output.appendChild(lineDiv);
+  actualizarEstadoConsola(store, 'esperando');
+};
+
+window.cerrarConsola = function(store) {
+  const consola = consolasActivas.get(store);
+  if (!consola) return;
+
+  if (confirm(`¿Cerrar la consola de ${store.toUpperCase()}?`)) {
+    consola.element.remove();
+    consolasActivas.delete(store);
+  }
+};
+
+window.limpiarTodasLasConsolas = function() {
+  if (confirm('¿Limpiar todas las consolas?')) {
+    consolasActivas.forEach((consola, store) => {
+      limpiarConsola(store);
+    });
+  }
+};
+
+// ===== Scraping con consola individual =====
+async function ejecutarScraping(store) {
+  crearConsola(store);
+  
+  try {
+    const resp = await fetch(`${API}/scrape/${store}`, { method: "POST" });
+    const data = await resp.json();
+    
+    if (!resp.ok) {
+      throw new Error(data.message || "Error desconocido");
+    }
+  } catch (err) {
+    agregarLogAConsola(store, `❌ Error: ${err.message}`, 'error');
+    actualizarEstadoConsola(store, 'error');
+  }
+}
+
+// ===== Eventos Socket.IO mejorados =====
+socket.on("scrape-log", (data) => {
+  const store = typeof data === "object" ? data.store : null;
+  const msg = typeof data === "string" ? data : data.message || "";
+  
+  if (!msg.trim()) return;
+
+  const storeMatch = msg.match(/\[(\w+)\]/);
+  const detectedStore = storeMatch ? storeMatch[1].toLowerCase() : store;
+
+  if (detectedStore && ['unimarc', 'tottus', 'jumbo', 'acuenta'].includes(detectedStore)) {
+    agregarLogAConsola(detectedStore, msg);
+  }
+});
+
+socket.on("scrape-error", (data) => {
+  const store = data.store;
+  const msg = typeof data === "string" ? data : data.message || "";
+  
+  if (store) {
+    agregarLogAConsola(store, `❌ ERROR: ${msg}`, 'error');
+    actualizarEstadoConsola(store, 'error');
+  }
+});
+
+socket.on("scrape-complete", (data) => {
+  const store = data.store;
+  const msg = data.message || (data.success ? "✅ Completado" : "❌ Error");
+  
+  if (store) {
+    agregarLogAConsola(store, msg, data.success ? 'success' : 'error');
+    actualizarEstadoConsola(store, data.success ? 'completado' : 'error');
+  }
+
+  cargarDatosDashboard();
+  cargarActividadSemanal();
+});
+
+// Exponer ejecutarScraping globalmente
+window.ejecutarScraping = ejecutarScraping;

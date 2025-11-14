@@ -9,7 +9,11 @@ import { getDB } from "../config/db.js";
 // ✔ IMPORTS NECESARIOS
 import bcrypt from "bcrypt";
 import { ObjectId } from "mongodb";
-import { obtenerNegociosConDuenio } from "../controllers/users.controller.js";
+import {
+  obtenerNegociosConDuenio,
+  actualizarNegocio,
+  eliminarNegocio,
+} from "../controllers/users.controller.js";
 
 const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
@@ -75,7 +79,6 @@ router.post("/login", async (req, res) => {
     const redirect = user.role === "admin" ? "/principal" : "/catalogo";
 
     res.json({ ok: true, redirect });
-
   } catch (err) {
     console.error("❌ Error login:", err);
     res.status(500).json({ error: "Error interno" });
@@ -110,12 +113,24 @@ router.post("/registrar", async (req, res) => {
     });
 
     res.json({ ok: true, mensaje: "Usuario registrado" });
-
   } catch (err) {
     console.error("❌ Error registro:", err);
     res.status(500).json({ error: "Error interno" });
   }
 });
+
+// =======================================================
+// 🏪 NEGOCIOS (DEBE IR ANTES de las rutas con :id)
+// =======================================================
+
+// ✅ Obtener todos los negocios con dueño
+router.get("/api/usuarios/negocios", obtenerNegociosConDuenio);
+
+// ✅ Actualizar negocio
+router.put("/api/usuarios/:userId/negocios/:negocioId", actualizarNegocio);
+
+// ✅ Eliminar negocio
+router.delete("/api/usuarios/:userId/negocios/:negocioId", eliminarNegocio);
 
 // =======================================================
 // 👤 USUARIOS CRUD COMPLETO
@@ -132,7 +147,7 @@ router.get("/api/usuarios", async (req, res) => {
   }
 });
 
-// Obtener 1 usuario por ID
+// Obtener 1 usuario por ID (DEBE IR DESPUÉS de /negocios)
 router.get("/api/usuarios/:id", async (req, res) => {
   try {
     const db = getDB();
@@ -195,12 +210,54 @@ router.delete("/api/usuarios/:id", async (req, res) => {
   }
 });
 
+// =======================================================
+// 🔐 VERIFICAR SESIÓN ACTIVA
+// =======================================================
+router.get("/api/sesion-activa", (req, res) => {
+  if (req.session && req.session.user) {
+    return res.json({
+      ok: true,
+      user: req.session.user,
+    });
+  }
+  res.status(401).json({
+    ok: false,
+    message: "No hay sesión activa",
+  });
+});
+
+router.get("/api/auth/yo", (req, res) => {
+  if (req.session && req.session.user) {
+    return res.json({
+      ok: true,
+      user: req.session.user,
+    });
+  }
+  res.status(401).json({
+    ok: false,
+    message: "No autenticado",
+  });
+});
 
 // =======================================================
-// 🏪 NEGOCIOS
+// 🚪 CERRAR SESIÓN
 // =======================================================
+router.post("/api/auth/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Error cerrando sesión:", err);
+      return res.status(500).json({
+        ok: false,
+        error: "Error al cerrar sesión",
+      });
+    }
 
-// ✔ ESTA ES LA RUTA QUE FALTABA PARA QUE FUNCIONE EL PANEL
-router.get("/api/negocios-con-duenio", obtenerNegociosConDuenio);
+    res.clearCookie("connect.sid");
+    res.json({
+      ok: true,
+      message: "Sesión cerrada correctamente",
+    });
+  });
+});
 
 export default router;

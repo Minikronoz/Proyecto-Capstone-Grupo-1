@@ -2,156 +2,248 @@
 // 📁 routes/productos.js — COMPLETO Y CORREGIDO
 // ===============================================
 import express from "express";
+import { ObjectId } from "mongodb"; // ✅ AGREGAR ESTE IMPORT
 import { getDB } from "../config/db.js";
-
 
 const router = express.Router();
 
-router.get("/:id/historico", async (req, res) => {
-  try {
-    const db = getDB();
-    const { id } = req.params;
-
-    const esObjectId = /^[0-9a-fA-F]{24}$/.test(id);
-    const filtroProducto = esObjectId
-      ? { _id: new ObjectId(id) }
-      : { _id: id };
-
-    const producto = await db.collection("productos").findOne(filtroProducto);
-    if (!producto) {
-      return res.status(404).json({ error: "Producto no encontrado" });
-    }
-
-    const filtroHistorial = esObjectId
-      ? { productId: new ObjectId(id) }
-      : { productId: id };
-
-    // 🟦 Obtener historial real
-    let historialReal = await db
-      .collection("priceHistory")
-      .find(filtroHistorial)
-      .sort({ fecha: 1 })
-      .toArray();
-
-    // Normalizar (fecha || date)
-    historialReal = historialReal.map(h => ({
-      date: h.date || h.fecha,
-      price: h.price
-    }));
-
-    // 🟦 Ordenar por fecha
-    historialReal.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-    // 🟦 Generar lista de 30 días hacia atrás
-    const hoy = new Date();
-    const historialCompleto = [];
-
-    // Determinar precio base inicial
-    let precioAnterior =
-      historialReal.length > 0 ? historialReal[0].price : producto.currentPrice;
-
-    for (let i = 29; i >= 0; i--) {
-      const fecha = new Date(hoy);
-      fecha.setDate(hoy.getDate() - i);
-
-      // Buscar precio real exacto ese día
-      const registroReal = historialReal.find(h => {
-        const d1 = new Date(h.date).toISOString().split("T")[0];
-        const d2 = fecha.toISOString().split("T")[0];
-        return d1 === d2;
-      });
-
-      if (registroReal) {
-        precioAnterior = registroReal.price; // actualizar
-      }
-
-      historialCompleto.push({
-        date: fecha,
-        price: precioAnterior
-      });
-    }
-
-    // 🟦 Variación (último vs anteúltimo)
-    let variacion = 0;
-    let emoji = "➖";
-
-    if (historialCompleto.length >= 2) {
-      const prev = historialCompleto[28].price;
-      const actual = historialCompleto[29].price;
-
-      variacion = prev !== 0
-        ? (((actual - prev) / prev) * 100).toFixed(1)
-        : 0;
-
-      if (variacion > 0) emoji = "📈";
-      else if (variacion < 0) emoji = "📉";
-    }
-
-    // 🟦 Días con mismo precio
-    let diasEstable = 1;
-    for (let i = historialCompleto.length - 2; i >= 0; i--) {
-      if (historialCompleto[i].price === historialCompleto[i + 1].price) {
-        diasEstable++;
-      } else break;
-    }
-
-    return res.json({
-      ok: true,
-      producto,
-      historial: historialCompleto,
-      variacion: Number(variacion),
-      emoji,
-      tendenciaColor:
-        variacion > 0 ? "#d32f2f" : variacion < 0 ? "#2e7d32" : "#00A7B5",
-      diasEstable,
-    });
-  } catch (error) {
-    console.error("❌ Error en HISTORICO:", error);
-    res.status(500).json({ error: "Error al obtener histórico" });
-  }
-});
-
-
-// ==========================================================
-// SUGERENCIAS
-// ==========================================================
+// =============================================================
+// 💡 Obtener sugerencias de búsqueda
+// =============================================================
 router.get("/sugerencias", async (req, res) => {
   try {
     const db = getDB();
-    const q = req.query.q?.trim() || "";
+    const { q } = req.query;
 
-    if (q.length < 2) return res.json([]);
+    console.log("🔍 Buscando sugerencias para:", q);
 
-    const productos = await db
-      .collection("productos")
-      .find({ title: { $regex: q, $options: "i" } })
-      .project({ title: 1 })
+    if (!q || q.trim().length < 3) {
+      return res.status(400).json({ 
+        ok: false, 
+        error: "Se requieren al menos 3 caracteres" 
+      });
+    }
+
+    const termino = q.trim();
+
+    // Buscar productos que coincidan
+    const productos = await db.collection("productos")
+      .find({
+        $or: [
+          { title: { $regex: termino, $options: "i" } },
+          { brand: { $regex: termino, $options: "i" } }
+        ]
+      })
       .limit(10)
       .toArray();
 
-    const sugerencias = productos.map((p) => p.title);
+    // Extraer títulos únicos
+    const sugerencias = [...new Set(productos.map(p => p.title))].slice(0, 8);
+
+    console.log(`✅ Sugerencias encontradas: ${sugerencias.length}`);
 
     res.json(sugerencias);
+
   } catch (err) {
-    console.error("❌ Error en GET /productos/sugerencias:", err);
-    res.status(500).json({ error: "Error al obtener sugerencias" });
+    console.error("❌ Error en sugerencias:", err);
+    res.status(500).json({ 
+      ok: false, 
+      error: "Error al buscar sugerencias" 
+    });
   }
 });
 
-// ==========================================================
-// LISTA GENERAL
-// ==========================================================
-router.get("/", async (req, res) => {
+// =============================================================
+// 📊 Obtener historial de precios de un producto
+// =============================================================
+router.get("/:id/historico", async (req, res) => {
   try {
     const db = getDB();
-    const productos = await db.collection("productos").find().limit(100).toArray();
-    res.json(productos);
+    const productId = req.params.id;
+
+    console.log("🔍 Buscando historial para:", productId);
+
+    // ✅ Validar que el ID sea válido
+    if (!ObjectId.isValid(productId)) {
+      return res.status(400).json({ 
+        ok: false, 
+        error: "ID de producto inválido" 
+      });
+    }
+
+    // ✅ Buscar el producto
+    const producto = await db.collection("productos").findOne({
+      _id: new ObjectId(productId)
+    });
+
+    if (!producto) {
+      console.log("❌ Producto no encontrado:", productId);
+      return res.status(404).json({ 
+        ok: false, 
+        error: "Producto no encontrado" 
+      });
+    }
+
+    console.log("✅ Producto encontrado:", producto.title);
+
+    // ✅ Buscar historial de precios
+    const historial = await db.collection("priceHistory")
+      .find({ productId: new ObjectId(productId) })
+      .sort({ fecha: 1 }) // Ordenar por fecha ascendente
+      .toArray();
+
+    console.log(`📊 Historial encontrado: ${historial.length} registros`);
+
+    // ✅ Si no hay historial, crear uno con el precio actual
+    if (historial.length === 0) {
+      const registroActual = {
+        productId: new ObjectId(productId),
+        store: producto.store,
+        price: producto.currentPrice,
+        previousPrice: null,
+        variation: 0,
+        offerDescription: producto.offerDescription || null,
+        fecha: producto.lastUpdate || new Date()
+      };
+
+      await db.collection("priceHistory").insertOne(registroActual);
+      
+      console.log("✅ Creado primer registro de historial");
+
+      return res.json({
+        ok: true,
+        producto,
+        historial: [{
+          date: registroActual.fecha,
+          price: registroActual.price,
+          variation: 0
+        }]
+      });
+    }
+
+    // ✅ Formatear historial para el gráfico
+    const historialFormateado = historial.map(h => ({
+      date: h.fecha,
+      price: h.price,
+      previousPrice: h.previousPrice,
+      variation: h.variation || 0,
+      offerDescription: h.offerDescription
+    }));
+
+    res.json({
+      ok: true,
+      producto,
+      historial: historialFormateado
+    });
+
   } catch (err) {
-    console.error("❌ Error en GET /productos:", err);
-    res.status(500).json({ error: "Error al obtener productos" });
+    console.error("❌ Error en HISTORICO:", err);
+    res.status(500).json({ 
+      ok: false, 
+      error: "Error al obtener historial de precios",
+      details: err.message 
+    });
   }
 });
 
+// =============================================================
+// 🔍 Buscar productos (para catálogo)
+// =============================================================
+router.get("/api/productos", async (req, res) => {
+  try {
+    const db = getDB();
+    const { q, store, categoria, minPrice, maxPrice } = req.query;
 
+    const filtro = {};
+
+    // Filtro por búsqueda de texto
+    if (q) {
+      filtro.$or = [
+        { title: { $regex: q, $options: "i" } },
+        { brand: { $regex: q, $options: "i" } }
+      ];
+    }
+
+    // Filtro por tienda
+    if (store) {
+      filtro.store = store;
+    }
+
+    // Filtro por categoría
+    if (categoria) {
+      filtro.categoria = categoria;
+    }
+
+    // Filtro por rango de precio
+    if (minPrice || maxPrice) {
+      filtro.currentPrice = {};
+      if (minPrice) filtro.currentPrice.$gte = parseFloat(minPrice);
+      if (maxPrice) filtro.currentPrice.$lte = parseFloat(maxPrice);
+    }
+
+    console.log("🔍 Filtros aplicados:", filtro);
+
+    const productos = await db.collection("productos")
+      .find(filtro)
+      .sort({ lastUpdate: -1 })
+      .limit(100)
+      .toArray();
+
+    console.log(`✅ Productos encontrados: ${productos.length}`);
+
+    res.json({
+      ok: true,
+      count: productos.length,
+      productos
+    });
+
+  } catch (err) {
+    console.error("❌ Error buscando productos:", err);
+    res.status(500).json({ 
+      ok: false, 
+      error: "Error al buscar productos" 
+    });
+  }
+});
+
+// =============================================================
+// 📦 Obtener producto por ID
+// =============================================================
+router.get("/api/productos/:id", async (req, res) => {
+  try {
+    const db = getDB();
+    const productId = req.params.id;
+
+    if (!ObjectId.isValid(productId)) {
+      return res.status(400).json({ 
+        ok: false, 
+        error: "ID de producto inválido" 
+      });
+    }
+
+    const producto = await db.collection("productos").findOne({
+      _id: new ObjectId(productId)
+    });
+
+    if (!producto) {
+      return res.status(404).json({ 
+        ok: false, 
+        error: "Producto no encontrado" 
+      });
+    }
+
+    res.json({
+      ok: true,
+      producto
+    });
+
+  } catch (err) {
+    console.error("❌ Error obteniendo producto:", err);
+    res.status(500).json({ 
+      ok: false, 
+      error: "Error al obtener producto" 
+    });
+  }
+});
 
 export default router;

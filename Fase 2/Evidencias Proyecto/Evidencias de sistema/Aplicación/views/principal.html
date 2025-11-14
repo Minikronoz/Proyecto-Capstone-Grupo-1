@@ -12,27 +12,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
   <script src="/socket.io/socket.io.js"></script>
   <base href="/" />
-
-  <style>
-    .kpi__value.grid-kpi { 
-      display:flex; flex-direction:column; 
-      gap:.6rem; font-size:.9rem; 
-    }
-    .item-card { 
-      display:flex; align-items:center; justify-content:space-between; 
-      background:#f9fafb; padding:.45rem .75rem;
-      border-left:4px solid #e5e7eb; border-radius:.6rem;
-    }
-    .item-card h4 { margin:0; font-size:.9rem; }
-    .item-card .datos { display:flex; gap:.75rem; font-size:.8rem; color:#334155; }
-    .log-output {
-      padding:.75rem 1rem; background:#020617;
-      color:#e5e7eb; font-family:"Fira Code", monospace;
-      font-size:.75rem; max-height:400px; overflow-y:auto;
-    }
-    .badge--error { background:#fee2e2; color:#b91c1c; }
-    .badge--ok { background:#dcfce7; color:#15803d; }
-  </style>
 </head>
 
 <body>
@@ -99,17 +78,35 @@
 
       <!-- SCRAPING -->
       <section id="scraping" class="seccion">
-        <div class="botones-scraping">
-          <button onclick="ejecutarScraping('unimarc')" class="btn btn-unimarc">Unimarc</button>
-          <button onclick="ejecutarScraping('tottus')" class="btn btn-tottus">Tottus</button>
-          <button onclick="ejecutarScraping('jumbo')" class="btn btn-jumbo">Jumbo</button>
-          <button onclick="ejecutarScraping('acuenta')" class="btn btn-acuenta">A Cuenta</button>
+        <div class="section-header">
+          <h2><i class="fa-solid fa-cloud-arrow-down"></i> Ejecución de Scraping</h2>
+          <p class="descripcion">Ejecuta los scripts para actualizar precios de supermercados.</p>
         </div>
 
-        <div id="log-unimarc" class="log-contenedor"><div class="log-output">Esperando ejecución...</div></div>
-        <div id="log-tottus" class="log-contenedor"><div class="log-output">Esperando ejecución...</div></div>
-        <div id="log-jumbo" class="log-contenedor"><div class="log-output">Esperando ejecución...</div></div>
-        <div id="log-acuenta" class="log-contenedor"><div class="log-output">Esperando ejecución...</div></div>
+        <div class="card scraping-card">
+          <div class="botones-scraping">
+            <button onclick="ejecutarScraping('unimarc')" class="btn btn-unimarc">
+              <i class="fa-solid fa-play"></i> Unimarc
+            </button>
+            <button onclick="ejecutarScraping('tottus')" class="btn btn-tottus">
+              <i class="fa-solid fa-play"></i> Tottus
+            </button>
+            <button onclick="ejecutarScraping('jumbo')" class="btn btn-jumbo">
+              <i class="fa-solid fa-play"></i> Jumbo
+            </button>
+            <button onclick="ejecutarScraping('acuenta')" class="btn btn-acuenta">
+              <i class="fa-solid fa-play"></i> A Cuenta
+            </button>
+            <button onclick="limpiarTodasLasConsolas()" class="btn btn-outline">
+              <i class="fa-solid fa-broom"></i> Limpiar Todas
+            </button>
+          </div>
+
+          <!-- 🎯 CONSOLAS INDIVIDUALES -->
+          <div id="contenedorConsolas" class="consolas-container">
+            <!-- Las consolas se crearán dinámicamente aquí -->
+          </div>
+        </div>
       </section>
 
       <!-- USUARIOS -->
@@ -250,22 +247,19 @@
   </div>
 
   <!-- JS GLOBAL -->
-<script src="js/dashboard.js"></script>
+  <script src="/js/dashboard.js"></script>
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("🔥 dashboard.js listo (DOM cargado)");
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    console.log("🔥 dashboard.js listo (DOM cargado)");
 
-  const form = document.getElementById("formEditarUsuario");
-  if (form) form.addEventListener("submit", guardarUsuario);
+    const form = document.getElementById("formEditarUsuario");
+    if (form) form.addEventListener("submit", guardarUsuario);
 
-  cargarDatosDashboard();
-  cargarActividadSemanal();
-});
-
-</script>
-
-
+    cargarDatosDashboard();
+    cargarActividadSemanal();
+  });
+  </script>
 
 </body>
 </html>

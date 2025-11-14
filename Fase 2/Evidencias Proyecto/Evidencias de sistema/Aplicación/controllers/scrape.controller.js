@@ -1,9 +1,9 @@
 // =============================================================
 // ⚙️ CONTROLADOR: Scraping de Supermercados (MongoClient Only)
 // =============================================================
-import { exec } from "child_process";
-import fs from "fs";
+import { exec, spawn } from "child_process"; // ← Agregar spawn
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 import { getDB } from "../config/db.js"; // ✔ conexión MongoClient correcta
 
@@ -87,72 +87,87 @@ function ejecutarScraping(nombreScript, io) {
     }
 
     console.log(`▶ Ejecutando scraping: ${scriptPath}`);
-
-    io.emit("scrape-progress", {
-      store: nombreScript,
-      message: `🚀 Iniciando scraping de ${nombreScript}...`,
+    
+    io.emit("scrape-log", { 
+      store: nombreScript, 
+      message: `🚀 Iniciando scraping de ${nombreScript}...` 
     });
 
-    const proceso = exec(`node "${scriptPath}"`, { cwd: process.cwd() });
+    // ✅ FIX: Usar comillas dobles para escapar espacios en Windows
+    const proceso = spawn('node', [scriptPath], {
+      cwd: process.cwd(),
+      shell: false, // ✅ CAMBIO: false evita problemas con espacios
+      env: { ...process.env, FORCE_COLOR: '0' },
+      windowsHide: true // ✅ Oculta ventana en Windows
+    });
 
     let nuevos = 0;
     let actualizados = 0;
     let revisados = 0;
 
     proceso.stdout.on("data", (data) => {
-      const msg = data.toString();
-
-      const lineas = msg.split("\n").filter((l) => l.trim());
-      lineas.forEach((linea) => {
-        io.emit("scrape-progress", { store: nombreScript, message: linea });
+      const texto = data.toString();
+      console.log(texto);
+      
+      const lineas = texto.split('\n').filter(l => l.trim());
+      
+      lineas.forEach(linea => {
+        const lineaLimpia = linea.replace(/\x1B\[[0-9;]*[JKmsu]/g, '');
+        
+        if (lineaLimpia.trim()) {
+          io.emit("scrape-log", { 
+            store: nombreScript, 
+            message: lineaLimpia 
+          });
+        }
       });
 
-      const match = msg.match(/Nuevos:\s*(\d+).*Actualizados:\s*(\d+).*Revisados.*?:\s*(\d+)/i);
+      const match = texto.match(/Nuevos:\s*(\d+).*Actualizados:\s*(\d+)/i);
       if (match) {
         nuevos = parseInt(match[1], 10);
         actualizados = parseInt(match[2], 10);
-        revisados = parseInt(match[3], 10);
       }
     });
 
     proceso.stderr.on("data", (data) => {
-      io.emit("scrape-error", {
-        store: nombreScript,
-        message: data.toString(),
+      const msg = data.toString().replace(/\x1B\[[0-9;]*[JKmsu]/g, '');
+      console.error(`[${nombreScript} ERROR] ${msg}`);
+      
+      io.emit("scrape-error", { 
+        store: nombreScript, 
+        message: msg 
       });
     });
 
-    // =============================================================
-    // 🔥 AHORA ESTA FUNCIÓN ES async → YA PODEMOS USAR await
-    // =============================================================
-    proceso.on("exit", async (code) => {
-  const success = code === 0;
+    proceso.on("exit", (code) => {
+      const success = code === 0;
+      const mensaje = success 
+        ? `✅ Scraping de ${nombreScript} completado exitosamente` 
+        : `❌ Scraping de ${nombreScript} terminó con código ${code}`;
+      
+      console.log(mensaje);
+      
+      io.emit("scrape-complete", { 
+        store: nombreScript, 
+        success, 
+        message: mensaje,
+        nuevos,
+        actualizados
+      });
 
-  // Emitimos al frontend
-  io.emit("scrape-complete", {
-    store: nombreScript,
-    success,
-    message: success
-      ? `✅ Scraping de ${nombreScript} completado exitosamente`
-      : `❌ Scraping de ${nombreScript} terminó con código ${code}`,
-  });
-
-  // 🟩 REGISTRO COMPATIBLE CON ACTIVIDAD SEMANAL
-  await logScraping(nombreScript, success ? "success" : "fail");
-
-  // Guardado normal
-  if (success) {
-    guardarScraping(nombreScript, { nuevos, actualizados, revisados });
-    return resolve();
-  } else {
-    return reject(new Error(`${nombreScript} terminó con código ${code}`));
-  }
-});
+      if (success) {
+        guardarScraping(nombreScript, { nuevos, actualizados, revisados });
+        resolve();
+      } else {
+        reject(new Error(`${nombreScript} terminó con código ${code}`));
+      }
+    });
 
     proceso.on("error", (err) => {
-      io.emit("scrape-error", {
-        store: nombreScript,
-        message: `Error al ejecutar: ${err.message}`,
+      console.error(`[${nombreScript}] Error al ejecutar proceso:`, err);
+      io.emit("scrape-error", { 
+        store: nombreScript, 
+        message: `Error al ejecutar: ${err.message}` 
       });
       reject(err);
     });

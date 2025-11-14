@@ -5,110 +5,109 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🛒 Catálogo de Productos</title>
   <link rel="stylesheet" href="/css/catalogo.css" />
-  <style>
-  /* ==============================
-     🔹 Estilos del popup emergente
-     ============================== */
-  .popup.oculto {
-    display: none;
-  }
-
-  .popup {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-  }
-
-  .popup-contenido {
-    background: #fff;
-    color: #333;
-    border-radius: 14px;
-    padding: 25px 35px;
-    text-align: center;
-    max-width: 400px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-    animation: aparecer 0.4s ease;
-  }
-
-  .popup-contenido h3 {
-    margin-bottom: 10px;
-    color: #00a7b5;
-  }
-
-  .popup-botones {
-    margin-top: 20px;
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .popup-botones .btn {
-    padding: 10px 18px;
-    border-radius: 8px;
-    text-decoration: none;
-    color: white;
-    background-color: #00a7b5;
-    transition: background 0.2s;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-  }
-
-  .popup-botones .btn:hover {
-    background-color: #008e9a;
-  }
-
-  .popup-botones .btn.secundario {
-    background-color: #777;
-  }
-
-  .popup-botones .btn.secundario:hover {
-    background-color: #555;
-  }
-
-  .popup-botones .btn.omitir {
-    background-color: #e0e0e0;
-    color: #333;
-  }
-
-  .popup-botones .btn.omitir:hover {
-    background-color: #ccc;
-  }
-
-  @keyframes aparecer {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
-  }
-</style>
-
 </head>
 
 <body>
+
+<!-- ✅ BARRA SUPERIOR DINÁMICA -->
 <div class="barra-superior" id="barra-superior">
-    <a href="/dashboard" class="logo-dash">🟢 DashUser</a>
-    <nav>
-      <a href="/editar-perfil">👤 Editar mis datos</a>
-      <a href="/login" class="logout-btn">🚪 Cerrar sesión</a>
-    </nav>
+  <a href="/catalogo" class="logo-dash">🛒 Catálogo</a>
+  
+  <nav id="nav-usuario">
+    <!-- Se llenará dinámicamente con JavaScript -->
+  </nav>
 </div>
 
-  <!-- 🔹 Fecha -->
-  <div class="ultima-actualizacion" id="fecha-actualizacion">
-    Última actualización: <strong></strong>
-  </div>
+<!-- 🔹 Script para cargar usuario -->
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const navUsuario = document.getElementById("nav-usuario");
 
-  <!-- 🔹 Filtros supermercados -->
-  <div class="filtro-superior">
+  try {
+    const res = await fetch("/api/sesion-activa", { 
+      credentials: "include" 
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      
+      if (data.ok && data.user) {
+        const nombreCompleto = `${data.user.nombre || ''} ${data.user.apellido || ''}`.trim() || 'Usuario';
+        
+        navUsuario.innerHTML = `
+          <div class="usuario-menu">
+            <button class="btn-usuario" onclick="toggleMenuUsuario()">
+              👤 Bienvenid@ ${nombreCompleto}
+            </button>
+            <div class="menu-desplegable" id="menuUsuario">
+              <a href="/dashboard">📊 Mi Dashboard</a>
+              <a href="/editar-perfil">⚙️ Editar Perfil</a>
+              <a href="#" onclick="cerrarSesion(event)">🚪 Cerrar Sesión</a>
+            </div>
+          </div>
+        `;
+        return;
+      }
+    }
+
+    navUsuario.innerHTML = `
+      <a href="/login" class="btn-nav">🔑 Iniciar sesión</a>
+      <a href="/registrar" class="btn-nav btn-registro">📝 Registrarse</a>
+    `;
+
+  } catch (error) {
+    navUsuario.innerHTML = `
+      <a href="/login" class="btn-nav">🔑 Iniciar sesión</a>
+      <a href="/registrar" class="btn-nav btn-registro">📝 Registrarse</a>
+    `;
+  }
+});
+
+function toggleMenuUsuario() {
+  const menu = document.getElementById("menuUsuario");
+  if (menu) {
+    menu.classList.toggle("mostrar");
+  }
+}
+
+document.addEventListener("click", (e) => {
+  const menu = document.getElementById("menuUsuario");
+  const btn = document.querySelector(".btn-usuario");
+  
+  if (menu && btn && !btn.contains(e.target) && !menu.contains(e.target)) {
+    menu.classList.remove("mostrar");
+  }
+});
+
+async function cerrarSesion(event) {
+  event.preventDefault();
+  
+  try {
+    await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include"
+    });
+    
+    window.location.href = "/catalogo";
+  } catch (error) {
+    console.error("Error cerrando sesión:", error);
+    window.location.href = "/login";
+  }
+}
+</script>
+
+<!-- 🔹 Fecha -->
+<div class="ultima-actualizacion" id="fecha-actualizacion">
+  Última actualización: <strong></strong>
+</div>
+
+<!-- 🔹 Filtros supermercados -->
+<div class="filtro-superior">
     <label><input type="checkbox" class="filtro-super" value="unimarc" checked><span class="tag unimarc">Unimarc</span></label>
     <label><input type="checkbox" class="filtro-super" value="tottus" checked><span class="tag tottus">Tottus</span></label>
     <label><input type="checkbox" class="filtro-super" value="jumbo" checked><span class="tag jumbo">Jumbo</span></label>
     <label><input type="checkbox" class="filtro-super" value="acuenta" checked><span class="tag acuenta">Acuenta</span></label>
-  </div>
+</div>
 
 <section class="zona-busqueda">
   <div class="bloque-busqueda">
@@ -125,192 +124,148 @@
   </div>
 </section>
 
+<section class="filtros-peso"></section>
 
-    <section class="filtros-peso"></section>
+<section class="productos" id="contenedorProductos">
+  <!-- Productos dinámicos -->
+</section>
 
-    <section class="productos" id="contenedorProductos">
-      <!-- Productos dinámicos -->
-    </section>
+<!-- 🔹 Carrito rápido -->
+<div id="carritoRapidoPanel" class="carrito-rapido oculto">
+  <div class="carrito-header">
+    <h3>Carrito rápido</h3>
+    <button id="cerrarCarritoRapido" class="cerrar-btn">✖</button>
+  </div>
+  <div id="carritoRapidoContenido" class="carrito-contenido">
+    <p>Selecciona un producto para comparar precios.</p>
+  </div>
+</div>
 
-    <!-- 🔹 Carrito rápido -->
-    <div id="carritoRapidoPanel" class="carrito-rapido oculto">
-      <div class="carrito-header">
-        <h3>Carrito rápido</h3>
-        <button id="cerrarCarritoRapido" class="cerrar-btn">✖</button>
-      </div>
-      <div id="carritoRapidoContenido" class="carrito-contenido">
-        <p>Selecciona un producto para comparar precios.</p>
-      </div>
-    </div>
-  </main>
+<!-- 🔹 Footer -->
+<footer>
+  <p>© 2025 Sistema de Reportes — Catálogo Interactivo</p>
+</footer>
 
-  <!-- 🔹 Footer -->
-  <footer>
-    <p>© 2025 Sistema de Reportes — Catálogo Interactivo</p>
-  </footer>
-
-<!-- 🔹 Ventana emergente -->
+<!-- ✅ POPUP REGISTRO (aparece después de 1 minuto sin sesión) -->
 <div id="popupRegistro" class="popup oculto">
   <div class="popup-contenido">
+    <button class="popup-cerrar" onclick="cerrarPopup()">✖</button>
     <h3>✨ Mejora tu experiencia ✨</h3>
     <p>
       Regístrate o inicia sesión para disfrutar de funciones personalizadas y guardar tus productos favoritos.
     </p>
     <div class="popup-botones">
-      <a href="/login" class="btn">🔑 Iniciar sesión</a>
-      <a href="/registrar" class="btn secundario">📝 Registrarme</a>
-      <button class="btn omitir" onclick="omitirPopup()">⏳ Omitir</button>
+      <a href="/login" class="btn-popup btn-login">🔑 Iniciar sesión</a>
+      <a href="/registrar" class="btn-popup btn-registro">📝 Registrarme</a>
+      <button class="btn-popup btn-omitir" onclick="omitirPopup()">⏳ Recordar más tarde</button>
     </div>
   </div>
 </div>
 
-  <!-- 🔹 Fecha dinámica -->
-  <script>
-    const fechaElemento = document.querySelector("#fecha-actualizacion strong");
-    const opciones = { weekday: "long", day: "numeric", month: "long", year: "numeric" };
-    const fechaFormateada = new Date().toLocaleDateString("es-ES", opciones);
-    fechaElemento.textContent = fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1);
-  </script>
-
-  <!-- 🔹 Registro de clic -->
-  <script>
-    async function registrarClickProducto(btn) {
-      const producto = {
-        idProducto: btn.getAttribute("data-id"),
-        titulo: btn.getAttribute("data-titulo"),
-        marca: btn.getAttribute("data-marca"),
-        precio: parseFloat(btn.getAttribute("data-precio")),
-        supermercado: btn.getAttribute("data-supermercado"),
-        link: btn.getAttribute("data-link"),
-        imagen: btn.getAttribute("data-imagen"),
-      };
-
-      try {
-        const res = await fetch("/api/clicks/registrar", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ producto }),
-          credentials: "include"
-        });
-        const data = await res.json();
-        console.log("Click guardado:", data.msg);
-      } catch (error) {
-        console.error("Error registrando clic:", error);
-      }
-
-      window.open(producto.link, "_blank");
-    }
-  </script>
-
-  <!-- 🔹 Script principal -->
-  <script src="/js/catalogo.js"></script>
-
-<!-- 🔹 Verificar sesión cada 1 minuto -->
+<!-- 🔹 Script de control del popup -->
 <script>
-  let sesionActiva = false;
-  let omitidoTemporalmente = false;
+let sesionActiva = false;
+let omitidoTemporalmente = false;
+let tiempoMostrado = false;
 
-  async function verificarSesion() {
-    try {
-      const res = await fetch("/api/sesion-activa", { credentials: "include" });
+async function verificarYMostrarPopup() {
+  try {
+    const res = await fetch("/api/sesion-activa", { credentials: "include" });
 
-      // ✅ Usuario con sesión activa → ocultar popup
-      if (res.ok) {
-        const data = await res.json();
-        if (data.user) {
-          sesionActiva = true;
-          ocultarPopup();
-          return;
-        }
+    if (res.ok) {
+      const data = await res.json();
+      if (data.ok && data.user) {
+        sesionActiva = true;
+        return; // Usuario autenticado, no mostrar popup
       }
-
-      // 🚫 Si se omitió temporalmente, no mostrar aún
-      if (omitidoTemporalmente || sesionActiva) return;
-
-      // ⚠️ Mostrar popup si no hay sesión
-      mostrarPopup();
-
-    } catch (error) {
-      console.error("❌ Error verificando sesión:", error);
-      if (!omitidoTemporalmente && !sesionActiva) mostrarPopup();
-    }
-  }
-
-  function mostrarPopup() {
-    const popup = document.getElementById("popupRegistro");
-    popup.classList.remove("oculto");
-  }
-
-  function ocultarPopup() {
-    const popup = document.getElementById("popupRegistro");
-    popup.classList.add("oculto");
-  }
-
-  function omitirPopup() {
-    ocultarPopup();
-    omitidoTemporalmente = true;
-    // ⏳ Reaparece después de 2 minutos
-    setTimeout(() => {
-      omitidoTemporalmente = false;
-    }, 120000);
-  }
-
-  // ⏱️ Ejecutar verificación cada 60 s
-  setInterval(verificarSesion, 60000);
-
-  // ✅ Primera verificación al cargar
-  document.addEventListener("DOMContentLoaded", verificarSesion);
-
-document.addEventListener("DOMContentLoaded", async () => {
-  try {
-    const res = await fetch("/api/auth/yo");
-    const data = await res.json();
-
-    const barra = document.getElementById("barra-superior");
-
-    // ❌ Si NO está logueado → ocultar la barra
-    if (!data.ok) {
-      barra.style.display = "none";
-      return;
     }
 
-    // ✅ Si está logueado → mostrar (igual por si se ocultó en otra página)
-    barra.style.display = "flex";
+    // ✅ Usuario NO autenticado → Esperar 1 minuto antes de mostrar
+    if (!sesionActiva && !omitidoTemporalmente && !tiempoMostrado) {
+      setTimeout(() => {
+        if (!sesionActiva && !omitidoTemporalmente) {
+          mostrarPopup();
+          tiempoMostrado = true;
+        }
+      }, 60000); // 60 segundos = 1 minuto
+    }
 
   } catch (error) {
-    console.error("Error verificando sesión", error);
+    console.warn("⚠️ Error verificando sesión");
   }
-});
-
-document.addEventListener("DOMContentLoaded", async () => {
-  const popup = document.getElementById("popupRegistro");
-
-  try {
-    const res = await fetch("/api/auth/yo");
-    const data = await res.json();
-
-    // ✔️ Si el usuario está logueado → ocultar popup y salir
-    if (data.ok) {
-      popup.style.display = "none";
-      return;
-    }
-
-    // ❌ Si NO está logueado → mostrar popup automáticamente
-    popup.classList.remove("oculto");
-
-  } catch (error) {
-    console.error("Error verificando sesión:", error);
-  }
-});
-
-// Opción para el botón "Omitir"
-function omitirPopup() {
-  const popup = document.getElementById("popupRegistro");
-  popup.style.display = "none";
 }
 
+function mostrarPopup() {
+  const popup = document.getElementById("popupRegistro");
+  if (popup) {
+    popup.classList.remove("oculto");
+    document.body.style.overflow = "hidden"; // Bloquear scroll
+  }
+}
 
+function cerrarPopup() {
+  const popup = document.getElementById("popupRegistro");
+  if (popup) {
+    popup.classList.add("oculto");
+    document.body.style.overflow = "auto"; // Restaurar scroll
+  }
+}
+
+function omitirPopup() {
+  cerrarPopup();
+  omitidoTemporalmente = true;
+  
+  // Volver a permitir popup después de 5 minutos
+  setTimeout(() => {
+    omitidoTemporalmente = false;
+    tiempoMostrado = false;
+  }, 300000); // 5 minutos
+}
+
+// ✅ Iniciar verificación al cargar la página
+document.addEventListener("DOMContentLoaded", verificarYMostrarPopup);
 </script>
+
+<!-- 🔹 Fecha dinámica -->
+<script>
+  const fechaElemento = document.querySelector("#fecha-actualizacion strong");
+  const opciones = { weekday: "long", day: "numeric", month: "long", year: "numeric" };
+  const fechaFormateada = new Date().toLocaleDateString("es-ES", opciones);
+  fechaElemento.textContent = fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1);
+</script>
+
+<!-- 🔹 Registro de clic -->
+<script>
+  async function registrarClickProducto(btn) {
+    const producto = {
+      idProducto: btn.getAttribute("data-id"),
+      titulo: btn.getAttribute("data-titulo"),
+      marca: btn.getAttribute("data-marca"),
+      precio: parseFloat(btn.getAttribute("data-precio")),
+      supermercado: btn.getAttribute("data-supermercado"),
+      link: btn.getAttribute("data-link"),
+      imagen: btn.getAttribute("data-imagen"),
+    };
+
+    try {
+      const res = await fetch("/api/clicks/registrar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ producto }),
+        credentials: "include"
+      });
+      const data = await res.json();
+      console.log("Click guardado:", data.msg);
+    } catch (error) {
+      console.error("Error registrando clic:", error);
+    }
+
+    window.open(producto.link, "_blank");
+  }
+</script>
+
+<!-- 🔹 Script principal -->
+<script src="/js/catalogo.js"></script>
 
 </body>
 </html>
