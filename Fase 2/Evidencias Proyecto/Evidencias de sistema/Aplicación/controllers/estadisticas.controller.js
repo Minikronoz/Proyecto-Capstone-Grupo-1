@@ -42,24 +42,30 @@ export const rankingProductosNuevos = async (req, res) => {
   }
 };
 
-// 💰 Índice de competitividad de precios (Atlas compatible y homogéneo con el resto)
+// 💰 Índice de competitividad de precios (con filtros anti-datos corruptos)
 export const indiceCompetitividad = async (req, res) => {
   try {
     const db = getDB();
 
-    // Nombre de colección en Atlas (ajusta si usas otro)
+    // Buscar colección correcta
     const colecciones = await db.listCollections().toArray();
     const nombreColeccion = colecciones.some(c => c.name === "priceHistory")
       ? "priceHistory"
-      : "pricehistories"; // fallback
+      : "pricehistories";
 
     const data = await db.collection(nombreColeccion).aggregate([
       {
         $match: {
           store: { $exists: true, $ne: null },
-          price: { $exists: true, $gt: 0 }
+          price: { $exists: true },
+
+          // 🛑 FILTRO ANTI-PRECIOS CORRUPTOS
+          // Solo aceptamos precios entre $50 y $500.000
+          price: { $gte: 50, $lte: 500000 }
         }
       },
+
+      // Convertir strings a número
       {
         $addFields: {
           priceNum: {
@@ -71,27 +77,44 @@ export const indiceCompetitividad = async (req, res) => {
           }
         }
       },
+
+      // 🧹 Filtrar nuevamente por si conversiones producen valores raros
       {
-        $group: {
-          _id: "$store",              // 👈 IMPORTANTE: igual que el resto de stats
-          promedio: { $avg: "$priceNum" }
+        $match: {
+          priceNum: { $gte: 50, $lte: 500000 }
         }
       },
+
+      // Calcular promedio por tienda
+      {
+        $group: {
+          _id: "$store",
+          promedio: { $avg: "$priceNum" },
+          cantidad: { $sum: 1 }
+        }
+      },
+
+      // Ordenar ascendente → más competitivo primero
       { $sort: { promedio: 1 } },
+
+      // Formato limpio final
       {
         $project: {
-          _id: 1,                     // 👈 dejamos el store en _id
-          total: { $round: ["$promedio", 0] }  // 👈 y el valor en total (como otros endpoints)
+          _id: 1,
+          total: { $round: ["$promedio", 0] },
+          cantidad: 1
         }
       }
     ]).toArray();
 
     res.json(data.length ? data : []);
+
   } catch (error) {
     console.error("❌ Error en indiceCompetitividad:", error);
     res.status(500).json({ error: "Error al calcular índice de competitividad" });
   }
 };
+
 
 
 // 🌎 Cruce entre género y región (Atlas compatible y estándar)
@@ -240,9 +263,6 @@ export const productosCrecimiento = async (req, res) => {
 };
 
 
-// controllers/estadisticas.controller.js
-
-
 /** 📉 Productos con baja de precio (últimos 7 días) */
 export async function obtenerBajasDePrecio(req, res) {
   try {
@@ -254,9 +274,31 @@ export async function obtenerBajasDePrecio(req, res) {
         {
           $match: {
             fecha: { $gte: hace7dias },
-            $expr: { $lt: ["$price", "$previousPrice"] } // precio bajó
+
+            // Precio bajó
+            $expr: { $lt: ["$price", "$previousPrice"] },
+
+            // Filtros anti-scraping corrupto
+            price: { $gte: 100, $lte: 200000 },
+            previousPrice: { $gte: 100, $lte: 200000 }
           }
         },
+
+        // Calcular diferencia
+        {
+          $addFields: {
+            diferencia: { $subtract: ["$previousPrice", "$price"] }
+          }
+        },
+
+        // Evitar bajas falsas exageradas
+        {
+          $match: {
+            diferencia: { $lte: 50000 }
+          }
+        },
+
+        // JOIN con productos
         {
           $lookup: {
             from: "productos",
@@ -266,6 +308,8 @@ export async function obtenerBajasDePrecio(req, res) {
           }
         },
         { $unwind: "$producto" },
+
+        // Selección de campos
         {
           $project: {
             _id: 0,
@@ -273,13 +317,16 @@ export async function obtenerBajasDePrecio(req, res) {
             store: 1,
             precioAnterior: "$previousPrice",
             precioActual: "$price",
-            diferencia: { $subtract: ["$previousPrice", "$price"] },
+            diferencia: 1,
             fecha: 1,
             titulo: "$producto.title",
             image: "$producto.image",
-            categoria: "$producto.categoria"
+            categoria: "$producto.categoria",
+            link: "$producto.link",
+
           }
         },
+
         { $sort: { diferencia: -1 } }
       ])
       .toArray();
@@ -288,6 +335,110 @@ export async function obtenerBajasDePrecio(req, res) {
 
   } catch (err) {
     console.error("❌ Error en obtenerBajasDePrecio:", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+}
+
+/** 📈 Productos con subida de precio (últimos 7 días) */
+export async function obtenerSubidasDePrecio(req, res) {
+  try {
+    const db = getDB();
+    const hace7dias = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+    const data = await db.collection("priceHistory")
+      .aggregate([
+        {
+          $match: {
+            fecha: { $gte: hace7dias },
+
+            // Precio subió
+            $expr: { $gt: ["$price", "$previousPrice"] },
+
+            // Filtros anti-precios corruptos
+            price: { $gte: 50, $lte: 500000 },
+            previousPrice: { $gte: 50, $lte: 500000 }
+          }
+        },
+
+        // Convertir strings a número
+        {
+          $addFields: {
+            priceNum: {
+              $cond: [
+                { $eq: [{ $type: "$price" }, "string"] },
+                { $toDouble: "$price" },
+                "$price"
+              ]
+            },
+            prevNum: {
+              $cond: [
+                { $eq: [{ $type: "$previousPrice" }, "string"] },
+                { $toDouble: "$previousPrice" },
+                "$previousPrice"
+              ]
+            }
+          }
+        },
+
+        // Segundo filtro de seguridad
+        {
+          $match: {
+            priceNum: { $gte: 50, $lte: 500000 },
+            prevNum: { $gte: 50, $lte: 500000 }
+          }
+        },
+
+        // Calcular diferencia real
+        {
+          $addFields: {
+            diferencia: { $subtract: ["$priceNum", "$prevNum"] }
+          }
+        },
+
+        // Evitar subidas falsas por scrap roto
+        {
+          $match: {
+            diferencia: { $lte: 50000 }
+          }
+        },
+
+        // JOIN productos
+        {
+          $lookup: {
+            from: "productos",
+            localField: "productId",
+            foreignField: "_id",
+            as: "producto"
+          }
+        },
+        { $unwind: "$producto" },
+
+        // Campos finales
+        {
+          $project: {
+            _id: 0,
+            productId: 1,
+            store: 1,
+            precioAnterior: "$prevNum",
+            precioActual: "$priceNum",
+            diferencia: 1,
+            fecha: 1,
+            titulo: "$producto.title",
+            image: "$producto.image",
+            categoria: "$producto.categoria",
+            link: "$producto.link",
+
+          }
+        },
+
+        { $sort: { diferencia: -1 } }
+      ])
+      .toArray();
+
+    res.json({ ok: true, data });
+
+  } catch (err) {
+    console.error("❌ Error en obtenerSubidasDePrecio:", err);
     res.status(500).json({ ok: false, error: err.message });
   }
 }

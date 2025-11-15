@@ -58,56 +58,92 @@
           <p class="descripcion">Monitorea la actividad del sistema en tiempo real.</p>
         </div>
 
-        <div class="kpis">
-          <article class="kpi-card"><div class="kpi__value" id="kpi-productos">—</div></article>
-          <article class="kpi-card"><div class="kpi__value" id="kpi-usuarios">—</div></article>
-          <article class="kpi-card"><div class="kpi__value" id="kpi-negocios">—</div></article>
-        </div>
+<!-- TÍTULO KPIS -->
+<h3 class="titulo-seccion titulo-kpis"> Indicadores Principales</h3>
 
-        <div id="kpi-ultimo-scraping" class="scraping-wrapper"></div>
+<div class="kpis">
 
-        <div class="charts-grid">
-          <div class="chart-card"><canvas id="chartRegiones"></canvas></div>
-          <div class="chart-card"><canvas id="chartGenero"></canvas></div>
-        </div>
+  <article class="kpi-card">
+    <p class="kpi-titulo"> Productos Totales</p>
+    <div class="kpi__value" id="kpi-productos">—</div>
+  </article>
 
-        <div class="card-scraping">
-          <div id="tablaScrapingSemanal" class="tabla-semanal"></div>
-        </div>
-      </section>
+  <article class="kpi-card">
+    <p class="kpi-titulo"> Usuarios Registrados</p>
+    <div class="kpi__value" id="kpi-usuarios">—</div>
+  </article>
 
-      <!-- SCRAPING -->
-      <section id="scraping" class="seccion">
-        <div class="section-header">
-          <h2><i class="fa-solid fa-cloud-arrow-down"></i> Ejecución de Scraping</h2>
-          <p class="descripcion">Ejecuta los scripts para actualizar precios de supermercados.</p>
-        </div>
+  <article class="kpi-card">
+    <p class="kpi-titulo"> Negocios Activos</p>
+    <div class="kpi__value" id="kpi-negocios">—</div>
+  </article>
 
-        <div class="card scraping-card">
-          <div class="botones-scraping">
-            <button onclick="ejecutarScraping('unimarc')" class="btn btn-unimarc">
-              <i class="fa-solid fa-play"></i> Unimarc
-            </button>
-            <button onclick="ejecutarScraping('tottus')" class="btn btn-tottus">
-              <i class="fa-solid fa-play"></i> Tottus
-            </button>
-            <button onclick="ejecutarScraping('jumbo')" class="btn btn-jumbo">
-              <i class="fa-solid fa-play"></i> Jumbo
-            </button>
-            <button onclick="ejecutarScraping('acuenta')" class="btn btn-acuenta">
-              <i class="fa-solid fa-play"></i> A Cuenta
-            </button>
-            <button onclick="limpiarTodasLasConsolas()" class="btn btn-outline">
-              <i class="fa-solid fa-broom"></i> Limpiar Todas
-            </button>
-          </div>
+</div>
 
-          <!-- 🎯 CONSOLAS INDIVIDUALES -->
-          <div id="contenedorConsolas" class="consolas-container">
-            <!-- Las consolas se crearán dinámicamente aquí -->
-          </div>
-        </div>
-      </section>
+
+<!-- TÍTULO ÚLTIMO SCRAPING -->
+<h3 class="titulo-seccion titulo-scraping"> Último Scraping Ejecutado</h3>
+<div id="kpi-ultimo-scraping" class="scraping-wrapper"></div>
+
+
+<!-- TÍTULO GRÁFICOS -->
+<h3 class="titulo-seccion titulo-graficos">Distribución de Usuarios</h3>
+
+<!-- BLOQUE COMPLETO DEL GRÁFICO 1 -->
+<div class="chart-block">
+  <div class="chart-card">
+    <canvas id="chartRegiones"></canvas>
+  </div>
+</div>
+
+<!-- BLOQUE COMPLETO DEL GRÁFICO 2 -->
+<div class="chart-block">
+  <p class="subtitulo-chart"> Distribución por Género</p>
+  <div class="chart-card">
+    <canvas id="chartGenero"></canvas>
+  </div>
+</div>
+<!-- TÍTULO TABLA SEMANAL -->
+<h3 class="titulo-seccion titulo-tabla"> Scraping Semanal</h3>
+<div class="card-scraping">
+  <div id="tablaScrapingSemanal" class="tabla-semanal"></div>
+</div>
+</section>
+
+<!-- SCRAPING -->
+<section id="scraping" class="seccion">
+  <div class="section-header">
+    <h2><i class="fa-solid fa-cloud-arrow-down"></i> Ejecución de Scraping</h2>
+    <p class="descripcion">Ejecuta los scripts para actualizar precios de supermercados.</p>
+  </div>
+
+  <div class="card scraping-card">
+    <div class="botones-scraping">
+      <button onclick="ejecutarScraping('unimarc')" class="btn btn-unimarc">
+        <i class="fa-solid fa-play"></i> Unimarc
+      </button>
+      <button onclick="ejecutarScraping('tottus')" class="btn btn-tottus">
+        <i class="fa-solid fa-play"></i> Tottus
+      </button>
+      <button onclick="ejecutarScraping('jumbo')" class="btn btn-jumbo">
+        <i class="fa-solid fa-play"></i> Jumbo
+      </button>
+      <button onclick="ejecutarScraping('acuenta')" class="btn btn-acuenta">
+        <i class="fa-solid fa-play"></i> A Cuenta
+      </button>
+      <button onclick="limpiarTodasLasConsolas()" class="btn btn-outline">
+        <i class="fa-solid fa-broom"></i> Limpiar Todas
+      </button>
+    </div>
+
+    <div id="contenedorConsolas" class="consolas-container"></div>
+  </div>
+</section>
+
+
+
+
+
 
       <!-- USUARIOS -->
       <section id="usuarios" class="seccion">
@@ -225,23 +261,51 @@
         </div>
       </section>
 
-      <!-- MODAL NEGOCIO -->
-      <div id="modalEditarNegocio" class="modal oculto">
-        <div class="modal-contenido">
-          <h3>Editar Negocio</h3>
+<!-- MODAL NEGOCIO -->
+<div id="modalEditarNegocio" class="modal oculto">
+  <div class="modal-contenido">
+    <h3>Editar Negocio</h3>
 
-          <input type="hidden" id="negocioId">
-          <label>Nombre del negocio</label><input type="text" id="negocioNombre">
-          <label>Giro</label><input type="text" id="negocioGiro">
-          <label>Comuna</label><input type="text" id="negocioComuna">
-          <label>Sector</label><input type="text" id="negocioSector">
+    <input type="hidden" id="negocioId">
 
-          <div class="modal-botones">
-            <button class="btn-guardar" onclick="guardarNegocio()">Guardar</button>
-            <button class="btn-cerrar" onclick="cerrarModalNegocio()">Cerrar</button>
-          </div>
-        </div>
-      </div>
+    <!-- Nombre + Rol tributario -->
+    <label for="negocioNombre">Nombre del negocio</label>
+    <input type="text" id="negocioNombre" />
+
+    <label for="negocioRolTributario">RUT / Rol tributario</label>
+    <input type="text" id="negocioRolTributario" />
+
+    <!-- Giro -->
+    <label for="negocioGiro">Giro</label>
+    <input type="text" id="negocioGiro" />
+
+    <!-- Contacto -->
+    <label for="negocioTelefono">Teléfono</label>
+    <input type="text" id="negocioTelefono" />
+
+    <label for="negocioCorreo">Correo</label>
+    <input type="email" id="negocioCorreo" />
+
+    <label for="negocioWeb">Sitio web</label>
+    <input type="text" id="negocioWeb" />
+
+    <!-- Ubicación -->
+    <label for="negocioRegion">Región</label>
+    <input type="text" id="negocioRegion" />
+
+    <label for="negocioComuna">Comuna</label>
+    <input type="text" id="negocioComuna" />
+
+    <label for="negocioSector">Sector</label>
+    <input type="text" id="negocioSector" />
+
+    <div class="modal-botones">
+      <button class="btn-guardar" onclick="guardarNegocio()">Guardar</button>
+      <button class="btn-cerrar" onclick="cerrarModalNegocio()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 
     </main>
   </div>

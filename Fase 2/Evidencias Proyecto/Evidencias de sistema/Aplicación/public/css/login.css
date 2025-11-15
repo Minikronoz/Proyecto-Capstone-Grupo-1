@@ -1,7 +1,4 @@
-/* ===========================
-   🎨 Estilo del Login Moderno
-   =========================== */
-
+/* Fondo */
 body {
   font-family: "Segoe UI", Roboto, sans-serif;
   background: linear-gradient(135deg, #e3f2fd, #bbdefb);
@@ -12,105 +9,76 @@ body {
   margin: 0;
 }
 
-/* Caja principal */
+/* CONTENEDOR ESCALADO */
 .container {
   background: white;
-  padding: 2.5rem 3rem;
-  border-radius: 15px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  width: 360px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.container:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-/* Título */
-h2 {
-  text-align: center;
-  color: #0d47a1;
-  font-weight: 600;
-  margin-bottom: 1.8rem;
-}
-
-/* Campos */
-input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 15px;
-  outline: none;
-  transition: 0.2s;
-}
-
-input:focus {
-  border-color: #1976d2;
-  box-shadow: 0 0 4px rgba(25, 118, 210, 0.4);
-}
-
-/* Botón principal */
-.btn-catalogo {
-  width: 100%;
-  background: linear-gradient(90deg, #1976d2, #2196f3);
-  color: white;
-  border: none;
-  padding: 12px;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.3s ease;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-}
-
-.btn-catalogo:hover {
-  background: linear-gradient(90deg, #1565c0, #1e88e5);
-  transform: translateY(-2px);
-}
-
-/* Enlaces inferiores */
-.extra-links {
-  text-align: center;
-  margin-top: 1.3rem;
-}
-
-.extra-links a {
-  display: block;
-  color: #1565c0;
-  text-decoration: none;
-  margin-top: 6px;
-  font-size: 14px;
-  transition: 0.2s;
-}
-
-.extra-links a:hover {
-  color: #0d47a1;
-  text-decoration: underline;
-}
-
-/* Animación de aparición */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.container {
+  padding: 4rem 4rem;
+  border-radius: 30px;
+  width: 550px;                    /* Más ancho */
+  max-width: 90%;                  /* Maximiza en pantallas grandes */
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.18);
   animation: fadeIn 0.5s ease-out;
+
+  /* 🔥 Aquí ocurre la magia */
+  transform: scale(1.35);          /* ESCALA REAL DEL TAMAÑO */
+  transform-origin: center;
 }
 
 .logo {
   display: block;
-  margin: 0 auto 1rem;
-  width: 80px;
+  margin: 0 auto 2rem;
+  width: 230px;      /* Aumentado */
   height: auto;
+}
+
+/* Título grande */
+h2 {
+  text-align: center;
+  font-size: 2.3rem;
+  margin-bottom: 2.5rem;
+  color: #0b3c91;
+  font-weight: 750;
+}
+
+/* Inputs grandes */
+.form-login input {
+  width: 100%;
+  padding: 18px;
+  margin-bottom: 22px;
+  border: 1px solid #c8d6e5;
+  border-radius: 12px;
+  font-size: 18px;
+  background: #f8fbff;
+}
+
+/* Botón grande */
+.btn-catalogo {
+  width: 100%;
+  padding: 18px;
+  font-size: 18px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #1976d2, #2196f3);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+/* Enlaces */
+.extra-links {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.extra-links a {
+  display: block;
+  margin-top: 10px;
+  font-size: 17px;
+  color: #1565c0;
+}
+
+/* Animación */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }

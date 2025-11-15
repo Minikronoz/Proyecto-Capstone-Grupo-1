@@ -139,6 +139,7 @@ function renderGraficosDashboard(charts) {
         labels: Object.keys(reg),
         datasets: [
           {
+            label: "Usuarios por Región",   // 👈 AQUÍ EL NOMBRE DEL DATASET
             data: Object.values(reg),
             backgroundColor: "#00A7B5AA",
           },
@@ -146,7 +147,7 @@ function renderGraficosDashboard(charts) {
       },
       options: {
         responsive: true,
-        animation: false, // ❗ evita rebote visual
+        animation: false,
         maintainAspectRatio: false,
       },
     });
@@ -161,6 +162,7 @@ function renderGraficosDashboard(charts) {
         labels: Object.keys(gen),
         datasets: [
           {
+            label: "Usuarios por Género",   // opcional, por prolijidad
             data: Object.values(gen),
             backgroundColor: ["#00A7B5", "#71C562", "#004D61"],
           },
@@ -169,12 +171,13 @@ function renderGraficosDashboard(charts) {
       options: {
         responsive: true,
         cutout: "45%",
-        animation: false, // ❗ evita rebote visual
+        animation: false,
         maintainAspectRatio: false,
       },
     });
   }
 }
+
 
 // =============================================================
 // 🗓 ACTIVIDAD SEMANAL

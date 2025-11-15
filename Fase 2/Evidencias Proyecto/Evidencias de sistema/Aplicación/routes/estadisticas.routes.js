@@ -14,7 +14,8 @@ import {
   insights,
   palabrasTendencia,
   distribucionUsuariosRegion,
-  obtenerBajasDePrecio
+  obtenerBajasDePrecio,
+  obtenerSubidasDePrecio,
 } from "../controllers/estadisticas.controller.js";
 
 const router = express.Router();
@@ -647,5 +648,7 @@ router.get("/distribucion-usuarios-region", distribucionUsuariosRegion);
 
 // 🔻 Productos con baja de precio
 router.get("/bajas", obtenerBajasDePrecio);
+
+router.get("/subidas", obtenerSubidasDePrecio);
 
 export default router;

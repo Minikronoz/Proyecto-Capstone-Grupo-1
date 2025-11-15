@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Registro de Usuario</title>
+
   <link rel="stylesheet" href="/css/registrar.css" />
   <script src="/js/regiones.js"></script>
 
@@ -21,9 +22,36 @@
       const negociosContainer = document.getElementById("negociosContainer");
       const addNegocioBtn = document.getElementById("addNegocioBtn");
 
-      // ==============================
-      // 🌎 REGIÓN → COMUNA → SECTOR
-      // ==============================
+      /* =====================================================
+         🔍 FUNCIÓN VALIDAR RUT (PERSONA O TRIBUTARIO)
+      ===================================================== */
+      function validarRutChileno(rutCompleto) {
+        if (!rutCompleto) return false;
+
+        rutCompleto = rutCompleto.replace(/\./g, "").replace("-", "").toUpperCase();
+        if (!/^[0-9]+[0-9K]$/.test(rutCompleto)) return false;
+
+        const cuerpo = rutCompleto.slice(0, -1);
+        const dv = rutCompleto.slice(-1);
+
+        let suma = 0;
+        let multiplo = 2;
+
+        for (let i = cuerpo.length - 1; i >= 0; i--) {
+          suma += multiplo * parseInt(cuerpo[i]);
+          multiplo = multiplo < 7 ? multiplo + 1 : 2;
+        }
+
+        const dvEsperado = 11 - (suma % 11);
+        const dvFinal =
+          dvEsperado === 11 ? "0" : dvEsperado === 10 ? "K" : dvEsperado.toString();
+
+        return dvFinal === dv;
+      }
+
+      /* =====================================================
+         🌎 CARGA REGIONES / COMUNAS / SECTORES
+      ===================================================== */
       Object.keys(regiones).forEach(region => {
         const opt = document.createElement("option");
         opt.value = region;
@@ -53,9 +81,9 @@
         });
       });
 
-      // ==============================
-      // 🏪 NEGOCIOS DINÁMICOS
-      // ==============================
+      /* =====================================================
+         🏪 NEGOCIOS DINÁMICOS
+      ===================================================== */
       tieneNegocioCheck.addEventListener("change", e => {
         negociosContainer.style.display = e.target.checked ? "block" : "none";
       });
@@ -66,8 +94,8 @@
         div.classList.add("negocio-item");
         div.innerHTML = `
           <h4>Negocio ${index}</h4>
-          <input type="text" name="nombreNegocio_${index}" placeholder="Nombre del negocio" required>
-          <input type="text" name="rolTributario_${index}" placeholder="Rol Tributario" required>
+          <input type="text" class="nombreNegocio" name="nombreNegocio_${index}" placeholder="Nombre del negocio" required>
+          <input type="text" class="rolTributario" name="rolTributario_${index}" placeholder="Rol Tributario (RUT)" required>
           <input type="text" name="giro_${index}" placeholder="Giro del negocio" required>
           <input type="text" name="telefonoNegocio_${index}" placeholder="Teléfono (opcional)">
           <input type="email" name="correoNegocio_${index}" placeholder="Correo (opcional)">
@@ -78,12 +106,63 @@
         div.querySelector(".removeNegocioBtn").addEventListener("click", () => div.remove());
       });
 
-      // ==============================
-      // 🧩 REGISTRO CON FETCH (JSON)
-      // ==============================
+      /* =====================================================
+         🧩 VALIDACIONES DEL FORMULARIO
+      ===================================================== */
+      function mostrarError(msg) {
+        mensaje.textContent = "❌ " + msg;
+        mensaje.style.color = "red";
+        mensaje.style.fontWeight = "600";
+        mensaje.style.marginTop = "10px";
+      }
+
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
+        mensaje.textContent = "";
+        mensaje.style.color = "";
+
+        const nombre = form.nombre.value.trim();
+        const apellido = form.apellido.value.trim();
+        const rut = form.rut.value.trim();
+        const fechaNacimiento = form.fechaNacimiento.value;
+        const correo = form.correo.value.trim();
+        const contraseña = form.contraseña.value;
+
+        /* ==== VALIDACIONES GENERALES ==== */
+        if (!nombre) return mostrarError("Debe ingresar un nombre.");
+        if (!apellido) return mostrarError("Debe ingresar un apellido.");
+        if (!validarRutChileno(rut)) return mostrarError("El RUT ingresado no es válido.");
+        if (!fechaNacimiento) return mostrarError("Debe ingresar su fecha de nacimiento.");
+
+        if (!correo.includes("@") || !correo.includes("."))
+          return mostrarError("Debe ingresar un correo válido.");
+
+        if (contraseña.length < 6)
+          return mostrarError("La contraseña debe tener al menos 6 caracteres.");
+
+        /* ==== VALIDAR NEGOCIOS ==== */
+        if (tieneNegocioCheck.checked) {
+          const negocios = document.querySelectorAll(".negocio-item");
+
+          if (negocios.length === 0)
+            return mostrarError("Debe agregar al menos un negocio.");
+
+          for (let n of negocios) {
+            const nombreNegocio = n.querySelector(".nombreNegocio").value.trim();
+            const rutNegocio = n.querySelector(".rolTributario").value.trim();
+
+            if (!nombreNegocio)
+              return mostrarError("El nombre del negocio es obligatorio.");
+
+            if (!validarRutChileno(rutNegocio))
+              return mostrarError("El Rol Tributario debe ser un RUT válido.");
+          }
+        }
+
+        /* =====================================================
+           📤 SI TODO ES VÁLIDO → ENVIAR A LA BASE DE DATOS
+        ===================================================== */
         const formData = new FormData(form);
         const data = {};
         formData.forEach((value, key) => {
@@ -98,17 +177,16 @@
           });
 
           const text = await res.text();
+
           if (res.ok) {
             mensaje.textContent = "✅ Registro exitoso. Redirigiendo...";
             mensaje.style.color = "green";
             setTimeout(() => (window.location.href = "/login"), 1500);
           } else {
-            mensaje.textContent = `❌ ${text}`;
-            mensaje.style.color = "red";
+            mostrarError(text);
           }
         } catch (err) {
-          mensaje.textContent = `⚠️ Error: ${err.message}`;
-          mensaje.style.color = "red";
+          mostrarError("Error de conexión con el servidor.");
         }
       });
     });
@@ -117,7 +195,7 @@
 
 <body>
   <div class="form-container">
-    <img src="/img/logo.png" alt="Logo del Sistema" class="logo" />
+    <img src="/logo.png" class="logo" />
     <h2>Registro de Usuario</h2>
 
     <form>
@@ -162,7 +240,6 @@
       <div class="links">
         <a href="/login">Acceder a mi cuenta</a><br />
         <a href="/olvide-password">¿Olvidaste tu contraseña?</a><br />
-
       </div>
     </form>
   </div>

@@ -626,8 +626,9 @@ tr:nth-child(even) {
 }
 
 /* ==============================
-   🪟 MODALES
+   🪟 MODALES — Versión PRO 2025
    ============================== */
+
 .modal {
   display: none;
 }
@@ -640,49 +641,137 @@ tr:nth-child(even) {
   display: none;
 }
 
+/* Fondo borroso */
 .modal__backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(2, 6, 23, 0.45);
-  backdrop-filter: blur(2px);
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
   z-index: 99;
 }
 
+/* Contenedor del modal */
 .modal__dialog {
   position: fixed;
-  inset: 50% auto auto 50%;
+  top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
-  width: min(640px, 92vw);
+  
+  width: min(500px, 92vw);
   background: var(--blanco);
   border: 1px solid var(--gris-medio);
   border-radius: var(--radius-lg);
-  box-shadow: var(--sombra);
+  
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
   z-index: 100;
+
   display: flex;
   flex-direction: column;
+  padding: 0;
+  animation: modalFade 0.22s ease-out;
+
   max-height: 85vh;
+  overflow-y: auto;
 }
 
-.modal__header,
-.modal__footer {
-  padding: 12px 14px;
+/* Animación */
+@keyframes modalFade {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -45%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Header */
+.modal__header {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--gris-medio);
+  background: var(--gris-claro);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 .modal__header h3 {
   margin: 0;
+  font-size: 20px;
   color: var(--petroleo);
+  font-weight: 600;
 }
 
+/* Body */
+.modal__body {
+  padding: 18px;
+  display: grid;
+  gap: 14px;
+}
+
+.modal__body label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gris-texto);
+}
+
+.modal__body input,
+.modal__body select {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid var(--gris-medio);
+  border-radius: 8px;
+  background: #fff;
+  transition: all 0.2s ease;
+}
+
+.modal__body input:focus,
+.modal__body select:focus {
+  border-color: var(--petroleo);
+  box-shadow: 0 0 0 2px rgba(0, 107, 126, 0.25);
+  outline: none;
+}
+
+/* Footer */
 .modal__footer {
+  padding: 14px 18px;
   border-top: 1px solid var(--gris-medio);
   display: flex;
-  gap: 10px;
+  gap: 12px;
   justify-content: flex-end;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 
-.modal__body {
-  padding: 12px 14px;
+/* Botones */
+.modal__footer button {
+  padding: 10px 18px;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s ease;
+  border: none;
 }
+
+/* Cancelar */
+.modal__footer button:nth-child(1) {
+  background: #ececec;
+  color: #333;
+}
+
+.modal__footer button:nth-child(1):hover {
+  background: #d6d6d6;
+}
+
+/* Guardar */
+.modal__footer button:nth-child(2) {
+  background: var(--petroleo);
+  color: white;
+}
+
+.modal__footer button:nth-child(2):hover {
+  background: var(--petroleo-600);
+}
+
 
 /* formulario interno modal usuario */
 .form-grid {
@@ -940,17 +1029,27 @@ tr:nth-child(even) {
 }
 
 .modal__dialog {
-  position: relative;
-  background: white;
-  padding: 0;
-  border-radius: 0.75rem;
-  width: 90%;
-  max-width: 600px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: min(500px, 92vw);
+  background: var(--blanco);
+  border: 1px solid var(--gris-medio);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--sombra);
+  z-index: 100;
+
+  display: flex;
+  flex-direction: column;
   max-height: 85vh;
   overflow-y: auto;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  z-index: 10000;
+  padding: 0;
+
+  animation: modalFade 0.24s ease-out;
 }
+
 
 .modal__header {
   padding: 1.25rem 1.5rem;
@@ -1304,4 +1403,40 @@ tr:nth-child(even) {
 
 .consola-acuenta .consola-header {
   background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+}
+
+
+/* bloque separado para cada gráfico */
+.chart-block {
+  margin-bottom: 25px;
+}
+
+.subtitulo-chart {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 12px 0 6px;
+  color: var(--gris-texto);
+  padding-left: 2px;
+}
+
+.subtitulo-chart {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b; /* Gris azulado profesional */
+  margin: 20px 0 10px;
+  padding-left: 6px;
+  position: relative;
+  letter-spacing: 0.3px;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+}
+
+.subtitulo-chart::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 48px;
+  height: 3px;
+  background: linear-gradient(90deg, #00a7b5, #32d4c1);
+  border-radius: 50px;
 }

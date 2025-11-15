@@ -577,3 +577,125 @@ footer {
     padding-right: 0;
   }
 }
+/* ===========================================
+   TABLAS DE VARIACIÓN - MISMO ESTILO CHARTS
+=========================================== */
+
+/* Scroll elegante */
+.tabla-scroll {
+  max-height: 340px;
+  overflow-y: auto;
+  margin-top: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.tabla-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.tabla-scroll::-webkit-scrollbar-thumb {
+  background: #00a7b5;
+  border-radius: 8px;
+}
+.tabla-scroll::-webkit-scrollbar-thumb:hover {
+  background: #008c97;
+}
+
+/* Tabla estilo "Indice Competitividad" */
+.tabla-precios {
+  width: 100%;
+  border-collapse: collapse;
+  color: #1e293b;
+  font-size: 14px;
+}
+
+/* Centrado igual que los charts */
+.tabla-centered th,
+.tabla-centered td {
+  text-align: center !important;
+}
+
+/* Encabezados */
+.tabla-precios thead tr {
+  background: #f1f5f9;
+}
+
+.tabla-precios th {
+  padding: 12px 8px;
+  font-weight: 600;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+/* Filas */
+.tabla-precios td {
+  padding: 10px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.tabla-precios tbody tr:hover {
+  background-color: #f8fafc;
+  transition: 0.15s;
+}
+
+/* Imagen */
+.tabla-precios img {
+  width: 38px;
+  height: 38px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+}
+
+/* Producto con link */
+.producto-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: #0f172a;
+  font-weight: 500;
+}
+.producto-link:hover {
+  color: #00a7b5;
+  text-decoration: underline;
+}
+
+/* Verde → bajó */
+.precio-baja {
+  color: #22c55e;
+  font-weight: 700;
+}
+
+/* Rojo → subió */
+.precio-subida {
+  color: #ef4444;
+  font-weight: 700;
+}
+/* ============================
+   CARD PARA TABLAS — CENTRADA
+============================ */
+.tabla-card {
+  max-width: 850px;
+  margin: 0 auto 40px auto; /* centrado horizontal + separación */
+  padding: 20px 24px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  border: 1px solid #e2e8f0;
+}
+
+/* Título centrado como los charts */
+.tabla-card h3 {
+  text-align: center;
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* Ajuste visual adicional */
+.tabla-precios {
+  width: 100%;
+  table-layout: fixed; /* columnas uniformes */
+}

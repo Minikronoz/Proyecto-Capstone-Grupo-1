@@ -16,7 +16,7 @@
 <header>
   <div class="header-content">
     <div class="header-left">
-      <img src="/icons/dashboard-icon.png" alt="Logo" class="logo">
+      <img src="/logo.png" class="logo" />
       <h1>Panel de Analítica General</h1>
     </div>
 
@@ -103,37 +103,51 @@
 </aside>
 
 <main>
-  <!-- ======================================================
-       📈 BLOQUES DE VARIACIONES DE PRECIOS
-  ====================================================== -->
-  <div class="charts-grid">
-    <div class="chart-card">
-      <div class="chart-card__header">
-        <h3>📉 Productos con Baja de Precio (últimos 7 días)</h3>
-      </div>
-      <div class="chart-card__body">
-        <div id="listaBajas" class="lista-precios"></div>
-      </div>
-    </div>
+<div class="tabla-card">
+  <h3 class="subtitulo-chart"> Productos con Baja de Precio (últimos 7 días)</h3>
 
-    <div class="chart-card">
-<table id="tablaBajas">
-  <thead>
-    <tr>
-      <th>Producto</th>
-      <th>Tienda</th>
-      <th>Antes</th>
-      <th>Ahora</th>
-      <th>Baja</th>
-      <th>Fecha</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
-    </div>
-
-
+  <div class="tabla-scroll">
+    <table id="tablaBajas" class="tabla-precios tabla-centered">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Tienda</th>
+          <th>Antes</th>
+          <th>Ahora</th>
+          <th>Baja</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
+</div>
+
+
+<div class="tabla-card">
+  <h3 class="subtitulo-chart"> Productos con Subida de Precio (últimos 7 días)</h3>
+
+  <div class="tabla-scroll">
+    <table id="tablaSubidas" class="tabla-precios tabla-centered">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Tienda</th>
+          <th>Antes</th>
+          <th>Ahora</th>
+          <th>Subida</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+
+
+
+
   <section>
   <h2>💰 Índice de competitividad de precios</h2>
   <div class="chart-container">
@@ -282,6 +296,7 @@ async function fetchData(url, filtros = {}) {
   const res = await fetch(`${url}?${query}`);
   return await res.json();
 }
+
 async function renderDistribucionUsuariosRegion() {
   const ctx = document.getElementById("distribucionUsuariosRegion").getContext("2d");
   const data = await fetch("/api/estadisticas/distribucion-usuarios-region").then(r => r.json());
@@ -682,9 +697,18 @@ async function renderMapaChile() {
   });
 }
 
+
+function registrarClick(producto) {
+  fetch("http://localhost:4000/api/clicks/registrar", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ producto })
+  }).catch(err => console.error("Error registrando click:", err));
+}
+
 async function cargarBajas() {
   try {
-    const res = await fetch("/api/estadisticas/bajas");
+    const res = await fetch("http://localhost:4000/api/estadisticas/bajas");
     const data = await res.json();
 
     if (!data.ok) {
@@ -700,14 +724,30 @@ async function cargarBajas() {
 
       tbody.innerHTML += `
         <tr>
-          <td>
-            <img src="${item.image}" style="width:40px; border-radius:6px; margin-right:6px;">
-            ${item.titulo}
+          <td class="col-producto">
+            <a href="${item.link}"
+   target="_blank"
+   class="producto-link"
+   onclick='registrarClick({
+     idProducto: "${item.productId}",
+     titulo: "${item.titulo.replace(/"/g, "&quot;")}",
+     supermercado: "${item.store}",
+     precio: ${item.precioActual},
+     link: "${item.link}",
+     imagen: "${item.image}"
+   })'>
+              <img src="${item.image}" alt="${item.titulo}">
+              <span>${item.titulo}</span>
+            </a>
           </td>
+
           <td>${item.store}</td>
+
           <td>$${item.precioAnterior.toLocaleString("es-CL")}</td>
           <td>$${item.precioActual.toLocaleString("es-CL")}</td>
-          <td style="color:red; font-weight:bold;">-$${item.diferencia.toLocaleString("es-CL")}</td>
+
+          <td class="precio-baja">-${item.diferencia.toLocaleString("es-CL")}</td>
+
           <td>${fecha}</td>
         </tr>
       `;
@@ -718,7 +758,58 @@ async function cargarBajas() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", cargarBajas);
+
+
+async function cargarSubidas() {
+  try {
+    const res = await fetch("http://localhost:4000/api/estadisticas/subidas");
+    const data = await res.json();
+
+    if (!data.ok) {
+      console.error("No ok:", data);
+      return;
+    }
+
+    const tbody = document.querySelector("#tablaSubidas tbody");
+    tbody.innerHTML = "";
+
+    data.data.forEach(item => {
+      const fecha = new Date(item.fecha).toLocaleDateString("es-CL");
+
+      tbody.innerHTML += `
+        <tr>
+          <td class="col-producto">
+            <a href="${item.link}" target="_blank" class="producto-link">
+              <img src="${item.image}" alt="${item.titulo}">
+              <span>${item.titulo}</span>
+            </a>
+          </td>
+
+          <td>${item.store}</td>
+
+          <td>$${item.precioAnterior.toLocaleString("es-CL")}</td>
+          <td>$${item.precioActual.toLocaleString("es-CL")}</td>
+
+          <td class="precio-subida">+${item.diferencia.toLocaleString("es-CL")}</td>
+
+          <td>${fecha}</td>
+        </tr>
+      `;
+    });
+
+  } catch (error) {
+    console.error("Error cargando subidas:", error);
+  }
+}
+
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  cargarBajas();
+  cargarSubidas();
+});
+
 
 </script>
 </body>
