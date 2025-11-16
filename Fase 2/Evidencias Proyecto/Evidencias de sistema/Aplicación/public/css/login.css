@@ -1,83 +1,99 @@
-/* Fondo */
+/* 🎨 FONDO */
 body {
   font-family: "Segoe UI", Roboto, sans-serif;
   background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  height: 100vh;
+  margin: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  margin: 0;
 }
 
-/* CONTENEDOR ESCALADO */
+/* 🟦 CONTENEDOR */
 .container {
   background: white;
-  padding: 4rem 4rem;
-  border-radius: 30px;
-  width: 550px;                    /* Más ancho */
-  max-width: 90%;                  /* Maximiza en pantallas grandes */
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.18);
-  animation: fadeIn 0.5s ease-out;
+  padding: 3rem 3rem;
+  border-radius: 26px;
+  width: 420px;                /* Tamaño ideal */
+  max-width: 90%;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
+  animation: fadeIn 0.6s ease-out;
 
-  /* 🔥 Aquí ocurre la magia */
-  transform: scale(1.35);          /* ESCALA REAL DEL TAMAÑO */
-  transform-origin: center;
+  /* ❌ Eliminamos el zoom gigante */
 }
 
+/* 🟢 LOGO */
 .logo {
   display: block;
-  margin: 0 auto 2rem;
-  width: 230px;      /* Aumentado */
+  margin: 0 auto 1.8rem;
+  width: 180px;       /* Tamaño ideal */
   height: auto;
 }
 
-/* Título grande */
+/* 🟠 TÍTULO */
 h2 {
   text-align: center;
-  font-size: 2.3rem;
-  margin-bottom: 2.5rem;
+  font-size: 2rem;
+  margin-bottom: 2rem;
   color: #0b3c91;
   font-weight: 750;
 }
 
-/* Inputs grandes */
+/* 🔵 INPUTS */
 .form-login input {
   width: 100%;
-  padding: 18px;
-  margin-bottom: 22px;
+  padding: 15px;
+  margin-bottom: 20px;
   border: 1px solid #c8d6e5;
   border-radius: 12px;
-  font-size: 18px;
+  font-size: 16px;
   background: #f8fbff;
+  transition: border 0.2s ease;
 }
 
-/* Botón grande */
+.form-login input:focus {
+  border-color: #1976d2;
+  outline: none;
+}
+
+/* 🟣 BOTÓN */
 .btn-catalogo {
   width: 100%;
-  padding: 18px;
-  font-size: 18px;
+  padding: 16px;
+  font-size: 17px;
   border-radius: 12px;
   background: linear-gradient(90deg, #1976d2, #2196f3);
   color: white;
   border: none;
   cursor: pointer;
   font-weight: 700;
+  margin-top: 5px;
+  transition: opacity 0.2s ease;
 }
 
-/* Enlaces */
+.btn-catalogo:hover {
+  opacity: 0.92;
+}
+
+/* 💬 ENLACES */
 .extra-links {
-  margin-top: 2rem;
+  margin-top: 1.5rem;
   text-align: center;
 }
 
 .extra-links a {
   display: block;
-  margin-top: 10px;
-  font-size: 17px;
+  margin-top: 8px;
+  font-size: 15px;
   color: #1565c0;
+  text-decoration: none;
 }
 
-/* Animación */
+.extra-links a:hover {
+  text-decoration: underline;
+}
+
+/* ✨ ANIMACIÓN */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }

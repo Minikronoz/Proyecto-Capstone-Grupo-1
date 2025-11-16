@@ -8,7 +8,26 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
 
 </head>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const res = await fetch("/yo");
+    const data = await res.json();
 
+    if (!data.ok) {
+      return window.location.href = "/login";
+    }
+
+    if (data.user.role !== "admin") {
+      alert("🚫 Solo administradores pueden acceder.");
+      return window.location.href = "/catalogo";
+    }
+  } catch (e) {
+    console.error(e);
+    window.location.href = "/login";
+  }
+});
+</script>
 <body>
   <script>
   Chart.register(ChartDataLabels);

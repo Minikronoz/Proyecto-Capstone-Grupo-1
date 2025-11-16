@@ -7,7 +7,24 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <link rel="stylesheet" href="/css/principal.css" />
+  <script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const res = await fetch("/yo");
+  const data = await res.json();
 
+  if (!data.ok) return; // no logueado → nada que ocultar
+
+  const role = data.user.role;
+
+  if (role === "usuario") {
+    document.querySelector(".menu-dashboard")?.classList.add("oculto");
+  }
+
+  if (role !== "admin") {
+    document.querySelector(".menu-admin")?.classList.add("oculto");
+  }
+});
+</script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
   <script src="/socket.io/socket.io.js"></script>
@@ -15,6 +32,53 @@
 </head>
 
 <body>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const res = await fetch("/yo");
+    const data = await res.json();
+
+    if (!data.ok) {
+      return window.location.href = "/login";
+    }
+
+    if (data.user.role !== "admin") {
+      alert("🚫 Solo administradores pueden acceder.");
+      return window.location.href = "/catalogo";
+    }
+  } catch (e) {
+    console.error(e);
+    window.location.href = "/login";
+  }
+});
+</script>
+
+
+<style>
+.oculto { display: none !important; }
+</style>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const res = await fetch("/yo");
+    const data = await res.json();
+
+    if (!data.ok) {
+      return window.location.href = "/login";
+    }
+
+    if (data.user.role !== "admin" && data.user.role !== "cliente") {
+      alert("🚫 No tienes acceso a este dashboard.");
+      return window.location.href = "/catalogo";
+    }
+  } catch (e) {
+    console.error(e);
+    window.location.href = "/login";
+  }
+});
+</script>
 
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
@@ -218,6 +282,7 @@
         <label>Rol</label>
         <select id="editRole">
           <option value="usuario">Usuario</option>
+          <option value="cliente">Cliente</option>
           <option value="admin">Administrador</option>
         </select>
 
@@ -313,6 +378,25 @@
   <!-- JS GLOBAL -->
   <script src="/js/dashboard.js"></script>
 
+<script > 
+
+  async function cambiarRol(id, nuevoRol) {
+  const res = await fetch(`/api/usuarios/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ role: nuevoRol })
+  });
+
+  const data = await res.json();
+  if (data.ok) {
+    alert("Rol actualizado");
+    location.reload();
+  } else {
+    alert("Error: " + (data.error || data.mensaje));
+  }
+}
+
+</script>
   <script>
   document.addEventListener("DOMContentLoaded", () => {
     console.log("🔥 dashboard.js listo (DOM cargado)");

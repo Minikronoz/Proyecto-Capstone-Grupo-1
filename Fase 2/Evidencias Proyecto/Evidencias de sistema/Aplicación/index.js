@@ -12,7 +12,9 @@ import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import { spawn } from "child_process";
 import fs from "fs";
-
+import  verificarSesionUsuario  from "./middlewares/authUser.js";
+import {verificarAdmin} from "./middlewares/authAdmin.js";
+import verificarCliente from "./middlewares/authCliente.js";
 import { connectDB, getDB } from "./config/db.js";
 
 dotenv.config();
@@ -151,13 +153,20 @@ app.get("/catalogo", (req, res) =>
 );
 
 // Principal (admin)
-app.get("/principal", (req, res) =>
-  res.sendFile(path.join(__dirname, "views", "principal.html"))
+app.get(
+  "/principal",
+  verificarSesionUsuario,
+  verificarAdmin,
+  (req, res) =>
+    res.sendFile(path.join(__dirname, "views", "principal.html"))
 );
 
 // Dashboard Analítico
-app.get("/dashboard", (req, res) =>
-  res.sendFile(path.join(__dirname, "views", "dashboard.html"))
+app.get("/dashboard",
+  verificarSesionUsuario,
+  verificarCliente,
+  (req, res) =>
+    res.sendFile(path.join(__dirname, "views", "dashboard.html"))
 );
 
 // LOGIN
@@ -171,7 +180,7 @@ app.get("/registrar", (req, res) =>
 );
 
 // EDITAR PERFIL
-app.get("/editar-perfil", (req, res) =>
+app.get("/editar-perfil", verificarSesionUsuario, (req, res) =>
   res.sendFile(path.join(__dirname, "views", "editar-perfil.html"))
 );
 
@@ -181,7 +190,7 @@ app.get("/forgot", (req, res) =>
 );
 
 // HISTÓRICO DE PRODUCTOS
-app.get("/historico", (req, res) =>
+app.get("/historico", verificarSesionUsuario, (req, res) =>
   res.sendFile(path.join(__dirname, "views", "historico.html"))
 );
 

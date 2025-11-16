@@ -260,4 +260,17 @@ router.post("/api/auth/logout", (req, res) => {
   });
 });
 
+router.get("/yo", (req, res) => {
+  if (!req.session || !req.session.user) {
+    return res.json({ ok: false });
+  }
+
+  res.json({
+    ok: true,
+    user: req.session.user
+  });
+});
+
+
+
 export default router;

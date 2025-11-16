@@ -6,7 +6,21 @@
   <title>Editar Perfil</title>
   <link rel="stylesheet" href="/css/registrar.css" />
   <script src="/js/regiones.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const res = await fetch("/yo");
+    const data = await res.json();
 
+    if (!data.ok) {
+      return window.location.href = "/login";
+    }
+  } catch (e) {
+    console.error(e);
+    window.location.href = "/login";
+  }
+});
+</script>
   <script defer>
   document.addEventListener("DOMContentLoaded", async () => {
     const msg = document.getElementById("msg");
