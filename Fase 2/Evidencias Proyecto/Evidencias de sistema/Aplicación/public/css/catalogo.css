@@ -1057,12 +1057,49 @@ button:active, .btn-ver:active {
   transform: translateY(-2px);
 }
 
-/* ---------------------------
-   CONTENEDOR HORIZONTAL
----------------------------- */
+.paginacion-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.btn-pag {
+  background: #e8f5fe;
+  border: 1px solid #90caf9;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.btn-pag:hover:not(:disabled) {
+  background: #bbdefb;
+}
+
+.btn-pag.activo {
+  background: #00a7b5;
+  color: white;
+  border-color: #008e9a;
+}
+
+.btn-pag:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.puntos {
+  padding: 0 4px;
+  font-size: 16px;
+  color: #555;
+}
+
 .botones-extra {
   display: flex;
-  gap: 10px;
+  justify-content: center; /* centrado horizontal */
+  gap: 10px;               /* separación entre botones */
   margin-top: 10px;
-  justify-content: center;
 }

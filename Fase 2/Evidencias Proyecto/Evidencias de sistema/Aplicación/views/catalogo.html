@@ -19,6 +19,7 @@
 </div>
 
 <!-- 🔹 Script para cargar usuario -->
+
 <script>
 document.addEventListener("DOMContentLoaded", async () => {
   const navUsuario = document.getElementById("nav-usuario");
@@ -35,7 +36,13 @@ document.addEventListener("DOMContentLoaded", async () => {
           `${usuario.nombre || ""} ${usuario.apellido || ""}`.trim() ||
           "Usuario";
 
-        // 🔥 Mostrar botón Dashboard SOLO si es admin o cliente
+        // 🔥 Mostrar botón Panel Administrativo SOLO admin
+        let principalLink = "";
+        if (usuario.role === "admin") {
+          principalLink = `<a href="/principal">🛠 Panel Administrativo</a>`;
+        }
+
+        // 🔥 Dashboard disponible para admin + cliente
         let dashboardLink = "";
         if (usuario.role === "admin" || usuario.role === "cliente") {
           dashboardLink = `<a href="/dashboard">📊 Mi Dashboard</a>`;
@@ -48,7 +55,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             </button>
             <div class="menu-desplegable" id="menuUsuario">
 
-              ${dashboardLink}    <!-- 👈 APARECE SOLO SI TIENE PERMISOS -->
+              ${principalLink}     <!-- 🔥 SOLO ADMIN -->
+              ${dashboardLink}     <!-- 🔥 ADMIN + CLIENTE -->
 
               <a href="/editar-perfil">⚙️ Editar Perfil</a>
               <a href="#" onclick="cerrarSesion(event)">🚪 Cerrar Sesión</a>
@@ -59,7 +67,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
-    // Si NO hay sesión
+    // 🔒 Si no hay sesión → mostrar iniciar sesión
     navUsuario.innerHTML = `
       <a href="/login" class="btn-nav">🔑 Iniciar sesión</a>
       <a href="/registrar" class="btn-nav btn-registro">📝 Registrarse</a>
@@ -71,6 +79,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
   }
 });
+
+
 
 
 function toggleMenuUsuario() {
@@ -139,6 +149,8 @@ async function cerrarSesion(event) {
 <section class="productos" id="contenedorProductos">
   <!-- Productos dinámicos -->
 </section>
+
+<div id="paginacion" class="paginacion"></div>
 
 <!-- 🔹 Carrito rápido -->
 <div id="carritoRapidoPanel" class="carrito-rapido oculto">

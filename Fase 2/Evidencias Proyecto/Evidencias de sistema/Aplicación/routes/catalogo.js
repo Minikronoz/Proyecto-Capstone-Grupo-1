@@ -71,7 +71,7 @@ router.get("/", async (req, res) => {
       .find(filtro)
       .project(proyeccion)
       .sort({ lastUpdate: -1 }) // Más recientes primero
-      .limit(400)
+      .limit(7000)
       .toArray();
 
     res.json(productos);

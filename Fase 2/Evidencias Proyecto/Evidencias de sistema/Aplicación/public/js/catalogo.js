@@ -8,6 +8,11 @@ let filtrosPesoVisibles = false;
 const ALL_STORES = ["unimarc", "tottus", "jumbo", "acuenta"];
 let selectedStores = new Set(ALL_STORES);
 
+let currentPage = 1;
+let pageSize = 200; // 👉 Aquí defines cuántos productos por página
+let totalPages = 1;
+
+
 // ---------- Utils ----------
 function normalizarPesoDesdeTitulo(title) {
   if (!title) return null;
@@ -37,6 +42,13 @@ function getFilteredProducts() {
   }
   return lista;
 }
+
+
+function paginar(lista, page, size) {
+  const start = (page - 1) * size;
+  return lista.slice(start, start + size);
+}
+
 function renderizarProductos(lista) {
   const contenedor = document.getElementById("contenedorProductos");
   contenedor.innerHTML = "";
@@ -46,7 +58,13 @@ function renderizarProductos(lista) {
     return;
   }
 
-  lista.forEach((p) => {
+// 🔥 aplicar paginación
+const listaPaginada = paginar(lista, currentPage, pageSize);
+
+// actualizar total de páginas
+totalPages = Math.ceil(lista.length / pageSize);
+
+listaPaginada.forEach((p) => {
     const card = document.createElement("div");
     card.className = "producto-card";
 
@@ -111,17 +129,89 @@ function renderizarProductos(lista) {
         Ver producto
       </button>
       <div class="botones-extra">
-        <button class="btn-carrito-rapido"
-          data-titulo="${p.title}"
-          onclick="abrirCarritoRapido('${p.title.replace(/'/g, "\\'")}')">🛒 Carrito rápido</button>
         <button class="btn-secundario"
           onclick="verHistorico('${p._id}', '${p.title}', '${p.brand}', '${p.image}', '${p.store}')">
           Histórico
         </button>
       </div>`;
     contenedor.appendChild(card);
+    
   });
+  
+  renderizarPaginacion();
 }
+
+function renderizarPaginacion() {
+  const cont = document.getElementById("paginacion");
+  if (!cont) return;
+
+  cont.innerHTML = "";
+
+  let html = `<div class="paginacion-container">`;
+
+  // 🔹 Botón anterior
+  html += `
+    <button class="btn-pag" onclick="cambiarPagina(currentPage - 1)" 
+      ${currentPage === 1 ? "disabled" : ""}>
+      ⟵ Anterior
+    </button>
+  `;
+
+  // ---- SISTEMA DE POCAS PÁGINAS ----
+  const paginas = [];
+
+  // Siempre mostrar las 3 primeras
+  paginas.push(1, 2, 3);
+
+  // Páginas alrededor de la actual
+  for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+    if (i > 3 && i < totalPages - 2) paginas.push(i);
+  }
+
+  // Siempre mostrar últimas 3
+  paginas.push(totalPages - 2, totalPages - 1, totalPages);
+
+  // Quita duplicados y valores inválidos
+  const paginasFiltradas = [...new Set(paginas.filter(n => n >= 1 && n <= totalPages))];
+
+  // ---- Render de páginas con saltos ("…") ----
+  let ultima = 0;
+  paginasFiltradas.forEach((p) => {
+    if (p !== ultima + 1) {
+      html += `<span class="puntos">…</span>`;
+    }
+
+    html += `
+      <button class="btn-pag ${p === currentPage ? "activo" : ""}" 
+        onclick="cambiarPagina(${p})">
+        ${p}
+      </button>
+    `;
+
+    ultima = p;
+  });
+
+  // 🔹 Botón siguiente
+  html += `
+    <button class="btn-pag" onclick="cambiarPagina(currentPage + 1)" 
+      ${currentPage === totalPages ? "disabled" : ""}>
+      Siguiente ⟶
+    </button>
+  `;
+
+  html += `</div>`;
+  cont.innerHTML = html;
+}
+
+
+function cambiarPagina(nuevaPagina) {
+  if (nuevaPagina < 1 || nuevaPagina > totalPages) return;
+
+  currentPage = nuevaPagina;
+  renderizarProductos(getFilteredProducts());
+  renderizarPaginacion();
+} 
+
 async function registrarClickProducto(btn) {
   let precioRaw = btn.getAttribute("data-precio") || "";
   let precioFinal = 0;
@@ -200,6 +290,7 @@ function renderizarFiltrosPeso(productos) {
   };
   cont.appendChild(limpiar);
 }
+
 async function cargarProductos(busqueda = "") {
   try {
     const res = await fetch(`/api/catalogo?q=${encodeURIComponent(busqueda)}`);
@@ -220,7 +311,12 @@ async function cargarProductos(busqueda = "") {
   } catch (err) {
     console.error("Error cargando productos:", err);
   }
+
+  renderizarProductos(getFilteredProducts());
+renderizarPaginacion();
 }
+
+
 const inputBusqueda = document.getElementById("busqueda");
 const contenedorSugerencias = document.getElementById("sugerencias");
 let sugerenciasTimeout = null;
@@ -312,6 +408,7 @@ function leerCheckboxesSuper() {
 
 function aplicarFiltroSupermercado() {
   leerCheckboxesSuper();
+  currentPage = 1;
   renderizarProductos(getFilteredProducts());
 }
 

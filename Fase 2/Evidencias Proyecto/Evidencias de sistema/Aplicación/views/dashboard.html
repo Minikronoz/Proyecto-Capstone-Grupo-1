@@ -62,6 +62,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <option value="">Todos</option>
         <option value="Masculino">Masculino</option>
         <option value="Femenino">Femenino</option>
+        <option value="otro">otro</option>
       </select>
 
       <label for="filtroRegion">Región:</label>
@@ -98,12 +99,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       <label for="filtroHasta">Hasta:</label>
       <input type="date" id="filtroHasta">
 
-      <label for="filtroUsuario">Usuario:</label>
-      <select id="filtroUsuario">
-        <option value="">Todos</option>
-        <option value="registrado">Registrados</option>
-        <option value="invitado">Invitados</option>
-      </select>
 
       <button id="btnFiltrar">Filtrar</button>
     </div>
@@ -223,6 +218,44 @@ document.addEventListener("DOMContentLoaded", async () => {
     <h2>📊 Comparativa entre consultas y búsquedas</h2>
     <div class="chart-container"><canvas id="comparativaConsultasBusquedas"></canvas></div>
   </section>
+
+  
+  <section>
+    <h2>👥 Usuarios activos por día</h2>
+    <div class="chart-container"><canvas id="usuariosActivosDia"></canvas></div>
+  </section>
+
+  <section>
+    <h2>⏰ Actividad por hora del día</h2>
+    <div class="chart-container"><canvas id="actividadPorHora"></canvas></div>
+  </section>
+
+
+
+  <section>
+    <h2>🏬 Supermercados más activos por región</h2>
+    <div class="chart-container"><canvas id="topSuperRegion"></canvas></div>
+  </section>
+
+  <section>
+    <h2>🔥 Palabras en tendencia (última semana)</h2>
+    <div class="chart-container"><canvas id="palabrasTendencia"></canvas></div>
+  </section>
+
+  
+  <section>
+    <h2>🔍búsqueda más usados</h2>
+    <div class="chart-container"><canvas id="busquedasTop"></canvas></div>
+  </section>
+
+  <section>
+    <h2>📅 Tendencia diaria de búsquedas</h2>
+    <div class="chart-container"><canvas id="busquedasPorDia"></canvas></div>
+  </section>
+
+
+
+  
   ====================================================== -->
 
 
@@ -272,52 +305,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     <div class="chart-container"><canvas id="porTiempo"></canvas></div>
   </section>
 
-  <section>
-    <h2>📈 Tendencia semanal de consultas</h2>
-    <div class="chart-container"><canvas id="chartTendencia"></canvas></div>
-  </section>
+
 
  
 
 
 
-  <!-- ======================================================
-       👥 COMPORTAMIENTO DEL USUARIO
-  ====================================================== -->
-  <section>
-    <h2>👥 Usuarios activos por día</h2>
-    <div class="chart-container"><canvas id="usuariosActivosDia"></canvas></div>
-  </section>
 
-  <section>
-    <h2>⏰ Actividad por hora del día</h2>
-    <div class="chart-container"><canvas id="actividadPorHora"></canvas></div>
-  </section>
-
-
-
-  <section>
-    <h2>🏬 Supermercados más activos por región</h2>
-    <div class="chart-container"><canvas id="topSuperRegion"></canvas></div>
-  </section>
-
-  <section>
-    <h2>🔥 Palabras en tendencia (última semana)</h2>
-    <div class="chart-container"><canvas id="palabrasTendencia"></canvas></div>
-  </section>
-
-  <!-- ======================================================
-       🔍 BLOQUES DE BÚSQUEDAS
-  ====================================================== -->
-  <section>
-    <h2>🔍búsqueda más usados</h2>
-    <div class="chart-container"><canvas id="busquedasTop"></canvas></div>
-  </section>
-
-  <section>
-    <h2>📅 Tendencia diaria de búsquedas</h2>
-    <div class="chart-container"><canvas id="busquedasPorDia"></canvas></div>
-  </section>
 
 
 
@@ -578,6 +572,7 @@ setTimeout(() => {
 
 document.addEventListener("DOMContentLoaded", () => {
   initDashboard();
+  renderMapaChile();
 });
 // 👥 Usuarios activos por día
 async function renderUsuariosActivosDia() {
@@ -707,7 +702,7 @@ async function renderPalabrasTendencia() {
 // 🌎 Mapa Chile
 async function renderMapaChile() {
   const mapa=document.getElementById("mapaChile"); mapa.innerHTML="";
-  const regiones=["Arica y Parinacota","Tarapacá","Antofagasta","Atacama","Coquimbo","Valparaíso","Metropolitana","O’Higgins","Maule","Ñuble","Biobío","La Araucanía","Los Ríos","Los Lagos","Aysén","Magallanes"];
+  const regiones=["Arica y Parinacota","Tarapacá","Antofagasta","Atacama","Coquimbo","Valparaíso","Metropolitana de Santiago","O’Higgins","Maule","Ñuble","Biobío","La Araucanía","Los Ríos","Los Lagos","Aysén","Magallanes"];
   const colores=["#a47c48","#b0874d","#c29a64","#d3b47a","#e6ca92","#d5e7a7","#b8e0a2","#8fd78f","#69ce7e","#49b66d","#34a45d","#2b9655","#23874b","#1e7742","#1a6638","#14542d"];
   const data=await fetch("/api/estadisticas/usuarios-por-region").then(r=>r.json());
   const mapaUsuarios=Object.fromEntries(data.map(d=>[d._id,d.total]));
