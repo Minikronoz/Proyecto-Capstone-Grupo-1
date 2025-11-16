@@ -86,36 +86,130 @@ router.post("/login", async (req, res) => {
 });
 
 // =======================================================
-// 📝 REGISTRO
+// 📝 REGISTRO COMPLETO
 // =======================================================
 router.post("/registrar", async (req, res) => {
   try {
     const db = getDB();
-    const { nombre, apellido, correo, contraseña } = req.body;
-
-    if (!nombre || !correo || !contraseña)
-      return res.status(400).json({ error: "Faltan datos obligatorios" });
-
-    const existe = await db.collection("users").findOne({ correo });
-    if (existe)
-      return res.status(409).json({ error: "El correo ya está registrado" });
-
-    const hash = await bcrypt.hash(contraseña, 10);
-
-    await db.collection("users").insertOne({
+    const {
       nombre,
       apellido,
+      rut,
+      fechaNacimiento,
+      genero,
+      region,
+      comuna,
+      sector,
       correo,
+      contraseña,
+      tieneNegocio
+    } = req.body;
+
+    console.log("📦 Datos recibidos:", req.body); // ← Para debug
+
+    // ✅ Validación de campos obligatorios
+    if (!nombre || !correo || !contraseña) {
+      return res.status(400).json({
+        error: "Nombre, correo y contraseña son obligatorios"
+      });
+    }
+
+    // ✅ Verificar si el correo ya existe
+    const existe = await db.collection("users").findOne({ correo: correo.toLowerCase().trim() });
+    if (existe) {
+      return res.status(409).json({
+        error: "El correo ya está registrado"
+      });
+    }
+
+    // ✅ Calcular edad si se proporciona fecha de nacimiento
+    let edad = null;
+    if (fechaNacimiento) {
+      const hoy = new Date();
+      const nacimiento = new Date(fechaNacimiento);
+      edad = hoy.getFullYear() - nacimiento.getFullYear();
+      const mes = hoy.getMonth() - nacimiento.getMonth();
+      if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+        edad--;
+      }
+    }
+
+    // ✅ Hashear contraseña
+    const hash = await bcrypt.hash(contraseña, 10);
+
+    // ✅ Procesar negocios si existen
+    const negocios = [];
+    if (tieneNegocio === "on" || tieneNegocio === true || tieneNegocio === "true") {
+      console.log("🏪 Usuario tiene negocios, procesando...");
+      
+      // Buscar todos los campos de negocios en el body
+      const negocioKeys = Object.keys(req.body).filter(k => k.startsWith("nombreNegocio_"));
+      
+      console.log("🔍 Claves de negocios encontradas:", negocioKeys);
+
+      negocioKeys.forEach(key => {
+        const index = key.split("_")[1];
+        const negocio = {
+          nombre: req.body[`nombreNegocio_${index}`]?.trim() || null,
+          rolTributario: req.body[`rolTributario_${index}`]?.trim() || null,
+          giro: req.body[`giro_${index}`]?.trim() || null,
+          telefono: req.body[`telefonoNegocio_${index}`]?.trim() || null,
+          correo: req.body[`correoNegocio_${index}`]?.trim() || null,
+          web: req.body[`webNegocio_${index}`]?.trim() || null,
+          region: req.body[`regionNegocio_${index}`] || region,
+          comuna: req.body[`comunaNegocio_${index}`] || comuna,
+          sector: req.body[`sectorNegocio_${index}`] || sector,
+        };
+
+        // Solo agregar si tiene al menos nombre
+        if (negocio.nombre) {
+          negocios.push(negocio);
+          console.log("✅ Negocio agregado:", negocio.nombre);
+        }
+      });
+    }
+
+    // ✅ Crear el usuario completo
+    const nuevoUsuario = {
+      nombre: nombre.trim(),
+      apellido: apellido?.trim() || null,
+      rut: rut?.trim() || null,
+      fechaNacimiento: fechaNacimiento ? new Date(fechaNacimiento) : null,
+      edad: edad,
+      genero: genero || null,
+      region: region || null,
+      comuna: comuna || null,
+      sector: sector || null,
+      correo: correo.toLowerCase().trim(),
       contraseña: hash,
       role: "usuario",
-      negocios: [],
+      tieneNegocio: negocios.length > 0,
+      negocios: negocios,
       creadoEn: new Date(),
+      actualizadoEn: null,
+    };
+
+    console.log("💾 Usuario a guardar:", {
+      ...nuevoUsuario,
+      contraseña: "[OCULTA]"
     });
 
-    res.json({ ok: true, mensaje: "Usuario registrado" });
+    // ✅ Insertar en MongoDB
+    const resultado = await db.collection("users").insertOne(nuevoUsuario);
+
+    console.log("✅ Usuario registrado exitosamente:", correo, "ID:", resultado.insertedId);
+
+    res.json({
+      ok: true,
+      mensaje: "Usuario registrado correctamente",
+      userId: resultado.insertedId
+    });
+
   } catch (err) {
-    console.error("❌ Error registro:", err);
-    res.status(500).json({ error: "Error interno" });
+    console.error("❌ Error en registro:", err);
+    res.status(500).json({
+      error: "Error interno del servidor al registrar usuario"
+    });
   }
 });
 
