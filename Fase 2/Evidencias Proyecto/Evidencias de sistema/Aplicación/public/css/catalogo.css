@@ -1015,5 +1015,54 @@ button:active, .btn-ver:active {
     font-size: 0.95rem;
   }
 }
+/* ---------------------------
+   BOTÓN PRINCIPAL (Ver / Carrito)
+---------------------------- */
+.btn-primario {
+  background: var(--calipso-500);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  transition: var(--transition);
+  cursor: pointer;
+}
 
-/* ✅ Fin del CSS */
+.btn-primario:hover {
+  background: var(--petroleo);
+  transform: translateY(-2px);
+}
+
+/* ---------------------------
+   BOTÓN SECUNDARIO (Histórico)
+---------------------------- */
+.btn-secundario {
+  background: transparent;
+  color: var(--calipso-500);
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 2px solid var(--calipso-500);
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.btn-secundario:hover {
+  background: var(--calipso-500);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* ---------------------------
+   CONTENEDOR HORIZONTAL
+---------------------------- */
+.botones-extra {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  justify-content: center;
+}

@@ -24,23 +24,32 @@ document.addEventListener("DOMContentLoaded", async () => {
   const navUsuario = document.getElementById("nav-usuario");
 
   try {
-    const res = await fetch("/api/sesion-activa", { 
-      credentials: "include" 
-    });
+    const res = await fetch("/api/sesion-activa", { credentials: "include" });
 
     if (res.ok) {
       const data = await res.json();
-      
+
       if (data.ok && data.user) {
-        const nombreCompleto = `${data.user.nombre || ''} ${data.user.apellido || ''}`.trim() || 'Usuario';
-        
+        const usuario = data.user;
+        const nombreCompleto =
+          `${usuario.nombre || ""} ${usuario.apellido || ""}`.trim() ||
+          "Usuario";
+
+        // 🔥 Mostrar botón Dashboard SOLO si es admin o cliente
+        let dashboardLink = "";
+        if (usuario.role === "admin" || usuario.role === "cliente") {
+          dashboardLink = `<a href="/dashboard">📊 Mi Dashboard</a>`;
+        }
+
         navUsuario.innerHTML = `
           <div class="usuario-menu">
             <button class="btn-usuario" onclick="toggleMenuUsuario()">
               👤 Bienvenid@ ${nombreCompleto}
             </button>
             <div class="menu-desplegable" id="menuUsuario">
-              <a href="/dashboard">📊 Mi Dashboard</a>
+
+              ${dashboardLink}    <!-- 👈 APARECE SOLO SI TIENE PERMISOS -->
+
               <a href="/editar-perfil">⚙️ Editar Perfil</a>
               <a href="#" onclick="cerrarSesion(event)">🚪 Cerrar Sesión</a>
             </div>
@@ -50,11 +59,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
+    // Si NO hay sesión
     navUsuario.innerHTML = `
       <a href="/login" class="btn-nav">🔑 Iniciar sesión</a>
       <a href="/registrar" class="btn-nav btn-registro">📝 Registrarse</a>
     `;
-
   } catch (error) {
     navUsuario.innerHTML = `
       <a href="/login" class="btn-nav">🔑 Iniciar sesión</a>
@@ -62,6 +71,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
   }
 });
+
 
 function toggleMenuUsuario() {
   const menu = document.getElementById("menuUsuario");

@@ -14,19 +14,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     const res = await fetch("/yo");
     const data = await res.json();
 
+    // Si no hay sesión → al login
     if (!data.ok) {
       return window.location.href = "/login";
     }
 
-    if (data.user.role !== "admin") {
-      alert("🚫 Solo administradores pueden acceder.");
+    const rol = data.user.role;
+
+    // 🔥 Solo permitir ADMIN o CLIENTE
+    if (rol !== "admin" && rol !== "cliente") {
+      alert("🚫 No tienes permiso para acceder a esta página.");
       return window.location.href = "/catalogo";
     }
+
   } catch (e) {
     console.error(e);
     window.location.href = "/login";
   }
 });
+
 </script>
 <body>
   <script>
@@ -179,6 +185,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     <canvas id="rankingProductosNuevos"></canvas>
   </div>
 </section>
+  <!-- ======================================================
 <section>
   <h2>🌎 Cruce entre género y región</h2>
   <div class="chart-container">
@@ -191,6 +198,34 @@ document.addEventListener("DOMContentLoaded", async () => {
     <canvas id="usuariosNuevosRecurrentes"></canvas>
   </div>
 </section>
+   <section>
+    <h2>🏆 Productos con mayor crecimiento</h2>
+    <div class="ranking" id="rankingCrecimiento">Cargando...</div>
+  </section>
+    <section>
+    <h2>🧠 Insights del sistema</h2>
+    <div class="insights" id="panelInsights">
+      <p>Cargando insights...</p>
+    </div>
+  </section>
+
+    <section>
+    <h2>🧍‍♂️🧍‍♀️ Top productos por género</h2>
+    <div class="chart-container"><canvas id="topProductosGenero"></canvas></div>
+  </section>
+
+    <section>
+    <h2>🗺️ Búsquedas por región</h2>
+    <div class="chart-container"><canvas id="busquedasPorRegion"></canvas></div>
+  </section>
+
+    <section>
+    <h2>📊 Comparativa entre consultas y búsquedas</h2>
+    <div class="chart-container"><canvas id="comparativaConsultasBusquedas"></canvas></div>
+  </section>
+  ====================================================== -->
+
+
 
   <!-- ======================================================
        📊 BLOQUES DE ANÁLISIS DE PRODUCTOS
@@ -242,17 +277,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     <div class="chart-container"><canvas id="chartTendencia"></canvas></div>
   </section>
 
-  <section>
-    <h2>🏆 Productos con mayor crecimiento</h2>
-    <div class="ranking" id="rankingCrecimiento">Cargando...</div>
-  </section>
+ 
 
-  <section>
-    <h2>🧠 Insights del sistema</h2>
-    <div class="insights" id="panelInsights">
-      <p>Cargando insights...</p>
-    </div>
-  </section>
+
 
   <!-- ======================================================
        👥 COMPORTAMIENTO DEL USUARIO
@@ -267,10 +294,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     <div class="chart-container"><canvas id="actividadPorHora"></canvas></div>
   </section>
 
-  <section>
-    <h2>🧍‍♂️🧍‍♀️ Top productos por género</h2>
-    <div class="chart-container"><canvas id="topProductosGenero"></canvas></div>
-  </section>
+
 
   <section>
     <h2>🏬 Supermercados más activos por región</h2>
@@ -286,7 +310,7 @@ document.addEventListener("DOMContentLoaded", async () => {
        🔍 BLOQUES DE BÚSQUEDAS
   ====================================================== -->
   <section>
-    <h2>🔍 Términos de búsqueda más usados</h2>
+    <h2>🔍búsqueda más usados</h2>
     <div class="chart-container"><canvas id="busquedasTop"></canvas></div>
   </section>
 
@@ -295,15 +319,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     <div class="chart-container"><canvas id="busquedasPorDia"></canvas></div>
   </section>
 
-  <section>
-    <h2>🗺️ Búsquedas por región</h2>
-    <div class="chart-container"><canvas id="busquedasPorRegion"></canvas></div>
-  </section>
 
-  <section>
-    <h2>📊 Comparativa entre consultas y búsquedas</h2>
-    <div class="chart-container"><canvas id="comparativaConsultasBusquedas"></canvas></div>
-  </section>
+
+
 </main>
 
 <footer>© 2025 Sistema de Reportes y Analítica — Dashboard Integrado</footer>
