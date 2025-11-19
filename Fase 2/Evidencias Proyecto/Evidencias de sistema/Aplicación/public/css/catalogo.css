@@ -308,6 +308,9 @@ body {
 .tag.acuenta {
   background: linear-gradient(145deg, #ef6c00, #cc5700);
 }
+.tag.santaisabel {
+  background: #c2185b; 
+}
 
 .tag:hover {
   filter: brightness(1.1);

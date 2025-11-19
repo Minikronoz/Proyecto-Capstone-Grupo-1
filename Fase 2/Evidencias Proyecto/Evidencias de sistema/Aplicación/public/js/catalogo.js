@@ -5,7 +5,7 @@
 let productosGlobal = [];
 let selectedWeight = null;
 let filtrosPesoVisibles = false;
-const ALL_STORES = ["unimarc", "tottus", "jumbo", "acuenta","santa isabel"];
+const ALL_STORES = ["unimarc", "tottus", "jumbo", "acuenta","santaisabel"];
 let selectedStores = new Set(ALL_STORES);
 
 let currentPage = 1;
@@ -82,7 +82,7 @@ listaPaginada.forEach((p) => {
       ? "#00695c"
       : tienda === "acuenta"
       ? "#f57c00"
-      : tienda === "santa isabel"
+      : tienda === "santaisabel"
       ? "#c2185b"
       : "#616161";
 
