@@ -1,194 +1,340 @@
 // =============================================================
-// 🛒 Catálogo de Productos — Versión limpia para Atlas
+// 🛒 Catálogo de Productos — Versión con filtros inteligentes
 // =============================================================
 
 let productosGlobal = [];
-let selectedWeight = null;
+let selectedWeights = new Set(); // ✅ Cambiar a Set para múltiples valores
 let filtrosPesoVisibles = false;
-const ALL_STORES = ["unimarc", "tottus", "jumbo", "acuenta","santaisabel"];
+const ALL_STORES = ["unimarc", "tottus", "jumbo", "acuenta", "santaisabel"];
 let selectedStores = new Set(ALL_STORES);
 
 let currentPage = 1;
-let pageSize = 200; // 👉 Aquí defines cuántos productos por página
+let pageSize = 200;
 let totalPages = 1;
 
-
-// ---------- Utils ----------
+// ==========================================
+// 🔢 Normalizar peso/volumen desde título
+// ==========================================
 function normalizarPesoDesdeTitulo(title) {
   if (!title) return null;
-  const m = title.match(/(\d+(?:[\.,]\d+)?)(\s?)(g|kg)\b/i);
-  if (!m) return null;
-  let valor = parseFloat(m[1].replace(",", "."));
-  const unidad = m[3].toLowerCase();
-  if (unidad === "kg") valor *= 1000;
-  if (valor < 50 || valor > 50000) return null;
-  return Math.round(valor);
+  
+  // 🔥 Detectar VOLUMEN (litros, ml, cc)
+  const matchVolumen = title.match(/(\d+(?:[\.,]\d+)?)\s*(l|ml|cc)\b/i);
+  if (matchVolumen) {
+    let valor = parseFloat(matchVolumen[1].replace(",", "."));
+    const unidad = matchVolumen[2].toLowerCase();
+    
+    // Convertir todo a mililitros
+    if (unidad === "l") valor *= 1000;
+    
+    return { valor: Math.round(valor), tipo: "volumen", unidadOriginal: unidad };
+  }
+  
+  // 🔥 Detectar PESO (gramos, kg)
+  const matchPeso = title.match(/(\d+(?:[\.,]\d+)?)\s*(g|kg)\b/i);
+  if (matchPeso) {
+    let valor = parseFloat(matchPeso[1].replace(",", "."));
+    const unidad = matchPeso[2].toLowerCase();
+    
+    // Convertir todo a gramos
+    if (unidad === "kg") valor *= 1000;
+    
+    if (valor < 50 || valor > 50000) return null;
+    return { valor: Math.round(valor), tipo: "peso", unidadOriginal: unidad };
+  }
+  
+  return null;
 }
 
+// ==========================================
+// 🎯 Detectar tipo de producto predominante
+// ==========================================
+function detectarTipoProducto(productos) {
+  let volumen = 0;
+  let peso = 0;
+  
+  productos.forEach((p) => {
+    const medida = normalizarPesoDesdeTitulo(p.title);
+    if (medida) {
+      if (medida.tipo === "volumen") volumen++;
+      else if (medida.tipo === "peso") peso++;
+    }
+  });
+  
+  // Si hay más productos con volumen, priorizar volumen
+  if (volumen > peso) return "volumen";
+  if (peso > volumen) return "peso";
+  
+  // Si no hay ninguno, no mostrar filtros
+  if (volumen === 0 && peso === 0) return "ninguno";
+  
+  return "ambos";
+}
+
+// ==========================================
+// 🏷️ Renderizar filtros inteligentes
+// ==========================================
+function renderizarFiltrosPeso(productos) {
+  const cont = document.querySelector(".filtros-peso");
+  cont.innerHTML = "";
+
+  const pesosVolumen = new Map();
+  const pesosPeso = new Map();
+  
+  productos.forEach((p) => {
+    const medida = normalizarPesoDesdeTitulo(p.title);
+    if (!medida) return;
+    
+    if (medida.tipo === "volumen") {
+      pesosVolumen.set(medida.valor, medida.unidadOriginal);
+    } else if (medida.tipo === "peso") {
+      pesosPeso.set(medida.valor, medida.unidadOriginal);
+    }
+  });
+
+  const tipoProducto = detectarTipoProducto(productos);
+  
+  if (tipoProducto === "ninguno") {
+    cont.innerHTML = "";
+    return;
+  }
+  
+  // Mostrar VOLUMEN
+  if ((tipoProducto === "volumen" || tipoProducto === "ambos") && pesosVolumen.size > 0) {
+    const titulo = document.createElement("h4");
+    titulo.textContent = "Filtrar por volumen";
+    titulo.className = "filtro-titulo";
+    cont.appendChild(titulo);
+    
+    const ordenados = Array.from(pesosVolumen.keys()).sort((a, b) => a - b);
+    ordenados.forEach((valor) => {
+      const chip = document.createElement("div");
+      chip.className = "chip-filtro";
+      chip.dataset.valor = valor;
+      chip.dataset.tipo = "volumen";
+      
+      if (valor >= 1000) {
+        chip.textContent = `${(valor / 1000).toFixed(1).replace('.0', '')} L`;
+      } else {
+        chip.textContent = `${valor} ml`;
+      }
+      
+      const estaSeleccionado = Array.from(selectedWeights).some(
+        sw => sw.valor === valor && sw.tipo === "volumen"
+      );
+      if (estaSeleccionado) {
+        chip.classList.add("seleccionado");
+      }
+      
+      chip.onclick = () => toggleFiltro(valor, "volumen");
+      cont.appendChild(chip);
+    });
+  }
+  
+  // Mostrar PESO
+  if ((tipoProducto === "peso" || tipoProducto === "ambos") && pesosPeso.size > 0) {
+    const titulo = document.createElement("h4");
+    titulo.textContent = "Filtrar por peso";
+    titulo.className = "filtro-titulo";
+    cont.appendChild(titulo);
+    
+    const ordenados = Array.from(pesosPeso.keys()).sort((a, b) => a - b);
+    ordenados.forEach((valor) => {
+      const chip = document.createElement("div");
+      chip.className = "chip-filtro";
+      chip.dataset.valor = valor;
+      chip.dataset.tipo = "peso";
+      
+      if (valor >= 1000) {
+        chip.textContent = `${(valor / 1000).toFixed(1).replace('.0', '')} kg`;
+      } else {
+        chip.textContent = `${valor} g`;
+      }
+      
+      const estaSeleccionado = Array.from(selectedWeights).some(
+        sw => sw.valor === valor && sw.tipo === "peso"
+      );
+      if (estaSeleccionado) {
+        chip.classList.add("seleccionado");
+      }
+      
+      chip.onclick = () => toggleFiltro(valor, "peso");
+      cont.appendChild(chip);
+    });
+  }
+
+  // Boton limpiar al FINAL
+  if (pesosVolumen.size > 0 || pesosPeso.size > 0) {
+    const limpiar = document.createElement("button");
+    limpiar.textContent = "Limpiar todos los filtros";
+    limpiar.className = "btn-limpiar-filtro";
+    limpiar.onclick = () => {
+      selectedWeights.clear();
+      currentPage = 1;
+      renderizarProductos(getFilteredProducts());
+      renderizarFiltrosPeso(productosGlobal);
+    };
+    cont.appendChild(limpiar);
+  }
+}
+
+// ==========================================
+// 🔄 Toggle filtro (seleccionar/deseleccionar)
+// ==========================================
+function toggleFiltro(valor, tipo) {
+  // Buscar si ya existe
+  const filtroExistente = Array.from(selectedWeights).find(
+    sw => sw.valor === valor && sw.tipo === tipo
+  );
+  
+  if (filtroExistente) {
+    // ❌ Deseleccionar
+    selectedWeights.delete(filtroExistente);
+  } else {
+    // ✅ Seleccionar
+    selectedWeights.add({ valor, tipo });
+  }
+  
+  currentPage = 1;
+  renderizarProductos(getFilteredProducts());
+  renderizarFiltrosPeso(productosGlobal); // Refrescar para actualizar clases "seleccionado"
+}
+
+// ==========================================
+// 🎯 Filtrar productos
+// ==========================================
 function getFilteredProducts() {
   let lista = [...productosGlobal];
 
+  // Filtrar por supermercado
   if (selectedStores.size > 0 && selectedStores.size < ALL_STORES.length) {
     lista = lista.filter((p) => selectedStores.has((p.store || "").toLowerCase()));
   } else if (selectedStores.size === 0) {
     return [];
   }
 
-  if (selectedWeight !== null) {
+  // 🔥 Filtrar por peso/volumen (múltiples valores)
+  if (selectedWeights.size > 0) {
     lista = lista.filter((p) => {
-      const w = normalizarPesoDesdeTitulo(p.title);
-      return w !== null && Math.abs(w - selectedWeight) < 10;
+      const medida = normalizarPesoDesdeTitulo(p.title);
+      if (!medida) return false;
+      
+      // Verificar si el producto coincide con ALGUNO de los filtros seleccionados
+      return Array.from(selectedWeights).some(filtro => {
+        if (medida.tipo !== filtro.tipo) return false;
+        
+        // Tolerancia de ±10%
+        const tolerancia = filtro.valor * 0.1;
+        return Math.abs(medida.valor - filtro.valor) <= tolerancia;
+      });
     });
   }
+  
   return lista;
 }
 
-
-function paginar(lista, page, size) {
-  const start = (page - 1) * size;
-  return lista.slice(start, start + size);
-}
-
+// ==========================================
+// 🎨 Renderizar productos
+// ==========================================
 function renderizarProductos(lista) {
   const contenedor = document.getElementById("contenedorProductos");
   contenedor.innerHTML = "";
 
   if (!lista.length) {
     contenedor.innerHTML = "<p>No se encontraron productos.</p>";
+    document.getElementById("paginacion").innerHTML = "";
     return;
   }
 
-// 🔥 aplicar paginación
-const listaPaginada = paginar(lista, currentPage, pageSize);
+  // Paginación
+  totalPages = Math.ceil(lista.length / pageSize);
+  const listaPaginada = lista.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
-// actualizar total de páginas
-totalPages = Math.ceil(lista.length / pageSize);
+  listaPaginada.forEach((p) => {
+    const card = document.createElement("div");
+    card.className = "producto-card";
 
-listaPaginada.forEach((p) => {
-  const card = document.createElement("div");
-  card.className = "producto-card";
+    const tienda = (p.store || "").toLowerCase();
+    const colorTienda =
+      tienda === "unimarc" ? "#d32f2f" :
+      tienda === "tottus" ? "#388e3c" :
+      tienda === "jumbo" ? "#00695c" :
+      tienda === "acuenta" ? "#f57c00" :
+      tienda === "santaisabel" ? "#c2185b" : "#616161";
 
-  // ==========================================
-  // 🎨 COLOR DE TIENDA + Soporte Santa Isabel
-  // ==========================================
-  const tienda = (p.store || "").toLowerCase();
+    const storeLabel = `<span class="store-label" style="background:${colorTienda}">${(p.store || "SIN TIENDA").toUpperCase()}</span>`;
+    const marca = p.brand && p.brand.trim() && p.brand !== "null" ? p.brand : "Sin marca";
 
-  const colorTienda =
-    tienda === "unimarc"
-      ? "#d32f2f"
-      : tienda === "tottus"
-      ? "#388e3c"
-      : tienda === "jumbo"
-      ? "#00695c"
-      : tienda === "acuenta"
-      ? "#f57c00"
-      : tienda === "santaisabel"
-      ? "#c2185b"
-      : "#616161";
+    let precioNum = 0;
+    if (typeof p.currentPrice === "number") precioNum = p.currentPrice;
+    else if (typeof p.currentPrice === "string") {
+      precioNum = parseFloat(p.currentPrice.replace(/[^\d.,]/g, "").replace(",", ".")) || 0;
+    } else if (p.formattedPrice) {
+      const m = p.formattedPrice.match(/([\d\.,]+)/);
+      if (m) precioNum = parseFloat(m[1].replace(/\./g, "").replace(",", ".")) || 0;
+    }
 
-  const storeLabel = `
-    <span class="store-label" style="background:${colorTienda}">
-      ${(p.store || "SIN TIENDA").toUpperCase()}
-    </span>`;
+    card.innerHTML = `
+      <div class="store-container">${storeLabel}</div>
+      <img src="${p.image || "/img/no-image.png"}" alt="${p.title}" loading="lazy">
+      <h3 class="product-title">${p.title}</h3>
+      <p class="brand"><strong>${marca}</strong></p>
+      <div class="price-box">
+        <p class="price-actual">${p.formattedPrice || "$ -"}</p>
+        ${p.priceNormal ? `<p class="price-normal">Normal: ${p.priceNormal}</p>` : ""}
+        ${p.pricePerUnit ? `<p class="price-unit"><small>${p.pricePerUnit}</small></p>` : ""}
+      </div>
 
-  // ============================
-  // 🏷 Marca
-  // ============================
-  const marca =
-    p.brand && p.brand.trim() && p.brand !== "null"
-      ? p.brand
-      : "Sin marca";
-
-  // ===============================
-  // 💰 Normalizar precio a número
-  // ===============================
-  let precioNum = 0;
-  if (typeof p.currentPrice === "number") precioNum = p.currentPrice;
-  else if (typeof p.currentPrice === "string")
-    precioNum =
-      parseFloat(
-        p.currentPrice.replace(/[^\d.,]/g, "").replace(",", ".")
-      ) || 0;
-  else if (p.formattedPrice) {
-    const m = p.formattedPrice.match(/([\d\.,]+)/);
-    if (m)
-      precioNum =
-        parseFloat(m[1].replace(/\./g, "").replace(",", ".")) || 0;
-  }
-
-  // ============================
-  // 🗓 Fecha
-  // ============================
-  const fecha =
-    p.lastUpdate && !isNaN(new Date(p.lastUpdate))
-      ? new Date(p.lastUpdate).toLocaleDateString("es-CL", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        })
-      : "-";
-
-  // =====================================
-  // 📌 Render del card HTML COMPLETO
-  // =====================================
-  card.innerHTML = `
-    <div class="store-container">${storeLabel}</div>
-    <img src="${p.image || "/img/no-image.png"}" alt="${p.title}" loading="lazy">
-    <h3 class="product-title">${p.title}</h3>
-    <p class="brand"><strong>${marca}</strong></p>
-    <div class="price-box">
-      <p class="price-actual">${p.formattedPrice || "$ -"}</p>
-      ${p.priceNormal ? `<p class="price-normal">Normal: ${p.priceNormal}</p>` : ""}
-      ${p.pricePerUnit ? `<p class="price-unit"><small>${p.pricePerUnit}</small></p>` : ""}
-    </div>
-
-    <button class="btn-ver"
-      data-id="${p._id || p.id || ""}"
-      data-titulo="${p.title || ""}"
-      data-marca="${p.brand || ""}"
-      data-precio="${precioNum}"
-      data-supermercado="${tienda}"
-      data-link="${p.link || ""}"
-      data-imagen="${p.image || ""}"
-      onclick="registrarClickProducto(this)">
-      Ver producto
-    </button>
-
-    <button class="btn-carrito"
-      data-id="${p._id || p.id || ""}"
-      data-nombre="${p.title || ""}"
-      data-precio="${precioNum}"
-      data-imagen="${p.image || ""}"
-      data-url="${p.link || ""}"
-      data-supermercado="${tienda}"
-      onclick="agregarDesdeBoton(this)">
-      🛒 Agregar al carrito
-    </button>
-
-    <div class="botones-extra">
-      <button class="btn-secundario"
-        onclick="verHistorico('${p._id}', '${p.title}', '${p.brand}', '${p.image}', '${p.store}')">
-        Histórico
+      <button class="btn-ver"
+        data-id="${p._id || p.id || ""}"
+        data-titulo="${p.title || ""}"
+        data-marca="${p.brand || ""}"
+        data-precio="${precioNum}"
+        data-supermercado="${tienda}"
+        data-link="${p.link || ""}"
+        data-imagen="${p.image || ""}"
+        onclick="registrarClickProducto(this)">
+        Ver producto
       </button>
-    </div>
-  `;
 
-  contenedor.appendChild(card);
-});
+      <button class="btn-carrito"
+        data-id="${p._id || p.id || ""}"
+        data-nombre="${p.title || ""}"
+        data-precio="${precioNum}"
+        data-imagen="${p.image || ""}"
+        data-url="${p.link || ""}"
+        data-supermercado="${tienda}"
+        onclick="agregarDesdeBoton(this)">
+        🛒 Agregar al carrito
+      </button>
 
-renderizarPaginacion();
+      <div class="botones-extra">
+        <button class="btn-secundario"
+          onclick="verHistorico('${p._id}', '${p.title}', '${p.brand}', '${p.image}', '${p.store}')">
+          Histórico
+        </button>
+      </div>
+    `;
 
+    contenedor.appendChild(card);
+  });
+
+  renderizarPaginacion();
 }
 
+// ==========================================
+// 📄 Renderizar paginación
+// ==========================================
 function renderizarPaginacion() {
   const cont = document.getElementById("paginacion");
   if (!cont) return;
 
   cont.innerHTML = "";
 
+  if (totalPages <= 1) return;
+
   let html = `<div class="paginacion-container">`;
 
-  // 🔹 Botón anterior
   html += `
     <button class="btn-pag" onclick="cambiarPagina(currentPage - 1)" 
       ${currentPage === 1 ? "disabled" : ""}>
@@ -196,41 +342,22 @@ function renderizarPaginacion() {
     </button>
   `;
 
-  // ---- SISTEMA DE POCAS PÁGINAS ----
   const paginas = [];
-
-  // Siempre mostrar las 3 primeras
   paginas.push(1, 2, 3);
-
-  // Páginas alrededor de la actual
   for (let i = currentPage - 1; i <= currentPage + 1; i++) {
     if (i > 3 && i < totalPages - 2) paginas.push(i);
   }
-
-  // Siempre mostrar últimas 3
   paginas.push(totalPages - 2, totalPages - 1, totalPages);
 
-  // Quita duplicados y valores inválidos
   const paginasFiltradas = [...new Set(paginas.filter(n => n >= 1 && n <= totalPages))];
 
-  // ---- Render de páginas con saltos ("…") ----
   let ultima = 0;
   paginasFiltradas.forEach((p) => {
-    if (p !== ultima + 1) {
-      html += `<span class="puntos">…</span>`;
-    }
-
-    html += `
-      <button class="btn-pag ${p === currentPage ? "activo" : ""}" 
-        onclick="cambiarPagina(${p})">
-        ${p}
-      </button>
-    `;
-
+    if (p !== ultima + 1) html += `<span class="puntos">…</span>`;
+    html += `<button class="btn-pag ${p === currentPage ? "activo" : ""}" onclick="cambiarPagina(${p})">${p}</button>`;
     ultima = p;
   });
 
-  // 🔹 Botón siguiente
   html += `
     <button class="btn-pag" onclick="cambiarPagina(currentPage + 1)" 
       ${currentPage === totalPages ? "disabled" : ""}>
@@ -242,15 +369,43 @@ function renderizarPaginacion() {
   cont.innerHTML = html;
 }
 
-
 function cambiarPagina(nuevaPagina) {
   if (nuevaPagina < 1 || nuevaPagina > totalPages) return;
-
   currentPage = nuevaPagina;
   renderizarProductos(getFilteredProducts());
-  renderizarPaginacion();
-} 
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
 
+// ==========================================
+// 🔍 Cargar productos
+// ==========================================
+async function cargarProductos(busqueda = "") {
+  try {
+    const res = await fetch(`/api/catalogo?q=${encodeURIComponent(busqueda)}`);
+    const productos = await res.json();
+    productosGlobal = productos;
+
+    selectedWeights.clear(); // ✅ Limpiar filtros al hacer nueva búsqueda
+    currentPage = 1;
+    
+    renderizarProductos(getFilteredProducts());
+
+    const huboBusqueda = busqueda.trim() !== "";
+    if (huboBusqueda) {
+      renderizarFiltrosPeso(productos);
+      filtrosPesoVisibles = true;
+    } else if (filtrosPesoVisibles) {
+      document.querySelector(".filtros-peso").innerHTML = "";
+      filtrosPesoVisibles = false;
+    }
+  } catch (err) {
+    console.error("Error cargando productos:", err);
+  }
+}
+
+// ==========================================
+// 🖱️ Registrar clic en producto
+// ==========================================
 async function registrarClickProducto(btn) {
   let precioRaw = btn.getAttribute("data-precio") || "";
   let precioFinal = 0;
@@ -259,9 +414,7 @@ async function registrarClickProducto(btn) {
     if (!isNaN(precioRaw)) precioFinal = parseFloat(precioRaw);
     else {
       const match = precioRaw.match(/([\d\.,]+)/);
-      if (match)
-        precioFinal =
-          parseFloat(match[1].replace(/\./g, "").replace(",", ".")) || 0;
+      if (match) precioFinal = parseFloat(match[1].replace(/\./g, "").replace(",", ".")) || 0;
     }
   }
 
@@ -290,72 +443,13 @@ async function registrarClickProducto(btn) {
 
   window.open(producto.link, "_blank");
 }
+
 function verHistorico(id, titulo, marca, imagen, tienda) {
   const params = new URLSearchParams({ id, titulo, marca, imagen, tienda });
   window.location.href = `/historico?${params.toString()}`;
 }
 
-function agregarCarrito(id) {
-  alert(`🧺 Agregar al carrito pendiente para producto ID: ${id}`);
-}
-function renderizarFiltrosPeso(productos) {
-  const cont = document.querySelector(".filtros-peso");
-  cont.innerHTML = "";
-
-  const pesos = new Set();
-  productos.forEach((p) => {
-    const w = normalizarPesoDesdeTitulo(p.title);
-    if (w !== null) pesos.add(w);
-  });
-
-  const ordenados = Array.from(pesos).sort((a, b) => a - b);
-  ordenados.forEach((peso) => {
-    const chip = document.createElement("div");
-    chip.className = "chip-filtro";
-    chip.textContent = peso >= 1000 ? `${peso / 1000} kg` : `${peso} g`;
-    chip.onclick = () => {
-      selectedWeight = peso;
-      renderizarProductos(getFilteredProducts());
-    };
-    cont.appendChild(chip);
-  });
-
-  const limpiar = document.createElement("button");
-  limpiar.textContent = "Limpiar filtro";
-  limpiar.className = "btn-limpiar-filtro";
-  limpiar.onclick = () => {
-    selectedWeight = null;
-    renderizarProductos(getFilteredProducts());
-  };
-  cont.appendChild(limpiar);
-}
-
-async function cargarProductos(busqueda = "") {
-  try {
-    const res = await fetch(`/api/catalogo?q=${encodeURIComponent(busqueda)}`);
-    const productos = await res.json();
-    productosGlobal = productos;
-
-    selectedWeight = null;
-    renderizarProductos(getFilteredProducts());
-
-    const huboBusqueda = busqueda.trim() !== "";
-    if (huboBusqueda) {
-      renderizarFiltrosPeso(productos);
-      filtrosPesoVisibles = true;
-    } else if (filtrosPesoVisibles) {
-      document.querySelector(".filtros-peso").innerHTML = "";
-      filtrosPesoVisibles = false;
-    }
-  } catch (err) {
-    console.error("Error cargando productos:", err);
-  }
-
-  renderizarProductos(getFilteredProducts());
-renderizarPaginacion();
-}
-
-
+// Búsqueda y sugerencias
 const inputBusqueda = document.getElementById("busqueda");
 const contenedorSugerencias = document.getElementById("sugerencias");
 let sugerenciasTimeout = null;
@@ -369,8 +463,7 @@ if (inputBusqueda && contenedorSugerencias) {
       return;
     }
     if (texto.length < 3) {
-      contenedorSugerencias.innerHTML =
-        "<div class='sin-sugerencias'>Escribe al menos 3 caracteres…</div>";
+      contenedorSugerencias.innerHTML = "<div class='sin-sugerencias'>Escribe al menos 3 caracteres…</div>";
       contenedorSugerencias.style.display = "block";
       return;
     }
@@ -383,8 +476,7 @@ if (inputBusqueda && contenedorSugerencias) {
         const sugerencias = await resp.json();
 
         if (!sugerencias.length) {
-          contenedorSugerencias.innerHTML =
-            "<div class='sin-sugerencias'>Sin resultados</div>";
+          contenedorSugerencias.innerHTML = "<div class='sin-sugerencias'>Sin resultados</div>";
           contenedorSugerencias.style.display = "block";
           return;
         }
@@ -436,6 +528,7 @@ async function buscar() {
   contenedorSugerencias.innerHTML = "";
   contenedorSugerencias.style.display = "none";
 }
+
 function leerCheckboxesSuper() {
   const cbs = document.querySelectorAll(".filtro-super");
   selectedStores = new Set(
