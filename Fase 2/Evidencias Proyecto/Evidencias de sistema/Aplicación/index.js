@@ -70,7 +70,7 @@ app.use(
     saveUninitialized: false,
     store: MongoStore.create({
       mongoUrl: process.env.MONGODB_URI,
-      dbName: "duoc_user",
+      dbName: "SistemaDeReportes",
       collectionName: "sesiones",
       ttl: 60 * 60 * 2,
     }),

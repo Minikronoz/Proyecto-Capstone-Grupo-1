@@ -5,7 +5,7 @@
 let productosGlobal = [];
 let selectedWeight = null;
 let filtrosPesoVisibles = false;
-const ALL_STORES = ["unimarc", "tottus", "jumbo", "acuenta"];
+const ALL_STORES = ["unimarc", "tottus", "jumbo", "acuenta","santa isabel"];
 let selectedStores = new Set(ALL_STORES);
 
 let currentPage = 1;
@@ -65,80 +65,120 @@ const listaPaginada = paginar(lista, currentPage, pageSize);
 totalPages = Math.ceil(lista.length / pageSize);
 
 listaPaginada.forEach((p) => {
-    const card = document.createElement("div");
-    card.className = "producto-card";
+  const card = document.createElement("div");
+  card.className = "producto-card";
 
-    const colorTienda =
-      p.store === "unimarc"
-        ? "#d32f2f"
-        : p.store === "tottus"
-        ? "#388e3c"
-        : p.store === "jumbo"
-        ? "#00695c"
-        : p.store === "acuenta"
-        ? "#f57c00"
-        : "#616161";
+  // ==========================================
+  // 🎨 COLOR DE TIENDA + Soporte Santa Isabel
+  // ==========================================
+  const tienda = (p.store || "").toLowerCase();
 
-    const storeLabel = `
-      <span class="store-label" style="background:${colorTienda}">
-        ${(p.store || "SIN TIENDA").toUpperCase()}
-      </span>`;
+  const colorTienda =
+    tienda === "unimarc"
+      ? "#d32f2f"
+      : tienda === "tottus"
+      ? "#388e3c"
+      : tienda === "jumbo"
+      ? "#00695c"
+      : tienda === "acuenta"
+      ? "#f57c00"
+      : tienda === "santa isabel"
+      ? "#c2185b"
+      : "#616161";
 
-    const marca =
-      p.brand && p.brand.trim() && p.brand !== "null" ? p.brand : "Sin marca";
+  const storeLabel = `
+    <span class="store-label" style="background:${colorTienda}">
+      ${(p.store || "SIN TIENDA").toUpperCase()}
+    </span>`;
 
-    let precioNum = 0;
-    if (typeof p.currentPrice === "number") precioNum = p.currentPrice;
-    else if (typeof p.currentPrice === "string")
+  // ============================
+  // 🏷 Marca
+  // ============================
+  const marca =
+    p.brand && p.brand.trim() && p.brand !== "null"
+      ? p.brand
+      : "Sin marca";
+
+  // ===============================
+  // 💰 Normalizar precio a número
+  // ===============================
+  let precioNum = 0;
+  if (typeof p.currentPrice === "number") precioNum = p.currentPrice;
+  else if (typeof p.currentPrice === "string")
+    precioNum =
+      parseFloat(
+        p.currentPrice.replace(/[^\d.,]/g, "").replace(",", ".")
+      ) || 0;
+  else if (p.formattedPrice) {
+    const m = p.formattedPrice.match(/([\d\.,]+)/);
+    if (m)
       precioNum =
-        parseFloat(p.currentPrice.replace(/[^\d.,]/g, "").replace(",", ".")) || 0;
-    else if (p.formattedPrice) {
-      const m = p.formattedPrice.match(/([\d\.,]+)/);
-      if (m) precioNum = parseFloat(m[1].replace(/\./g, "").replace(",", ".")) || 0;
-    }
+        parseFloat(m[1].replace(/\./g, "").replace(",", ".")) || 0;
+  }
 
-    const fecha =
-      p.lastUpdate && !isNaN(new Date(p.lastUpdate))
-        ? new Date(p.lastUpdate).toLocaleDateString("es-CL", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          })
-        : "-";
+  // ============================
+  // 🗓 Fecha
+  // ============================
+  const fecha =
+    p.lastUpdate && !isNaN(new Date(p.lastUpdate))
+      ? new Date(p.lastUpdate).toLocaleDateString("es-CL", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        })
+      : "-";
 
-    card.innerHTML = `
-      <div class="store-container">${storeLabel}</div>
-      <img src="${p.image || "/img/no-image.png"}" alt="${p.title}" loading="lazy">
-      <h3 class="product-title">${p.title}</h3>
-      <p class="brand"><strong>${marca}</strong></p>
-      <div class="price-box">
-        <p class="price-actual">${p.formattedPrice || "$ -"}</p>
-        ${p.priceNormal ? `<p class="price-normal">Normal: ${p.priceNormal}</p>` : ""}
-        ${p.pricePerUnit ? `<p class="price-unit"><small>${p.pricePerUnit}</small></p>` : ""}
-        ${p.offerDescription ? `<p class="price-offer">🎁 ${p.offerDescription}</p>` : ""}
-      </div>
-      <button class="btn-ver"
-        data-id="${p._id || p.id || ""}"
-        data-titulo="${p.title || ""}"
-        data-marca="${p.brand || ""}"
-        data-precio="${precioNum}"
-        data-supermercado="${p.store || ""}"
-        data-link="${p.link || ""}"
-        data-imagen="${p.image || ""}"
-        onclick="registrarClickProducto(this)">
-        Ver producto
+  // =====================================
+  // 📌 Render del card HTML COMPLETO
+  // =====================================
+  card.innerHTML = `
+    <div class="store-container">${storeLabel}</div>
+    <img src="${p.image || "/img/no-image.png"}" alt="${p.title}" loading="lazy">
+    <h3 class="product-title">${p.title}</h3>
+    <p class="brand"><strong>${marca}</strong></p>
+    <div class="price-box">
+      <p class="price-actual">${p.formattedPrice || "$ -"}</p>
+      ${p.priceNormal ? `<p class="price-normal">Normal: ${p.priceNormal}</p>` : ""}
+      ${p.pricePerUnit ? `<p class="price-unit"><small>${p.pricePerUnit}</small></p>` : ""}
+      ${p.offerDescription ? `<p class="price-offer"> ${p.offerDescription}</p>` : ""}
+    </div>
+
+    <button class="btn-ver"
+      data-id="${p._id || p.id || ""}"
+      data-titulo="${p.title || ""}"
+      data-marca="${p.brand || ""}"
+      data-precio="${precioNum}"
+      data-supermercado="${tienda}"
+      data-link="${p.link || ""}"
+      data-imagen="${p.image || ""}"
+      onclick="registrarClickProducto(this)">
+      Ver producto
+    </button>
+
+    <button class="btn-carrito"
+      data-id="${p._id || p.id || ""}"
+      data-nombre="${p.title || ""}"
+      data-precio="${precioNum}"
+      data-imagen="${p.image || ""}"
+      data-url="${p.link || ""}"
+      data-supermercado="${tienda}"
+      onclick="agregarDesdeBoton(this)">
+      🛒 Agregar al carrito
+    </button>
+
+    <div class="botones-extra">
+      <button class="btn-secundario"
+        onclick="verHistorico('${p._id}', '${p.title}', '${p.brand}', '${p.image}', '${p.store}')">
+        Histórico
       </button>
-      <div class="botones-extra">
-        <button class="btn-secundario"
-          onclick="verHistorico('${p._id}', '${p.title}', '${p.brand}', '${p.image}', '${p.store}')">
-          Histórico
-        </button>
-      </div>`;
-    contenedor.appendChild(card);
-    
-  });
-  
-  renderizarPaginacion();
+    </div>
+  `;
+
+  contenedor.appendChild(card);
+});
+
+renderizarPaginacion();
+
 }
 
 function renderizarPaginacion() {

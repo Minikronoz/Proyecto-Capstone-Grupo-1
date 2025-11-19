@@ -7,7 +7,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const uri = process.env.MONGODB_URI;
-const dbName = process.env.DB_NAME || "duoc_user";
+const dbName = process.env.DB_NAME || "SistemaDeReportes";
 
 let client = null;
 let db = null;

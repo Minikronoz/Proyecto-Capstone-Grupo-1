@@ -29,6 +29,22 @@
   --sombra-strong: 0 8px 24px rgba(0,0,0,0.08);
   --transition: all 0.25s ease;
 }
+.btn-carrito {
+  background: #009688;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-top: 6px;
+  width: 100%;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.btn-carrito:hover {
+  background: #00796b;
+}
 
 /* 🔤 Tipografía y fondo global */
 body {

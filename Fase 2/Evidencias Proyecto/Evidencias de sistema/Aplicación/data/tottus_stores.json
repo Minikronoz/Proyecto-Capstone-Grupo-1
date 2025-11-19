@@ -1,0 +1,86 @@
+{
+  "stores": [
+    {
+      "region": "Región Metropolitana",
+      "comuna": "Alameda",
+      "direccion": "Av Libertador Bernardo O'Higgins 3470, Santiago",
+      "horario": [
+        "Lunes a Sábado 8:30 - 20:00 hrs",
+        "Domingo y Festivos 8:30 - 20:00 hrs"
+      ]
+    },
+    {
+      "region": "Región Metropolitana",
+      "comuna": "Las Condes",
+      "direccion": "Av Las Condes 11087, Santiago",
+      "horario": [
+        "Lunes a Sábado 8:30 - 21:00 hrs",
+        "Domingo y Festivos 9:00 - 21:00 hrs"
+      ]
+    },
+    {
+      "region": "Región Metropolitana",
+      "comuna": "Maipú",
+      "direccion": "Av 5 de Abril 2550, Maipú",
+      "horario": [
+        "Lunes a Domingo 8:30 - 21:00 hrs"
+      ]
+    },
+    {
+      "region": "Región Metropolitana",
+      "comuna": "Puente Alto",
+      "direccion": "Av Concha y Toro 1149, Puente Alto",
+      "horario": [
+        "Lunes a Domingo 8:30 - 21:00 hrs"
+      ]
+    },
+    {
+      "region": "Región Metropolitana",
+      "comuna": "La Florida",
+      "direccion": "Walker Martínez 1380, La Florida",
+      "horario": [
+        "Lunes a Domingo 8:00 - 21:00 hrs"
+      ]
+    },
+    {
+      "region": "Región de Coquimbo",
+      "comuna": "La Serena",
+      "direccion": "Av del Mar 1300, La Serena",
+      "horario": [
+        "Lunes a Domingo 8:30 - 21:00 hrs"
+      ]
+    },
+    {
+      "region": "Región de Valparaíso",
+      "comuna": "Viña del Mar",
+      "direccion": "14 Norte 635, Viña del Mar",
+      "horario": [
+        "Lunes a Domingo 8:30 - 21:00 hrs"
+      ]
+    },
+    {
+      "region": "Región del Biobío",
+      "comuna": "Concepción",
+      "direccion": "Av Los Carrera 1900, Concepción",
+      "horario": [
+        "Lunes a Domingo 8:30 - 21:00 hrs"
+      ]
+    },
+    {
+      "region": "Región del Maule",
+      "comuna": "Talca",
+      "direccion": "Av San Miguel 1234, Talca",
+      "horario": [
+        "Lunes a Domingo 8:30 - 20:30 hrs"
+      ]
+    },
+    {
+      "region": "Región de Antofagasta",
+      "comuna": "Antofagasta",
+      "direccion": "Av Edmundo Pérez Zujovic 5555",
+      "horario": [
+        "Lunes a Domingo 8:30 - 21:00 hrs"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+
+superbodega acuenta	Paine	Av. 18 de Septiembre # 311	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Parral	Avenida Las Delicias Sur 302	Abierto	Maule	08:00	21:30
+superbodega acuenta	Temuco	Pedro de Valdivia	Abierto	La Araucanía	08:00	21:30
+superbodega acuenta	Ovalle	Peñafiel con Padre Damián Heredia	Abierto	Coquimbo	08:00	21:30
+superbodega acuenta	San Javier	Av. Cienfuegos # 1475	Abierto	Maule	08:00	21:30
+superbodega acuenta	Talca	El Arenal #686, Talca	Abierto	O’Higgins	08:00	21:30
+superbodega acuenta	Quillota	Diego Echeverría # 085	Abierto	Valparaíso	08:00	21:30
+superbodega acuenta	Puente Alto	Eyzaguirre Oriente	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Hualpén	Gran Bretaña 4041, Hualpen	Abierto	Biobío	08:00	21:30
+superbodega acuenta	Mulchén	Villagran 951-957	Abierto	Biobío	08:00	21:30
+superbodega acuenta	Quilicura	Avenida Matta 1400	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	San Bernardo	Eucaliptus 81	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Maipú	Av. Rinconada 2525	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	El Bosque	Lo Martines/Tucapel	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Puerto Montt	Jorge Alessandri sitio 3 y 4	Abierto	Los Lagos	08:00	21:30
+superbodega acuenta	Conchalí	Santa Inés 2189	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	El Quisco	Av. I. Dubournais # 0398	Abierto	Valparaíso	08:00	21:30
+superbodega acuenta	Lebu	Andres Bello #140	Abierto	Biobío	08:00	21:30
+superbodega acuenta	Melipilla	Merced 999	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Lautaro	Avenida Matta 1202	Abierto	La Araucanía	08:00	21:30
+superbodega acuenta	Ovalle	Calle Maestranza S/N Lote 4	Abierto	Coquimbo	08:00	21:30
+superbodega acuenta	Coronel	Carlos Prats 0901	Abierto	Biobío	08:00	21:30
+superbodega acuenta	Isla de Maipo	Manuel Rodriguez 684	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Viña del Mar	Calle Estero Maitenlahue 925 Reñaca Alto	Abierto	Valparaíso	08:00	21:30
+superbodega acuenta	Temuco	Av. Manuel Antonio Matta 025	Abierto	La Araucanía	08:00	21:30
+superbodega acuenta	Linares	Januario Espinoza 759	Abierto	Maule	08:00	21:30
+superbodega acuenta	Puente Alto	Gabriela Poniente Nº 03960	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Pudahuel	Av. Travesía Nº 7217	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Concepción	Av. Andalién Nº 950	Abierto	Biobío	08:00	21:30
+superbodega acuenta	La Calera	Av. Latorre 280	Abierto	Valparaíso	08:00	21:30
+superbodega acuenta	Quinta Normal	Av. Carrascal Nº 6015	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Talca	Avenida Lircay N°2301	Abierto	Maule	08:00	21:30
+superbodega acuenta	Independencia	Av. Fermín Vivaceta Nº 827	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Peñaflor	Av. 21 de Mayo Nº 4075	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Padre las Casas	Av. Maquehue 1243	Abierto	La Araucanía	08:00	21:30
+central mayorista	Peñalolén	San Luis de Macul 4335	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Castro	Galvarino Riveros 1703	Abierto	Los Lagos	08:00	21:30
+superbodega acuenta	Valdivia	Carlos Anwandter 930	Abierto	Los Ríos	08:00	21:30
+superbodega acuenta	Chillán	Maipón Nº 873	Abierto	Biobío	08:00	21:30
+superbodega acuenta	Curicó	Av. Camilo Henríquez N° 469	Abierto	Maule	08:00	21:30
+superbodega acuenta	Curicó	Av. Maipú N° 798	Abierto	Maule	08:00	21:30
+superbodega acuenta	Lo Espejo	Lo Ovalle Nº 02356	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Chiguayante	Av. Manuel Rodriguez N° 2550	Abierto	Biobío	08:00	21:30
+superbodega acuenta	Maipú	Av. Sur Nº 411	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Puerto Montt	Calle Parque Alerce Andino Nº 1901	Abierto	Los Lagos	08:00	21:30
+superbodega acuenta	Maipú	Camino Melipilla Nº 18500	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Osorno	Calle República Nº 870	Abierto	Los Lagos	08:00	21:30
+superbodega acuenta	Peñalolén	Av. Tobalaba N° 10831	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Huechuraba	Av. Recoleta N° 5200	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Renca	Av. Caupolicán Nº 1520	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	San Felipe	Av. Maipú N° 1121	Abierto	Valparaíso	08:00	21:30
+superbodega acuenta	Puerto Montt	Pto Montt Terminal	Abierto	Los Lagos	08:00	21:30
+superbodega acuenta	Talcahuano	Gomez Carreño 3425	Abierto	Biobío	08:00	21:30
+superbodega acuenta	Buin	Condell	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Hualpén	Av. Cristobal Colón 8831	Abierto	Biobío	08:00	21:30
+superbodega acuenta	Limache	Echaurren	Abierto	Valparaíso	08:00	21:30
+superbodega acuenta	Rancagua	Av. El Sol 1071	Abierto	O’Higgins	08:00	21:30
+superbodega acuenta	Valdivia	Av Pedro Montt 4300	Abierto	Los Ríos	08:00	21:30
+superbodega acuenta	Valdivia	Picarte 2661	Abierto	La Araucanía	08:00	21:30
+superbodega acuenta	Villarrica	Aviador Acevedo 1258	Abierto	La Araucanía	08:00	21:30
+superbodega acuenta	Quillota	Av. J. B. Alberdi 2000	Abierto	Valparaíso	08:00	21:30
+superbodega acuenta	San Fernando	Av. Manuel Rodríguez 770	Abierto	O’Higgins	08:00	21:30
+superbodega acuenta	Angol	O´higgins esq Riquelme	Abierto	La Araucanía	08:00	21:30
+superbodega acuenta	Chillán	Av Los Puelches 1691	Abierto	Biobío	08:00	21:30
+superbodega acuenta	Alto Hospicio	Ruta A-16 S/N	Abierto	Tarapacá	08:00	21:30
+superbodega acuenta	Molina	Maipu 2083	Abierto	Maule	08:00	21:30
+superbodega acuenta	Talca	San Miguel	Abierto	Maule	08:00	21:30
+superbodega acuenta	Cauquenes	Claudina Urrutia	Abierto	Maule	08:00	21:30
+superbodega acuenta	Alto Hospicio	Centro	Abierto	Tarapacá	08:00	21:30
+superbodega acuenta	Arauco	Caupolican, esquina Yungay	Abierto	Biobío	08:00	21:30
+superbodega acuenta	Nueva Imperial	Anibal Pinto / Arturo Prat	Abierto	La Araucanía	08:00	21:30
+superbodega acuenta	La Serena	Av Viña del Mar 2950	Abierto	Coquimbo	08:00	21:30
+superbodega acuenta	Rengo	Calle Riquelme	Abierto	O’Higgins	08:00	21:30
+superbodega acuenta	Valparaíso	Luis Guevara Ortuzar 2002	Abierto	Valparaíso	08:00	21:30
+superbodega acuenta	Lampa	Av Baquedano 862	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	El Monte	Av Los Libertadores 453	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Coquimbo	Los Clarines S/N	Abierto	Coquimbo	08:00	21:30
+superbodega acuenta	San Carlos	Independencia II	Abierto	Biobío	08:00	21:30
+superbodega acuenta	Constitución	Rosas/Blanco	Abierto	Biobío	08:00	21:30
+superbodega acuenta	Cartagena	San Miguel #781	Abierto	Valparaíso	08:00	21:30
+superbodega acuenta	Penco	Infante 205	Abierto	Biobío	08:00	21:30
+superbodega acuenta	Tomé	Avenida Egaña	Abierto	Biobío	08:00	21:30
+superbodega acuenta	Los Angeles	Las Azaleas	Abierto	Biobío	08:00	21:30
+superbodega acuenta	La Ligua	Av. Portales 1271	Abierto	Valparaíso	08:00	21:30
+superbodega acuenta	San Pedro de la Paz	Av. Michaihue	Abierto	Biobío	08:00	21:30
+superbodega acuenta	Los Angeles	Los Carrera #1420	Abierto	Biobío	08:00	21:30
+superbodega acuenta	Talca	12 Oriente N°848	Abierto	Maule	08:00	21:30
+superbodega acuenta	Talca	Ignacio Carrera Pinto Nº0170	Abierto	Maule	08:00	21:30
+superbodega acuenta	La Unión	Comercio, Riquelme	Abierto	Los Ríos	08:00	21:30
+superbodega acuenta	Salamanca	Manuel Bulnes 340	Abierto	Coquimbo	08:00	21:30
+superbodega acuenta	Graneros	Avenida la compañía 459	Abierto	O’Higgins	08:00	21:30
+superbodega acuenta	Quinta Normal	Mapocho 5041	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Copiapó	Los Loros esquina Condell	Abierto	Atacama	08:00	21:30
+superbodega acuenta	Victoria	O'Higgins 240	Abierto	La Araucanía	08:00	21:30
+superbodega acuenta	Illapel	Salvador Allende 824	Abierto	Coquimbo	08:00	21:30
+superbodega acuenta	Pichilemu	Ortúzar 323	Abierto	O’Higgins	08:00	21:30
+superbodega acuenta	Nacimiento	Villa Alegre 675	Abierto	Biobío	08:00	21:30
+superbodega acuenta	Casablanca	Avenida Arturo Prat 81	Abierto	Valparaíso	08:00	21:30
+superbodega acuenta	Mostazal	Avenida Luco 365	Abierto	O’Higgins	08:00	21:30
+superbodega acuenta	Coquimbo	Ruta 43 a Ovalle lote 59	Abierto	Coquimbo	08:00	21:30
+superbodega acuenta	Villa Alemana	Huanhualí 1331	Abierto	Valparaíso	08:00	21:30
+superbodega acuenta	Los Andes	Pascual Baburizza 716	Abierto	Valparaíso	08:00	21:30
+superbodega acuenta	Valparaíso	Rodelillo 6071	Abierto	Valparaíso	08:00	21:30
+superbodega acuenta	Vicuña	Yungay 303	Abierto	Coquimbo	08:00	21:30
+superbodega acuenta	Curacaví	Av. Ambrosio O'Higgins 2100	Abierto	Metropolitana	08:00	21:30
+superbodega acuenta	Río Bueno	Pedro Lagos 1219	Abierto	Los Ríos	08:00	21:30
+superbodega acuenta	Curanilahue	Avenida Libertador Bernardo O'Higgins 814	Abierto	Biobío	08:00	21:30
+superbodega acuenta	San Antonio	Avenida 21 de Mayo 950	Abierto	Valparaíso	08:00	21:30
+superbodega acuenta	Hualqui	Bombero Perret 248	Abierto	Biobío	08:00	21:30
+superbodega acuenta	Purranque	Eleuterio Ramirez 156	Abierto	Los Lagos	08:00	21:30
+superbodega acuenta	Cabildo	Humeres 266	Abierto	Valparaíso	08:00	21:30
+superbodega acuenta	Las Cabras	Avenida Estadio 859	Abierto	O’Higgins	08:00	21:30
+superbodega acuenta	Mariquina	Alejo Carrillo s/n	Abierto	Los Ríos	08:00	21:30
+superbodega acuenta	Temuco Labranza II	Calle 1 Norte 070	Abierto	La Araucanía	08:00	21:30
+superbodega acuenta	Quillón	Av. Cayumanqui 341	Abierto	Ñuble	08:00	21:30
+superbodega acuenta	Collipulli	Alcázar 1278	Abierto	La Araucanía	08:00	21:30
+superbodega acuenta	Victoria	General Lagos 1278	Abierto	La Araucanía	08:00	21:30
+superbodega acuenta	San Vicente	Comalle 515	Abierto	O’Higgins	08:00	21:30
+superbodega acuenta	Los Ángeles	Las Violetas 887	Abierto	Biobío	08:00	21:30
+superbodega acuenta	Viña del Mar	Eduardo Frei 4025	Abierto	Valparaíso	08:00	21:30
+superbodega acuenta	Quintero	Camino Del Sol Loteo Antares s/n sitios 1-3	Abierto	Valparaíso	08:00	21:30
+superbodega acuenta	Chimbarongo	Javiera Carrera 330	Abierto	O’Higgins	08:00	21:30
+superbodega acuenta	Longaví	Calle Oriente 2 N°228	Abierto	Maule	08:00	21:30
+superbodega acuenta	Carahue	Villagrán 420	Abierto	La Araucanía	08:00	21:30
+superbodega acuenta	Frutillar	Av. Alessandri 197	Abierto	Los Lagos	08:00	21:30
+superbodega acuenta	Loncoche	Av. José Manuel Balmaceda 751	Abierto	La Araucanía	08:00	21:30
+superbodega acuenta	San Clemente	Huamachuco s/n	Abierto	Maule	08:00	21:30
+superbodega acuenta	Lota	Arturo Prat 402	Abierto	Biobío	08:00	21:30

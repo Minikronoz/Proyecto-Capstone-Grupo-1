@@ -1,0 +1,2228 @@
+[
+  {
+    "name": "Unimarc Santa María Arica",
+    "direccion": "Santa Maria 2465",
+    "comuna": "Arica",
+    "region": "Arica y Parinacota",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Rotonda Arica",
+    "direccion": "18 de Septiembre 2501",
+    "comuna": "Arica",
+    "region": "Arica y Parinacota",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Iquique Centro",
+    "direccion": "Tarapacá 579",
+    "comuna": "Iquique",
+    "region": "Tarapacá",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Vivar",
+    "direccion": "Vivar 786",
+    "comuna": "Iquique",
+    "region": "Tarapacá",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Amunátegui",
+    "direccion": "Amunátegui 902",
+    "comuna": "Iquique",
+    "region": "Tarapacá",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Juan Martínez",
+    "direccion": "Manuel Rodríguez 964",
+    "comuna": "Iquique",
+    "region": "Tarapacá",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Los Molles",
+    "direccion": "Santiago Polanco 2251",
+    "comuna": "Iquique",
+    "region": "Tarapacá",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Bilbao",
+    "direccion": "Av. Francisco Bilbao 3545",
+    "comuna": "Iquique",
+    "region": "Tarapacá",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Alto Hospicio II",
+    "direccion": "Ruta A16 3350",
+    "comuna": "Alto Hospicio",
+    "region": "Tarapacá",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Tocopilla I",
+    "direccion": "Av. 21 de Mayo 1724",
+    "comuna": "Tocopilla",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Tocopilla II",
+    "direccion": "Policarpo Toro S/N",
+    "comuna": "Tocopilla",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Calama I",
+    "direccion": "Av. Granaderos 3180",
+    "comuna": "Calama",
+    "region": "Antofagasta",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Brasilia",
+    "direccion": "Brasilia 2386",
+    "comuna": "Calama",
+    "region": "Antofagasta",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc La Torre II",
+    "direccion": "Latorre 2149",
+    "comuna": "Calama",
+    "region": "Antofagasta",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Calama II",
+    "direccion": "Aconcagua 2588",
+    "comuna": "Calama",
+    "region": "Antofagasta",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc La Chimba II",
+    "direccion": "Pedro Aguirre Cerda 11387",
+    "comuna": "Antofagasta",
+    "region": "Antofagasta",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Plaza",
+    "direccion": "Ignacio Carrera Pinto 909",
+    "comuna": "Antofagasta",
+    "region": "Antofagasta",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc La Chimba",
+    "direccion": "Pedro Aguirre Cerda 8700",
+    "comuna": "Antofagasta",
+    "region": "Antofagasta",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Bonilla",
+    "direccion": "Huamachuco 8481",
+    "comuna": "Antofagasta",
+    "region": "Antofagasta",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Oviedo Cavada",
+    "direccion": "Carlos Oviedo Cavada 5319",
+    "comuna": "Antofagasta",
+    "region": "Antofagasta",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Santos Ossa",
+    "direccion": "José Santos Ossa 2421",
+    "comuna": "Antofagasta",
+    "region": "Antofagasta",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Pampino",
+    "direccion": "Av. Santos Ossa 2350",
+    "comuna": "Antofagasta",
+    "region": "Antofagasta",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Parque",
+    "direccion": "Av. Jose Miguel Carrera 1527",
+    "comuna": "Antofagasta",
+    "region": "Antofagasta",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc La Torre",
+    "direccion": "Carlos Pezoa Veliz 10-22 Loc. 01",
+    "comuna": "Antofagasta",
+    "region": "Antofagasta",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Gran Vía",
+    "direccion": "Av. Angamos 0159",
+    "comuna": "Antofagasta",
+    "region": "Antofagasta",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Coviefi",
+    "direccion": "Av. Argentina 1910",
+    "comuna": "Antofagasta",
+    "region": "Antofagasta",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc El Salvador",
+    "direccion": "Av. O'Higgins 115",
+    "comuna": "El Tabo",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Barquito",
+    "direccion": "Gabriela Mistral 602L",
+    "comuna": "Chañaral",
+    "region": "Atacama",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Caldera I",
+    "direccion": "Batallón Atacama 319",
+    "comuna": "Caldera",
+    "region": "Atacama",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Los Carrera",
+    "direccion": "Los Carreras 479",
+    "comuna": "Copiapó",
+    "region": "Atacama",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Chacabuco",
+    "direccion": "Los Carreras 586",
+    "comuna": "Copiapó",
+    "region": "Atacama",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Chañarcillo",
+    "direccion": "Chacabuco 231",
+    "comuna": "Copiapó",
+    "region": "Atacama",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Copiapó",
+    "direccion": "Av. Henríquez 523",
+    "comuna": "Copiapó",
+    "region": "Atacama",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Atacama",
+    "direccion": "Los Carreras 2242",
+    "comuna": "Copiapó",
+    "region": "Atacama",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc El Palomar",
+    "direccion": "Av. El Palomar 1525",
+    "comuna": "Copiapó",
+    "region": "Atacama",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Vallenar I",
+    "direccion": "Brasil 663",
+    "comuna": "Vallenar",
+    "region": "Atacama",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Vallenar II",
+    "direccion": "Arturo Prat 2350",
+    "comuna": "Vallenar",
+    "region": "Atacama",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Circunvalación",
+    "direccion": "Av. Monjitas Oriente 2706",
+    "comuna": "La Serena",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Las Compañías",
+    "direccion": "Nicaragua 1571",
+    "comuna": "La Serena",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Recova",
+    "direccion": "Brasil 715",
+    "comuna": "La Serena",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Balmaceda",
+    "direccion": "Balmaceda 1350",
+    "comuna": "La Serena",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Florida",
+    "direccion": "Av. 18 de Septiembre/Las Parcelas 5040",
+    "comuna": "La Serena",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Cisternas",
+    "direccion": "Reinaldo Boltz 1950",
+    "comuna": "La Serena",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc El Milagro",
+    "direccion": "Santiago de Apóstol 4063",
+    "comuna": "La Serena",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Regimiento Arica",
+    "direccion": "Regimiento Arica 6001",
+    "comuna": "La Serena",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Huachalalume",
+    "direccion": "Avenida Waldo Alcalde 401",
+    "comuna": "Local 1",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Coquimbo",
+    "direccion": "Varela 1480",
+    "comuna": "Coquimbo",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Alto Peñuelas",
+    "direccion": "Alessandri 531",
+    "comuna": "Coquimbo",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Los Álamos",
+    "direccion": "Los Álamos 580",
+    "comuna": "Coquimbo",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Sindempart",
+    "direccion": "Av. El Sauce 981",
+    "comuna": "Coquimbo",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Vicuña",
+    "direccion": "Chacabuco 302",
+    "comuna": "Vicuña",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Benavente",
+    "direccion": "Benavente 221",
+    "comuna": "Ovalle",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Ovalle I",
+    "direccion": "Libertad 249",
+    "comuna": "Ovalle",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Tangue",
+    "direccion": "Tangue 36",
+    "comuna": "Ovalle",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Combarbalá",
+    "direccion": "Comercio 310",
+    "comuna": "Combarbalá",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Illapel I",
+    "direccion": "Constitución 515",
+    "comuna": "Illapel",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Illapel II",
+    "direccion": "Independencia 0104",
+    "comuna": "Illapel",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Salamanca",
+    "direccion": "Manuel Bulnes 677",
+    "comuna": "Salamanca",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Salamanca II",
+    "direccion": "Manuel Bulnes 220",
+    "comuna": "Salamanca",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Los Vilos",
+    "direccion": "Caupolicán 584",
+    "comuna": "Los Vilos",
+    "region": "Coquimbo",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Puchuncaví",
+    "direccion": "Av. Presidente Ríos 672",
+    "comuna": "Puchuncaví",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc San Felipe Encon",
+    "direccion": "Av. Encón con Hnos Carrera",
+    "comuna": "San Felipe",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc San Felipe",
+    "direccion": "Portus 1248",
+    "comuna": "San Felipe",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc San Esteban",
+    "direccion": "Avenida Arturo Alessandri Palma 50",
+    "comuna": "San Esteban",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Quintero",
+    "direccion": "Estrella de Chile 169",
+    "comuna": "Quintero",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Quintero II",
+    "direccion": "Av. Normandie 2680",
+    "comuna": "Quintero",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Los Andes I",
+    "direccion": "Hermanos Clark 55",
+    "comuna": "Los Andes",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Los Andes",
+    "direccion": "Yerbas Buenas 460",
+    "comuna": "Los Andes",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Llay Llay II",
+    "direccion": "Balmaceda 307",
+    "comuna": "Llaillay",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Quillota I",
+    "direccion": "O'Higgins 34",
+    "comuna": "Quillota",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Quillota III",
+    "direccion": "San Martín 147",
+    "comuna": "Quillota",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Pinares de Montemar PA",
+    "direccion": "Josemaria Escrivá de Balaguer N° 861",
+    "comuna": "Concon",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Jardín Del Mar",
+    "direccion": "Los Sargazos 1855",
+    "comuna": "Viña del Mar",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Olmué",
+    "direccion": "Diego Portales 2090",
+    "comuna": "Olmué",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Limache",
+    "direccion": "República 342",
+    "comuna": "Limache",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc 4 Poniente",
+    "direccion": "4 Poniente 630",
+    "comuna": "Viña del Mar",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc 1 Norte",
+    "direccion": "1 Norte 839",
+    "comuna": "Viña del Mar",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Etchevers",
+    "direccion": "Etchevers Alto 594",
+    "comuna": "Viña del Mar",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Valparaíso Puerto",
+    "direccion": "Av. Errazuriz 629 (Puerto)",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Valparaíso",
+    "direccion": "Av. Brasil 1479",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Villa Alemana III",
+    "direccion": "Av. Valparaíso 899",
+    "comuna": "Villa Alemana",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Villa Alemana",
+    "direccion": "Av. Valparaíso 1982",
+    "comuna": "Villa Alemana",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Marga Marga",
+    "direccion": "Del Alheli 2011",
+    "comuna": "Quilpué",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Til Til",
+    "direccion": "Arturo Prat 295",
+    "comuna": "Tiltil",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Curauma",
+    "direccion": "Av. Obispo Valdés 1170",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Batuco",
+    "direccion": "Av. Francia 640",
+    "comuna": "Lampa",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Lampa",
+    "direccion": "Arturo Prat 681",
+    "comuna": "Lampa",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Larapinta",
+    "direccion": "Av. Los Halcones 2180",
+    "comuna": "Lampa",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Casablanca",
+    "direccion": "Constitución 120",
+    "comuna": "Casablanca",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Huechuraba Fontova",
+    "direccion": "Av. Pedro Fontova 7626",
+    "comuna": "Huechuraba",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Los Trapenses",
+    "direccion": "José Alcalde Delano 10497",
+    "comuna": "Lo Barnechea",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Las Condes",
+    "direccion": "Av. Las Condes 14791",
+    "comuna": "Lo Barnechea",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Santa María",
+    "direccion": "Av. Santa María 6940",
+    "comuna": "Vitacura",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Las Tranqueras",
+    "direccion": "Vitacura 8400",
+    "comuna": "Vitacura",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Zapadores",
+    "direccion": "Av. Zapadores 1320",
+    "comuna": "Conchalí",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Dorsal",
+    "direccion": "Av. Guanaco 3100",
+    "comuna": "Conchalí",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc El Quisco",
+    "direccion": "José Narciso Aguirre 17",
+    "comuna": "El Quisco",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Vitacura Vespucio",
+    "direccion": "Av. Vitacura 4607",
+    "comuna": "Vitacura",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Renca II",
+    "direccion": "Avenida José Manuel Balmaceda 4569",
+    "comuna": "Renca",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Renca",
+    "direccion": "Av. Brasil 7085",
+    "comuna": "Renca",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Curacaví I",
+    "direccion": "Av. O'Higgins 1920",
+    "comuna": "Curacaví",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Los Militares",
+    "direccion": "Av. Manquehue Norte 457",
+    "comuna": "Las Condes",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Los Domínicos",
+    "direccion": "Av. Patagonia 99 Local 3",
+    "comuna": "Las Condes",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Av. Peru",
+    "direccion": "Av. Peru 735",
+    "comuna": "Local 12",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Escuela Militar",
+    "direccion": "Av. Apoquindo 4335",
+    "comuna": "Las Condes",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Independecia",
+    "direccion": "Independencia 2127",
+    "comuna": "Independencia",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Carrascal",
+    "direccion": "Gonzalo Bulnes 2407",
+    "comuna": "Quinta Normal",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Juan Antonio Ríos",
+    "direccion": "Salomon Sack 351",
+    "comuna": "Independencia",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Manquehue",
+    "direccion": "Av. Manquehue 1700",
+    "comuna": "Las Condes",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Manuel Montt",
+    "direccion": "Av. Manuel Montt 1097",
+    "comuna": "Providencia",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Francisco Bilbao",
+    "direccion": "Av. Francisco Bilbao 2050",
+    "comuna": "Providencia",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Morandé",
+    "direccion": "Compañía 1214",
+    "comuna": "Santiago",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Príncipe De Gales",
+    "direccion": "Príncipe de Gales 7271",
+    "comuna": "La Reina",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Diego Portales",
+    "direccion": "Av. Portugal 56",
+    "comuna": "Santiago",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Estado",
+    "direccion": "Estado 85",
+    "comuna": "Santiago",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Pudahuel",
+    "direccion": "Av. San Pablo 8315",
+    "comuna": "Pudahuel",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Los Leones",
+    "direccion": "Gral. José Artigas 3250",
+    "comuna": "Ñuñoa",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Ciudad De Los Valles",
+    "direccion": "Av. El Canal 19591",
+    "comuna": "Pudahuel",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Portugal",
+    "direccion": "Portugal 579",
+    "comuna": "Santiago",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Manuel Montt II",
+    "direccion": "Av. Irarrázaval 1740",
+    "comuna": "Ñuñoa",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Irarrázaval",
+    "direccion": "Av. Irarrázaval 4354",
+    "comuna": "Ñuñoa",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc El Tabo",
+    "direccion": "San Marcos 1027",
+    "comuna": "El Tabo",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Grecia",
+    "direccion": "Av. Grecia 320",
+    "comuna": "Ñuñoa",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Pajarito",
+    "direccion": "Av Gladys Marin 6950",
+    "comuna": "Estación Central",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Villa Olímpica",
+    "direccion": "Obispo Orrego 1250",
+    "comuna": "Ñuñoa",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Las Rejas",
+    "direccion": "Av. Las Rejas Sur 1279",
+    "comuna": "Estación Central",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Las Parcelas",
+    "direccion": "Av. Las Parcelas 9001",
+    "comuna": "Peñalolén",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Ignacio Carrera Pinto",
+    "direccion": "Av. Capitan Ignacio Carrera 3857",
+    "comuna": "Ñuñoa",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Maipú El Rosal",
+    "direccion": "Av. El Rosal 6361",
+    "comuna": "Maipú",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Consistorial",
+    "direccion": "Av. Consistorial 2701",
+    "comuna": "Peñalolén",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Macul",
+    "direccion": "Av Macul 3578",
+    "comuna": "Macul",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc 2° Transversal Maipú",
+    "direccion": "Segunda Transversal 4090",
+    "comuna": "Maipú",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Gran Avenida I",
+    "direccion": "Av. José Miguel Carrera 5485",
+    "comuna": "San Miguel",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc San Joaquín",
+    "direccion": "Santa Rosa 5320",
+    "comuna": "San Joaquín",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Rinconada",
+    "direccion": "Av. Rinconada 1900",
+    "comuna": "Maipú",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Ramón Freire",
+    "direccion": "Av. Pajaritos 1529",
+    "comuna": "Maipú",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Mirador",
+    "direccion": "Av. Vicuña Mackenna 6331",
+    "comuna": "La Florida",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Metro Lo Ovalle",
+    "direccion": "Gran Avenida 6555",
+    "comuna": "La Cisterna",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Maipú 4 Poniente",
+    "direccion": "4 Poniente 1197",
+    "comuna": "Maipú",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Vicente Valdés",
+    "direccion": "Vicuña Mackenna 7802",
+    "comuna": "La Florida",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Silva Carvallo",
+    "direccion": "Av. Silva Carvallo 1414",
+    "comuna": "Maipú",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Rojas Magallanes",
+    "direccion": "Rojas Magallanes 3638",
+    "comuna": "La Florida",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Vicuña P19",
+    "direccion": "Av. Vicuña Mackenna 9090",
+    "comuna": "La Florida",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Abrazo De Maipú",
+    "direccion": "Jorge Guerra 16190",
+    "comuna": "Maipú",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Maipú Camino Melipilla",
+    "direccion": "Camino Melipilla 16860",
+    "comuna": "Maipú",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Cartagena",
+    "direccion": "Av. Arzobispo Casanova 306",
+    "comuna": "Cartagena",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Concha Y Toro",
+    "direccion": "Av. Concha y Toro 3193",
+    "comuna": "Puente Alto",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc El Bosque",
+    "direccion": "Av José Miguel Carrera 13125",
+    "comuna": "El Bosque",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc San Bernardo I",
+    "direccion": "Av. Padre Hurtado 13694",
+    "comuna": "San Bernardo",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Troncal San Francisco",
+    "direccion": "Av. Las Nieves Oriente 02251 (Esquina Av. Troncal San Francisco)",
+    "comuna": "Puente Alto",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Las Vizcachas",
+    "direccion": "Av. Camino San José de Maipo 6355",
+    "comuna": "local comercial C1",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Peñaflor",
+    "direccion": "Miraflores 1185",
+    "comuna": "Peñaflor",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Pirque",
+    "direccion": "Avenida Ramón Subercaseaux 230",
+    "comuna": "Pirque",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Santo Domingo II",
+    "direccion": "Ruta 66 LO 1”. Lote n°2. Sector Los Morros.",
+    "comuna": "Santo Domingo",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Camino Nos",
+    "direccion": "Camino Nos a los Morros 565",
+    "comuna": "San Bernardo",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Santo Domingo",
+    "direccion": "Av. El Golf 06",
+    "comuna": "Santo Domingo",
+    "region": "Valparaíso",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Talagante O'Higgins",
+    "direccion": "Av. Bernardo O'Higgins 2259",
+    "comuna": "Talagante",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Buin Maipo",
+    "direccion": "Camino Buin Maipo 3147",
+    "comuna": "Buin",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Buin",
+    "direccion": "José Manuel Balmaceda 280",
+    "comuna": "Buin",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Alto Jahuel",
+    "direccion": "Miraflores 242",
+    "comuna": "Buin",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Isla de Maipo",
+    "direccion": "Santelices 641",
+    "comuna": "Isla de Maipo",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Linderos",
+    "direccion": "Longitudinal Sur 4251 (L 24)",
+    "comuna": "Buin",
+    "region": "Metropolitana",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Graneros",
+    "direccion": "Obispo Rafael Lira Infante 042",
+    "comuna": "Graneros",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Rancagua Kennedy",
+    "direccion": "Av. Kennedy 2235",
+    "comuna": "Rancagua",
+    "region": "O'Higgins",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Rancagua República",
+    "direccion": "República de Chile 391",
+    "comuna": "Rancagua",
+    "region": "O'Higgins",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Rancagua",
+    "direccion": "Doctor Salinas 115",
+    "comuna": "Rancagua",
+    "region": "O'Higgins",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Membrillar",
+    "direccion": "Membrillar 10",
+    "comuna": "Rancagua",
+    "region": "O'Higgins",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Machalí",
+    "direccion": "Av. Miguel Ramírez 1420",
+    "comuna": "Rancagua",
+    "region": "O'Higgins",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc San Juan de Machalí",
+    "direccion": "San Juan 1135 local 38 Machali",
+    "comuna": "Machalí",
+    "region": "O'Higgins",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Las Cabras",
+    "direccion": "José Miguel Carrera 325",
+    "comuna": "Las Cabras",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Peumo",
+    "direccion": "Sarmiento 393",
+    "comuna": "Peumo",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc San Fernando II",
+    "direccion": "Manuel Rodríguez 954",
+    "comuna": "San Fernando",
+    "region": "O'Higgins",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc San Fernando I",
+    "direccion": "Av. Bernardo O'Higgins 701",
+    "comuna": "San Fernando",
+    "region": "O'Higgins",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Nancagua",
+    "direccion": "Armando Jaramillo 152",
+    "comuna": "Nancagua",
+    "region": "O'Higgins",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Chimbarongo",
+    "direccion": "Carmen Larraín 44",
+    "comuna": "Chimbarongo",
+    "region": "O'Higgins",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Chimbarongo II",
+    "direccion": "Garcia y Reyes S/N",
+    "comuna": "Chimbarongo",
+    "region": "O'Higgins",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Teno",
+    "direccion": "Av. Comalle 50",
+    "comuna": "Teno",
+    "region": "Maule",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Romeral",
+    "direccion": "Av. Libertad 1124 (Local B)",
+    "comuna": "Romeral",
+    "region": "Maule",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Camilo Henríquez I",
+    "direccion": "Av. Camilo Henríquez 445",
+    "comuna": "Curicó",
+    "region": "Maule",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Camilo Henríquez II",
+    "direccion": "Av. Camilo Henríquez 655",
+    "comuna": "Curicó",
+    "region": "Maule",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Curicó Terminal",
+    "direccion": "Prat 733",
+    "comuna": "Curicó",
+    "region": "Maule",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Curicó Alameda",
+    "direccion": "Estado 43",
+    "comuna": "Curicó",
+    "region": "Maule",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Av. España",
+    "direccion": "Av. España 414",
+    "comuna": "Curicó",
+    "region": "Maule",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Sagrada Familia",
+    "direccion": "Av. Esperanza 138",
+    "comuna": "Sagrada Familia",
+    "region": "Maule",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Lontué",
+    "direccion": "Av. 7 Abril 2069 (Local B)",
+    "comuna": "Molina",
+    "region": "Maule",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Molina II",
+    "direccion": "Av. Luis Cruz Martínez 2016",
+    "comuna": "Molina",
+    "region": "Maule",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Molina I",
+    "direccion": "Av. Luis Cruz Martínez 1314",
+    "comuna": "Molina",
+    "region": "Maule",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Constitución I",
+    "direccion": "Vial 224",
+    "comuna": "Constitución",
+    "region": "Maule",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Talca 1 Norte",
+    "direccion": "Calle 1 Norte 1570",
+    "comuna": "Talca",
+    "region": "Maule",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Talca II",
+    "direccion": "Av. Carlos Schorr 265",
+    "comuna": "Talca",
+    "region": "Maule",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Talca 5 Norte",
+    "direccion": "Avenida 5 Norte N°3615",
+    "comuna": "Talca",
+    "region": "Maule",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Talca III",
+    "direccion": "2 Sur 1953",
+    "comuna": "Talca",
+    "region": "Maule",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Talca IV",
+    "direccion": "14 Sur 1310",
+    "comuna": "Talca",
+    "region": "Maule",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc San Clemente",
+    "direccion": "Huamachuco 613",
+    "comuna": "San Clemente",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc San Javier",
+    "direccion": "Balmaceda 1900",
+    "comuna": "San Javier",
+    "region": "Maule",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Linares I",
+    "direccion": "Maipu 556",
+    "comuna": "Linares",
+    "region": "Maule",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Cauquenes",
+    "direccion": "Catedral 215",
+    "comuna": "Cauquenes",
+    "region": "Maule",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc San Carlos II",
+    "direccion": "Ignacio Serrano 500",
+    "comuna": "San Carlos",
+    "region": "Ñuble",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Coelemu",
+    "direccion": "Castellón 597",
+    "comuna": "Coelemu",
+    "region": "Ñuble",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Chillán II",
+    "direccion": "Av. 5 De Abril 754",
+    "comuna": "Chillán",
+    "region": "Ñuble",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Chillán IV",
+    "direccion": "Av. 5 de Abril 864",
+    "comuna": "Chillán",
+    "region": "Ñuble",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Chillán",
+    "direccion": "Av. Collín 866",
+    "comuna": "Chillán",
+    "region": "Ñuble",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Caracol",
+    "direccion": "Ignacio Serrano 980",
+    "comuna": "Tomé",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Chillán Viejo",
+    "direccion": "Av. Bernardo O'Higgins 2305",
+    "comuna": "Chillán Viejo",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Coihueco",
+    "direccion": "Balmaceda 546",
+    "comuna": "Coihueco",
+    "region": "Ñuble",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Talcahuano Bilbao",
+    "direccion": "Bilbao 446",
+    "comuna": "Talcahuano",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Penco",
+    "direccion": "Freire 699",
+    "comuna": "Penco",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Quillón",
+    "direccion": "Cayumanqui 495",
+    "comuna": "Quillón",
+    "region": "Ñuble",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Bulnes",
+    "direccion": "Carlos Palacios 151",
+    "comuna": "Bulnes",
+    "region": "Ñuble",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Higueras",
+    "direccion": "Las Araucarias 295",
+    "comuna": "Talcahuano",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Gomez Carreño",
+    "direccion": "Gómez Carreño 3875",
+    "comuna": "Talcahuano",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Gran Vía",
+    "direccion": "Bulgaria 2818",
+    "comuna": "Hualpén",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Lomas De San Andrés",
+    "direccion": "Cosme Churruca 75 Loc. 21",
+    "comuna": "Concepción",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Bellavista",
+    "direccion": "Los Lleuques 1540",
+    "comuna": "Concepción",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Peñuelas",
+    "direccion": "Av. Dos 35",
+    "comuna": "Hualpén",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Concepción II",
+    "direccion": "Tucapel 1313",
+    "comuna": "Concepción",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Concepción III",
+    "direccion": "Caupolicán 772",
+    "comuna": "Concepción",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Los Huertos",
+    "direccion": "Las Violetas 1782",
+    "comuna": "San Pedro de la Paz",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Concepción I",
+    "direccion": "Chacabuco 70",
+    "comuna": "Concepción",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc San Pedro De La Paz",
+    "direccion": "Camino El Venado 1380",
+    "comuna": "San Pedro de la Paz",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc San Pedro Del Mar",
+    "direccion": "Tucapel 285",
+    "comuna": "San Pedro de la Paz",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Lomas Coloradas",
+    "direccion": "Los Mañíos 7045",
+    "comuna": "San Pedro de la Paz",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc El Carmen",
+    "direccion": "Esmeralda 550",
+    "comuna": "El Carmen",
+    "region": "Ñuble",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Chiguayante II",
+    "direccion": "Av. 8 Oriente 720",
+    "comuna": "Chiguayante",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Chiguayante",
+    "direccion": "Manuel Rodríguez 785",
+    "comuna": "Chiguayante",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Manquimavida",
+    "direccion": "Manuel Rodríguez 1500",
+    "comuna": "Chiguayante",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Hualqui",
+    "direccion": "La Araucana 490",
+    "comuna": "Hualqui",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc El Volcán",
+    "direccion": "Juan Antonio Ríos 3039",
+    "comuna": "Coronel",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Coronel II",
+    "direccion": "Manuel Montt 398",
+    "comuna": "Coronel",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Coronel",
+    "direccion": "M. Montt 501 Coronel",
+    "comuna": "Coronel",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Coronel III",
+    "direccion": "Lautaro 477",
+    "comuna": "Coronel",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Cabrero",
+    "direccion": "General Cruz 380",
+    "comuna": "Cabrero",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Lota II",
+    "direccion": "Pedro Aguirre Cerda 684",
+    "comuna": "Lota",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc La Violeta",
+    "direccion": "Pedro Aguirre Cerda 602",
+    "comuna": "Lota",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Yumbel",
+    "direccion": "O'Higgins 620",
+    "comuna": "Yumbel",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Yungay",
+    "direccion": "Esmeralda 211",
+    "comuna": "Yungay",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Huepil",
+    "direccion": "Arturo Prat 500",
+    "comuna": "Tucapel",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Arauco II",
+    "direccion": "Covadonga 391",
+    "comuna": "Arauco",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Laja",
+    "direccion": "Balmaceda 62",
+    "comuna": "Laja",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Marconi",
+    "direccion": "Av. Marconi 1177",
+    "comuna": "Los Ángeles",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Colón",
+    "direccion": "Av. Colón 600",
+    "comuna": "Los Ángeles",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Los Angeles Sinay",
+    "direccion": "Av. Alemania 610",
+    "comuna": "Los Ángeles",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Portal",
+    "direccion": "Av. Alemania 100",
+    "comuna": "Los Ángeles",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Curanilahue",
+    "direccion": "O'Higgins 101",
+    "comuna": "Curanilahue",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Los Angeles Carrera",
+    "direccion": "Los Carrera 1380",
+    "comuna": "Los Ángeles",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Nacimiento",
+    "direccion": "San Martín 560",
+    "comuna": "Nacimiento",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Lebu",
+    "direccion": "Bulnes 130",
+    "comuna": "Lebu",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Mulchén",
+    "direccion": "Anibal Pinto 777",
+    "comuna": "Mulchén",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Los Lleuques",
+    "direccion": "Av. Pdte Eduardo Frei 162",
+    "comuna": "Cañete",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Cañete",
+    "direccion": "Saavedra 525",
+    "comuna": "Cañete",
+    "region": "Biobío",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Angol I",
+    "direccion": "Av. O'Higgins 1257",
+    "comuna": "Angol",
+    "region": "La Araucanía",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Collipulli",
+    "direccion": "Cruz 233",
+    "comuna": "Collipulli",
+    "region": "La Araucanía",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Victoria I",
+    "direccion": "Pisagua 1354",
+    "comuna": "Victoria",
+    "region": "La Araucanía",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Traiguén",
+    "direccion": "Santa Cruz 1170",
+    "comuna": "Traiguén",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Curacautín",
+    "direccion": "Bernardo O'Higgins 515",
+    "comuna": "Curacautín",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Lautaro",
+    "direccion": "Av. O'Higgins 630",
+    "comuna": "Lautaro",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Temuco Alemania",
+    "direccion": "Av. Alemania 849",
+    "comuna": "Temuco",
+    "region": "La Araucanía",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Temuco II",
+    "direccion": "Anibal Pinto 72",
+    "comuna": "Temuco",
+    "region": "La Araucanía",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Temuco Caupolicán",
+    "direccion": "Av. Caupolican 0191",
+    "comuna": "Temuco",
+    "region": "La Araucanía",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Temuco San Martín",
+    "direccion": "San Martin 675",
+    "comuna": "Temuco",
+    "region": "La Araucanía",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Temuco IV",
+    "direccion": "Av. Javiera Carrera 1610",
+    "comuna": "Temuco",
+    "region": "La Araucanía",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Barrio Inglés",
+    "direccion": "Av. Las Encinas 02690",
+    "comuna": "Temuco",
+    "region": "La Araucanía",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Padre Las Casas",
+    "direccion": "Av. Manquehue 1244",
+    "comuna": "Padre las Casas",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Nueva Imperial",
+    "direccion": "Arturo Prat 246",
+    "comuna": "Nueva Imperial",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Pitrufquen",
+    "direccion": "Av. Francisco Bilbao 476",
+    "comuna": "Pitrufquén",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Pucon",
+    "direccion": "Av. Bernardo O'Higgins 774",
+    "comuna": "Pucón",
+    "region": "La Araucanía",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Villarrica",
+    "direccion": "Geronimo de Alderete 697",
+    "comuna": "Villarrica",
+    "region": "La Araucanía",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Loncoche",
+    "direccion": "Balmaceda 389",
+    "comuna": "Loncoche",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc San José",
+    "direccion": "Jose Puch 1100",
+    "comuna": "Mariquina",
+    "region": "Los Ríos",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Panguipulli",
+    "direccion": "Pedro de Valdivia 115",
+    "comuna": "Panguipulli",
+    "region": "Los Ríos",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Yungay Valdivia",
+    "direccion": "Yungay 420",
+    "comuna": "Valdivia",
+    "region": "Los Ríos",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Las Ánimas",
+    "direccion": "Bombero Classing 204",
+    "comuna": "Valdivia",
+    "region": "Los Ríos",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Arauco",
+    "direccion": "Arauco 697",
+    "comuna": "Valdivia",
+    "region": "Los Ríos",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Valdivia IV",
+    "direccion": "Av. Francia 2651",
+    "comuna": "Valdivia",
+    "region": "Los Ríos",
+    "lastUpdate": "2025-11-19T12:22:02.402Z"
+  },
+  {
+    "name": "Unimarc Los Lagos II",
+    "direccion": "Quinchilca 334",
+    "comuna": "Los Lagos",
+    "region": "Los Ríos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Los Lagos I",
+    "direccion": "Balmaceda Norte 79",
+    "comuna": "Los Lagos",
+    "region": "Los Ríos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Paillaco",
+    "direccion": "Arturo Prat 688",
+    "comuna": "Paillaco",
+    "region": "Los Ríos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc La Unión II",
+    "direccion": "Serrano 617",
+    "comuna": "La Unión",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Río Bueno II",
+    "direccion": "Pedro Lagos 593",
+    "comuna": "Río Bueno",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Victoria",
+    "direccion": "Victoria 367",
+    "comuna": "Osorno",
+    "region": "Los Lagos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Bulnes II",
+    "direccion": "Ramírez 699",
+    "comuna": "Osorno",
+    "region": "Los Lagos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Central",
+    "direccion": "Patrio Lynch 1278",
+    "comuna": "Osorno",
+    "region": "Los Lagos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Osorno Francia",
+    "direccion": "AV. Francia 1701 Local 1",
+    "comuna": "Osorno",
+    "region": "Los Lagos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Oriente",
+    "direccion": "Julio Buschman 2223",
+    "comuna": "Osorno",
+    "region": "Los Lagos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Purranque",
+    "direccion": "Eleuterio Ramírez 549",
+    "comuna": "Purranque",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Frutillar III",
+    "direccion": "Arturo Alessandri 381",
+    "comuna": "Frutillar",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Llanquihue",
+    "direccion": "Baquedano 612",
+    "comuna": "Llanquihue",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Los Muermos",
+    "direccion": "Nelson Aguilar 480",
+    "comuna": "Los Muermos",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Puerto Montt II",
+    "direccion": "Av. Gabriela Mistral 900",
+    "comuna": "Puerto Montt",
+    "region": "Los Lagos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Los Volcanes",
+    "direccion": "Volcán Hornopirén 1728",
+    "comuna": "Puerto Montt",
+    "region": "Los Lagos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Tepual",
+    "direccion": "El Tepual 1360",
+    "comuna": "local 1",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc La Rotonda",
+    "direccion": "Av. Parque Industrial 450",
+    "comuna": "Puerto Montt",
+    "region": "Los Lagos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc La Paloma",
+    "direccion": "Volcán Puntiagudo 100",
+    "comuna": "Puerto Montt",
+    "region": "Los Lagos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Alerce",
+    "direccion": "Av. Gabriela Mistral S/N",
+    "comuna": "Puerto Montt",
+    "region": "Los Lagos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Urmeneta",
+    "direccion": "Urmeneta 574",
+    "comuna": "Puerto Montt",
+    "region": "Los Lagos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Puerto Montt III",
+    "direccion": "Chillán 65",
+    "comuna": "Puerto Montt",
+    "region": "Los Lagos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Juan Soler",
+    "direccion": "Juan Soler Manfredini 51",
+    "comuna": "Puerto Montt",
+    "region": "Los Lagos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Mirasol",
+    "direccion": "Av. de La Cruz 2006",
+    "comuna": "Puerto Montt",
+    "region": "Los Lagos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Los Notros",
+    "direccion": "Av. Los Notros 1272",
+    "comuna": "Puerto Montt",
+    "region": "Los Lagos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Calbuco",
+    "direccion": "Federico Errázuriz 211",
+    "comuna": "Calbuco",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Calbuco II",
+    "direccion": "Federico Errázuriz 572",
+    "comuna": "Calbuco",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Ancud III",
+    "direccion": "Colo - Colo 318",
+    "comuna": "Ancud",
+    "region": "Los Lagos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Dalcahue",
+    "direccion": "Ramon Freire Poniente 625",
+    "comuna": "Dalcahue",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Achao",
+    "direccion": "Delicias 06",
+    "comuna": "Quinchao",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Castro I",
+    "direccion": "O'Higgins 711",
+    "comuna": "Castro",
+    "region": "Los Lagos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Chonchi",
+    "direccion": "Sargento Candelaria N° 800",
+    "comuna": "Chonchi",
+    "region": "Los Lagos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Quellón",
+    "direccion": "Gomez Garcia N320",
+    "comuna": "Quellón",
+    "region": "Los Lagos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Quellón II",
+    "direccion": "Ladrillero 460",
+    "comuna": "Quellón",
+    "region": "Los Lagos",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Aysén",
+    "direccion": "Carrera 1500",
+    "comuna": "Aisén",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Coyhaique",
+    "direccion": "Lautaro 331",
+    "comuna": "Coyhaique",
+    "region": "Aysén",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Puerto Natales",
+    "direccion": "Bulnes 742",
+    "comuna": "Natales",
+    "region": "SIN REGIÓN",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Zenteno Austral",
+    "direccion": "Capitán Guillermo 05",
+    "comuna": "Punta Arenas",
+    "region": "Magallanes",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Allende Austral",
+    "direccion": "Av. Salvador Allende 0399",
+    "comuna": "Punta Arenas",
+    "region": "Magallanes",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Bories Austral",
+    "direccion": "Bories 647",
+    "comuna": "Punta Arenas",
+    "region": "Magallanes",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Zona Franca I",
+    "direccion": "Manzana 18 Zona Franca",
+    "comuna": "Punta Arenas",
+    "region": "Magallanes",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc España Austral",
+    "direccion": "Av. España 01375",
+    "comuna": "Punta Arenas",
+    "region": "Magallanes",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Lautaro Navarro Austral",
+    "direccion": "Lautaro Navarro 1293",
+    "comuna": "Punta Arenas",
+    "region": "Magallanes",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  },
+  {
+    "name": "Unimarc Aguirre Cerda Austral",
+    "direccion": "Av. Pedro Aguirre Cerda 0413",
+    "comuna": "Punta Arenas",
+    "region": "Magallanes",
+    "lastUpdate": "2025-11-19T12:22:02.403Z"
+  }
+]
