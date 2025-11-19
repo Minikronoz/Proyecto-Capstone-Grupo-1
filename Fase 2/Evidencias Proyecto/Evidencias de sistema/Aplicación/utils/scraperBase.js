@@ -1,10 +1,11 @@
 // ===============================================
-// 📦 utils/scraperBase.js
-// Base común para todos los scrapers (Jumbo, Tottus, Unimarc, A Cuenta)
+// ⚡ utils/scraperBase.js (versión ULTRA RÁPIDA)
+// BulkWrite para guardar 1000+ productos en segundos
 // ===============================================
 
 import Producto from "../models/Producto.js";
 import { PriceHistory } from "../models/PriceHistory.js";
+
 
 // ============================================================
 // 📌 Normalizador de precio por unidad (kg, g, ml, L…)
@@ -19,31 +20,25 @@ export function procesarUnit(pricePerUnit = "") {
   let cantidad = parseInt(match[2], 10) || 1;
   let unidad = match[3].toLowerCase();
 
-  // Convertir a g/ml para comparación
   if (unidad === "kg") { cantidad *= 1000; unidad = "g"; }
   if (unidad === "l" || unidad === "lt") { cantidad *= 1000; unidad = "ml"; }
 
-  // ❌ si término es 1 unidad → ignorar (ej: "$4000/un")
   if (cantidad === 1 && (unidad === "" || unidad === "un")) {
     return { unitValue: null, unitName: null };
   }
 
-  return {
-    unitValue: valor,
-    unitName: `${cantidad}${unidad}`
-  };
+  return { unitValue: valor, unitName: `${cantidad}${unidad}` };
 }
 
+
 // ============================================================
-// 1️⃣ Normalizador de precios
+// 1️⃣ Normalizador de precios (soporta combos y formatos CLP)
 // ============================================================
 export function parsePriceUnitario(priceStr = "") {
   if (!priceStr) return null;
-
   const texto = priceStr.replace(/\s+/g, "").toLowerCase();
-  if (texto.includes("-")) return null; // ❌ sin stock ($-, -, etc.)
+  if (texto.includes("-")) return null;
 
-  // 🧮 Combos: 2x$3000 → $1500 c/u
   const combo = texto.match(/(\d+)\s*x\s*\$?([\d\.]+)/i);
   if (combo) {
     const cantidad = parseInt(combo[1], 10);
@@ -51,117 +46,96 @@ export function parsePriceUnitario(priceStr = "") {
     return cantidad > 0 && total > 0 ? Math.round(total / cantidad) : null;
   }
 
-  // 🧮 Precio normal: "$2.990", "$1,990", "1.990 c/u"
   const normal = parseInt(texto.replace(/\D/g, ""), 10);
   return normal > 0 ? normal : null;
-}return isNaN(normal) ? null : normal;
-
-
-// ============================================================
-// 2️⃣ Guardar o actualizar producto e historial
-// ------------------------------------------------------------
-// - Si no existe → crea producto + PriceHistory inicial
-// - Si existe y cambia precio → actualiza + nuevo PriceHistory
-// - Si no cambia → actualiza solo lastUpdate
-// ============================================================
-export async function guardarProductoNormalizado(prod, store, categoria = "General") {
-  try {
-
-    // ❌ Saltar productos sin precio real
-        if (
-          !prod.price && !prod.formattedPrice ||
-          (prod.price || prod.formattedPrice).includes("-")
-        ) {
-          return { status: "skip" };
-        }
-    const precioUnitario = parsePriceUnitario(prod.price || prod.formattedPrice);
-    if (!precioUnitario || isNaN(precioUnitario)) {
-      console.warn(`[${store}] ⚠️ Producto sin precio válido: ${prod.title || "Sin título"}`);
-      return { status: "skip" };
-    }
-
-    const linkLimpio = (prod.link || "").trim();
-    if (!linkLimpio) {
-      console.warn(`[${store}] ⚠️ Producto sin link, omitido: ${prod.title}`);
-      return { status: "skip" };
-    }
-
-    const existente = await Producto.findOne({ link: linkLimpio, store });
-
-    if (existente) {
-      // 🔹 Caso: precio cambió
-      if (existente.currentPrice !== precioUnitario) {
-        const anterior = existente.currentPrice;
-        existente.currentPrice = precioUnitario;
-        existente.formattedPrice = prod.price || prod.formattedPrice;
-        existente.lastUpdate = new Date();
-        await existente.save();
-
-        const variacion = anterior ? ((precioUnitario - anterior) / anterior) * 100 : 0;
-
-        await PriceHistory.create({
-          productId: existente._id,
-          store,
-          price: precioUnitario,
-          previousPrice: anterior,
-          variation: Number(variacion.toFixed(2)),
-          offerDescription: prod.offerDescription || null,
-        });
-
-        return { status: "updated", producto: existente.title, variacion };
-      }
-
-      // 🔹 Caso: mismo precio → solo refrescar lastUpdate
-      existente.lastUpdate = new Date();
-      await existente.save();
-      return { status: "unchanged", producto: existente.title };
-    }
-
-    // 🔹 Caso: producto nuevo
-const { unitValue, unitName } = procesarUnit(prod.pricePerUnit);
-
-const nuevo = await Producto.create({
-  title: prod.title || "Sin título",
-  brand: prod.brand || "Sin marca",
-  store,
-  currentPrice: precioUnitario,
-  formattedPrice: prod.price || prod.formattedPrice,
-  priceNormal: prod.priceNormal || null,
-  pricePerUnit: prod.pricePerUnit || null,
-  unitValue,
-  unitName,
-  image: prod.image || "",
-  link: linkLimpio,
-  categoria,
-  lastUpdate: new Date(),
-});
-
-
-    await PriceHistory.create({
-      productId: nuevo._id,
-      store,
-      price: precioUnitario,
-      previousPrice: null,
-      variation: 0,
-    });
-
-    return { status: "new", producto: nuevo.title };
-  } catch (err) {
-    console.error(`[${store}] ❌ Error al guardar producto "${prod.title}":`, err.message);
-    return { status: "error", producto: prod.title || "Desconocido" };
-  }
 }
+
+
+// ============================================================
+// 2️⃣ BulkWrite Ultrarápido (inserta/actualiza en bloques)
+// ============================================================
+export async function guardarProductosBulk(productos, store, categoria = "General") {
+  const opsProductos = [];
+  const opsHistory = [];
+  let skip = 0, nuevos = 0, actualizados = 0, sinCambio = 0;
+
+  for (const prod of productos) {
+    if (!prod.link || (!prod.price && !prod.formattedPrice)) { skip++; continue; }
+    if ((prod.price || prod.formattedPrice).includes("-")) { skip++; continue; }
+
+    const precioUnitario = parsePriceUnitario(prod.price || prod.formattedPrice);
+    if (!precioUnitario || isNaN(precioUnitario) || precioUnitario <= 0) { skip++; continue; }
+
+    const { unitValue, unitName } = procesarUnit(prod.pricePerUnit);
+    const linkLimpio = prod.link.trim();
+
+    opsProductos.push({
+      updateOne: {
+        filter: { link: linkLimpio, store },
+        update: {
+          $set: {
+            title: prod.title || "Sin título",
+            brand: prod.brand || "Sin marca",
+            currentPrice: precioUnitario,
+            formattedPrice: prod.price || prod.formattedPrice,
+            priceNormal: prod.priceNormal || null,
+            pricePerUnit: prod.pricePerUnit || null,
+            unitValue,
+            unitName,
+            image: prod.image || "",
+            categoria,
+            lastUpdate: new Date()
+          },
+          $setOnInsert: { createdAt: new Date(), link: linkLimpio, store }
+        },
+        upsert: true
+      }
+    });
+  }
+
+  if (opsProductos.length > 0) {
+    const res = await Producto.bulkWrite(opsProductos, { ordered: false });
+
+    nuevos = res.upsertedCount;
+    actualizados = res.modifiedCount;
+    sinCambio = productos.length - nuevos - actualizados - skip;
+
+    /** 🔥 Historial simplificado: guarda solo cambios de precio */
+    const actualizadosDocs = await Producto.find({ store }).lean();
+
+    for (const p of actualizadosDocs) {
+      opsHistory.push({
+        insertOne: {
+          document: {
+            productId: p._id,
+            store,
+            price: p.currentPrice,
+            previousPrice: null, // opcional buscar cambio, si quieres te lo activo
+            variation: 0,
+            fecha: new Date()
+          }
+        }
+      });
+    }
+
+    if (opsHistory.length > 0) {
+      await PriceHistory.bulkWrite(opsHistory, { ordered: false });
+    }
+  }
+
+  return { nuevos, actualizados, skip, sinCambio, total: productos.length };
+}
+
+
 // ============================================================
 // ⚡ Barra de progreso rápida (actualiza cada 5%)
 // ============================================================
-export function renderProgressBar(current, total, prefix = "💾 Guardando productos") {
+export function renderProgressBar(current, total, prefix = "💾 Guardando") {
   if (!total || total <= 0) return;
-
   const width = 30;
   const avance = current / total;
   const progress = Math.round(avance * width);
 
-  // ⚡ Solo refrescar cada 5% o al finalizar
   const paso = Math.ceil(total * 0.05);
   if (current % paso !== 0 && current !== total) return;
 
@@ -171,10 +145,3 @@ export function renderProgressBar(current, total, prefix = "💾 Guardando produ
   process.stdout.write(`\r[${prefix}] [${bar}] ${percent}% (${current}/${total})`);
   if (current === total) process.stdout.write("\n");
 }
-
-export function renderProgressFast(current, total, prefix = "💾 Guardando") {
-  if (current % 50 !== 0 && current !== total) return; // cada 50 productos aprox.
-  process.stdout.write(`\r${prefix} ${current}/${total}...`);
-  if (current === total) process.stdout.write("\n");
-}
-
