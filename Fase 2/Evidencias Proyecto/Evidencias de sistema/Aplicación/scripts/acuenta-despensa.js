@@ -128,7 +128,8 @@ function detectarMarca(title = "") {
   const t = title.toLowerCase();
 
   // Marcas propias Acuenta
-  if (t.includes("acuenta")) return "Marca Propia Acuenta";
+  if (t.includes("acuenta")) return "A Cuenta (Marca Propia)";
+
 
   // Búsqueda en marcas comerciales
   const marca = MARCAS_CONOCIDAS.find(m => t.includes(m.toLowerCase()));
@@ -176,28 +177,36 @@ function renderProgressBar(current, total, prefix = `[${STORE}]`) {
 function procesarUnit(pricePerUnit = "") {
   if (!pricePerUnit) return { unitValue: null, unitName: null };
 
-  // Ejemplo: "$1.578/l"
-  const match = pricePerUnit.match(/([\d\.]+).*?\/\s*([a-z]+)/i);
+  // Ejemplos válidos:
+  // "$995 x 10g", "$4.500/kg", "$1500/l", "$850/100g"
+  const match = pricePerUnit.match(/([\d\.]+).*?(?:x|\/)\s*(\d+)?\s*(g|gr|kg|ml|l|lt)/i);
   if (!match) return { unitValue: null, unitName: null };
 
   let valor = parseInt(match[1].replace(/\D/g, ""), 10);
-  let unidad = match[2].toLowerCase();
+  let cantidad = parseInt(match[2], 10) || 1;
+  let unidad = match[3].toLowerCase();
 
-  // Convertir a ml/g
-  if (unidad === "l") {
-    unidad = "ml";
-    valor = Math.round(valor); // valor por 1L → luego el cliente divide
-  }
+  // Normalización
   if (unidad === "kg") {
+    cantidad *= 1000;
     unidad = "g";
-    valor = Math.round(valor);
+  }
+  if (unidad === "l" || unidad === "lt") {
+    cantidad *= 1000;
+    unidad = "ml";
+  }
+
+  // ❌ Si es 1 unidad → ignorar (ej: "$4000/un", "$3500/ud")
+  if (unidad === "" || unidad === "un" || unidad === "unidad" || cantidad === 1) {
+    return { unitValue: null, unitName: null };
   }
 
   return {
     unitValue: valor,
-    unitName: unidad
+    unitName: `${cantidad}${unidad}`
   };
 }
+
 
 // =============================================================
 // 🚀 MAIN

@@ -6,6 +6,33 @@
 import Producto from "../models/Producto.js";
 import { PriceHistory } from "../models/PriceHistory.js";
 
+// ============================================================
+// 📌 Normalizador de precio por unidad (kg, g, ml, L…)
+// ============================================================
+export function procesarUnit(pricePerUnit = "") {
+  if (!pricePerUnit) return { unitValue: null, unitName: null };
+
+  const match = pricePerUnit.match(/([\d\.]+).*?(?:x|\/)\s*(\d+)?\s*(g|gr|kg|ml|l|lt)/i);
+  if (!match) return { unitValue: null, unitName: null };
+
+  let valor = parseInt(match[1].replace(/\D/g, ""), 10);
+  let cantidad = parseInt(match[2], 10) || 1;
+  let unidad = match[3].toLowerCase();
+
+  // Convertir a g/ml para comparación
+  if (unidad === "kg") { cantidad *= 1000; unidad = "g"; }
+  if (unidad === "l" || unidad === "lt") { cantidad *= 1000; unidad = "ml"; }
+
+  // ❌ si término es 1 unidad → ignorar (ej: "$4000/un")
+  if (cantidad === 1 && (unidad === "" || unidad === "un")) {
+    return { unitValue: null, unitName: null };
+  }
+
+  return {
+    unitValue: valor,
+    unitName: `${cantidad}${unidad}`
+  };
+}
 
 // ============================================================
 // 1️⃣ Normalizador de precios
@@ -14,19 +41,21 @@ export function parsePriceUnitario(priceStr = "") {
   if (!priceStr) return null;
 
   const texto = priceStr.replace(/\s+/g, "").toLowerCase();
+  if (texto.includes("-")) return null; // ❌ sin stock ($-, -, etc.)
 
-  // 🧮 Caso combos: "2x$3000", "2 x $3.000", "3X$7500"
+  // 🧮 Combos: 2x$3000 → $1500 c/u
   const combo = texto.match(/(\d+)\s*x\s*\$?([\d\.]+)/i);
   if (combo) {
     const cantidad = parseInt(combo[1], 10);
     const total = parseInt(combo[2].replace(/\D/g, ""), 10);
-    if (cantidad > 0 && total > 0) return Math.round(total / cantidad);
+    return cantidad > 0 && total > 0 ? Math.round(total / cantidad) : null;
   }
 
-  // 🧮 Caso normal: "$2.990", "$1,990 c/u"
+  // 🧮 Precio normal: "$2.990", "$1,990", "1.990 c/u"
   const normal = parseInt(texto.replace(/\D/g, ""), 10);
-  return isNaN(normal) ? null : normal;
-}
+  return normal > 0 ? normal : null;
+}return isNaN(normal) ? null : normal;
+
 
 // ============================================================
 // 2️⃣ Guardar o actualizar producto e historial
@@ -37,6 +66,14 @@ export function parsePriceUnitario(priceStr = "") {
 // ============================================================
 export async function guardarProductoNormalizado(prod, store, categoria = "General") {
   try {
+
+    // ❌ Saltar productos sin precio real
+        if (
+          !prod.price && !prod.formattedPrice ||
+          (prod.price || prod.formattedPrice).includes("-")
+        ) {
+          return { status: "skip" };
+        }
     const precioUnitario = parsePriceUnitario(prod.price || prod.formattedPrice);
     if (!precioUnitario || isNaN(precioUnitario)) {
       console.warn(`[${store}] ⚠️ Producto sin precio válido: ${prod.title || "Sin título"}`);
@@ -81,17 +118,24 @@ export async function guardarProductoNormalizado(prod, store, categoria = "Gener
     }
 
     // 🔹 Caso: producto nuevo
-    const nuevo = await Producto.create({
-      title: prod.title || "Sin título",
-      brand: prod.brand || "Sin marca",
-      store,
-      currentPrice: precioUnitario,
-      formattedPrice: prod.price || prod.formattedPrice,
-      image: prod.image || "",
-      link: linkLimpio,
-      categoria,
-      lastUpdate: new Date(),
-    });
+const { unitValue, unitName } = procesarUnit(prod.pricePerUnit);
+
+const nuevo = await Producto.create({
+  title: prod.title || "Sin título",
+  brand: prod.brand || "Sin marca",
+  store,
+  currentPrice: precioUnitario,
+  formattedPrice: prod.price || prod.formattedPrice,
+  priceNormal: prod.priceNormal || null,
+  pricePerUnit: prod.pricePerUnit || null,
+  unitValue,
+  unitName,
+  image: prod.image || "",
+  link: linkLimpio,
+  categoria,
+  lastUpdate: new Date(),
+});
+
 
     await PriceHistory.create({
       productId: nuevo._id,
@@ -107,14 +151,30 @@ export async function guardarProductoNormalizado(prod, store, categoria = "Gener
     return { status: "error", producto: prod.title || "Desconocido" };
   }
 }
-
 // ============================================================
-// 3️⃣ Barra de progreso visual en consola
+// ⚡ Barra de progreso rápida (actualiza cada 5%)
+// ============================================================
 export function renderProgressBar(current, total, prefix = "💾 Guardando productos") {
+  if (!total || total <= 0) return;
+
   const width = 30;
-  const progress = Math.round((current / total) * width);
+  const avance = current / total;
+  const progress = Math.round(avance * width);
+
+  // ⚡ Solo refrescar cada 5% o al finalizar
+  const paso = Math.ceil(total * 0.05);
+  if (current % paso !== 0 && current !== total) return;
+
   const bar = "█".repeat(progress) + "░".repeat(width - progress);
-  const percent = ((current / total) * 100).toFixed(1).padStart(5);
+  const percent = (avance * 100).toFixed(1).padStart(5);
+
   process.stdout.write(`\r[${prefix}] [${bar}] ${percent}% (${current}/${total})`);
   if (current === total) process.stdout.write("\n");
 }
+
+export function renderProgressFast(current, total, prefix = "💾 Guardando") {
+  if (current % 50 !== 0 && current !== total) return; // cada 50 productos aprox.
+  process.stdout.write(`\r${prefix} ${current}/${total}...`);
+  if (current === total) process.stdout.write("\n");
+}
+

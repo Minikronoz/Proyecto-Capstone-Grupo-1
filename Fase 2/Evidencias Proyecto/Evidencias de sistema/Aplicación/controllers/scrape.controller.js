@@ -77,7 +77,7 @@ function guardarScraping(supermercado, { actualizados = 0, nuevos = 0, revisados
 
 function ejecutarScraping(nombreScript, io) {
   return new Promise((resolve, reject) => {
-    const scriptPath = path.join(__dirname, `../scripts/${nombreScript}-despensa.mjs`);
+    const scriptPath = path.join(__dirname, `../scripts/${nombreScript}-despensa.js`);
 
     if (!fs.existsSync(scriptPath)) {
       const errMsg = `❌ Script no encontrado: ${scriptPath}`;

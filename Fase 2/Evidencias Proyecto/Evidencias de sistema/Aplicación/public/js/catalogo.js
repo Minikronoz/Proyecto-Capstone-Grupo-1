@@ -140,7 +140,6 @@ listaPaginada.forEach((p) => {
       <p class="price-actual">${p.formattedPrice || "$ -"}</p>
       ${p.priceNormal ? `<p class="price-normal">Normal: ${p.priceNormal}</p>` : ""}
       ${p.pricePerUnit ? `<p class="price-unit"><small>${p.pricePerUnit}</small></p>` : ""}
-      ${p.offerDescription ? `<p class="price-offer"> ${p.offerDescription}</p>` : ""}
     </div>
 
     <button class="btn-ver"

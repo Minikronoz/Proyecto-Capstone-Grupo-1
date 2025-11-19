@@ -157,12 +157,20 @@ async function extraerProductos(page) {
       };
 
       const productos = [];
-
+      
       for (const el of els) {
         const title =
           el.querySelector("p.Shelf_nameProduct__0KIRG, p[class*='product-name']")?.innerText?.trim() || null;
         if (!title) continue;
 
+
+        const agotado =
+        el.innerText.toLowerCase().includes("agotado") ||
+        el.innerText.toLowerCase().includes("no disponible") ||
+        el.innerText.toLowerCase().includes("sin stock");
+
+        if (agotado) continue;
+        
         let brand =
           el.querySelector("p.Shelf_brandText__vmuWJ, p[class*='brand']")?.innerText?.trim() || "";
         if (!brand || brand.length < 2) brand = detectarMarca(title);
@@ -188,6 +196,8 @@ async function extraerProductos(page) {
         // 🔗 Enlace
         let link = el.querySelector("a[href*='/product/']")?.getAttribute("href") || null;
         if (link && !link.startsWith("http")) link = `https://www.unimarc.cl${link}`;
+
+
 
         productos.push({
           title,
@@ -290,9 +300,18 @@ for (const [url, categoria] of CATEGORIAS) {
       actualizados = 0,
       revisados = 0;
 
-    for (const prod of productosCategoria) {
-     const priceNum = parsePrice(prod.formattedPrice);
-if (isNaN(priceNum)) continue;
+for (const prod of productosCategoria) {
+  // ❌ Filtrar sin stock → $ -, $0, null, vacío
+  if (
+    !prod.formattedPrice ||
+    prod.formattedPrice.includes("-") ||
+    prod.formattedPrice.trim() === "" ||
+    /(\$0|\$ 0)/.test(prod.formattedPrice)
+  )
+    continue;
+
+  const priceNum = parsePrice(prod.formattedPrice);
+  if (isNaN(priceNum) || priceNum <= 0) continue;
 
 const globalId = generarGlobalId(prod.title, prod.brand);
 
