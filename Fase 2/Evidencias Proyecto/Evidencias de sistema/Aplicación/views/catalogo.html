@@ -145,12 +145,30 @@ async function cerrarSesion(event) {
   </div>
 </section>
 
+<!-- 🔽 Filtro de PESO debajo del buscador -->
 <section class="filtros-peso"></section>
 
-<section class="productos" id="contenedorProductos">
-  <!-- Productos dinámicos -->
-</section>
+<!-- 🧱 LAYOUT: Sidebar + Productos -->
+<div class="catalogo-layout">
 
+  <!-- 📌 PANEL LATERAL DE MARCAS -->
+  <aside class="sidebar-marcas">
+    <h3>Marca</h3>
+    <input type="text" id="filtroMarcasBuscar" placeholder="Buscar marca..." class="input-buscar-marca">
+    
+    <div id="listaMarcas" class="marcas-lista">
+      <!-- Se llenará dinámicamente -->
+    </div>
+  </aside>
+
+  <!-- 🛒 Productos -->
+  <section class="productos" id="contenedorProductos">
+    <!-- Productos dinámicos -->
+  </section>
+
+</div>
+
+<!-- 🔢 Paginación -->
 <div id="paginacion" class="paginacion"></div>
 
 <!-- 🔹 Carrito rápido -->
@@ -285,6 +303,60 @@ document.addEventListener("DOMContentLoaded", verificarYMostrarPopup);
 
     window.open(producto.link, "_blank");
   }
+</script>
+
+<script>
+// ===== Cargar marcas dinámicamente =====
+async function cargarMarcas() {
+  const texto = document.getElementById("busqueda").value.trim();
+  const tiendas = Array.from(document.querySelectorAll(".filtro-super:checked")).map(t => t.value).join(",");
+
+  const res = await fetch(`/api/productos/marcas?q=${texto}&tiendas=${tiendas}`);
+  const data = await res.json();
+
+  const lista = document.getElementById("listaMarcas");
+  if (!data.ok || !data.marcas.length) {
+    lista.innerHTML = "<p>Sin marcas</p>";
+    return;
+  }
+
+  lista.innerHTML = data.marcas.map(m => `
+    <label><input type="checkbox" class="chkMarca" value="${m}"> ${m}</label>
+  `).join("");
+
+  document.querySelectorAll(".chkMarca").forEach(cb => {
+    cb.addEventListener("change", () => cargarProductos(document.getElementById("busqueda").value.trim()));
+  });
+}
+
+function cargarMarcasSidebar() {
+  const lista = document.getElementById("listaMarcas");
+  const marcas = getAvailableBrands();
+
+  if (marcas.length === 0) {
+    lista.innerHTML = "<p style='color:#888;font-size:13px;'>Sin marcas disponibles</p>";
+    return;
+  }
+
+  lista.innerHTML = marcas.map(m => `
+      <label><input type="checkbox" class="chkMarca" value="${m}"> ${m}</label>
+  `).join("");
+
+  document.querySelectorAll(".chkMarca").forEach(cb => {
+    cb.addEventListener("change", () => renderProductos());
+  });
+}
+
+// ===== Buscador LOCAL dentro de marcas =====
+document.getElementById("filtroMarcasBuscar").addEventListener("keyup", () => {
+  const filtro = document.getElementById("filtroMarcasBuscar").value.toLowerCase();
+  document.querySelectorAll("#listaMarcas label").forEach(el => {
+    el.style.display = el.textContent.toLowerCase().includes(filtro) ? "flex" : "none";
+  });
+});
+
+// === Llamar marcas al iniciar ===
+document.addEventListener("DOMContentLoaded", cargarMarcas);
 </script>
 
 <!-- 🔹 Script principal -->

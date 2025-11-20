@@ -149,7 +149,7 @@ router.get("/:id/historico", async (req, res) => {
 // =============================================================
 // 🔍 Buscar productos (para catálogo)
 // =============================================================
-router.get("/api/productos", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const db = getDB();
     const { q, store, categoria, minPrice, maxPrice } = req.query;
@@ -163,7 +163,9 @@ router.get("/api/productos", async (req, res) => {
         { brand: { $regex: q, $options: "i" } }
       ];
     }
-
+    if (req.query.marcas) {
+  filtro.brand = { $in: req.query.marcas.split(",") };
+}
     // Filtro por tienda
     if (store) {
       filtro.store = store;
@@ -243,6 +245,46 @@ router.get("/api/productos/:id", async (req, res) => {
       ok: false, 
       error: "Error al obtener producto" 
     });
+  }
+});
+// =============================================================
+// 🏷️ Obtener marcas filtradas por búsqueda y tiendas seleccionadas
+// =============================================================
+router.get("/marcas", async (req, res) => {
+  try {
+    const db = getDB();
+    const { q, tiendas } = req.query;
+
+    const filtro = {};
+
+    if (q && q.trim() !== "") {
+      filtro.$or = [
+        { title: { $regex: q, $options: "i" } },
+        { brand: { $regex: q, $options: "i" } }
+      ];
+    }
+
+    if (tiendas) {
+      filtro.store = { $in: tiendas.split(",") };
+    }
+
+    // 👇 Group para obtener marcas únicas
+    const marcas = await db.collection("productos")
+      .aggregate([
+        { $match: filtro },
+        { $group: { _id: "$brand" } },
+        { $sort: { _id: 1 } }
+      ])
+      .toArray();
+
+    res.json({
+      ok: true,
+      marcas: marcas.map(m => m._id).filter(Boolean)
+    });
+
+  } catch (err) {
+    console.error("❌ Error cargando marcas:", err);
+    res.status(500).json({ ok: false, error: "Error al obtener marcas" });
   }
 });
 

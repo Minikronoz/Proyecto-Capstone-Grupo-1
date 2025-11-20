@@ -173,6 +173,7 @@ function renderizarFiltrosPeso(productos) {
       currentPage = 1;
       renderizarProductos(getFilteredProducts());
       renderizarFiltrosPeso(productosGlobal);
+      cargarMarcasSidebar();
     };
     cont.appendChild(limpiar);
   }
@@ -197,7 +198,8 @@ function toggleFiltro(valor, tipo) {
   
   currentPage = 1;
   renderizarProductos(getFilteredProducts());
-  renderizarFiltrosPeso(productosGlobal); // Refrescar para actualizar clases "seleccionado"
+  renderizarFiltrosPeso(productosGlobal); 
+  cargarMarcasSidebar(); // 🟢 ACTUALIZA MARCAS SEGÚN PESO// Refrescar para actualizar clases "seleccionado"
 }
 
 // ==========================================
@@ -232,6 +234,36 @@ function getFilteredProducts() {
   
   return lista;
 }
+// ==========================================
+// 🏷️ Obtener marcas disponibles según filtros actuales
+// ==========================================
+function getAvailableBrands() {
+  const productosFiltrados = getFilteredProducts();
+
+  const marcas = new Set();
+  productosFiltrados.forEach(p => {
+    if (p.brand && p.brand !== "null" && p.brand !== "") {
+      marcas.add(p.brand.trim());
+    }
+  });
+
+  return [...marcas].sort();
+}
+
+
+// 🧽 Limpia el precio y deja solo el primero que aparezca (evita $14450$16990)
+function limpiarPrecioFormulario(precio = "") {
+  if (!precio) return null;
+  let txt = precio.toString().replace(/\s+/g, "");
+  const m = txt.match(/\$[\d\.]+/);
+  return m ? m[0] : precio;
+}
+
+// 🔢 Extrae solo números para comparar precios correctamente
+function extraerNumero(precio = "") {
+  if (!precio) return null;
+  return parseInt(precio.toString().replace(/\D/g, ""), 10);
+}
 
 // ==========================================
 // 🎨 Renderizar productos
@@ -265,6 +297,7 @@ function renderizarProductos(lista) {
     const storeLabel = `<span class="store-label" style="background:${colorTienda}">${(p.store || "SIN TIENDA").toUpperCase()}</span>`;
     const marca = p.brand && p.brand.trim() && p.brand !== "null" ? p.brand : "Sin marca";
 
+    // 🧮 Calcular precio numérico
     let precioNum = 0;
     if (typeof p.currentPrice === "number") precioNum = p.currentPrice;
     else if (typeof p.currentPrice === "string") {
@@ -274,14 +307,28 @@ function renderizarProductos(lista) {
       if (m) precioNum = parseFloat(m[1].replace(/\./g, "").replace(",", ".")) || 0;
     }
 
+    // 🧹 Limpiar precios irreales (evitar duplicados sin oferta real)
+    if (p.priceNormal && limpiarPrecioFormulario(p.priceNormal) === limpiarPrecioFormulario(p.formattedPrice)) {
+      p.priceNormal = null;
+    }
+
+    const precioActualNum = extraerNumero(p.formattedPrice);
+    const precioNormalNum = extraerNumero(p.priceNormal);
+
+    // 🚫 Si el precio normal es igual al actual o inválido → ocultar
+    if (!precioNormalNum || precioNormalNum === precioActualNum) {
+      p.priceNormal = null;
+    }
+
+    // 🖼️ Render de la tarjeta
     card.innerHTML = `
       <div class="store-container">${storeLabel}</div>
       <img src="${p.image || "/img/no-image.png"}" alt="${p.title}" loading="lazy">
       <h3 class="product-title">${p.title}</h3>
       <p class="brand"><strong>${marca}</strong></p>
+
       <div class="price-box">
-        <p class="price-actual">${p.formattedPrice || "$ -"}</p>
-        ${p.priceNormal ? `<p class="price-normal">Normal: ${p.priceNormal}</p>` : ""}
+        <p class="price-actual">${limpiarPrecioFormulario(p.formattedPrice) || "$ -"}</p>
         ${p.pricePerUnit ? `<p class="price-unit"><small>${p.pricePerUnit}</small></p>` : ""}
       </div>
 
@@ -321,6 +368,82 @@ function renderizarProductos(lista) {
 
   renderizarPaginacion();
 }
+
+async function cargarMarcas() {
+  const texto = document.getElementById("busqueda").value.trim();
+  const tiendas = Array.from(selectedStores).join(",");
+
+  const res = await fetch(`/api/productos/marcas?q=${texto}&tiendas=${tiendas}`);
+  const data = await res.json();
+
+  const lista = document.getElementById("listaMarcas");
+
+  if (!data.ok || !data.marcas.length) {
+    lista.innerHTML = "<p style='font-size:13px;color:#777;'>Sin marcas disponibles</p>";
+    sidebar.classList.add("pocas-marcas");
+    return;
+  }
+
+  lista.innerHTML = data.marcas.map(m => `
+    <label><input type="checkbox" class="chkMarca" value="${m}"> ${m}</label>
+  `).join("");
+
+  // 📌 Ajuste dinámico del tamaño del sidebar
+  const totalMarcas = data.marcas.length;
+  const sidebar = document.querySelector(".sidebar-marcas");
+
+  if (totalMarcas <= 5) {
+    sidebar.classList.add("pocas-marcas");
+  } else {
+    sidebar.classList.remove("pocas-marcas");
+  }
+
+  // ♻️ Eventos para volver a filtrar los productos
+  document.querySelectorAll(".chkMarca").forEach(cb => {
+    cb.addEventListener("change", () => cargarProductos(texto));
+  });
+}
+
+
+// Buscar dentro del filtro lateral
+document.addEventListener("input", (e) => {
+  if (e.target.id === "filtroMarcasBuscar") cargarMarcas();
+});
+
+// Recargar productos al seleccionar marcas
+document.addEventListener("change", (e) => {
+  if (e.target.classList.contains("chkMarca")) {
+    currentPage = 1;
+    cargarProductos(document.getElementById("busqueda").value.trim());
+  }
+});
+
+function obtenerMarcasSeleccionadas() {
+  return [...document.querySelectorAll(".chkMarca:checked")].map(el => el.value);
+}
+
+
+// 📌 Obtener marcas seleccionadas para filtro en productos
+function obtenerMarcasSeleccionadas() {
+  return [...document.querySelectorAll(".chkMarca:checked")].map(el => el.value);
+}
+
+// 📌 Cuando el usuario selecciona o deselecciona una marca → Recargar productos
+document.addEventListener("change", (e) => {
+  if (e.target.classList.contains("chkMarca")) {
+    currentPage = 1;
+    cargarProductos(inputBusqueda.value.trim());
+  }
+});
+
+document.addEventListener("click", (e) => {
+  const drop = document.getElementById("dropdownMarcas");
+  const btn = document.getElementById("btnMarcas");
+  if (drop && !drop.contains(e.target) && !btn.contains(e.target)) {
+    drop.classList.add("oculto");
+  }
+});
+
 
 // ==========================================
 // 📄 Renderizar paginación
@@ -381,18 +504,23 @@ function cambiarPagina(nuevaPagina) {
 // ==========================================
 async function cargarProductos(busqueda = "") {
   try {
-    const res = await fetch(`/api/catalogo?q=${encodeURIComponent(busqueda)}`);
-    const productos = await res.json();
-    productosGlobal = productos;
+    let url = `/api/productos?q=${encodeURIComponent(busqueda)}`;
 
-    selectedWeights.clear(); // ✅ Limpiar filtros al hacer nueva búsqueda
+    const marcas = obtenerMarcasSeleccionadas();
+    if (marcas.length) url += `&marcas=${marcas.join(",")}`;
+
+    const res = await fetch(url);
+    const productos = await res.json();
+    productosGlobal = productos.productos || [];
+
+    selectedWeights.clear();
     currentPage = 1;
-    
+
     renderizarProductos(getFilteredProducts());
 
     const huboBusqueda = busqueda.trim() !== "";
     if (huboBusqueda) {
-      renderizarFiltrosPeso(productos);
+      renderizarFiltrosPeso(productosGlobal);
       filtrosPesoVisibles = true;
     } else if (filtrosPesoVisibles) {
       document.querySelector(".filtros-peso").innerHTML = "";
@@ -402,6 +530,7 @@ async function cargarProductos(busqueda = "") {
     console.error("Error cargando productos:", err);
   }
 }
+
 
 // ==========================================
 // 🖱️ Registrar clic en producto
@@ -525,9 +654,13 @@ async function buscar() {
   }
 
   await cargarProductos(termino);
+  cargarMarcasSidebar();  // 👈 NUEVO: recargar SOLO marcas que existan en este resultado
+
   contenedorSugerencias.innerHTML = "";
   contenedorSugerencias.style.display = "none";
 }
+
+
 
 function leerCheckboxesSuper() {
   const cbs = document.querySelectorAll(".filtro-super");
@@ -542,7 +675,9 @@ function aplicarFiltroSupermercado() {
   leerCheckboxesSuper();
   currentPage = 1;
   renderizarProductos(getFilteredProducts());
+  cargarMarcasSidebar(); // 🟢 ACTUALIZA
 }
+
 
 function wireSuperCheckboxes() {
   const cbs = document.querySelectorAll(".filtro-super");
@@ -552,4 +687,8 @@ function wireSuperCheckboxes() {
 window.addEventListener("DOMContentLoaded", () => {
   wireSuperCheckboxes();
   cargarProductos();
+
+  const btnMarcas = document.getElementById("btnMarcas");
+  if (btnMarcas) btnMarcas.addEventListener("click", cargarMarcas);
 });
+
