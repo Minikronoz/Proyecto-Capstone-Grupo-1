@@ -127,8 +127,32 @@ const CATEGORIAS = [
   // ["https://www.unimarc.cl/category/hogar", "Hogar"],
 ];
 
-// 🧮 Convierte "$1.990" → 1990
-const parsePrice = (s) => (s ? parseInt(s.replace(/\D/g, ""), 10) : null);
+// =============================================================
+// 💰 Conversión de precios: "$1.590" / "$3.290$4.290" / "2x$2.500"
+// =============================================================
+function parsePrice(priceString = "") {
+  if (!priceString) return null;
+
+  // Limpieza general
+  const texto = priceString.replace(/\s+/g, "").toLowerCase();
+
+  // 🟦 1) Si es combo tipo "2x$3000" o "3 x $1200"
+  const combo = texto.match(/(\d+)\s*x\s*\$?([\d\.]+)/i);
+  if (combo) {
+    const cantidad = parseInt(combo[1], 10);
+    const total = parseInt(combo[2].replace(/\D/g, ""), 10);
+    return cantidad > 0 ? Math.round(total / cantidad) : null;
+  }
+
+  // 🟥 2) Capturar SOLO el primer precio del string (muy común en Unimarc)
+  const primerPrecio = texto.match(/\$?([\d\.]+)/);
+  if (!primerPrecio) return null;
+
+  // 🟩 3) Convertir ese precio a número entero
+  const num = parseInt(primerPrecio[1].replace(/\D/g, ""), 10);
+  return isNaN(num) ? null : num;
+}
+
 
 // 🎨 Barra de progreso visual
 function renderProgressBar(current, total, prefix = "Progreso") {
@@ -409,36 +433,31 @@ renderProgressBar(revisados, productosCategoria.length, `[${STORE}] Guardando`);
 }
 
 
-  // 📊 Resumen y cierre final
-  console.log(`\n📈 RESULTADOS TOTALES`);
-  console.log(`[${STORE}] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-  console.log(`🧾 Total productos procesados: ${totalGlobal}`);
-  console.log(`🆕 Nuevos: ${nuevosGlobal}, 🔄 Actualizados: ${actualizadosGlobal}`);
-  console.log(`✅ Scraping completado con éxito`);
+// 📊 Resumen final estandarizado (modo servidor)
+console.log(`\n📊 ${STORE.toUpperCase()} — RESULTADOS`);
+console.log(`🆕 Nuevos: ${nuevos}`);
+console.log(`♻️ Actualizados: ${actualizados}`);
+console.log(`🔎 Revisados: ${revisados}`);
+console.log(`📦 Total en Atlas: ${totalDB}`);
+console.log(`⏱️ Finalizado: ${new Date().toLocaleString("es-CL")}\n`);
 
-  try {
-    await actualizarScrapingArchivo({
-      store: STORE,
-      nuevos: nuevosGlobal,
-      actualizados: actualizadosGlobal,
-      totalProductos: totalGlobal,
-      fecha: new Date(),
-    });
-    console.log(`[${STORE}] 🧾 Archivo de scraping actualizado correctamente`);
-  } catch (err) {
-    console.warn(
-      `[${STORE}] ⚠️ No se pudo actualizar el archivo de scraping:`,
-      err.message
-    );
-  }
-
-  await browser.close();
-  await closeDB();
-  console.log(`[${STORE}] 🔒 Conexión cerrada correctamente con MongoDB Atlas`);
-  console.log(`[${STORE}] 🚀 Proceso finalizado exitosamente`);
+try {
+  await actualizarScrapingArchivo({
+    store: STORE,
+    nuevos,
+    actualizados,
+    totalProductos: totalDB,
+    fecha: new Date(),
+  });
+  console.log(`[${STORE}] 🧾 Archivo de scraping actualizado correctamente`);
+} catch (err) {
+  console.warn(`[${STORE}] ⚠️ No se pudo actualizar el archivo de scraping:`, err.message);
 }
 
-// 🏁 Ejecutar script principal
+// ❌ NO CERRAMOS BROWSER NI DB (modo servidor)
+console.log(`[${STORE}] ⏳ Navegador y DB permanecen activos (modo servidor)\n`);
+}
+
 main().catch((err) => {
   console.error(`[${STORE}] ❌ Error global:`, err);
   process.exit(1);

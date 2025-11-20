@@ -107,22 +107,31 @@ function generarGlobalId(title, brand) {
 }
 
 
-
-
 // =============================================================
-// 💰 Conversión de precios: "$1.990" o "2x$3.000" → número unitario
+// 💰 Conversión de precios: "$1.990" / "$1.990$3.710" / "2x$3.000"
 // =============================================================
 function parsePrice(priceString = "") {
+  if (!priceString) return null;
+
   const texto = priceString.replace(/\s+/g, "").toLowerCase();
+
+  // 🟦 1) Si es combo tipo "2x$3000"
   const combo = texto.match(/(\d+)\s*x\s*\$?([\d\.]+)/i);
   if (combo) {
     const cantidad = parseInt(combo[1], 10);
     const total = parseInt(combo[2].replace(/\D/g, ""), 10);
     return cantidad > 0 ? Math.round(total / cantidad) : null;
   }
-  const normal = parseInt(texto.replace(/\D/g, ""), 10);
-  return isNaN(normal) ? null : normal;
+
+  // 🟥 2) Capturar SOLO el primer precio del string (importante en Jumbo)
+  const primerPrecio = texto.match(/\$?([\d\.]+)/);
+  if (!primerPrecio) return null;
+
+  // 🟩 3) Convertir ese primer precio a número
+  const num = parseInt(primerPrecio[1].replace(/\D/g, ""), 10);
+  return isNaN(num) ? null : num;
 }
+
 // =============================================================
 // 🧠 Detección automática de marcas conocidas
 // =============================================================

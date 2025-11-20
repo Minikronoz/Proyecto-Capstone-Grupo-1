@@ -345,6 +345,7 @@ body {
 .color-tottus  { color: #2e7d32; }
 .color-jumbo   { color: #1e40af; }
 .color-acuenta { color: #b45309; }
+.color-santaisabel { color: #9333ea; }
 
 /* ==============================
    📈 CHARTS
@@ -449,7 +450,10 @@ body {
   background: linear-gradient(180deg, #f38b1f 0%, #d6781b 100%);
   border-color: #c36d18;
 }
-
+.btn-santaisabel {
+  background: linear-gradient(180deg, #a855f7 0%, #9333ea 100%);
+  border-color: #7e22ce;
+}
 .btn-outline {
   background: var(--blanco);
   color: var(--petroleo);

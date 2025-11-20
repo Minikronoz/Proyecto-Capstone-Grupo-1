@@ -300,14 +300,14 @@ function renderUsuarios(lista) {
 
 
 async function editarUsuario(id) {
-  console.log("🔥 FUNCION EDITAR USUARIO LLAMADA | ID =", id);
+  console.log(" FUNCION EDITAR USUARIO LLAMADA | ID =", id);
 
 
   try {
     const res = await fetch(`/api/usuarios/${id}`);
 
     if (!res.ok) {
-      console.error("❌ Error HTTP al obtener usuario:", res.status);
+      console.error(" Error HTTP al obtener usuario:", res.status);
       alert("No se pudo cargar el usuario");
       return;
     }
@@ -333,7 +333,7 @@ async function editarUsuario(id) {
 
     document.getElementById("modalEditarUsuario").classList.remove("oculto");
   } catch (err) {
-    console.error("❌ Error en editarUsuario:", err);
+    console.error(" Error en editarUsuario:", err);
     alert("Error cargando usuario");
   }
 }
@@ -663,7 +663,8 @@ function crearConsola(store) {
     unimarc: '🔴',
     tottus: '🟢',
     jumbo: '🔵',
-    acuenta: '🟡'
+    acuenta: '🟡',
+    santaisabel: '🟣'
   };
 
   consolaDiv.innerHTML = `
@@ -806,11 +807,11 @@ async function ejecutarScraping(store) {
   
   try {
     const resp = await fetch(`${API}/scrape/${store}`, { method: "POST" });
-    const data = await resp.json();
     
-    if (!resp.ok) {
-      throw new Error(data.message || "Error desconocido");
-    }
+    let data = {};
+    try { data = await resp.json(); } catch { data = {}; }
+
+    if (!resp.ok) throw new Error(data.message || "Error desconocido");
   } catch (err) {
     agregarLogAConsola(store, `❌ Error: ${err.message}`, 'error');
     actualizarEstadoConsola(store, 'error');
@@ -827,7 +828,7 @@ socket.on("scrape-log", (data) => {
   const storeMatch = msg.match(/\[(\w+)\]/);
   const detectedStore = storeMatch ? storeMatch[1].toLowerCase() : store;
 
-  if (detectedStore && ['unimarc', 'tottus', 'jumbo', 'acuenta'].includes(detectedStore)) {
+  if (detectedStore && ['unimarc', 'tottus', 'jumbo', 'acuenta','santaisabel'].includes(detectedStore)) {
     agregarLogAConsola(detectedStore, msg);
   }
 });

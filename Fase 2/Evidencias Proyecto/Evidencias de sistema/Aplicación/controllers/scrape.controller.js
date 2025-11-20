@@ -85,7 +85,7 @@ function ejecutarScraping(nombreScript, io) {
       io.emit("scrape-error", { store: nombreScript, message: errMsg });
       return reject(new Error(errMsg));
     }
-
+ 
     console.log(`▶ Ejecutando scraping: ${scriptPath}`);
     
     io.emit("scrape-log", { 
@@ -129,15 +129,23 @@ function ejecutarScraping(nombreScript, io) {
       }
     });
 
-    proceso.stderr.on("data", (data) => {
-      const msg = data.toString().replace(/\x1B\[[0-9;]*[JKmsu]/g, '');
-      console.error(`[${nombreScript} ERROR] ${msg}`);
-      
-      io.emit("scrape-error", { 
-        store: nombreScript, 
-        message: msg 
-      });
-    });
+proceso.stderr.on("data", (data) => {
+  let msg = data.toString().replace(/\x1B\[[0-9;]*[JKmsu]/g, '').trim();
+
+  // ⚠️ SOLO filtramos HTML bruto pero mostramos todo lo demás
+  if (msg.startsWith("<") || msg.includes("<!DOCTYPE")) {
+    io.emit("scrape-log", { store: nombreScript, message: "⚠️ HTML detectado (posible bloqueo o captcha)" });
+    return;
+  }
+
+  console.error(`[${nombreScript} ERROR] ${msg}`);
+
+  io.emit("scrape-error", { 
+    store: nombreScript, 
+    message: msg 
+  });
+});
+
 
     proceso.on("exit", (code) => {
       const success = code === 0;
@@ -172,13 +180,13 @@ function ejecutarScraping(nombreScript, io) {
       reject(err);
     });
   });
-}
+}    
 
 export default ejecutarScraping;
 
 
 // =============================================================
-// 📡 HANDLERS API (Acuenta / Tottus / Jumbo / Unimarc)
+// 📡 HANDLERS API (Acuenta / Tottus / Jumbo / Unimarc / Santa Isabel)
 // =============================================================
 export const scrapeAcuenta = (req, res) =>
   ejecutarScraping("acuenta", req.app.get("io"))
@@ -200,12 +208,18 @@ export const scrapeUnimarc = (req, res) =>
     .then(() => res.json({ ok: true, message: "Scraping Unimarc iniciado" }))
     .catch((err) => res.status(500).json({ error: err.message }));
 
+export const scrapeSantaIsabel = (req, res) =>
+  ejecutarScraping("santaisabel", req.app.get("io"))
+    .then(() => res.json({ ok: true, message: "Scraping Santa Isabel iniciado" }))
+    .catch((err) => res.status(500).json({ error: err.message }));
+
 // =============================================================
 // 📅 GET /api/scrape/ultimos
 // =============================================================
 export const obtenerUltimosScraping = (req, res) => {
   res.json(leerFechas());
 };
+
 
 // =============================================================
 // 📊 ACTIVIDAD SEMANAL (MongoClient Only)
@@ -227,7 +241,7 @@ export async function obtenerActividadSemanal(req, res) {
     });
 
     const fechasISO = semana.map((d) => d.toISOString().split("T")[0]);
-    const tiendas = ["unimarc", "tottus", "jumbo", "acuenta"];
+    const tiendas = ["unimarc", "tottus", "jumbo", "acuenta","santaisabel"];
 
     const actividad = {};
     tiendas.forEach((store) => {

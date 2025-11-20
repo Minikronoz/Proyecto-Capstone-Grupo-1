@@ -32,13 +32,15 @@ export function procesarUnit(pricePerUnit = "") {
 
 
 // ============================================================
-// 1️⃣ Normalizador de precios (soporta combos y formatos CLP)
+// 1️⃣ Normalizador de precios (soporta combos, evita dobles "$")
 // ============================================================
 export function parsePriceUnitario(priceStr = "") {
   if (!priceStr) return null;
+
   const texto = priceStr.replace(/\s+/g, "").toLowerCase();
   if (texto.includes("-")) return null;
 
+  // 🟦 Combo 2x, 3x, etc.
   const combo = texto.match(/(\d+)\s*x\s*\$?([\d\.]+)/i);
   if (combo) {
     const cantidad = parseInt(combo[1], 10);
@@ -46,9 +48,14 @@ export function parsePriceUnitario(priceStr = "") {
     return cantidad > 0 && total > 0 ? Math.round(total / cantidad) : null;
   }
 
-  const normal = parseInt(texto.replace(/\D/g, ""), 10);
+  // 🟥 SOLO PRIMER PRECIO (evita "$2990$3710")
+  const primerPrecio = texto.match(/\$?([\d\.]+)/);
+  if (!primerPrecio) return null;
+
+  const normal = parseInt(primerPrecio[1].replace(/\D/g, ""), 10);
   return normal > 0 ? normal : null;
 }
+
 
 
 // ============================================================
@@ -93,24 +100,36 @@ export async function guardarProductosBulk(productos, store, categoria = "Genera
     });
   }
 
-  if (opsProductos.length > 0) {
-    const res = await Producto.bulkWrite(opsProductos, { ordered: false });
+// ============================================================
+// 🟣 Guardar historial solo cuando cambia precio (más rápido)
+// ============================================================
+if (opsProductos.length > 0) {
+  const res = await Producto.bulkWrite(opsProductos, { ordered: false });
 
-    nuevos = res.upsertedCount;
-    actualizados = res.modifiedCount;
-    sinCambio = productos.length - nuevos - actualizados - skip;
+  nuevos = res.upsertedCount;
+  actualizados = res.modifiedCount;
+  sinCambio = productos.length - nuevos - actualizados - skip;
 
-    /** 🔥 Historial simplificado: guarda solo cambios de precio */
-    const actualizadosDocs = await Producto.find({ store }).lean();
+  // 🧠 Guardar solo los productos modificados
+  if (actualizados > 0) {
+    const idsActualizados = Object.values(res.upsertedIds);
 
-    for (const p of actualizadosDocs) {
+    const docsActualizados = await Producto.find(
+      idsActualizados.length > 0
+        ? { _id: { $in: idsActualizados }, store }
+        : { store }
+    )
+    .select("_id currentPrice")
+    .lean();
+
+    for (const p of docsActualizados) {
       opsHistory.push({
         insertOne: {
           document: {
             productId: p._id,
             store,
             price: p.currentPrice,
-            previousPrice: null, // opcional buscar cambio, si quieres te lo activo
+            previousPrice: null, // opcional recuperar anterior
             variation: 0,
             fecha: new Date()
           }
@@ -122,26 +141,27 @@ export async function guardarProductosBulk(productos, store, categoria = "Genera
       await PriceHistory.bulkWrite(opsHistory, { ordered: false });
     }
   }
+}
+
 
   return { nuevos, actualizados, skip, sinCambio, total: productos.length };
 }
 
 
 // ============================================================
-// ⚡ Barra de progreso rápida (actualiza cada 5%)
+// ⚡ Barra de progreso estándar (solo cada 5%)
 // ============================================================
-export function renderProgressBar(current, total, prefix = "💾 Guardando") {
+export function renderProgressBar(current, total, prefix = "⏳ Procesando") {
   if (!total || total <= 0) return;
-  const width = 30;
-  const avance = current / total;
-  const progress = Math.round(avance * width);
+  const width = 28;
+  const progress = Math.round((current / total) * width);
 
-  const paso = Math.ceil(total * 0.05);
-  if (current % paso !== 0 && current !== total) return;
+  const pasoMinimo = Math.ceil(total * 0.05);
+  if (current % pasoMinimo !== 0 && current !== total) return;
 
   const bar = "█".repeat(progress) + "░".repeat(width - progress);
-  const percent = (avance * 100).toFixed(1).padStart(5);
+  const percent = ((current / total) * 100).toFixed(0).padStart(3);
 
-  process.stdout.write(`\r[${prefix}] [${bar}] ${percent}% (${current}/${total})`);
+  process.stdout.write(`\r${prefix} [${bar}] ${percent}%`);
   if (current === total) process.stdout.write("\n");
 }

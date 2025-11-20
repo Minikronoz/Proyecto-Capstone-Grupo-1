@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="/css/dashboard.css?v=8">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
 </head>
 <script>
@@ -169,7 +170,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
   <section>
-  <h2>💰 Índice de competitividad de precios</h2>
+<h2 style="text-align:center; font-weight:600;">
+  💸 Índice de competitividad de precios
+</h2>
   <div class="chart-container">
     <canvas id="indiceCompetitividad"></canvas>
   </div>
@@ -258,7 +261,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     <div class="chart-container"><canvas id="porEdad"></canvas></div>
   </section>
 
-  
+    <section>
+    <h2>Usuarios por región</h2>
+    <div class="chart-container"><canvas id="porRegion"></canvas></div>
+  </section>
   ====================================================== -->
 
 
@@ -288,10 +294,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     <div class="chart-container"><canvas id="porGenero"></canvas></div>
   </section>
 
-  <section>
-    <h2>Usuarios por región</h2>
-    <div class="chart-container"><canvas id="porRegion"></canvas></div>
-  </section>
+
 
   <section>
     <h2>Búsquedas de Usuarios por comuna</h2>
@@ -364,9 +367,13 @@ async function renderDistribucionUsuariosRegion() {
   });
 }
 
-async function renderChart(id, url, label, filtros = {}) {
-  const data = await fetchData(url, filtros);
-  const ctx = document.getElementById(id).getContext("2d");
+
+async function renderCompetitividadChart(id, url, label) {
+  const data = await fetchData(url);
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
   if (charts[id]) charts[id].destroy();
 
   if (!data?.length) {
@@ -376,38 +383,178 @@ async function renderChart(id, url, label, filtros = {}) {
     return;
   }
 
-  const isBar = !["porDia","porTiempo","busquedasPorDia","comparativaConsultasBusquedas"].includes(id);
-  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-  gradient.addColorStop(0, "rgba(0,167,181,0.9)");
-  gradient.addColorStop(1, "rgba(0,167,181,0.4)");
+  // 🟢 Datos normalizados
+  const etiquetas = data.map(d => d.tienda);
+  const valores = data.map(d => d.promedio);
+
+  // 🥇 Mejor (más barato)
+  const mejorPrecio = Math.min(...valores);
+
+  // 🎨 Colores consistentes
+  const colorNormal = "rgba(0,167,181,0.85)";   // Turquesa institucional
+  const colorNormalBorder = "#007a85";
+  const colorGanador = "rgba(67,160,71,0.9)";    // Verde ganador
+  const colorGanadorBorder = "#2e7d32";
 
   charts[id] = new Chart(ctx, {
-    type: isBar ? "bar" : "line",
+    type: "bar",
     data: {
-      labels: data.map(d => d._id || "—"),
+      labels: etiquetas,
       datasets: [{
-        label, data: data.map(d => d.total),
-        backgroundColor: isBar ? gradient : "rgba(0,167,181,0.25)",
-        borderColor: "#009FB0", borderWidth: 2, borderRadius: isBar ? 8 : 0,
-        tension: 0.35, fill: !isBar
+        label,
+        data: valores,
+        backgroundColor: valores.map(v => v === mejorPrecio ? colorGanador : colorNormal),
+        borderColor: valores.map(v => v === mejorPrecio ? colorGanadorBorder : colorNormalBorder),
+        borderWidth: 2,
+        borderRadius: 10
       }]
     },
     options: {
-      responsive: true, maintainAspectRatio: false,
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        
+        // 🧾 Valores arriba del bar
+        datalabels: {
+          anchor: "end",
+          align: "start",
+          offset: -6,
+          formatter: value => `$${value.toLocaleString("es-CL")}`,
+          color: "#0f172a",
+          font: { weight: "bold", size: 12 }
+        },
+
+        // 💬 Tooltip PRO
+        tooltip: {
+          backgroundColor: "#1E293B",
+          titleColor: "#fff",
+          bodyColor: "#fff",
+          displayColors: false,
+          callbacks: {
+            label: ctx => `Precio promedio: $${ctx.raw.toLocaleString("es-CL")}`
+          }
+        }
+      },
+
+      // 📈 Ejes con formato profesional
       scales: {
-        x: { ticks: { color: "#334155" }, grid: { color: "transparent" } },
-        y: { beginAtZero: true, ticks: { color: "#475569" } }
+        y: {
+          beginAtZero: false,
+          ticks: {
+            callback: v => "$" + v.toLocaleString("es-CL"),
+            color: "#334155",
+            font: { size: 13 }
+          },
+          grid: { color: "rgba(0,0,0,0.05)" }
+        },
+        x: {
+          ticks: { color: "#1E293B", font: { size: 14, weight: "bold" } },
+          grid: { color: "transparent" }
+        }
+      }
+    },
+    plugins: [ChartDataLabels]
+  });
+}
+
+
+
+
+async function renderChart(id, url, label, filtros = {}) {
+  // 📌 Obtener datos desde API
+  const data = await fetchData(url, filtros);
+  const canvas = document.getElementById(id);
+
+  if (!canvas) {
+    console.warn(`⚠️ No existe un canvas con id "${id}".`);
+    return;
+  }
+
+  const ctx = canvas.getContext("2d");
+
+  // 🧹 Limpiar gráfico previo
+  if (charts[id]) charts[id].destroy();
+
+  // 🪫 No hay datos suficientes
+  if (!data?.length) {
+    ctx.font = "16px Poppins";
+    ctx.fillStyle = "#64748b";
+    ctx.fillText("Sin datos suficientes para mostrar.", 50, 50);
+    return;
+  }
+
+  // 📌 Extrae valores soportando múltiples formatos
+  const valores = data.map(d =>
+    d.promedio ?? d.total ?? d.valor ?? d.value ?? 0
+  );
+
+  // 📌 Etiquetas limpias y normalizadas
+  const etiquetas = data.map(d =>
+    d.tienda ?? d.nombre ?? d._id ?? d.label ?? "—"
+  );
+
+  // 🎨 Estilo profesional
+  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient.addColorStop(0, "rgba(0,167,181,0.95)");
+  gradient.addColorStop(1, "rgba(0,167,181,0.35)");
+
+  const isBar = id === "indiceCompetitividad" || !["porDia","porTiempo","busquedasPorDia","comparativaConsultasBusquedas"].includes(id);
+
+  // 🧾 Crear gráfico
+  charts[id] = new Chart(ctx, {
+    type: isBar ? "bar" : "line",
+    data: {
+      labels: etiquetas,
+      datasets: [{
+        label,
+        data: valores,
+        backgroundColor: isBar ? gradient : "rgba(0,167,181,0.25)",
+        borderColor: "#009FB0",
+        borderWidth: 2,
+        borderRadius: isBar ? 10 : 0,
+        tension: 0.35,
+        fill: isBar ? false : true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          ticks: { color: "#334155", font: { weight: "bold", size: 13 } },
+          grid: { color: "transparent" }
+        },
+        y: {
+          beginAtZero: false,
+          ticks: {
+            color: "#475569",
+            callback: v => id === "indiceCompetitividad"
+              ? `$${v.toLocaleString("es-CL")}`
+              : v.toLocaleString("es-CL")
+          },
+          grid: { color: "rgba(0,0,0,0.05)" }
+        }
       },
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: "#1E293B", titleColor: "#fff",
-          bodyColor: "#fff", displayColors: false
+          backgroundColor: "#1E293B",
+          titleColor: "#fff",
+          bodyColor: "#fff",
+          displayColors: false,
+          callbacks: {
+            label: ctx => id === "indiceCompetitividad"
+              ? `$${ctx.raw.toLocaleString("es-CL")}`
+              : ctx.raw.toLocaleString("es-CL")
+          }
         }
       }
     }
   });
 }
+
+
 
 async function cargarDashboard(filtros = {}) {
   await Promise.all([
@@ -419,12 +566,20 @@ async function cargarDashboard(filtros = {}) {
     renderChart("porRegion","/api/estadisticas/usuarios-por-region","Usuarios",filtros),
     renderChart("porComuna","/api/estadisticas/usuarios-por-comuna","Usuarios",filtros),
     renderChart("porTiempo","/api/estadisticas/productos-por-tiempo","Productos",filtros),
-    renderChart("indiceCompetitividad","/api/estadisticas/indice-competitividad","Precio promedio ($)",filtros),
+
+    // 👇 LA NUEVA FUNCIÓN FORMAL
+    renderCompetitividadChart(
+      "indiceCompetitividad",
+      "/api/estadisticas/indice-competitividad",
+      "Precio promedio ($)"
+    ),
+
     renderChart("rankingProductosNuevos","/api/estadisticas/ranking-productos-nuevos","Nuevos productos",filtros),
     renderChart("cruceGeneroRegion","/api/estadisticas/cruce-genero-region","Usuarios",filtros),
     renderChart("usuariosNuevosRecurrentes","/api/estadisticas/usuarios-nuevos-recurrentes","Usuarios",filtros)
   ]);
 }
+
 
 
 
@@ -439,6 +594,7 @@ async function cargarDashboardBusquedas() {
     renderChart("comparativaConsultasBusquedas","/api/estadisticas/comparativa","Consultas vs Búsquedas")
   ]);
 }
+
 async function renderTendencia() {
   const data = await fetch("/api/estadisticas/tendencia-semanal").then(r => r.json());
   const ctx = document.getElementById("chartTendencia").getContext("2d");
@@ -598,36 +754,82 @@ async function renderUsuariosActivosDia() {
   });
 }
 
-// 🧍‍♂️🧍‍♀️ Top productos por género
+// 🧍‍♂️🧍‍♀️ TOP PRODUCTOS POR GÉNERO (versión normalizada)
 async function renderTopProductosGenero() {
   try {
     const data = await fetch("/api/estadisticas/top-productos-genero").then(r => r.json());
-    const ctx = document.getElementById("topProductosGenero").getContext("2d");
+    const canvas = document.getElementById("topProductosGenero");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+
+    // 🔄 Destruir gráficos previos
     if (charts["topProductosGenero"]) charts["topProductosGenero"].destroy();
 
-    const labels = [], valores = [], porcentajes = [], colores = [];
-    const colorMasculino = "rgba(0,167,181,0.7)";
-    const colorFemenino = "rgba(255,99,132,0.7)";
-    const colorOtro = "rgba(153,102,255,0.7)";
+    // 📌 Colores por grupo
+    const colores = {
+      "Masculino": "rgba(0,167,181,0.75)",
+      "Femenino": "rgba(255,99,132,0.75)",
+      "Otro": "rgba(153,102,255,0.75)",
+      "No especificado": "rgba(180,180,180,0.75)"
+    };
 
-    data.forEach(g => g.productos.forEach(p => {
-      labels.push(`${g._id}: ${p.producto}`);
-      valores.push(p.total);
-      porcentajes.push(p.porcentaje || null);
-      colores.push(g._id === "Masculino" ? colorMasculino : g._id === "Femenino" ? colorFemenino : colorOtro);
-    }));
+    const labels = [];
+    const valores = [];
+    const background = [];
 
+    // ⚠ Si viene vacío → Mostrar mensaje
+    if (!data || !data.length) {
+      canvas.parentNode.innerHTML = "<p class='no-data-msg'>No hay aún suficientes datos de usuarios por género 👥</p>";
+      return;
+    }
+
+    // 📌 Cargar datos
+    data.forEach(g => {
+      const genero = g._id || "No especificado";
+      g.productos.forEach(p => {
+        labels.push(`${genero}: ${p.producto}`);
+        valores.push(p.total);
+        background.push(colores[genero] || colores["No especificado"]);
+      });
+    });
+
+    // 🧠 Crear gráfico
     charts["topProductosGenero"] = new Chart(ctx, {
       type: "bar",
-      data: { labels, datasets: [{ label: "Clics", data: valores, backgroundColor: colores, borderColor: "#009FB0", borderWidth: 1.5, borderRadius: 6 }] },
+      data: {
+        labels,
+        datasets: [{
+          label: "Clics",
+          data: valores,
+          backgroundColor: background,
+          borderColor: "#333",
+          borderWidth: 1.2,
+          borderRadius: 6
+        }]
+      },
       options: {
         indexAxis: "y",
-        scales: { x: { beginAtZero: true }, y: { ticks: { callback: val => val.length > 25 ? val.slice(0, 25) + '…' : val } } },
-        plugins: { legend: { display: false } }
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: true }
+        },
+        scales: {
+          x: { beginAtZero: true },
+          y: {
+            ticks: {
+              callback: (val) => labels[val]?.length > 28 ? labels[val].slice(0, 28) + "…" : labels[val]
+            }
+          }
+        }
       }
     });
-  } catch (error) { console.error("❌ Error en renderTopProductosGenero:", error); }
+
+  } catch (error) {
+    console.error("❌ Error en renderTopProductosGenero:", error);
+  }
 }
+
 
 // 🏬 Supermercados más activos por región
 async function renderTopSupermercadosRegion() {

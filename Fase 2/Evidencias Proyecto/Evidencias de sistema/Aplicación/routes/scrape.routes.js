@@ -7,6 +7,7 @@ import {
   scrapeTottus,
   scrapeJumbo,
   scrapeUnimarc,
+  scrapeSantaIsabel,
   obtenerUltimosScraping,
   obtenerActividadSemanal,
   registrarEstadoScraping // 🔥 NUEVO
@@ -21,6 +22,8 @@ router.post("/acuenta", scrapeAcuenta);
 router.post("/tottus", scrapeTottus);
 router.post("/jumbo", scrapeJumbo);
 router.post("/unimarc", scrapeUnimarc);
+router.get("/santaisabel", scrapeSantaIsabel);
+
 
 // ================================
 // 📊 ÚLTIMOS REGISTROS PARA KPI

@@ -106,20 +106,29 @@ function generarGlobalId(title, brand) {
 
 
 // =============================================================
-// 💰 Conversión de precios
+// 💰 Conversión de precio Acuenta (evita dobles: "$2990$3790")
 // =============================================================
 const parsePrice = (priceStr = "") => {
   if (!priceStr) return null;
-  const clean = priceStr.replace(/\s+/g, "").toLowerCase();
-  const combo = clean.match(/(\d+)\s*x\s*\$?([\d\.]+)/i);
+  const texto = priceStr.replace(/\s+/g, "").toLowerCase();
+  if (texto.includes("-")) return null;
+
+  // 🟦 Combo "2x$3000"
+  const combo = texto.match(/(\d+)\s*x\s*\$?([\d\.]+)/i);
   if (combo) {
     const cantidad = parseInt(combo[1], 10);
     const total = parseInt(combo[2].replace(/\D/g, ""), 10);
-    if (cantidad > 0 && total > 0) return Math.round(total / cantidad);
+    return cantidad > 0 && total > 0 ? Math.round(total / cantidad) : null;
   }
-  const num = parseInt(clean.replace(/\D/g, ""), 10);
-  return isNaN(num) ? null : num;
+
+  // 🟥 SOLO primer precio (evita “...$2990$3790”)
+  const primerPrecio = texto.match(/\$?([\d\.]+)/);
+  if (!primerPrecio) return null;
+
+  const num = parseInt(primerPrecio[1].replace(/\D/g, ""), 10);
+  return num > 0 ? num : null;
 };
+
 
 // =============================================================
 // 🧠 Detección automática de marcas conocidas
@@ -134,7 +143,7 @@ function detectarMarca(title = "") {
   // Búsqueda en marcas comerciales
   const marca = MARCAS_CONOCIDAS.find(m => t.includes(m.toLowerCase()));
 
-  return marca ? marca : "Genérico / Sin Marca";
+  return marca ? marca : "Sin Marca";
 }
 
 // =============================================================
@@ -163,16 +172,24 @@ const CATEGORIAS = [
 
 
 // =============================================================
-// 📊 Barra de progreso
+// ⚡ Barra estándar (actualiza solo cada 5%)
 // =============================================================
 function renderProgressBar(current, total, prefix = `[${STORE}]`) {
-  const width = 30;
-  const progress = Math.round((current / total) * width);
+  if (!total || total <= 0) return;
+  const width = 28;
+  const avance = current / total;
+  const progress = Math.round(avance * width);
+
+  const pasoMin = Math.ceil(total * 0.05);
+  if (current % pasoMin !== 0 && current !== total) return;
+
   const bar = "█".repeat(progress) + "░".repeat(width - progress);
-  const percent = ((current / total) * 100).toFixed(1).padStart(5);
+  const percent = (avance * 100).toFixed(0).padStart(3);
+
   process.stdout.write(`\r${prefix} [${bar}] ${percent}% (${current}/${total})`);
   if (current === total) process.stdout.write("\n");
 }
+
 
 function procesarUnit(pricePerUnit = "") {
   if (!pricePerUnit) return { unitValue: null, unitName: null };
@@ -378,26 +395,27 @@ for (const [i, prod] of productosFinal.entries()) {
 }
 
 
-  const totalDB = await colProductos.countDocuments({ store: STORE });
-  console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-  console.log(`[${STORE}] 📊 RESULTADOS`);
-  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-  console.log(`Nuevos: ${nuevos}`);
-  console.log(`Actualizados: ${actualizados}`);
-  console.log(`Revisados hoy: ${revisados}`);
-  console.log(`Total Atlas: ${totalDB}`);
+const totalDB = await colProductos.countDocuments({ store: STORE });
 
-  // 💾 Guarda resumen global
-  await actualizarScrapingArchivo({
-    store: STORE,
-    nuevos,
-    actualizados,
-    totalProductos: totalDB
-  });
+console.log(`\n📊 ${STORE.toUpperCase()} — RESULTADOS`);
+console.log(`🆕 Nuevos: ${nuevos}`);
+console.log(`♻️ Actualizados: ${actualizados}`);
+console.log(`🔎 Revisados: ${revisados}`);
+console.log(`📦 Total en Atlas: ${totalDB}`);
+console.log(`⏱️ Finalizado: ${new Date().toLocaleString("es-CL")}\n`);
 
-  console.log(`[${STORE}] 🧾 Archivo de scraping actualizado`);
-  await browser.close();
-  console.log(`[${STORE}] 🔒 Conexión cerrada correctamente`);
+// 💾 Guarda resumen global
+await actualizarScrapingArchivo({
+  store: STORE,
+  nuevos,
+  actualizados,
+  totalProductos: totalDB
+});
+
+console.log(`[${STORE}] 🧾 Archivo de scraping actualizado`);
+// ❌ No cerramos browser ni DB para que continúe el proceso padre
+
+
 }
 
 main().catch((err) => console.error(`[${STORE}] ERROR GLOBAL`, err));

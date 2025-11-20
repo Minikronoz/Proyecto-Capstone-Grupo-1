@@ -130,7 +130,12 @@ router.get("/usuarios-por-genero", async (req, res) => {
     const match = buildMatchFilters(req.query);
 
     const data = await aggregateClicks([
-      { $match: { ...match, userGenero: { $exists: true, $ne: "" } } },
+      { 
+        $match: { 
+          ...match, 
+          userGenero: { $exists: true, $nin: [null, ""] }
+        } 
+      },
       { $group: { _id: "$userGenero", total: { $sum: 1 } } },
       { $sort: { total: -1 } },
     ]);
@@ -141,6 +146,7 @@ router.get("/usuarios-por-genero", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 
 // ======================================
@@ -178,7 +184,6 @@ router.get("/usuarios-por-region", async (req, res) => {
   }
 });
 
-
 // ======================================
 // 7️⃣ USUARIOS POR COMUNA
 // ======================================
@@ -193,12 +198,27 @@ router.get("/usuarios-por-comuna", async (req, res) => {
       { $limit: 15 },
     ]);
 
-    res.json(data);
+    // ⭐ Si no hay datos → mensaje especial
+    if (!data || data.length === 0) {
+      return res.json({
+        ok: false,
+        message: "Aún no hay búsquedas registradas por comuna 📍",
+        data: []
+      });
+    }
+
+    // ✔ Hay datos → formato estándar
+    res.json({
+      ok: true,
+      data
+    });
+
   } catch (err) {
     console.error("❌ Error en /usuarios-por-comuna:", err);
     res.status(500).json({ error: err.message });
   }
 });
+
 // ======================================
 // 🕒 PRODUCTOS POR TIEMPO (día / mes / año)
 // ======================================
@@ -548,7 +568,7 @@ router.get("/actividad-por-hora", async (req, res) => {
 
 
 // ======================================
-// 2️⃣ TOP PRODUCTOS POR GÉNERO
+// 2️⃣ TOP PRODUCTOS POR GÉNERO (NORMALIZADO)
 // ======================================
 router.get("/top-productos-genero", async (req, res) => {
   try {
@@ -559,19 +579,56 @@ router.get("/top-productos-genero", async (req, res) => {
       {
         $match: {
           ...match,
-          userGenero: { $exists: true, $ne: "" },
-          titulo: { $exists: true, $ne: "" }
+          titulo: { $exists: true, $ne: "" } // siempre obligamos a tener título
         }
       },
-      { $group: { _id: { genero: "$userGenero", producto: "$titulo" }, total: { $sum: 1 } } },
-      { $sort: { total: -1 } },
+
+      // 🎭 Normalizar género
+      {
+        $addFields: {
+          generoNormalizado: {
+            $switch: {
+              branches: [
+                { case: { $regexMatch: { input: "$userGenero", regex: /masc/i } }, then: "Masculino" },
+                { case: { $regexMatch: { input: "$userGenero", regex: /fem/i } }, then: "Femenino" },
+                { case: { $regexMatch: { input: "$userGenero", regex: /otro|x|nb/i } }, then: "Otro" }
+              ],
+              default: "No especificado"
+            }
+          }
+        }
+      },
+
+      // 📌 Agrupar por género + producto
+      {
+        $group: {
+          _id: { genero: "$generoNormalizado", producto: "$titulo" },
+          total: { $sum: 1 }
+        }
+      },
+
+      // 📌 Re-agrupar: array de productos por género
       {
         $group: {
           _id: "$_id.genero",
-          productos: { $push: { producto: "$_id.producto", total: "$total" } }
+          productos: {
+            $push: {
+              producto: "$_id.producto",
+              total: "$total"
+            }
+          }
         }
       },
-      { $project: { productos: { $slice: ["$productos", 5] } } }
+
+      // 🥇 Solo top 5 productos por género
+      { $project: { productos: { $slice: ["$productos", 5] } } },
+
+      // 🔽 Ordenar salida (Masculino, Femenino, Otro, No especificado)
+      {
+        $sort: {
+          "_id": 1
+        }
+      }
     ]).toArray();
 
     res.json(data);
@@ -581,6 +638,7 @@ router.get("/top-productos-genero", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 
 // ======================================

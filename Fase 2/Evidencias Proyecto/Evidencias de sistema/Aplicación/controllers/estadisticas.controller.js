@@ -42,75 +42,93 @@ export const rankingProductosNuevos = async (req, res) => {
   }
 };
 
-// 💰 Índice de competitividad de precios (con filtros anti-datos corruptos)
+// 📊 Índice de Competitividad — Ranking según precio promedio real del mercado
 export const indiceCompetitividad = async (req, res) => {
   try {
     const db = getDB();
 
-    // Buscar colección correcta
+    // 🔎 Detectar colección correcta (compatibilidad con migraciones)
     const colecciones = await db.listCollections().toArray();
     const nombreColeccion = colecciones.some(c => c.name === "priceHistory")
       ? "priceHistory"
       : "pricehistories";
 
-    const data = await db.collection(nombreColeccion).aggregate([
+    const resultado = await db.collection(nombreColeccion).aggregate([
+
+      // 1️⃣ Solo registros válidos con precio y tienda
       {
         $match: {
-          store: { $exists: true, $ne: null },
-          price: { $exists: true },
-
-          // 🛑 FILTRO ANTI-PRECIOS CORRUPTOS
-          // Solo aceptamos precios entre $50 y $500.000
-          price: { $gte: 50, $lte: 500000 }
+          price: { $exists: true, $ne: null },
+          store: { $exists: true, $ne: null }
         }
       },
 
-      // Convertir strings a número
+      // 2️⃣ Normalización: convertir strings y limpiar separadores de miles
       {
         $addFields: {
           priceNum: {
-            $cond: [
-              { $eq: [{ $type: "$price" }, "string"] },
-              { $toDouble: "$price" },
-              "$price"
-            ]
+            $toDouble: {
+              $replaceAll: { input: { $toString: "$price" }, find: ".", replacement: "" }
+            }
           }
         }
       },
 
-      // 🧹 Filtrar nuevamente por si conversiones producen valores raros
+      // 3️⃣ Filtrar datos corruptos después de convertir
       {
         $match: {
-          priceNum: { $gte: 50, $lte: 500000 }
+          priceNum: { $gte: 100, $lte: 300000 } // ✔ Rango real Chile
         }
       },
 
-      // Calcular promedio por tienda
+      // 4️⃣ Normalizar nombre de tienda (evita "Acuenta", "ACuenta", etc.)
+      {
+        $addFields: {
+          storeNorm: { $trim: { input: { $toLower: "$store" } } }
+        }
+      },
+
+      // 5️⃣ Agrupar por tienda → calcular promedio real
       {
         $group: {
-          _id: "$store",
+          _id: "$storeNorm",
           promedio: { $avg: "$priceNum" },
           cantidad: { $sum: 1 }
         }
       },
 
-      // Ordenar ascendente → más competitivo primero
+      // 6️⃣ Excluir rankings falsos por baja cantidad de datos
+      {
+        $match: { cantidad: { $gte: 50 } } // 🧠 Ajustable según dataset
+      },
+
+      // 7️⃣ Ordenar de menor a mayor precio → más barato primero
       { $sort: { promedio: 1 } },
 
-      // Formato limpio final
+      // 8️⃣ Proyección limpia + nombres bonitos finales
       {
         $project: {
-          _id: 1,
-          total: { $round: ["$promedio", 0] },
+          _id: 0,
+          tienda: {
+            $switch: {
+              branches: [
+                { case: { $eq: ["$_id", "acuenta"] }, then: "A Cuenta" },
+                { case: { $eq: ["$_id", "santaisabel"] }, then: "Santa Isabel" }
+              ],
+              default: { $toUpper: "$_id" }
+            }
+          },
+          promedio: { $round: ["$promedio", 0] },
           cantidad: 1
         }
       }
+
     ]).toArray();
 
-    res.json(data.length ? data : []);
+    res.json(resultado);
 
-  } catch (error) {
-    console.error("❌ Error en indiceCompetitividad:", error);
+  } catch (err) {
+    console.error("❌ Error en indiceCompetitividad:", err);
     res.status(500).json({ error: "Error al calcular índice de competitividad" });
   }
 };

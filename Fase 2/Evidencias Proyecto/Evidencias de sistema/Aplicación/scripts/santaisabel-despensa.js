@@ -5,6 +5,8 @@
 import { chromium } from "playwright";
 import { connectDB, getDB } from "../config/db.js";
 import crypto from "crypto";
+import { parsePriceUnitario } from "../utils/scraperBase.js";
+import { actualizarScrapingArchivo } from "../utils/actualizarScraping.js";
 
 const URL = "https://www.santaisabel.cl/despensa";
 const CATEGORIA = "Despensa";
@@ -43,6 +45,18 @@ function generarGlobalId(title, brand) {
   return crypto.createHash("md5").update(cadena).digest("hex").substring(0, 12);
 }
 
+// =============================================================
+// 💰 Normalizar texto de precio para evitar valores locos
+//    (ej: "$2.990 $3.710" → toma solo el primer precio)
+// =============================================================
+function normalizarTextoPrecio(precioText = "") {
+  if (!precioText) return "";
+
+  // Busca el primer patrón tipo $2.990, 2.990, $2990, etc.
+  const match = precioText.match(/\$?\s*[\d\.]+/);
+  return match ? match[0].trim() : precioText.trim();
+}
+
 // ======================================================================
 // 🚀 FUNCIÓN PRINCIPAL
 // ======================================================================
@@ -53,7 +67,7 @@ async function scrapeSantaIsabel() {
   const historialDB = db.collection("priceHistory");
 
   const browser = await chromium.launch({
-    headless: false, // 🔍 lo dejo false como tenías para depurar
+    headless: false, // lo dejamos false como tenías para depurar visualmente
     args: ["--disable-blink-features=AutomationControlled"],
     ignoreDefaultArgs: ["--enable-automation"]
   });
@@ -62,45 +76,45 @@ async function scrapeSantaIsabel() {
     userAgent: USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)]
   });
 
-  console.log("🛒 Abriendo Santa Isabel...");
+  console.log(`\n[${STORE}] 🛒 Abriendo Santa Isabel Despensa...`);
   await page.goto(URL, { waitUntil: "load", timeout: 60000 });
   await page.waitForTimeout(2000);
 
   // 🥠 Aceptar Cookies fuerza bruta
   try {
     await page.waitForFunction(() => {
-      return [...document.querySelectorAll("button")].some(b =>
+      return [...document.querySelectorAll("button")].some((b) =>
         b.innerText.includes("Aceptar")
       );
     }, { timeout: 8000 });
 
     await page.evaluate(() => {
       const botones = [...document.querySelectorAll("button")];
-      const btn = botones.find(b =>
+      const btn = botones.find((b) =>
         b.innerText.includes("Aceptar todas las cookies") ||
         b.innerText.includes("Aceptar")
       );
       if (btn) btn.click();
     });
 
-    console.log("🍪 Cookies aceptadas.");
+    console.log(`[${STORE}] 🍪 Cookies aceptadas.`);
     await page.waitForTimeout(1500);
   } catch {
-    console.log("⚠️ No apareció modal de cookies.");
+    console.log(`[${STORE}] ⚠️ No apareció modal de cookies.`);
   }
 
   await page.waitForSelector("a.product-card", { timeout: 20000 });
-  console.log("👀 Productos visibles, iniciando scraping...");
+  console.log(`[${STORE}] 👀 Productos visibles, iniciando scraping...`);
 
   // 📌 Paginación
   let totalPaginas = 1;
   try {
-    totalPaginas = await page.$$eval(".page-number", (btns) => btns.length);
+    totalPaginas = await page.$$eval(".page-number", (btns) => btns.length || 1);
   } catch {
-    console.log("⚠️ No se detectaron botones de página, se asume 1 página.");
+    console.log(`[${STORE}] ⚠️ No se detectaron botones de página, se asume 1 página.`);
   }
 
-  console.log(`📄 Total de páginas detectadas: ${totalPaginas}`);
+  console.log(`[${STORE}] 📄 Total de páginas detectadas: ${totalPaginas}`);
 
   // Contadores globales
   let nuevos = 0;
@@ -111,11 +125,11 @@ async function scrapeSantaIsabel() {
   // 🔄 RECORRER PÁGINAS
   // ======================================================================
   for (let pagina = 1; pagina <= totalPaginas; pagina++) {
-    console.log(`➡️ Procesando página ${pagina}/${totalPaginas}`);
+    console.log(`➡️ [${STORE}] Procesando página ${pagina}/${totalPaginas}`);
 
     try {
       if (pagina > 1) {
-        // Para la primera página ya estamos ahí
+        // Primera página ya cargada; el resto se navega
         try {
           await page.click(`.page-number:nth-child(${pagina})`);
         } catch {
@@ -124,77 +138,94 @@ async function scrapeSantaIsabel() {
           }, pagina);
         }
 
-        await page.waitForFunction(() => {
-          return document.querySelectorAll("a.product-card").length > 0;
-        }, { timeout: 8000 });
+        await page.waitForFunction(
+          () => document.querySelectorAll("a.product-card").length > 0,
+          { timeout: 8000 }
+        );
 
         await page.waitForTimeout(1000);
       }
     } catch (err) {
-      console.log(`⚠️ Error navegando a página ${pagina}: ${err.message}`);
+      console.log(`[${STORE}] ⚠️ Error navegando a página ${pagina}: ${err.message}`);
       continue;
     }
 
     // ======================================================================
-    // 🧠 EXTRACCIÓN DE DATOS
-    // ======================================================================
+    // 🧠 EXTRACCIÓN DE DATOS (SIN PARSEAR NÚMEROS AQUÍ)
+// ======================================================================
     let productos = [];
     for (let intento = 0; intento < 3; intento++) {
-productos = await page.$$eval("a.product-card", (cards) =>
-  cards.map(c => {
-    const precioText = c.querySelector(".prices-main-price")?.textContent?.trim() || null;
-    const pricePerUnitText = c.querySelector(".ppum-price-container span")?.textContent?.trim() || null;
-    const imgEl = c.querySelector("img.lazy-image");
+      productos = await page.$$eval("a.product-card", (cards) =>
+        cards.map((c) => {
+          try {
+            const precioText =
+              c.querySelector(".prices-main-price")?.textContent?.trim() || null;
+            const pricePerUnitText =
+              c.querySelector(".ppum-price-container span")?.textContent?.trim() ||
+              null;
+            const imgEl = c.querySelector("img.lazy-image");
 
-    const currentPrice = precioText
-      ? Number(precioText.replace(/[^0-9]/g, ""))
-      : null;
+            let image = imgEl?.getAttribute("src") || null;
+            if (image && image.startsWith("//")) {
+              image = "https:" + image;
+            }
 
-    let image = imgEl?.getAttribute("src") || null;
-    if (image && image.startsWith("//")) {
-      image = "https:" + image;
-    }
+            const linkHref = c.getAttribute("href");
+            const link = linkHref
+              ? linkHref.startsWith("http")
+                ? linkHref
+                : "https://www.santaisabel.cl" + linkHref
+              : null;
 
-    const linkHref = c.getAttribute("href");
-    const link = linkHref
-      ? (linkHref.startsWith("http")
-          ? linkHref
-          : "https://www.santaisabel.cl" + linkHref)
-      : null;
+            const title =
+              c.querySelector(".product-card-name")?.textContent?.trim() || null;
+            const brand =
+              c.querySelector(".product-card-brand")?.textContent?.trim() ||
+              "Sin marca";
 
-    return {
-      title: c.querySelector(".product-card-name")?.textContent?.trim() || null,
-      brand: c.querySelector(".product-card-brand")?.textContent?.trim() || "Sin marca",
-      store: "santaisabel",               // ← FIX
-      currentPrice,
-      formattedPrice: precioText,
-      priceNormal: null,
-      pricePerUnit: pricePerUnitText,
-      image,
-      link,
-      categoria: "Despensa",
-      categoriaSlug: "despensa",
-      lastUpdate: new Date()
-    };
-  })
-);
+            return {
+              title,
+              brand,
+              store: "santaisabel",
+              formattedPrice: precioText,
+              priceNormal: null,
+              pricePerUnit: pricePerUnitText,
+              image,
+              link,
+              categoria: "Despensa",
+              categoriaSlug: "despensa",
+              lastUpdate: new Date()
+            };
+          } catch {
+            return null;
+          }
+        }).filter(Boolean)
+      );
 
-
-      // 🔎 Filtro rápido: solo productos con título y precio válido
-      productos = productos.filter(p => p.title && p.currentPrice !== null);
+      // 🔎 Filtro rápido: solo productos con título y string de precio
+      productos = productos.filter((p) => p.title && p.formattedPrice);
 
       if (productos.length > 0) break;
-      console.log(`🔁 Reintentando carga (intento ${intento + 1})...`);
+      console.log(`[${STORE}] 🔁 Reintentando carga (intento ${intento + 1})...`);
       await page.waitForTimeout(1500);
     }
 
-    console.log(`📦 Productos capturados en página ${pagina}: ${productos.length}`);
+    console.log(
+      `[${STORE}] 📦 Productos capturados en página ${pagina}: ${productos.length}`
+    );
 
     // ======================================================================
-    // 💾 GUARDAR EN BD + HISTORIAL (NORMALIZADO CON globalId)
-    // ======================================================================
+    // 💾 GUARDAR EN BD + HISTORIAL (CON PARSER UNIFICADO)
+// ======================================================================
     for (const p of productos) {
-      if (!p.title || p.currentPrice === null) continue;
+      if (!p.title || !p.formattedPrice) continue;
+
+      // 1️⃣ Limpiamos el texto para evitar que se mezclen dos precios
+      const textoPrecioLimpio = normalizarTextoPrecio(p.formattedPrice);
+
+      // 2️⃣ Aplicamos el parser estándar (soporta "2x$3.000", etc.)
+      const precioNum = parsePriceUnitario(textoPrecioLimpio);
+      if (!precioNum || isNaN(precioNum) || precioNum <= 0) continue;
 
       const marcaDetectada = p.brand || "Sin marca";
       const globalId = generarGlobalId(p.title, marcaDetectada);
@@ -203,7 +234,7 @@ productos = await page.$$eval("a.product-card", (cards) =>
 
       if (existente) {
         // Solo registrar si cambió el precio
-        if (existente.currentPrice !== p.currentPrice) {
+        if (existente.currentPrice !== precioNum) {
           await productosDB.updateOne(
             { _id: existente._id },
             {
@@ -212,7 +243,7 @@ productos = await page.$$eval("a.product-card", (cards) =>
                 title: p.title,
                 brand: marcaDetectada,
                 store: STORE,
-                currentPrice: p.currentPrice,
+                currentPrice: precioNum,
                 formattedPrice: p.formattedPrice,
                 pricePerUnit: p.pricePerUnit || null,
                 priceNormal: p.priceNormal || null,
@@ -228,18 +259,27 @@ productos = await page.$$eval("a.product-card", (cards) =>
           await historialDB.insertOne({
             productId: existente._id,
             store: STORE,
-            price: p.currentPrice,
+            price: precioNum,
             previousPrice: existente.currentPrice || null,
             variation: existente.currentPrice
               ? Number(
-                  (((p.currentPrice - existente.currentPrice) / existente.currentPrice) * 100).toFixed(2)
+                  (((precioNum - existente.currentPrice) / existente.currentPrice) *
+                    100
+                  ).toFixed(2)
                 )
               : 0,
             fecha: new Date()
           });
 
           actualizados++;
-          console.log(`🔄 Precio actualizado: ${p.title}`);
+          // Si quieres menos ruido, puedes comentar este log:
+          // console.log(`🔄 Precio actualizado: ${p.title}`);
+        } else {
+          // Solo refrescamos lastUpdate para saber que fue revisado hoy
+          await productosDB.updateOne(
+            { _id: existente._id },
+            { $set: { lastUpdate: new Date() } }
+          );
         }
       } else {
         const now = new Date();
@@ -248,7 +288,7 @@ productos = await page.$$eval("a.product-card", (cards) =>
           title: p.title,
           brand: marcaDetectada,
           store: STORE,
-          currentPrice: p.currentPrice,
+          currentPrice: precioNum,
           formattedPrice: p.formattedPrice,
           pricePerUnit: p.pricePerUnit || null,
           priceNormal: p.priceNormal || null,
@@ -261,12 +301,12 @@ productos = await page.$$eval("a.product-card", (cards) =>
         });
 
         nuevos++;
-        console.log(`🆕 Nuevo producto agregado: ${p.title}`);
+        // console.log(`🆕 Nuevo producto agregado: ${p.title}`);
 
         await historialDB.insertOne({
           productId: result.insertedId,
           store: STORE,
-          price: p.currentPrice,
+          price: precioNum,
           previousPrice: null,
           variation: 0,
           fecha: new Date()
@@ -276,21 +316,40 @@ productos = await page.$$eval("a.product-card", (cards) =>
       revisados++;
     }
 
-    console.log(`✅ Página ${pagina} procesada. Lleva revisados: ${revisados}`);
+    console.log(
+      `[${STORE}] ✅ Página ${pagina} procesada. Lleva revisados acumulados: ${revisados}`
+    );
   }
 
   const totalDB = await productosDB.countDocuments({ store: STORE });
 
-  console.log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-  console.log("📊 RESULTADOS SANTA ISABEL — DESPENSA");
-  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-  console.log(`Nuevos:        ${nuevos}`);
-  console.log(`Actualizados:  ${actualizados}`);
-  console.log(`Revisados hoy: ${revisados}`);
-  console.log(`Total en Atlas (${STORE}): ${totalDB}`);
+  console.log(`\n📊 ${STORE.toUpperCase()} — RESULTADOS`);
+  console.log(`🆕 Nuevos: ${nuevos}`);
+  console.log(`♻️ Actualizados: ${actualizados}`);
+  console.log(`🔎 Revisados: ${revisados}`);
+  console.log(`📦 Total en Atlas: ${totalDB}`);
+  console.log(`⏱️ Finalizado: ${new Date().toLocaleString("es-CL")}\n`);
+
+  try {
+    await actualizarScrapingArchivo({
+      store: STORE,
+      nuevos,
+      actualizados,
+      totalProductos: totalDB,
+      fecha: new Date()
+    });
+    console.log(`[${STORE}] 🧾 Archivo de scraping actualizado correctamente`);
+  } catch (err) {
+    console.warn(
+      `[${STORE}] ⚠️ No se pudo actualizar archivo de scraping:`,
+      err.message
+    );
+  }
 
   await browser.close();
-  console.log("✔️ Scraping COMPLETO para Santa Isabel Despensa");
+  console.log(`[${STORE}] 🔒 Navegador cerrado — Scraper Santa Isabel finalizado`);
 }
 
-scrapeSantaIsabel().catch(console.error);
+scrapeSantaIsabel().catch((err) => {
+  console.error(`[${STORE}] ERROR GLOBAL`, err);
+});

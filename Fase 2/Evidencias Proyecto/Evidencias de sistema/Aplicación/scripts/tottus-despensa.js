@@ -361,27 +361,37 @@ async function main() {
     console.error(`[${STORE}] ❌ Error global:`, err.message);
     await page.screenshot({ path: join(__dirname, "error-tottus.png"), fullPage: true });
   } finally {
-    const totalDB = await colProductos.countDocuments({ store: STORE });
+  const totalDB = await colProductos.countDocuments({ store: STORE });
 
-    await browser.close();
-    await closeDB();
+  console.log(`\n📊 ${STORE.toUpperCase()} — RESULTADOS`);
+  console.log(`🆕 Nuevos: ${totalNuevos}`);
+  console.log(`♻️ Actualizados: ${totalActualizados}`);
+  console.log(`🔎 Revisados: ${totalRevisados}`);
+  console.log(`📦 Total en Atlas: ${totalDB}`);
+  console.log(`⏱️ Finalizado: ${new Date().toLocaleString("es-CL")}\n`);
 
-    console.log(`\n[${STORE}] 🧮 Resumen final`);
-    console.log(`Nuevos: ${totalNuevos}`);
-    console.log(`Actualizados: ${totalActualizados}`);
-    console.log(`Revisados: ${totalRevisados}`);
-    console.log(`Total BD: ${totalDB}`);
-
+  try {
     await actualizarScrapingArchivo({
       store: STORE,
       nuevos: totalNuevos,
       actualizados: totalActualizados,
       revisados: totalRevisados,
-      totalProductos: totalDB
+      totalProductos: totalDB,
+      fecha: new Date()
     });
 
-    console.log(`[${STORE}] 🧾 Archivo actualizado`);
+    console.log(`[${STORE}] 🧾 Archivo de scraping actualizado correctamente`);
+  } catch (err) {
+    console.warn(`[${STORE}] ⚠️ No se pudo actualizar archivo de scraping:`, err.message);
   }
+
+  // ❌ No cerramos navegador ni base → modo servidor
+  console.log(`[${STORE}] ⏳ Navegador y DB permanecen activos (modo servidor)\n`);
+}
 }
 
-main().catch((err) => console.error(`[${STORE}] ERROR GLOBAL`, err));
+main().catch((err) => {
+  console.error(`[${STORE}] ⚠️ Error global (el servidor continúa)`, err);
+  // ❗ No usamos process.exit(), el proceso sigue activo
+});
+
