@@ -20,17 +20,17 @@
     "total": 1577
   },
   "acuenta": {
-    "fecha": "2025-11-20T00:42:50.834Z",
-    "fechaLocal": "19-11-2025, 9:42:50 p. m.",
+    "fecha": "2025-11-20T22:42:26.100Z",
+    "fechaLocal": "20-11-2025, 7:42:26 p. m.",
     "nuevos": 0,
     "actualizados": 4,
-    "total": 498
+    "total": 715
   },
   "santaisabel": {
-    "fecha": "2025-11-20T01:13:04.180Z",
-    "fechaLocal": "19-11-2025, 10:13:04 p. m.",
-    "nuevos": 1547,
-    "actualizados": 4,
-    "total": 1547
+    "fecha": "2025-11-20T22:16:13.897Z",
+    "fechaLocal": "20-11-2025, 7:16:13 p. m.",
+    "nuevos": 14,
+    "actualizados": 8,
+    "total": 1561
   }
 }

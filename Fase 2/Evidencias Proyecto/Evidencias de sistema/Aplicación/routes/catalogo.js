@@ -81,10 +81,5 @@ router.get("/", async (req, res) => {
   }
 });
 
-// -------------------------------------------------------------
-// 🧠 Eliminado: índice duplicado
-// -------------------------------------------------------------
-// Ya no se crea aquí porque index.js lo crea al iniciar.
-// Mantener aquí causaba warnings y posibles errores en primera carga.
 
 export default router;

@@ -208,12 +208,15 @@ function toggleFiltro(valor, tipo) {
 function getFilteredProducts() {
   let lista = [...productosGlobal];
 
-  // Filtrar por supermercado
+  // 🛒 Filtrar por supermercado (CORREGIDO)
   if (selectedStores.size > 0 && selectedStores.size < ALL_STORES.length) {
-    lista = lista.filter((p) => selectedStores.has((p.store || "").toLowerCase()));
-  } else if (selectedStores.size === 0) {
-    return [];
+    lista = lista.filter((p) => {
+      const tienda = (p.store || "").toLowerCase().trim();
+      return selectedStores.has(tienda);
+    });
   }
+  // ❌ NO devolver [], sino mostrar todo si no hay filtros.
+  // Antes lo bloqueabas aquí.
 
   // 🔥 Filtrar por peso/volumen (múltiples valores)
   if (selectedWeights.size > 0) {
@@ -234,6 +237,7 @@ function getFilteredProducts() {
   
   return lista;
 }
+
 // ==========================================
 // 🏷️ Obtener marcas disponibles según filtros actuales
 // ==========================================
@@ -259,10 +263,38 @@ function limpiarPrecioFormulario(precio = "") {
   return m ? m[0] : precio;
 }
 
+
 // 🔢 Extrae solo números para comparar precios correctamente
 function extraerNumero(precio = "") {
   if (!precio) return null;
   return parseInt(precio.toString().replace(/\D/g, ""), 10);
+}
+
+
+// 🧽 Limpia un precio y lo convierte a número
+function parsePrecio(valor) {
+  if (!valor) return null;
+  if (typeof valor === "number") return valor;
+
+  let txt = valor.toString().trim();
+
+  // Detecta formato tipo: "2 x $2.200" o "3x$4.500"
+  const promo = txt.match(/(\d+)\s*x\s*\$?\s*([\d\.,]+)/i);
+  if (promo) {
+    const cantidad = parseFloat(promo[1]);
+    const precioTotal = parseFloat(promo[2].replace(/[^\d.,]/g, "").replace(",", "."));
+    return cantidad > 0 ? Math.round(precioTotal / cantidad) : precioTotal;
+  }
+
+  // Limpieza general para precios normales
+  const limpio = txt.replace(/[^\d.,]/g, "").replace(",", ".");
+  return parseFloat(limpio) || null;
+}
+
+// 🧼 Limpia solo para mostrar en HTML (sin cambiar valor numérico)
+function limpiarPrecioMostrar(valor) {
+  if (!valor) return "$ -";
+  return valor.toString().replace(/\s+/g, "").replace("$", "$");
 }
 
 // ==========================================
@@ -278,7 +310,7 @@ function renderizarProductos(lista) {
     return;
   }
 
-  // Paginación
+  // 📌 Paginación
   totalPages = Math.ceil(lista.length / pageSize);
   const listaPaginada = lista.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
@@ -286,7 +318,8 @@ function renderizarProductos(lista) {
     const card = document.createElement("div");
     card.className = "producto-card";
 
-    const tienda = (p.store || "").toLowerCase();
+    // 🎨 Color del supermercado (NORMALIZADO: trim + lowercase)
+    const tienda = (p.store || "").toLowerCase().trim();
     const colorTienda =
       tienda === "unimarc" ? "#d32f2f" :
       tienda === "tottus" ? "#388e3c" :
@@ -294,31 +327,30 @@ function renderizarProductos(lista) {
       tienda === "acuenta" ? "#f57c00" :
       tienda === "santaisabel" ? "#c2185b" : "#616161";
 
-    const storeLabel = `<span class="store-label" style="background:${colorTienda}">${(p.store || "SIN TIENDA").toUpperCase()}</span>`;
+    const storeLabel = `<span class="store-label" style="background:${colorTienda}">${(p.store || "SIN TIENDA").toUpperCase().trim()}</span>`;
+
+    // 🏷️ Marca
     const marca = p.brand && p.brand.trim() && p.brand !== "null" ? p.brand : "Sin marca";
 
-    // 🧮 Calcular precio numérico
+    // 🧮 Calcular precios
+    const precioActualNum = parsePrecio(p.formattedPrice);
+    const precioNormalNum = parsePrecio(p.priceNormal);
+
+    // 📌 Precio numérico final para carrito/clic
     let precioNum = 0;
-    if (typeof p.currentPrice === "number") precioNum = p.currentPrice;
-    else if (typeof p.currentPrice === "string") {
+    if (typeof p.currentPrice === "number") {
+      precioNum = p.currentPrice;
+    } else if (typeof p.currentPrice === "string") {
       precioNum = parseFloat(p.currentPrice.replace(/[^\d.,]/g, "").replace(",", ".")) || 0;
-    } else if (p.formattedPrice) {
-      const m = p.formattedPrice.match(/([\d\.,]+)/);
-      if (m) precioNum = parseFloat(m[1].replace(/\./g, "").replace(",", ".")) || 0;
+    } else {
+      precioNum = precioActualNum ?? 0;
     }
 
-    // 🧹 Limpiar precios irreales (evitar duplicados sin oferta real)
-    if (p.priceNormal && limpiarPrecioFormulario(p.priceNormal) === limpiarPrecioFormulario(p.formattedPrice)) {
-      p.priceNormal = null;
-    }
-
-    const precioActualNum = extraerNumero(p.formattedPrice);
-    const precioNormalNum = extraerNumero(p.priceNormal);
-
-    // 🚫 Si el precio normal es igual al actual o inválido → ocultar
-    if (!precioNormalNum || precioNormalNum === precioActualNum) {
-      p.priceNormal = null;
-    }
+    // 👁️ Solo mostramos el precio normal si es mayor que el actual
+    const mostrarPrecioNormal =
+      precioNormalNum &&
+      limpiarPrecioMostrar(p.priceNormal) !== limpiarPrecioMostrar(p.formattedPrice) &&
+      (!precioActualNum || precioNormalNum > precioActualNum);
 
     // 🖼️ Render de la tarjeta
     card.innerHTML = `
@@ -328,7 +360,12 @@ function renderizarProductos(lista) {
       <p class="brand"><strong>${marca}</strong></p>
 
       <div class="price-box">
-        <p class="price-actual">${limpiarPrecioFormulario(p.formattedPrice) || "$ -"}</p>
+        <p class="price-actual">${limpiarPrecioMostrar(p.formattedPrice) || "$ -"}</p>
+
+        ${mostrarPrecioNormal ? `
+          <p class="price-normal"><span class="tachado">${limpiarPrecioMostrar(p.priceNormal)}</span></p>
+        ` : ""}
+
         ${p.pricePerUnit ? `<p class="price-unit"><small>${p.pricePerUnit}</small></p>` : ""}
       </div>
 
@@ -369,36 +406,37 @@ function renderizarProductos(lista) {
   renderizarPaginacion();
 }
 
+
+
+
 async function cargarMarcas() {
   const texto = document.getElementById("busqueda").value.trim();
   const tiendas = Array.from(selectedStores).join(",");
+  // Serializa los filtros de peso/volumen seleccionados (ej: "volumen:1000,peso:500")
+  const pesoSeleccionado = serializeSelectedWeights();
 
-  const res = await fetch(`/api/productos/marcas?q=${texto}&tiendas=${tiendas}`);
+  const res = await fetch(`/api/productos/marcas?q=${texto}&tiendas=${tiendas}&peso=${pesoSeleccionado}`);
   const data = await res.json();
 
   const lista = document.getElementById("listaMarcas");
 
   if (!data.ok || !data.marcas.length) {
     lista.innerHTML = "<p style='font-size:13px;color:#777;'>Sin marcas disponibles</p>";
-    sidebar.classList.add("pocas-marcas");
     return;
   }
 
   lista.innerHTML = data.marcas.map(m => `
     <label><input type="checkbox" class="chkMarca" value="${m}"> ${m}</label>
   `).join("");
+const totalMarcas = data.marcas.length;
+const sidebar = document.querySelector(".sidebar-marcas");
 
-  // 📌 Ajuste dinámico del tamaño del sidebar
-  const totalMarcas = data.marcas.length;
-  const sidebar = document.querySelector(".sidebar-marcas");
+if (totalMarcas <= 5) {
+  sidebar.classList.add("pocas-marcas");
+} else {
+  sidebar.classList.remove("pocas-marcas");
+}
 
-  if (totalMarcas <= 5) {
-    sidebar.classList.add("pocas-marcas");
-  } else {
-    sidebar.classList.remove("pocas-marcas");
-  }
-
-  // ♻️ Eventos para volver a filtrar los productos
   document.querySelectorAll(".chkMarca").forEach(cb => {
     cb.addEventListener("change", () => cargarProductos(texto));
   });
@@ -421,20 +459,23 @@ document.addEventListener("change", (e) => {
 function obtenerMarcasSeleccionadas() {
   return [...document.querySelectorAll(".chkMarca:checked")].map(el => el.value);
 }
-
-
-// 📌 Obtener marcas seleccionadas para filtro en productos
-function obtenerMarcasSeleccionadas() {
-  return [...document.querySelectorAll(".chkMarca:checked")].map(el => el.value);
+// Serializa los filtros de peso/volumen seleccionados (ej: "volumen:1000,peso:500")
+function serializeSelectedWeights() {
+  if (!selectedWeights || selectedWeights.size === 0) return "";
+  try {
+    return Array.from(selectedWeights)
+      .map(sw => `${sw.tipo}:${sw.valor}`)
+      .join(",");
+  } catch (e) {
+    return "";
+  }
 }
 
-// 📌 Cuando el usuario selecciona o deselecciona una marca → Recargar productos
-document.addEventListener("change", (e) => {
-  if (e.target.classList.contains("chkMarca")) {
-    currentPage = 1;
-    cargarProductos(inputBusqueda.value.trim());
-  }
-});
+// Función auxiliar que recarga las marcas del sidebar. Antes estaba siendo
+// invocada pero no definida, lo que rompía el flujo.
+function cargarMarcasSidebar() {
+  cargarMarcas();
+}
 
 document.addEventListener("click", (e) => {
   const drop = document.getElementById("dropdownMarcas");
@@ -499,19 +540,17 @@ function cambiarPagina(nuevaPagina) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// ==========================================
-// 🔍 Cargar productos
-// ==========================================
 async function cargarProductos(busqueda = "") {
   try {
-    let url = `/api/productos?q=${encodeURIComponent(busqueda)}`;
+    let url = `/api/catalogo?q=${encodeURIComponent(busqueda)}`;
 
     const marcas = obtenerMarcasSeleccionadas();
     if (marcas.length) url += `&marcas=${marcas.join(",")}`;
 
     const res = await fetch(url);
     const productos = await res.json();
-    productosGlobal = productos.productos || [];
+
+    productosGlobal = productos || [];
 
     selectedWeights.clear();
     currentPage = 1;
@@ -530,6 +569,7 @@ async function cargarProductos(busqueda = "") {
     console.error("Error cargando productos:", err);
   }
 }
+
 
 
 // ==========================================
@@ -666,10 +706,11 @@ function leerCheckboxesSuper() {
   const cbs = document.querySelectorAll(".filtro-super");
   selectedStores = new Set(
     Array.from(cbs)
-      .filter((c) => c.checked)
-      .map((c) => c.value.toLowerCase())
+      .filter(c => c.checked)
+      .map(c => c.value.toLowerCase().trim())
   );
 }
+
 
 function aplicarFiltroSupermercado() {
   leerCheckboxesSuper();

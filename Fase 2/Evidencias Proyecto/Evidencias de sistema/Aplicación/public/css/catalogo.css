@@ -29,21 +29,25 @@
   --sombra-strong: 0 8px 24px rgba(0,0,0,0.08);
   --transition: all 0.25s ease;
 }
+/* ================== 🛒 BOTÓN CARRITO ================== */
 .btn-carrito {
-  background: #009688;
-  border: none;
-  color: white;
-  padding: 8px 12px;
-  font-size: 14px;
-  cursor: pointer;
+  width: 90%;
+  margin: 4px auto;
+  background: #00695c;
+  color: #fff;
   border-radius: 6px;
-  margin-top: 6px;
-  width: 100%;
+  padding: 7px 0;
   font-weight: 600;
-  transition: background 0.2s;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  transition: 0.2s ease;
 }
+
 .btn-carrito:hover {
-  background: #00796b;
+  background: #004d40;
 }
 
 /* 🔤 Tipografía y fondo global */
@@ -628,23 +632,21 @@ body {
   font-weight: 700;
   margin-bottom: 10px;
 }
-/* ================================
-   PARTE 8/11 — Botones + Carrito rápido
-   ================================ */
 
 .btn-ver {
-  background: var(--calipso-500);
-  color: white;
-  padding: 8px 14px;
+  width: 90%;
+  margin: 4px auto;
+  background: #009688;
+  color: #fff;
   border-radius: 6px;
-  text-decoration: none;
-  font-size: 13px;
+  padding: 7px 0;
   font-weight: 600;
-  transition: var(--transition);
+  border: none;
+  transition: 0.2s ease;
 }
+
 .btn-ver:hover {
-  background: var(--petroleo);
-  transform: translateY(-2px);
+  background: #00796b;
 }
 
 .carrito-rapido {
@@ -1121,21 +1123,19 @@ button:active, .btn-ver:active {
    BOTÓN SECUNDARIO (Histórico)
 ---------------------------- */
 .btn-secundario {
-  background: transparent;
-  color: var(--calipso-500);
-  padding: 8px 14px;
+  width: 90%;
+  margin: 8px auto 0 auto;
+  background: #f0f0f0;
+  color: #333;
   border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  border: 2px solid var(--calipso-500);
-  transition: var(--transition);
-  cursor: pointer;
+  padding: 6px 0;
+  font-weight: 500;
+  border: 1px solid #ccc;
+  transition: 0.2s ease;
 }
 
 .btn-secundario:hover {
-  background: var(--calipso-500);
-  color: white;
-  transform: translateY(-2px);
+  background: #e0e0e0;
 }
 
 .paginacion-container {
@@ -1332,4 +1332,15 @@ button:active, .btn-ver:active {
   max-height: 120px !important;       /* 👈 Pequeño pero con scroll si hace falta */
   overflow-y: auto !important;        /* 👈 Mantiene scroll si se pasa */
   flex-grow: unset !important;
+}
+.price-normal {
+  font-size: 13px;
+  color: #888;
+  margin-top: -4px;
+}
+
+.tachado {
+  text-decoration: line-through;
+  color: #b00;
+  font-weight: 600;
 }

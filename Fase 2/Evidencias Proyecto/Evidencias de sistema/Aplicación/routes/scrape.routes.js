@@ -22,7 +22,7 @@ router.post("/acuenta", scrapeAcuenta);
 router.post("/tottus", scrapeTottus);
 router.post("/jumbo", scrapeJumbo);
 router.post("/unimarc", scrapeUnimarc);
-router.get("/santaisabel", scrapeSantaIsabel);
+router.post("/santaisabel", scrapeSantaIsabel);
 
 
 // ================================
