@@ -1,5 +1,5 @@
 // ==============================================
-// 📁 routes/catalogo.js — versión MongoClient final
+//  routes/catalogo.js — versión MongoClient final
 // ==============================================
 import express from "express";
 import { getDB } from "../config/db.js";
@@ -7,7 +7,7 @@ import { getDB } from "../config/db.js";
 const router = express.Router();
 
 // -------------------------------------------------------------
-// 🔍 1️⃣ Sugerencias de productos (autocompletado)
+//  Sugerencias de productos (autocompletado)
 // -------------------------------------------------------------
 router.get("/sugerencias", async (req, res) => {
   try {
@@ -36,21 +36,45 @@ router.get("/sugerencias", async (req, res) => {
 });
 
 // -------------------------------------------------------------
-// 🛒 2️⃣ Catálogo principal (búsqueda + carga inicial)
+//  Catálogo principal (búsqueda + carga inicial)
 // -------------------------------------------------------------
 router.get("/", async (req, res) => {
   try {
     const q = (req.query.q || "").trim();
     const db = getDB();
 
-    // Filtro dinámico
+    // ==============================
+    //  Normalizador inteligente de búsquedas (sin acentos)
+    // ==============================
+    function normalizarRegex(text) {
+      const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      return new RegExp(
+        escaped
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, ""), // elimina acentos
+        "i"
+      );
+    }
+
+    // ==============================
+    //  Filtro dinámico
+    // ==============================
     let filtro = {};
 
     if (q.length >= 2) {
-      const regex = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
-      filtro = { title: regex };
+      const regex = normalizarRegex(q);
+
+      filtro = {
+        $or: [
+          { title: regex },
+          { brand: regex }
+        ]
+      };
     }
 
+    // ==============================
+    //  Proyección (campos permitidos)
+    // ==============================
     const proyeccion = {
       _id: 1,
       title: 1,
@@ -64,22 +88,28 @@ router.get("/", async (req, res) => {
       lastUpdate: 1,
       offerDescription: 1,
       priceNormal: 1,
+      categoria: 1,
     };
 
+    // ==============================
+    //  Consulta a MongoDB
+    // ==============================
     const productos = await db
       .collection("productos")
       .find(filtro)
       .project(proyeccion)
-      .sort({ lastUpdate: -1 }) // Más recientes primero
+      .sort({ lastUpdate: -1 }) // primero los más recientes
       .limit(7000)
       .toArray();
 
     res.json(productos);
+
   } catch (err) {
     console.error("❌ [catalogo] Error al obtener productos:", err);
     res.status(500).json({ error: "Error al cargar catálogo de productos" });
   }
 });
+
 
 
 export default router;

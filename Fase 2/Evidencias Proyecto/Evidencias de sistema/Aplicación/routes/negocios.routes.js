@@ -1,5 +1,5 @@
 // =============================================
-// 📁 routes/negocios.routes.js
+//  routes/negocios.routes.js
 // =============================================
 import express from "express";
 import { getDB } from "../config/db.js";
@@ -8,7 +8,7 @@ import { ObjectId } from "mongodb";
 const router = express.Router();
 
 // ==============================================
-// 🟢 OBTENER NEGOCIOS CON DATOS DEL DUEÑO
+//  OBTENER NEGOCIOS CON DATOS DEL DUEÑO
 // ==============================================
 router.get("/negocios-con-duenio", async (req, res) => {
   try {
@@ -52,7 +52,7 @@ router.get("/negocios-con-duenio", async (req, res) => {
 });
 
 // ==============================================
-// ✏️ EDITAR NEGOCIO
+//  EDITAR NEGOCIO
 // ==============================================
 router.put("/negocios/:id", async (req, res) => {
   try {
@@ -84,7 +84,7 @@ router.put("/negocios/:id", async (req, res) => {
 });
 
 // ==============================================
-// 🗑 ELIMINAR NEGOCIO
+//  ELIMINAR NEGOCIO
 // ==============================================
 router.delete("/negocios/:id", async (req, res) => {
   try {

@@ -1,5 +1,5 @@
 // ==============================
-// 📁 routes/clicks.routes.js
+//  routes/clicks.routes.js
 // ==============================
 import express from "express";
 import { getDB } from "../config/db.js";
@@ -8,20 +8,20 @@ import { ObjectId } from "mongodb";
 const router = express.Router();
 
 // =============================================
-// 🖱️ REGISTRO DE CLICKS DE PRODUCTOS
+//  REGISTRO DE CLICKS DE PRODUCTOS
 // =============================================
 router.post("/registrar", async (req, res) => {
   try {
     const db = getDB();
     const { producto } = req.body;
 
-    // 🧩 Validación mínima
+    //  Validación mínima
     if (!producto || !producto.idProducto) {
       return res.status(400).json({ error: "Faltan datos esenciales del producto." });
     }
 
     // =============================================
-    // 💰 NORMALIZACIÓN DEL PRECIO
+    //  NORMALIZACIÓN DEL PRECIO
     // =============================================
     let precioFinal = 0;
 
@@ -36,7 +36,7 @@ router.post("/registrar", async (req, res) => {
     let pricePerUnit = producto.pricePerUnit || null;
 
     // =============================================
-    // 🔍 BUSCAR DATOS EN DB SI FALTAN
+    //  BUSCAR DATOS EN DB SI FALTAN
     // =============================================
     if (!precioFinal || precioFinal === 0 || !pricePerUnit) {
       let prodDB = null;
@@ -68,7 +68,7 @@ router.post("/registrar", async (req, res) => {
     }
 
     // =============================================
-    // 👤 INFORMACIÓN DEL USUARIO (SI TIENE SESIÓN)
+    //  INFORMACIÓN DEL USUARIO (SI TIENE SESIÓN)
     // =============================================
     const sesion = req.session?.user || null;
     let userData = null;
@@ -88,12 +88,12 @@ router.post("/registrar", async (req, res) => {
     }
 
     // =============================================
-    // 🗂️ DOCUMENTO FINAL A GUARDAR
+    //  DOCUMENTO FINAL A GUARDAR
     // =============================================
     const now = new Date();
 
     const clickDoc = {
-      // 🛒 Producto
+      //  Producto
       idProducto: producto.idProducto,
       titulo: producto.titulo || "",
       marca: producto.marca || "",
@@ -103,7 +103,7 @@ router.post("/registrar", async (req, res) => {
       link: producto.link || "",
       imagen: producto.imagen || "",
 
-      // 👤 Información del usuario
+      //  Información del usuario
       userId: userData?._id?.toString() || sesion?.id || null,
       userCorreo: userData?.correo || sesion?.correo || "anonimo@local.cl",
       userNombre: userData?.nombre || null,
@@ -115,17 +115,17 @@ router.post("/registrar", async (req, res) => {
       userEdad: edadCalculada,
       negocios: userData?.negocios || [],
 
-      // 🕒 Fecha
+      //  Fecha
       createdAt: now,
       fecha: now,
 
-      // ⚙️ Técnicos
+      //  Técnicos
       ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress || null,
       ua: req.headers["user-agent"] || null,
     };
 
     // =============================================
-    // 💾 GUARDAR CLICK
+    //  GUARDAR CLICK
     // =============================================
     await db.collection("clicks").insertOne(clickDoc);
 
@@ -144,7 +144,7 @@ router.post("/registrar", async (req, res) => {
 });
 
 // =============================================
-// 📊 OBTENER ÚLTIMOS CLICKS
+//  OBTENER ÚLTIMOS CLICKS
 // =============================================
 router.get("/ultimos", async (req, res) => {
   try {

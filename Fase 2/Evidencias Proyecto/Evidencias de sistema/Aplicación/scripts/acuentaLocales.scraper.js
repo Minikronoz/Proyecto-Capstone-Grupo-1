@@ -8,7 +8,7 @@ const MONGODB_URI = process.env.MONGODB_URI;
 const DB_NAME = process.env.DB_NAME;
 
 // ========================================================
-// 📌 Función que convierte un bloque de texto en objetos limpitos
+//  Función que convierte un bloque de texto en objetos limpitos
 // ========================================================
 function parsearLocales(texto) {
   const lineas = texto.trim().split("\n");
@@ -52,7 +52,7 @@ function parsearLocales(texto) {
 }
 
 // ========================================================
-// 📌 Guardar en MongoDB
+//  Guardar en MongoDB
 // ========================================================
 async function guardarEnMongo(locales) {
   const cliente = new MongoClient(MONGODB_URI);
@@ -62,18 +62,18 @@ async function guardarEnMongo(locales) {
 
   const coleccion = db.collection("locales_acuenta");
 
-  console.log("🧹 Limpiando colección...");
+  console.log(" Limpiando colección...");
   await coleccion.deleteMany({});
 
-  console.log(`📥 Insertando ${locales.length} locales...`);
+  console.log(` Insertando ${locales.length} locales...`);
   await coleccion.insertMany(locales);
 
-  console.log("✅ Datos guardados correctamente");
+  console.log(" Datos guardados correctamente");
   await cliente.close();
 }
 
 // ========================================================
-// 🚀 MAIN
+//  MAIN
 // ========================================================
 async function main() {
   try {

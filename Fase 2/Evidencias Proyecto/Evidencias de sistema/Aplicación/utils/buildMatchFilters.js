@@ -1,5 +1,5 @@
 // ======================================================
-// 🧩 utils/buildMatchFilters.js
+
 // Genera dinámicamente el objeto $match para los pipelines
 // de estadísticas y dashboards (clicks, búsquedas, etc.)
 // ======================================================
@@ -17,7 +17,7 @@ export function buildMatchFilters(query = {}) {
   const match = {};
 
   // ======================================================
-  // 🏬 Filtros de atributos simples
+  //  Filtros de atributos simples
   // ======================================================
   if (supermercado && supermercado !== "todos")
     match.supermercado = supermercado;
@@ -29,7 +29,7 @@ export function buildMatchFilters(query = {}) {
     match.userRegion = region;
 
   // ======================================================
-  // 👥 Filtro tipo de usuario
+  //  Filtro tipo de usuario
   // ======================================================
   if (usuario === "registrado") {
     match.userCorreo = { $ne: "invitado@anonimo.cl" };
@@ -38,18 +38,18 @@ export function buildMatchFilters(query = {}) {
   }
 
   // ======================================================
-  // 📅 Filtros por rango de fechas o periodo
+  //  Filtros por rango de fechas o periodo
   // ======================================================
   let fechaInicio = null;
   let fechaFin = null;
 
-  // 1️⃣ Rango personalizado (desde / hasta)
+  //  Rango personalizado (desde / hasta)
   if (desde || hasta) {
     fechaInicio = desde ? new Date(desde) : null;
     fechaFin = hasta ? new Date(hasta) : new Date();
   }
 
-  // 2️⃣ Periodo automático (últimos X días)
+  //  Periodo automático (últimos X días)
   else if (periodo) {
     const dias = parseInt(periodo, 10);
     if (!isNaN(dias) && dias > 0) {
@@ -79,7 +79,7 @@ export function buildMatchFilters(query = {}) {
   }
 
   // ======================================================
-  // 🧠 Resultado final
+  //  Resultado final
   // ======================================================
   return match;
 }

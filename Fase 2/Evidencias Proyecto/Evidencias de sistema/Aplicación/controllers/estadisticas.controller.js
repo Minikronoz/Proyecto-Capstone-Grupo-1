@@ -1,5 +1,5 @@
 // =============================================================
-// 📊 CONTROLADOR: Estadísticas Generales del Sistema (versión MongoDB nativa)
+// CONTROLADOR: Estadísticas Generales del Sistema (versión MongoDB nativa)
 // =============================================================
 import { getDB } from "../config/db.js";
 // 🏪 Ranking de supermercados por variedad de productos nuevos (Atlas compatible)
@@ -28,8 +28,8 @@ export const rankingProductosNuevos = async (req, res) => {
       },
       {
         $group: {
-          _id: "$store",          // 👈 uniforme con los demás (clave estándar)
-          total: { $sum: 1 },     // 👈 cantidad de productos nuevos
+          _id: "$store",          
+          total: { $sum: 1 },     
         },
       },
       { $sort: { total: -1 } }
@@ -37,12 +37,12 @@ export const rankingProductosNuevos = async (req, res) => {
 
     res.json(data.length ? data : []);
   } catch (error) {
-    console.error("❌ Error en rankingProductosNuevos:", error);
+    console.error(" Error en rankingProductosNuevos:", error);
     res.status(500).json({ error: "Error al calcular ranking de productos nuevos" });
   }
 };
 
-// 📊 Índice de Competitividad — Ranking según precio promedio real del mercado
+//  Índice de Competitividad — Ranking según precio promedio real del mercado
 export const indiceCompetitividad = async (req, res) => {
   try {
     const db = getDB();
@@ -55,7 +55,7 @@ export const indiceCompetitividad = async (req, res) => {
 
     const resultado = await db.collection(nombreColeccion).aggregate([
 
-      // 1️⃣ Solo registros válidos con precio y tienda
+      // 1️ Solo registros válidos con precio y tienda
       {
         $match: {
           price: { $exists: true, $ne: null },
@@ -63,7 +63,7 @@ export const indiceCompetitividad = async (req, res) => {
         }
       },
 
-      // 2️⃣ Normalización: convertir strings y limpiar separadores de miles
+      // 2️ Normalización: convertir strings y limpiar separadores de miles
       {
         $addFields: {
           priceNum: {
@@ -74,21 +74,21 @@ export const indiceCompetitividad = async (req, res) => {
         }
       },
 
-      // 3️⃣ Filtrar datos corruptos después de convertir
+      // 3️ Filtrar datos corruptos después de convertir
       {
         $match: {
           priceNum: { $gte: 100, $lte: 300000 } // ✔ Rango real Chile
         }
       },
 
-      // 4️⃣ Normalizar nombre de tienda (evita "Acuenta", "ACuenta", etc.)
+      // 4️ Normalizar nombre de tienda (evita "Acuenta", "ACuenta", etc.)
       {
         $addFields: {
           storeNorm: { $trim: { input: { $toLower: "$store" } } }
         }
       },
 
-      // 5️⃣ Agrupar por tienda → calcular promedio real
+      // 5️ Agrupar por tienda → calcular promedio real
       {
         $group: {
           _id: "$storeNorm",
@@ -97,15 +97,15 @@ export const indiceCompetitividad = async (req, res) => {
         }
       },
 
-      // 6️⃣ Excluir rankings falsos por baja cantidad de datos
+      // 6️ Excluir rankings falsos por baja cantidad de datos
       {
-        $match: { cantidad: { $gte: 50 } } // 🧠 Ajustable según dataset
+        $match: { cantidad: { $gte: 50 } } 
       },
 
-      // 7️⃣ Ordenar de menor a mayor precio → más barato primero
+      // 7️ Ordenar de menor a mayor precio → más barato primero
       { $sort: { promedio: 1 } },
 
-      // 8️⃣ Proyección limpia + nombres bonitos finales
+      // 8️ Proyección limpia + nombres bonitos finales
       {
         $project: {
           _id: 0,
@@ -128,14 +128,14 @@ export const indiceCompetitividad = async (req, res) => {
     res.json(resultado);
 
   } catch (err) {
-    console.error("❌ Error en indiceCompetitividad:", err);
+    console.error(" Error en indiceCompetitividad:", err);
     res.status(500).json({ error: "Error al calcular índice de competitividad" });
   }
 };
 
 
 
-// 🌎 Cruce entre género y región (Atlas compatible y estándar)
+//  Cruce entre género y región (Atlas compatible y estándar)
 export const cruceGeneroRegion = async (req, res) => {
   try {
     const db = getDB();
@@ -173,13 +173,13 @@ export const cruceGeneroRegion = async (req, res) => {
 
     res.json(data.length ? data : []);
   } catch (error) {
-    console.error("❌ Error en cruceGeneroRegion:", error);
+    console.error(" Error en cruceGeneroRegion:", error);
     res.status(500).json({ error: "Error al generar cruce género-región" });
   }
 };
 
 
-// 👥 Usuarios nuevos vs. recurrentes (Atlas compatible y estándar)
+//  Usuarios nuevos vs. recurrentes (Atlas compatible y estándar)
 export const usuariosNuevosRecurrentes = async (req, res) => {
   try {
     const db = getDB();
@@ -210,11 +210,11 @@ export const usuariosNuevosRecurrentes = async (req, res) => {
       { _id: "Recurrentes", total: recurrentes }
     ]);
   } catch (error) {
-    console.error("❌ Error en usuariosNuevosRecurrentes:", error);
+    console.error(" Error en usuariosNuevosRecurrentes:", error);
     res.status(500).json({ error: "Error al calcular usuarios nuevos vs recurrentes" });
   }
 };
-// 📈 Productos con mayor crecimiento (Atlas compatible)
+//  Productos con mayor crecimiento (Atlas compatible)
 export const productosCrecimiento = async (req, res) => {
   try {
     const db = getDB();
@@ -269,19 +269,19 @@ export const productosCrecimiento = async (req, res) => {
     ]).toArray();
 
     if (!data.length) {
-      console.warn("⚠️ No se encontraron productos con crecimiento");
+      console.warn(" No se encontraron productos con crecimiento");
       return res.json([{ producto: "Sin crecimiento detectado", crecimiento: 0 }]);
     }
 
     res.json(data);
   } catch (error) {
-    console.error("❌ Error en productosCrecimiento:", error);
+    console.error(" Error en productosCrecimiento:", error);
     res.status(500).json({ error: "Error al calcular productos con mayor crecimiento" });
   }
 };
 
 
-/** 📉 Productos con baja de precio (últimos 7 días) */
+/** Productos con baja de precio (últimos 7 días) */
 export async function obtenerBajasDePrecio(req, res) {
   try {
     const db = getDB();
@@ -352,12 +352,12 @@ export async function obtenerBajasDePrecio(req, res) {
     res.json({ ok: true, data });
 
   } catch (err) {
-    console.error("❌ Error en obtenerBajasDePrecio:", err);
+    console.error(" Error en obtenerBajasDePrecio:", err);
     res.status(500).json({ ok: false, error: err.message });
   }
 }
 
-/** 📈 Productos con subida de precio (últimos 7 días) */
+/**  Productos con subida de precio (últimos 7 días) */
 export async function obtenerSubidasDePrecio(req, res) {
   try {
     const db = getDB();
@@ -456,19 +456,19 @@ export async function obtenerSubidasDePrecio(req, res) {
     res.json({ ok: true, data });
 
   } catch (err) {
-    console.error("❌ Error en obtenerSubidasDePrecio:", err);
+    console.error(" Error en obtenerSubidasDePrecio:", err);
     res.status(500).json({ ok: false, error: err.message });
   }
 }
 
 
 
-// 🧠 Insights del sistema (Atlas compatible)
+//  Insights del sistema (Atlas compatible)
 export const insights = async (req, res) => {
   try {
     const db = getDB();
 
-    // 🔍 Colecciones base
+    //  Colecciones base
     const colecciones = await db.listCollections().toArray();
     const tieneClicks = colecciones.some(c => c.name === "clicks");
     const tieneBusquedas = colecciones.some(c => c.name === "busquedas");
@@ -482,7 +482,7 @@ export const insights = async (req, res) => {
       usuariosUnicos: 0
     };
 
-    // 🛒 Producto más consultado
+    //  Producto más consultado
     if (tieneClicks) {
       const topProd = await db.collection("clicks").aggregate([
         { $match: { titulo: { $exists: true, $ne: "" } } },
@@ -493,7 +493,7 @@ export const insights = async (req, res) => {
       if (topProd[0]) resultado.topProducto = topProd[0]._id;
     }
 
-    // 🏬 Supermercado más activo
+    //  Supermercado más activo
     if (tieneClicks) {
       const topSuper = await db.collection("clicks").aggregate([
         { $match: { supermercado: { $exists: true, $ne: "" } } },
@@ -504,7 +504,7 @@ export const insights = async (req, res) => {
       if (topSuper[0]) resultado.topSupermercado = topSuper[0]._id;
     }
 
-    // 🌎 Región más activa
+    //  Región más activa
     if (tieneClicks) {
       const topRegion = await db.collection("clicks").aggregate([
         { $match: { userRegion: { $exists: true, $ne: "" } } },
@@ -515,7 +515,7 @@ export const insights = async (req, res) => {
       if (topRegion[0]) resultado.topRegion = topRegion[0]._id;
     }
 
-    // 🔍 Término de búsqueda más usado
+    //  Término de búsqueda más usado
     if (tieneBusquedas) {
       const topBusqueda = await db.collection("busquedas").aggregate([
         { $match: { termino: { $exists: true, $ne: "" } } },
@@ -526,7 +526,7 @@ export const insights = async (req, res) => {
       if (topBusqueda[0]) resultado.topBusqueda = topBusqueda[0]._id;
     }
 
-    // 👥 Usuarios únicos totales (sin distinct → versión Atlas)
+    //  Usuarios únicos totales (sin distinct → versión Atlas)
     if (tieneClicks) {
       const usuarios = await db.collection("clicks").aggregate([
         { $match: { userCorreo: { $exists: true, $ne: "" } } },
@@ -538,26 +538,26 @@ export const insights = async (req, res) => {
 
     res.json(resultado);
   } catch (error) {
-    console.error("❌ Error en insights:", error);
+    console.error(" Error en insights:", error);
     res.status(500).json({ error: "Error al generar insights del sistema" });
   }
 };
-// 🔥 Palabras en tendencia (última semana) — Atlas compatible
+//  Palabras en tendencia (última semana) — Atlas compatible
 export const palabrasTendencia = async (req, res) => {
   try {
     const db = getDB();
 
-    // 🗓️ Calcular rango de la última semana
+    //  Calcular rango de la última semana
     const hoy = new Date();
     const hace7 = new Date();
     hace7.setDate(hoy.getDate() - 7);
 
-    // 🧩 Confirmar si existe la colección "busquedas"
+    //  Confirmar si existe la colección "busquedas"
     const colecciones = await db.listCollections().toArray();
     const tieneBusquedas = colecciones.some(c => c.name === "busquedas");
     if (!tieneBusquedas) return res.json([]);
 
-    // 📊 Agrupar términos más buscados en la última semana
+    //  Agrupar términos más buscados en la última semana
     const data = await db.collection("busquedas").aggregate([
       {
         $match: {
@@ -582,31 +582,31 @@ export const palabrasTendencia = async (req, res) => {
       }
     ]).toArray();
 
-    // 🧠 Si no hay resultados, devolver array vacío
+    //  Si no hay resultados, devolver array vacío
     res.json(data.length ? data : []);
   } catch (error) {
-    console.error("❌ Error en palabrasTendencia:", error);
+    console.error(" Error en palabrasTendencia:", error);
     res.status(500).json({ error: "Error al calcular palabras en tendencia" });
   }
 };
 
 
-// 🌎 Distribución de usuarios por región (última semana) — Atlas compatible
+//  Distribución de usuarios por región (última semana) — Atlas compatible
 export const distribucionUsuariosRegion = async (req, res) => {
   try {
     const db = getDB();
 
-    // 🗓️ Fechas: últimos 7 días
+    //  Fechas: últimos 7 días
     const hoy = new Date();
     const hace7 = new Date();
     hace7.setDate(hoy.getDate() - 7);
 
-    // 🧩 Verificar existencia de colección "clicks"
+    //  Verificar existencia de colección "clicks"
     const colecciones = await db.listCollections().toArray();
     const tieneClicks = colecciones.some(c => c.name === "clicks");
     if (!tieneClicks) return res.json([]);
 
-    // 📊 Agrupar por región considerando actividad de los últimos 7 días
+    //  Agrupar por región considerando actividad de los últimos 7 días
     const data = await db.collection("clicks").aggregate([
       {
         $match: {
@@ -632,7 +632,7 @@ export const distribucionUsuariosRegion = async (req, res) => {
 
     res.json(data.length ? data : []);
   } catch (error) {
-    console.error("❌ Error en distribucionUsuariosRegion:", error);
+    console.error(" Error en distribucionUsuariosRegion:", error);
     res.status(500).json({ error: "Error al obtener distribución de usuarios por región" });
   }
 };

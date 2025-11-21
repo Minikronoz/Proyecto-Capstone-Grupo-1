@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     if (data.user.role !== "admin") {
-      alert("🚫 Solo administradores pueden acceder.");
+      alert(" Solo administradores pueden acceder.");
       return window.location.href = "/catalogo";
     }
   } catch (e) {
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     if (data.user.role !== "admin" && data.user.role !== "cliente") {
-      alert("🚫 No tienes acceso a este dashboard.");
+      alert(" No tienes acceso a este dashboard.");
       return window.location.href = "/catalogo";
     }
   } catch (e) {
@@ -404,7 +404,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 </script>
   <script>
   document.addEventListener("DOMContentLoaded", () => {
-    console.log("🔥 dashboard.js listo (DOM cargado)");
+    console.log(" dashboard.js listo (DOM cargado)");
 
     const form = document.getElementById("formEditarUsuario");
     if (form) form.addEventListener("submit", guardarUsuario);

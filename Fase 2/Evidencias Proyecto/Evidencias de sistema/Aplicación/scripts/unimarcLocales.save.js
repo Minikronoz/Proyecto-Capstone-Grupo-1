@@ -1,12 +1,12 @@
 // ======================================================================
-// 🏬 SCRAPER LOCALES UNIMARC — 2025
+//  SCRAPER LOCALES UNIMARC — 2025
 // ======================================================================
 import { chromium } from "playwright";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { connectDB, getDB } from "../config/db.js";
-import { REGIONES_COMUNAS } from "../data/regionesComunas.js"; // 👈 asegúrate de tenerlo igual que Jumbo
+import { REGIONES_COMUNAS } from "../data/regionesComunas.js"; 
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,7 +30,7 @@ async function main() {
     document.querySelectorAll("h6").forEach($title => {
       const name = $title.innerText.trim();
 
-      // 👇 Siguiente <p> es la dirección completa
+
       const p = $title.parentElement.querySelector("p");
       if (!p) return;
 
@@ -47,7 +47,7 @@ async function main() {
   });
 
   // ======================================================================
-  // 📌 Agregar Región automática con REGIONES_COMUNAS
+  //  Agregar Región automática con REGIONES_COMUNAS
   // ======================================================================
   const localesFinal = data.map(l => {
     let regionEncontrada = null;
@@ -68,14 +68,14 @@ async function main() {
   console.log(`📍 Locales encontrados: ${localesFinal.length}`);
 
   // ======================================================================
-  // 💾 Guardar JSON local (opcional)
+  //  Guardar JSON local (opcional)
   // ======================================================================
   const filePath = path.join(__dirname, "../data/unimarc_stores.json");
   fs.writeFileSync(filePath, JSON.stringify(localesFinal, null, 2));
   console.log(`💾 Archivo guardado: ${filePath}`);
 
   // ======================================================================
-  // 🗃️ GUARDAR EN MONGODB (colección: supermercados_locales)
+  //  GUARDAR EN MONGODB (colección: supermercados_locales)
   // ======================================================================
   await connectDB();
   const db = getDB();
@@ -88,7 +88,7 @@ async function main() {
   const withStoreName = localesFinal.map(l => ({ tienda: "UNIMARC", ...l }));
   await collection.insertMany(withStoreName);
 
-  console.log("🚀 DATOS DE UNIMARC GUARDADOS EN MONGO");
+  console.log(" DATOS DE UNIMARC GUARDADOS EN MONGO");
 
   await browser.close();
 }

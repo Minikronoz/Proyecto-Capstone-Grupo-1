@@ -29,20 +29,20 @@ export async function connectDB() {
 
     // Si se cae, dejar db = null para reintentar
     client.on("close", () => {
-      console.warn("⚠️ Conexión Mongo cerrada inesperadamente");
+      console.warn(" Conexión Mongo cerrada inesperadamente");
       db = null;
     });
 
     return db;
   } catch (error) {
-    console.error("❌ Error al conectar a MongoDB:", error);
+    console.error(" Error al conectar a MongoDB:", error);
     throw error;
   }
 }
 
 export function getDB() {
   if (!db) {
-    throw new Error("❌ Base de datos no inicializada. Llama a connectDB() primero.");
+    throw new Error(" Base de datos no inicializada. Llama a connectDB() primero.");
   }
   return db;
 }
@@ -52,7 +52,7 @@ export async function closeDB() {
     await client.close();
     db = null;
     client = null;
-    console.log("🔒 Conexión Mongo cerrada.");
+    console.log(" Conexión Mongo cerrada.");
   }
 }
 

@@ -1,5 +1,5 @@
 // ================================
-// 📊 Cargar datos del producto e historial
+//  Cargar datos del producto e historial
 // ================================
 document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
@@ -17,12 +17,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const { producto, historial } = data;
 
     // =====================================================
-    // 📌 ORDENAR historial por fecha
+    //  ORDENAR historial por fecha
     // =====================================================
     historial.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     // =====================================================
-    // 📌 Calcular variación (últimos 7 días)
+    //  Calcular variación (últimos 7 días)
     // =====================================================
     let precioHoy = historial[historial.length - 1].price;
     let precio7dias = null;
@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // =====================================================
-    // 🧾 Render del producto
+    //  Render del producto
     // =====================================================
     const contenedor = document.getElementById("productoDetalle");
 
@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
 
     // =====================================================
-    // 📈 Gráfico principal (evolución)
+    //  Gráfico principal (evolución)
     // =====================================================
     const labels = historial.map((h) =>
       new Date(h.date || h.fecha).toLocaleDateString("es-CL", {

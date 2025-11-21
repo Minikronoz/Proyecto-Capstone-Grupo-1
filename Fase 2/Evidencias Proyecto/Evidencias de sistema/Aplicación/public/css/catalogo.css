@@ -1,8 +1,6 @@
-/* ================================
-   PARTE 1/11 — Paleta + Base + Topbar
-   ================================ */
 
-/* 🌈 PALETA BASE */
+
+/*  PALETA BASE */
 :root {
   --calipso: #00a7b5;
   --calipso-50: #e6fbfd;
@@ -29,7 +27,7 @@
   --sombra-strong: 0 8px 24px rgba(0,0,0,0.08);
   --transition: all 0.25s ease;
 }
-/* ================== 🛒 BOTÓN CARRITO ================== */
+
 .btn-carrito {
   width: 90%;
   margin: 4px auto;
@@ -50,7 +48,7 @@
   background: #004d40;
 }
 
-/* 🔤 Tipografía y fondo global */
+/*  Tipografía y fondo global */
 body {
   font-family: "Segoe UI", "Inter", system-ui, -apple-system, Roboto, Arial, sans-serif;
   background-color: var(--gris-claro);
@@ -61,7 +59,7 @@ body {
 }
 
 /* ================================
-   🧭 BARRA SUPERIOR MEJORADA
+    BARRA SUPERIOR MEJORADA
    ================================ */
 .barra-superior {
   background: linear-gradient(to right, #ffffff, #f8fafa);
@@ -93,7 +91,7 @@ body {
   transform: translateY(-1px);
 }
 
-/* 🔹 Navegación con botones */
+/*  Navegación con botones */
 #nav-usuario {
   display: flex;
   align-items: center;
@@ -130,7 +128,7 @@ body {
   border-color: var(--calipso-600);
 }
 
-/* 🔹 Menú de usuario desplegable */
+/*  Menú de usuario desplegable */
 .usuario-menu {
   position: relative;
 }
@@ -196,9 +194,7 @@ body {
   padding-left: 22px;
 }
 
-/* ================================
-   PARTE 2/11 — Logo, navegación y fecha
-   ================================ */
+
 
 .logo-dash {
   display: flex;
@@ -216,7 +212,7 @@ body {
   transform: translateY(-1px);
 }
 
-/* 🔹 Navegación */
+/*  Navegación */
 .barra-superior nav a {
   color: var(--gris-texto);
   text-decoration: none;
@@ -231,7 +227,7 @@ body {
   background: var(--calipso-50);
 }
 
-/* 🔹 Fecha actual */
+/*  Fecha actual */
 .ultima-actualizacion {
   background: linear-gradient(0deg, var(--gris-claro), var(--blanco));
   padding: 10px 22px;
@@ -258,7 +254,7 @@ body {
   flex-wrap: wrap;
 }
 
-/* 🔘 Etiquetas */
+/*  Etiquetas */
 .filtro-superior label {
   display: flex;
   align-items: center;
@@ -279,15 +275,13 @@ body {
   transform: translateY(-1px);
 }
 
-/* ✅ Checkbox */
+/*  Checkbox */
 .filtro-superior input[type="checkbox"] {
   transform: scale(1.25);
   accent-color: var(--calipso);
   cursor: pointer;
 }
-/* ================================
-   PARTE 4/11 — Tags de Supermercado
-   ================================ */
+
 .tag {
   display: inline-block;
   border-radius: 6px;
@@ -321,7 +315,7 @@ body {
   transform: scale(1.03);
 }
 /* ================================
-   PARTE 5/11 — Zona de búsqueda
+    — Zona de búsqueda
    ================================ */
 .zona-busqueda {
   display: flex;
@@ -387,10 +381,10 @@ body {
   transform: translateY(-1px);
 }
 /* ================================
-   PARTE 6/11 — Sugerencias y filtros horizontales
+    — Sugerencias y filtros horizontales
    ================================ */
 
-/* 💬 CONTENEDOR DE SUGERENCIAS */
+/*  CONTENEDOR DE SUGERENCIAS */
 #sugerencias {
   position: absolute;
   top: 42px;
@@ -557,7 +551,7 @@ body {
   }
 }
 /* ================================
-   PARTE 7/11 — Catálogo de productos
+    Catálogo de productos
    ================================ */
 
 .productos {
@@ -694,7 +688,7 @@ body {
   color: #333;
 }
 /* ================================
-   PARTE 9/11 — Footer y Responsive general
+    — Footer y Responsive general
    ================================ */
 
 footer {
@@ -759,7 +753,7 @@ footer p {
   }
 }
 /* ================================
-   PARTE 10/11 — Histórico de precios
+    Histórico de precios
    ================================ */
 
 .historico-contenedor {
@@ -842,10 +836,10 @@ footer p {
   }
 }
 /* ================================
-   PARTE 11/11 — Animaciones y efectos visuales
+    Animaciones y efectos visuales
    ================================ */
 
-/* ✨ Fade In (entradas suaves) */
+/*  Fade In (entradas suaves) */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -857,17 +851,17 @@ footer p {
   }
 }
 
-/* 💨 Hover general para interactividad */
+/*  Hover general para interactividad */
 button, a, .producto-card, .chip-filtro, .tag {
   transition: all 0.25s ease-in-out;
 }
 
-/* 🎯 Enlaces clicables con suave escala */
+/*  Enlaces clicables con suave escala */
 a:hover, button:hover {
   filter: brightness(1.08);
 }
 
-/* 🌫️ Sombras globales sutiles */
+/*  Sombras globales sutiles */
 .shadow-sm {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
@@ -878,18 +872,18 @@ a:hover, button:hover {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* 🪶 Tarjetas flotantes */
+/*  Tarjetas flotantes */
 .card-float:hover {
   transform: translateY(-3px);
   box-shadow: var(--sombra-strong);
 }
 
-/* 💠 Fondo degradado general (solo si se requiere en alguna vista completa) */
+/*  Fondo degradado general (solo si se requiere en alguna vista completa) */
 .bg-gradient {
   background: linear-gradient(180deg, #ffffff, #f7fbfc);
 }
 
-/* 🔹 Scrollbar personalizado (moderno y minimalista) */
+/*  Scrollbar personalizado (moderno y minimalista) */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -905,23 +899,23 @@ a:hover, button:hover {
   background: #f0f0f0;
 }
 
-/* 💎 Suavizado de interacción */
+/*  Suavizado de interacción */
 input, button, select, textarea {
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
-/* 🕹️ Botones activos */
+/*  Botones activos */
 button:active, .btn-ver:active {
   transform: scale(0.98);
   opacity: 0.9;
 }
 
-/* 🌈 Efecto glow sutil para botones principales */
+/*  Efecto glow sutil para botones principales */
 .btn-ver:hover, .btn-limpiar-filtro:hover, .btn-volver:hover {
   box-shadow: 0 4px 12px rgba(0, 166, 181, 0.25);
 }
 
-/* 📱 Ajustes menores para móviles */
+/*  Ajustes menores para móviles */
 @media (max-width: 480px) {
   .filtro-superior label {
     font-size: 13px;
@@ -938,7 +932,7 @@ button:active, .btn-ver:active {
 }
 
 /* ================================
-   🔔 POPUP REGISTRO
+    POPUP REGISTRO
    ================================ */
 .popup {
   position: fixed;
@@ -1084,7 +1078,7 @@ button:active, .btn-ver:active {
   background: var(--gris-claro);
 }
 
-/* 📱 Responsive */
+/*  Responsive */
 @media (max-width: 576px) {
   .popup-contenido {
     padding: 2rem 1.5rem;
@@ -1244,7 +1238,7 @@ button:active, .btn-ver:active {
 .buscador {
   position: relative;
 }
-/* =============== 📌 LAYOUT CATÁLOGO CON SIDEBAR =============== */
+/* ===============  LAYOUT CATÁLOGO CON SIDEBAR =============== */
 .catalogo-layout {
   display: grid;
   grid-template-columns: 240px 1fr;
@@ -1263,22 +1257,22 @@ button:active, .btn-ver:active {
   padding: 15px;
   display: flex;
   flex-direction: column;
-  align-self: flex-start;         /* 👈 MUY IMPORTANTE */
-  position: sticky;               /* 👈 SE FIJA EN LA PANTALLA */
-  top: 100px;                     /* 👈 Altura bajo el header */
+  align-self: flex-start;         /*  MUY IMPORTANTE */
+  position: sticky;               /*  SE FIJA EN LA PANTALLA */
+  top: 100px;                     /*  Altura bajo el header */
 }
 
-/* 🏷️ Título */
+/*  Título */
 .sidebar-marcas h3 {
   margin-bottom: 12px;
   text-align: left;
   font-weight: 600;
 }
 
-/* 🔎 BUSCADOR de marcas centrado y limpio */
+/*  BUSCADOR de marcas centrado y limpio */
 .input-buscar-marca {
-  width: 92%;                      /* 👈 centrado visual */
-  margin: 0 auto 12px auto;        /* 👈 centrado */
+  width: 92%;                      /*  centrado visual */
+  margin: 0 auto 12px auto;        /*  centrado */
   padding: 8px 12px;
   font-size: 13px;
   border: 1px solid #bbb;
@@ -1294,15 +1288,15 @@ button:active, .btn-ver:active {
   outline: none;
 }
 
-/* 📜 Lista de marcas SIN recorte */
+/*  Lista de marcas SIN recorte */
 .marcas-lista {
   overflow-y: auto;
   padding-right: 4px;
-  flex: 1;                         /* 👈 ocupa espacio restante */
+  flex: 1;                         /*  ocupa espacio restante */
   max-height: 340px;
 }
 
-/* 📌 Ítems de la lista */
+/*  Ítems de la lista */
 .marcas-lista label {
   display: flex;
   align-items: center;
@@ -1321,16 +1315,16 @@ button:active, .btn-ver:active {
   accent-color: #009688;
 }
 
-/* 📌 Sidebar con pocas marcas ( ACHICA pero no corta ) */
+/*  Sidebar con pocas marcas ( ACHICA pero no corta ) */
 .sidebar-marcas.pocas-marcas {
   min-height: 120px !important;
-  max-height: 200px !important;       /* 👈 Control compacto */
+  max-height: 200px !important;       
   padding-bottom: 8px !important;
 }
 
 .sidebar-marcas.pocas-marcas .marcas-lista {
-  max-height: 120px !important;       /* 👈 Pequeño pero con scroll si hace falta */
-  overflow-y: auto !important;        /* 👈 Mantiene scroll si se pasa */
+  max-height: 120px !important;       
+  overflow-y: auto !important;        
   flex-grow: unset !important;
 }
 .price-normal {

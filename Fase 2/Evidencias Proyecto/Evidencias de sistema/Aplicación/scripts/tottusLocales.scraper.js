@@ -11,7 +11,7 @@ async function scrapeTottus() {
   });
 
   // =======================
-  // 🟦 Aceptar Cookies
+  //  Aceptar Cookies
   // =======================
   try {
     await page.waitForSelector('#onetrust-accept-btn-handler', { timeout: 4000 });

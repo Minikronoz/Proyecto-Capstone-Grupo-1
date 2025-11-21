@@ -8,16 +8,16 @@ async function actualizarAdmin() {
     const db = getDB();
 
     const correoAdmin = "admin@sistema.com";
-    const nuevaPassword = "123456"; // 🔑 Contraseña nueva (puedes cambiarla)
+    const nuevaPassword = "123456"; 
     const hash = await bcrypt.hash(nuevaPassword, 10);
 
-    // ✅ Buscar tanto por "correo" como por "email"
+    //  Buscar tanto por "correo" como por "email"
     const existente = await db.collection("users").findOne({
       $or: [{ correo: correoAdmin }, { email: correoAdmin }]
     });
 
     if (existente) {
-      // 🔹 Si existe → actualizamos
+      //  Si existe → actualizamos
       await db.collection("users").updateOne(
         { _id: existente._id },
         {
@@ -33,7 +33,7 @@ async function actualizarAdmin() {
       );
       console.log("🔄 Admin actualizado correctamente.");
     } else {
-      // 🔹 Si no existe → lo creamos
+      //  Si no existe → lo creamos
       await db.collection("users").insertOne({
         correo: correoAdmin,
         contraseña: hash,

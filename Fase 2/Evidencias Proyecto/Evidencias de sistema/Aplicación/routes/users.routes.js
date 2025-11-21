@@ -1,5 +1,5 @@
 // =======================================================
-// 📁 routes/users.routes.js — versión MongoDB Atlas (FINAL)
+//  routes/users.routes.js — versión MongoDB Atlas (FINAL)
 // =======================================================
 import express from "express";
 import path from "path";
@@ -20,7 +20,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // =======================================================
-// 🌐 VISTAS
+//  VISTAS
 // =======================================================
 
 router.get("/login", (req, res) =>
@@ -52,7 +52,7 @@ router.get("/olvide-password", (req, res) =>
 );
 
 // =======================================================
-// 🔐 LOGIN (POST)
+//  LOGIN (POST)
 // =======================================================
 router.post("/login", async (req, res) => {
   try {
@@ -86,7 +86,7 @@ router.post("/login", async (req, res) => {
 });
 
 // =======================================================
-// 📝 REGISTRO COMPLETO
+//  REGISTRO COMPLETO
 // =======================================================
 router.post("/registrar", async (req, res) => {
   try {
@@ -105,16 +105,16 @@ router.post("/registrar", async (req, res) => {
       tieneNegocio
     } = req.body;
 
-    console.log("📦 Datos recibidos:", req.body); // ← Para debug
+    console.log(" Datos recibidos:", req.body); // ← Para debug
 
-    // ✅ Validación de campos obligatorios
+    //  Validación de campos obligatorios
     if (!nombre || !correo || !contraseña) {
       return res.status(400).json({
         error: "Nombre, correo y contraseña son obligatorios"
       });
     }
 
-    // ✅ Verificar si el correo ya existe
+    //  Verificar si el correo ya existe
     const existe = await db.collection("users").findOne({ correo: correo.toLowerCase().trim() });
     if (existe) {
       return res.status(409).json({
@@ -122,7 +122,7 @@ router.post("/registrar", async (req, res) => {
       });
     }
 
-    // ✅ Calcular edad si se proporciona fecha de nacimiento
+    //  Calcular edad si se proporciona fecha de nacimiento
     let edad = null;
     if (fechaNacimiento) {
       const hoy = new Date();
@@ -134,18 +134,18 @@ router.post("/registrar", async (req, res) => {
       }
     }
 
-    // ✅ Hashear contraseña
+    //  Hashear contraseña
     const hash = await bcrypt.hash(contraseña, 10);
 
-    // ✅ Procesar negocios si existen
+    //  Procesar negocios si existen
     const negocios = [];
     if (tieneNegocio === "on" || tieneNegocio === true || tieneNegocio === "true") {
-      console.log("🏪 Usuario tiene negocios, procesando...");
+      console.log(" Usuario tiene negocios, procesando...");
       
       // Buscar todos los campos de negocios en el body
       const negocioKeys = Object.keys(req.body).filter(k => k.startsWith("nombreNegocio_"));
       
-      console.log("🔍 Claves de negocios encontradas:", negocioKeys);
+      console.log(" Claves de negocios encontradas:", negocioKeys);
 
       negocioKeys.forEach(key => {
         const index = key.split("_")[1];
@@ -164,12 +164,12 @@ router.post("/registrar", async (req, res) => {
         // Solo agregar si tiene al menos nombre
         if (negocio.nombre) {
           negocios.push(negocio);
-          console.log("✅ Negocio agregado:", negocio.nombre);
+          console.log(" Negocio agregado:", negocio.nombre);
         }
       });
     }
 
-    // ✅ Crear el usuario completo
+    //  Crear el usuario completo
     const nuevoUsuario = {
       nombre: nombre.trim(),
       apellido: apellido?.trim() || null,
@@ -194,10 +194,10 @@ router.post("/registrar", async (req, res) => {
       contraseña: "[OCULTA]"
     });
 
-    // ✅ Insertar en MongoDB
+    //  Insertar en MongoDB
     const resultado = await db.collection("users").insertOne(nuevoUsuario);
 
-    console.log("✅ Usuario registrado exitosamente:", correo, "ID:", resultado.insertedId);
+    console.log(" Usuario registrado exitosamente:", correo, "ID:", resultado.insertedId);
 
     res.json({
       ok: true,
@@ -214,20 +214,20 @@ router.post("/registrar", async (req, res) => {
 });
 
 // =======================================================
-// 🏪 NEGOCIOS (DEBE IR ANTES de las rutas con :id)
+//  NEGOCIOS (DEBE IR ANTES de las rutas con :id)
 // =======================================================
 
-// ✅ Obtener todos los negocios con dueño
+//  Obtener todos los negocios con dueño
 router.get("/api/usuarios/negocios", obtenerNegociosConDuenio);
 
-// ✅ Actualizar negocio
+//  Actualizar negocio
 router.put("/api/usuarios/:userId/negocios/:negocioId", actualizarNegocio);
 
-// ✅ Eliminar negocio
+//  Eliminar negocio
 router.delete("/api/usuarios/:userId/negocios/:negocioId", eliminarNegocio);
 
 // =======================================================
-// 👤 USUARIOS CRUD COMPLETO
+//  USUARIOS CRUD COMPLETO
 // =======================================================
 
 // Obtener todos
@@ -305,7 +305,7 @@ router.delete("/api/usuarios/:id", async (req, res) => {
 });
 
 // =======================================================
-// 🔐 VERIFICAR SESIÓN ACTIVA
+//  VERIFICAR SESIÓN ACTIVA
 // =======================================================
 router.get("/api/sesion-activa", (req, res) => {
   if (req.session && req.session.user) {
@@ -334,7 +334,7 @@ router.get("/api/auth/yo", (req, res) => {
 });
 
 // =======================================================
-// 🚪 CERRAR SESIÓN
+//  CERRAR SESIÓN
 // =======================================================
 router.post("/api/auth/logout", (req, res) => {
   req.session.destroy((err) => {

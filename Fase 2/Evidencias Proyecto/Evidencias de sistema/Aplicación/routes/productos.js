@@ -1,14 +1,14 @@
 // ===============================================
-// 📁 routes/productos.js — COMPLETO Y CORREGIDO
+//  routes/productos.js — COMPLETO Y CORREGIDO
 // ===============================================
 import express from "express";
-import { ObjectId } from "mongodb"; // ✅ AGREGAR ESTE IMPORT
+import { ObjectId } from "mongodb"; 
 import { getDB } from "../config/db.js";
 
 const router = express.Router();
 
 // =============================================================
-// 💡 Obtener sugerencias de búsqueda
+//  Obtener sugerencias de búsqueda
 // =============================================================
 router.get("/sugerencias", async (req, res) => {
   try {
@@ -40,12 +40,12 @@ router.get("/sugerencias", async (req, res) => {
     // Extraer títulos únicos
     const sugerencias = [...new Set(productos.map(p => p.title))].slice(0, 8);
 
-    console.log(`✅ Sugerencias encontradas: ${sugerencias.length}`);
+    console.log(` Sugerencias encontradas: ${sugerencias.length}`);
 
     res.json(sugerencias);
 
   } catch (err) {
-    console.error("❌ Error en sugerencias:", err);
+    console.error(" Error en sugerencias:", err);
     res.status(500).json({ 
       ok: false, 
       error: "Error al buscar sugerencias" 
@@ -54,7 +54,7 @@ router.get("/sugerencias", async (req, res) => {
 });
 
 // =============================================================
-// 📊 Obtener historial de precios de un producto
+//  Obtener historial de precios de un producto
 // =============================================================
 router.get("/:id/historico", async (req, res) => {
   try {
@@ -63,7 +63,7 @@ router.get("/:id/historico", async (req, res) => {
 
     console.log("🔍 Buscando historial para:", productId);
 
-    // ✅ Validar que el ID sea válido
+    //  Validar que el ID sea válido
     if (!ObjectId.isValid(productId)) {
       return res.status(400).json({ 
         ok: false, 
@@ -71,7 +71,7 @@ router.get("/:id/historico", async (req, res) => {
       });
     }
 
-    // ✅ Buscar el producto
+    //  Buscar el producto
     const producto = await db.collection("productos").findOne({
       _id: new ObjectId(productId)
     });
@@ -84,17 +84,17 @@ router.get("/:id/historico", async (req, res) => {
       });
     }
 
-    console.log("✅ Producto encontrado:", producto.title);
+    console.log(" Producto encontrado:", producto.title);
 
-    // ✅ Buscar historial de precios
+    //  Buscar historial de precios
     const historial = await db.collection("priceHistory")
       .find({ productId: new ObjectId(productId) })
       .sort({ fecha: 1 }) // Ordenar por fecha ascendente
       .toArray();
 
-    console.log(`📊 Historial encontrado: ${historial.length} registros`);
+    console.log(` Historial encontrado: ${historial.length} registros`);
 
-    // ✅ Si no hay historial, crear uno con el precio actual
+    //  Si no hay historial, crear uno con el precio actual
     if (historial.length === 0) {
       const registroActual = {
         productId: new ObjectId(productId),
@@ -108,7 +108,7 @@ router.get("/:id/historico", async (req, res) => {
 
       await db.collection("priceHistory").insertOne(registroActual);
       
-      console.log("✅ Creado primer registro de historial");
+      console.log(" Creado primer registro de historial");
 
       return res.json({
         ok: true,
@@ -121,7 +121,7 @@ router.get("/:id/historico", async (req, res) => {
       });
     }
 
-    // ✅ Formatear historial para el gráfico
+    //  Formatear historial para el gráfico
     const historialFormateado = historial.map(h => ({
       date: h.fecha,
       price: h.price,
@@ -147,7 +147,7 @@ router.get("/:id/historico", async (req, res) => {
 });
 
 // =============================================================
-// 🔍 Buscar productos (para catálogo)
+//  Buscar productos (para catálogo)
 // =============================================================
 router.get("/", async (req, res) => {
   try {
@@ -183,7 +183,7 @@ router.get("/", async (req, res) => {
       if (maxPrice) filtro.currentPrice.$lte = parseFloat(maxPrice);
     }
 
-    console.log("🔍 Filtros aplicados:", filtro);
+    console.log(" Filtros aplicados:", filtro);
 
     const productos = await db.collection("productos")
       .find(filtro)
@@ -191,7 +191,7 @@ router.get("/", async (req, res) => {
       .limit(100)
       .toArray();
 
-    console.log(`✅ Productos encontrados: ${productos.length}`);
+    console.log(` Productos encontrados: ${productos.length}`);
 
     res.json({
       ok: true,
@@ -200,7 +200,7 @@ router.get("/", async (req, res) => {
     });
 
   } catch (err) {
-    console.error("❌ Error buscando productos:", err);
+    console.error(" Error buscando productos:", err);
     res.status(500).json({ 
       ok: false, 
       error: "Error al buscar productos" 
@@ -209,7 +209,7 @@ router.get("/", async (req, res) => {
 });
 
 // =============================================================
-// 📦 Obtener producto por ID
+//  Obtener producto por ID
 // =============================================================
 router.get("/api/productos/:id", async (req, res) => {
   try {
@@ -248,7 +248,7 @@ router.get("/api/productos/:id", async (req, res) => {
   }
 });
 // =============================================================
-// 🏷️ Obtener marcas filtradas por búsqueda y tiendas seleccionadas
+//  Obtener marcas filtradas por búsqueda y tiendas seleccionadas
 // =============================================================
 router.get("/marcas", async (req, res) => {
   try {
@@ -268,7 +268,7 @@ router.get("/marcas", async (req, res) => {
       filtro.store = { $in: tiendas.split(",") };
     }
 
-    // 👇 Group para obtener marcas únicas
+    //  Group para obtener marcas únicas
     const marcas = await db.collection("productos")
       .aggregate([
         { $match: filtro },

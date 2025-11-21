@@ -1,5 +1,5 @@
 // ==============================
-// 📁 routes/busquedas.routes.js
+//  routes/busquedas.routes.js
 // ==============================
 import express from "express";
 import { getDB } from "../config/db.js";
@@ -7,7 +7,7 @@ import { getDB } from "../config/db.js";
 const router = express.Router();
 
 // -------------------------------------------------------------
-// 🔤 Palabras clave principales (ampliadas)
+//  Palabras clave principales (ampliadas)
 // -------------------------------------------------------------
 const PALABRAS_CLAVE = [
   "azucar", "harina", "pasta", "fideos", "leche", "cafe", "arroz",
@@ -20,7 +20,7 @@ const PALABRAS_CLAVE = [
 ];
 
 // -------------------------------------------------------------
-// 🧩 POST /api/busquedas → Registrar búsqueda
+//  POST /api/busquedas → Registrar búsqueda
 // -------------------------------------------------------------
 router.post("/", async (req, res) => {
   try {
@@ -65,7 +65,7 @@ router.post("/", async (req, res) => {
 });
 
 // -------------------------------------------------------------
-// 📊 GET /api/busquedas → Obtener últimas búsquedas (para admin o dashboard)
+//  GET /api/busquedas → Obtener últimas búsquedas (para admin o dashboard)
 // -------------------------------------------------------------
 router.get("/", async (req, res) => {
   try {

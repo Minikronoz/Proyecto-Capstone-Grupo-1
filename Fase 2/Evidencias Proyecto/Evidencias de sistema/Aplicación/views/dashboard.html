@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const rol = data.user.role;
 
-    // 🔥 Solo permitir ADMIN o CLIENTE
+    //  Solo permitir ADMIN o CLIENTE
     if (rol !== "admin" && rol !== "cliente") {
       alert("🚫 No tienes permiso para acceder a esta página.");
       return window.location.href = "/catalogo";
@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 </script>
 <!-- ======================================================
-     🌎 BLOQUE VISUAL: MAPA + RETENCIÓN
+      BLOQUE VISUAL: MAPA + RETENCIÓN
 ====================================================== -->
 <aside class="panel-lateral">
   <h2>🌎 Distribución de usuarios por región</h2>
@@ -171,88 +171,88 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   <section>
 <h2 style="text-align:center; font-weight:600;">
-  💸 Índice de competitividad de precios
+   Índice de competitividad de precios
 </h2>
   <div class="chart-container">
     <canvas id="indiceCompetitividad"></canvas>
   </div>
 </section>
 <section>
-  <h2>🏪 Ranking de supermercados por variedad de productos nuevos</h2>
+  <h2> Ranking de supermercados por variedad de productos nuevos</h2>
   <div class="chart-container">
     <canvas id="rankingProductosNuevos"></canvas>
   </div>
 </section>
   <!-- ======================================================
 <section>
-  <h2>🌎 Cruce entre género y región</h2>
+  <h2> Cruce entre género y región</h2>
   <div class="chart-container">
     <canvas id="cruceGeneroRegion"></canvas>
   </div>
 </section>
 <section>
-  <h2>👥 Usuarios nuevos vs. recurrentes</h2>
+  <h2> Usuarios nuevos vs. recurrentes</h2>
   <div class="chart-container">
     <canvas id="usuariosNuevosRecurrentes"></canvas>
   </div>
 </section>
    <section>
-    <h2>🏆 Productos con mayor crecimiento</h2>
+    <h2> Productos con mayor crecimiento</h2>
     <div class="ranking" id="rankingCrecimiento">Cargando...</div>
   </section>
     <section>
-    <h2>🧠 Insights del sistema</h2>
+    <h2> Insights del sistema</h2>
     <div class="insights" id="panelInsights">
       <p>Cargando insights...</p>
     </div>
   </section>
 
     <section>
-    <h2>🧍‍♂️🧍‍♀️ Top productos por género</h2>
+    <h2> Top productos por género</h2>
     <div class="chart-container"><canvas id="topProductosGenero"></canvas></div>
   </section>
 
     <section>
-    <h2>🗺️ Búsquedas por región</h2>
+    <h2> Búsquedas por región</h2>
     <div class="chart-container"><canvas id="busquedasPorRegion"></canvas></div>
   </section>
 
     <section>
-    <h2>📊 Comparativa entre consultas y búsquedas</h2>
+    <h2> Comparativa entre consultas y búsquedas</h2>
     <div class="chart-container"><canvas id="comparativaConsultasBusquedas"></canvas></div>
   </section>
 
   
   <section>
-    <h2>👥 Usuarios activos por día</h2>
+    <h2> Usuarios activos por día</h2>
     <div class="chart-container"><canvas id="usuariosActivosDia"></canvas></div>
   </section>
 
   <section>
-    <h2>⏰ Actividad por hora del día</h2>
+    <h2> Actividad por hora del día</h2>
     <div class="chart-container"><canvas id="actividadPorHora"></canvas></div>
   </section>
 
 
 
   <section>
-    <h2>🏬 Supermercados más activos por región</h2>
+    <h2> Supermercados más activos por región</h2>
     <div class="chart-container"><canvas id="topSuperRegion"></canvas></div>
   </section>
 
   <section>
-    <h2>🔥 Palabras en tendencia (última semana)</h2>
+    <h2> Palabras en tendencia (última semana)</h2>
     <div class="chart-container"><canvas id="palabrasTendencia"></canvas></div>
   </section>
 
   
   <section>
-    <h2>🔍búsqueda más usados</h2>
+    <h2>búsqueda más usados</h2>
     <div class="chart-container"><canvas id="busquedasTop"></canvas></div>
   </section>
 
   <section>
-    <h2>📅 Tendencia diaria de búsquedas</h2>
+    <h2> Tendencia diaria de búsquedas</h2>
     <div class="chart-container"><canvas id="busquedasPorDia"></canvas></div>
   </section>
 
@@ -270,7 +270,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
   <!-- ======================================================
-       📊 BLOQUES DE ANÁLISIS DE PRODUCTOS
+        BLOQUES DE ANÁLISIS DE PRODUCTOS
   ====================================================== -->
   <section>
     <h2>Productos más consultados</h2>
@@ -301,7 +301,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     <div class="chart-container"><canvas id="porComuna"></canvas></div>
   </section>
   <!-- ======================================================
-       📆 PRODUCTOS POR TIEMPO + TENDENCIAS + CRECIMIENTO
+        PRODUCTOS POR TIEMPO + TENDENCIAS + CRECIMIENTO
   ====================================================== -->
   <section>
     <h2>Productos más consultados por día/mes/año</h2>
@@ -383,14 +383,14 @@ async function renderCompetitividadChart(id, url, label) {
     return;
   }
 
-  // 🟢 Datos normalizados
+  //  Datos normalizados
   const etiquetas = data.map(d => d.tienda);
   const valores = data.map(d => d.promedio);
 
-  // 🥇 Mejor (más barato)
+  //  Mejor (más barato)
   const mejorPrecio = Math.min(...valores);
 
-  // 🎨 Colores consistentes
+  //  Colores consistentes
   const colorNormal = "rgba(0,167,181,0.85)";   // Turquesa institucional
   const colorNormalBorder = "#007a85";
   const colorGanador = "rgba(67,160,71,0.9)";    // Verde ganador
@@ -415,7 +415,7 @@ async function renderCompetitividadChart(id, url, label) {
       plugins: {
         legend: { display: false },
         
-        // 🧾 Valores arriba del bar
+        //  Valores arriba del bar
         datalabels: {
           anchor: "end",
           align: "start",
@@ -425,7 +425,7 @@ async function renderCompetitividadChart(id, url, label) {
           font: { weight: "bold", size: 12 }
         },
 
-        // 💬 Tooltip PRO
+        //  Tooltip PRO
         tooltip: {
           backgroundColor: "#1E293B",
           titleColor: "#fff",
@@ -437,7 +437,7 @@ async function renderCompetitividadChart(id, url, label) {
         }
       },
 
-      // 📈 Ejes con formato profesional
+      //  Ejes con formato profesional
       scales: {
         y: {
           beginAtZero: false,
@@ -462,7 +462,7 @@ async function renderCompetitividadChart(id, url, label) {
 
 
 async function renderChart(id, url, label, filtros = {}) {
-  // 📌 Obtener datos desde API
+  //  Obtener datos desde API
   const data = await fetchData(url, filtros);
   const canvas = document.getElementById(id);
 
@@ -473,10 +473,10 @@ async function renderChart(id, url, label, filtros = {}) {
 
   const ctx = canvas.getContext("2d");
 
-  // 🧹 Limpiar gráfico previo
+  //  Limpiar gráfico previo
   if (charts[id]) charts[id].destroy();
 
-  // 🪫 No hay datos suficientes
+  //  No hay datos suficientes
   if (!data?.length) {
     ctx.font = "16px Poppins";
     ctx.fillStyle = "#64748b";
@@ -484,24 +484,24 @@ async function renderChart(id, url, label, filtros = {}) {
     return;
   }
 
-  // 📌 Extrae valores soportando múltiples formatos
+  //  Extrae valores soportando múltiples formatos
   const valores = data.map(d =>
     d.promedio ?? d.total ?? d.valor ?? d.value ?? 0
   );
 
-  // 📌 Etiquetas limpias y normalizadas
+  //  Etiquetas limpias y normalizadas
   const etiquetas = data.map(d =>
     d.tienda ?? d.nombre ?? d._id ?? d.label ?? "—"
   );
 
-  // 🎨 Estilo profesional
+  //  Estilo profesional
   const gradient = ctx.createLinearGradient(0, 0, 0, 400);
   gradient.addColorStop(0, "rgba(0,167,181,0.95)");
   gradient.addColorStop(1, "rgba(0,167,181,0.35)");
 
   const isBar = id === "indiceCompetitividad" || !["porDia","porTiempo","busquedasPorDia","comparativaConsultasBusquedas"].includes(id);
 
-  // 🧾 Crear gráfico
+  //  Crear gráfico
   charts[id] = new Chart(ctx, {
     type: isBar ? "bar" : "line",
     data: {
@@ -567,7 +567,7 @@ async function cargarDashboard(filtros = {}) {
     renderChart("porComuna","/api/estadisticas/usuarios-por-comuna","Usuarios",filtros),
     renderChart("porTiempo","/api/estadisticas/productos-por-tiempo","Productos",filtros),
 
-    // 👇 LA NUEVA FUNCIÓN FORMAL
+    //  LA NUEVA FUNCIÓN FORMAL
     renderCompetitividadChart(
       "indiceCompetitividad",
       "/api/estadisticas/indice-competitividad",
@@ -620,7 +620,7 @@ async function renderTendencia() {
 
 
 
-// 📈 Productos con mayor crecimiento
+//  Productos con mayor crecimiento
 async function renderCrecimiento() {
   const cont = document.getElementById("rankingCrecimiento");
   cont.innerHTML = "<p>Cargando...</p>";
@@ -630,7 +630,7 @@ async function renderCrecimiento() {
 
     if (!data.length || data[0]?.producto === "Sin crecimiento detectado") {
       cont.innerHTML = `<div class="ranking-item" style="background:#fff4f4;border-left:4px solid #dc2626;">
-        ⚠️ Sin crecimiento detectado
+         Sin crecimiento detectado
       </div>`;
       return;
     }
@@ -682,7 +682,7 @@ async function initDashboard() {
 
 }
 // ======================================
-// 🎯 FILTROS AVANZADOS — DASHBOARD
+//  FILTROS AVANZADOS — DASHBOARD
 // ======================================
 document.getElementById("btnFiltrar").addEventListener("click", () => {
   const filtros = {
@@ -706,7 +706,7 @@ document.getElementById("btnFiltrar").addEventListener("click", () => {
   if (filtros.usuario === "registrado") filtros.userCorreo = { $ne: "invitado@anonimo.cl" };
   else if (filtros.usuario === "invitado") filtros.userCorreo = "invitado@anonimo.cl";
 
-  console.log("🧭 Filtros aplicados:", filtros);
+  console.log(" Filtros aplicados:", filtros);
   cargarDashboard(filtros);
   cargarDashboardBusquedas(filtros);
   renderTendencia();
@@ -730,7 +730,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initDashboard();
   renderMapaChile();
 });
-// 👥 Usuarios activos por día
+//  Usuarios activos por día
 async function renderUsuariosActivosDia() {
   const data = await fetch("/api/estadisticas/usuarios-activos-dia").then(r => r.json());
   const ctx = document.getElementById("usuariosActivosDia").getContext("2d");
@@ -754,7 +754,7 @@ async function renderUsuariosActivosDia() {
   });
 }
 
-// 🧍‍♂️🧍‍♀️ TOP PRODUCTOS POR GÉNERO (versión normalizada)
+//  TOP PRODUCTOS POR GÉNERO (versión normalizada)
 async function renderTopProductosGenero() {
   try {
     const data = await fetch("/api/estadisticas/top-productos-genero").then(r => r.json());
@@ -763,10 +763,10 @@ async function renderTopProductosGenero() {
 
     const ctx = canvas.getContext("2d");
 
-    // 🔄 Destruir gráficos previos
+    // Destruir gráficos previos
     if (charts["topProductosGenero"]) charts["topProductosGenero"].destroy();
 
-    // 📌 Colores por grupo
+    //  Colores por grupo
     const colores = {
       "Masculino": "rgba(0,167,181,0.75)",
       "Femenino": "rgba(255,99,132,0.75)",
@@ -778,13 +778,13 @@ async function renderTopProductosGenero() {
     const valores = [];
     const background = [];
 
-    // ⚠ Si viene vacío → Mostrar mensaje
+    //  Si viene vacío → Mostrar mensaje
     if (!data || !data.length) {
       canvas.parentNode.innerHTML = "<p class='no-data-msg'>No hay aún suficientes datos de usuarios por género 👥</p>";
       return;
     }
 
-    // 📌 Cargar datos
+    //  Cargar datos
     data.forEach(g => {
       const genero = g._id || "No especificado";
       g.productos.forEach(p => {
@@ -794,7 +794,7 @@ async function renderTopProductosGenero() {
       });
     });
 
-    // 🧠 Crear gráfico
+    //  Crear gráfico
     charts["topProductosGenero"] = new Chart(ctx, {
       type: "bar",
       data: {
@@ -831,7 +831,7 @@ async function renderTopProductosGenero() {
 }
 
 
-// 🏬 Supermercados más activos por región
+//  Supermercados más activos por región
 async function renderTopSupermercadosRegion() {
   const data = await fetch("/api/estadisticas/top-supermercados-region").then(r => r.json());
   const ctx = document.getElementById("topSuperRegion").getContext("2d");
@@ -846,7 +846,7 @@ async function renderTopSupermercadosRegion() {
     options: { responsive: true, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
   });
 }
-// ⏰ Actividad por hora
+//  Actividad por hora
 async function renderActividadPorHora() {
   const data = await fetch("/api/estadisticas/actividad-por-hora").then(r => r.json());
   const ctx = document.getElementById("actividadPorHora").getContext("2d");
@@ -901,7 +901,7 @@ async function renderPalabrasTendencia() {
 }
 
 
-// 🌎 Mapa Chile
+//  Mapa Chile
 async function renderMapaChile() {
   const mapa=document.getElementById("mapaChile"); mapa.innerHTML="";
   const regiones=["Arica y Parinacota","Tarapacá","Antofagasta","Atacama","Coquimbo","Valparaíso","Metropolitana de Santiago","O’Higgins","Maule","Ñuble","Biobío","La Araucanía","Los Ríos","Los Lagos","Aysén","Magallanes"];

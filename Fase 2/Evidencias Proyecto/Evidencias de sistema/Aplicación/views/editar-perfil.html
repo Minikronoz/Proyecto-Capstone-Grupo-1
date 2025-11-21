@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.addEventListener("DOMContentLoaded", async () => {
     const msg = document.getElementById("msg");
 
-    // 🔒 Verificar sesión activa
+    //  Verificar sesión activa
     try {
       const res = await fetch("/api/sesion-activa", { credentials: "include" });
       if (res.status === 401) {
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // ==================================================
-    // 📋 Cargar perfil del usuario desde MongoDB Atlas
+    //  Cargar perfil del usuario desde MongoDB Atlas
     // ==================================================
     async function cargarPerfilUsuario(userId) {
       const form = document.getElementById("formEditar");
@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       // ==================================================
-      // 💾 Guardar cambios
+      //  Guardar cambios
       // ==================================================
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
 
       // ==================================================
-      // 🧱 Función para crear bloques de negocio dinámicos
+      //  Función para crear bloques de negocio dinámicos
       // ==================================================
       function crearBloqueNegocio(n = {}, index) {
         const div = document.createElement("div");

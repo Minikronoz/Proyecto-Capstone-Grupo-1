@@ -1,5 +1,5 @@
 // ==============================
-// 📁 routes/estadisticas.routes.js
+//  routes/estadisticas.routes.js
 // ==============================
 import express from "express";
 import { getDB } from "../config/db.js";
@@ -21,14 +21,14 @@ import {
 const router = express.Router();
 
 // ======================================
-// 🔹 HELPER GENÉRICO PARA AGGREGATE
+//  HELPER GENÉRICO PARA AGGREGATE
 // ======================================
 async function aggregateClicks(pipeline) {
   const db = getDB();
   return db.collection("clicks").aggregate(pipeline).toArray();
 }
 // ======================================
-// 1️⃣ PRODUCTOS MÁS CLICKEADOS
+//  PRODUCTOS MÁS CLICKEADOS
 // ======================================
 router.get("/productos-mas-clickeados", async (req, res) => {
   try {
@@ -55,7 +55,7 @@ router.get("/productos-mas-clickeados", async (req, res) => {
 
 
 // ======================================
-// 2️⃣ CLICS POR SUPERMERCADO
+//  CLICS POR SUPERMERCADO
 // ======================================
 router.get("/clics-por-supermercado", async (req, res) => {
   try {
@@ -76,7 +76,7 @@ router.get("/clics-por-supermercado", async (req, res) => {
 
 
 // ======================================
-// 3️⃣ CLICS POR DÍA
+//  CLICS POR DÍA
 // ======================================
 router.get("/clics-por-dia", async (req, res) => {
   try {
@@ -102,7 +102,7 @@ router.get("/clics-por-dia", async (req, res) => {
   }
 });
 // ======================================
-// 4️⃣ USUARIOS POR EDAD
+// USUARIOS POR EDAD
 // ======================================
 router.get("/usuarios-por-edad", async (req, res) => {
   try {
@@ -123,7 +123,7 @@ router.get("/usuarios-por-edad", async (req, res) => {
 
 
 // ======================================
-// 5️⃣ USUARIOS POR GÉNERO
+//  USUARIOS POR GÉNERO
 // ======================================
 router.get("/usuarios-por-genero", async (req, res) => {
   try {
@@ -150,7 +150,7 @@ router.get("/usuarios-por-genero", async (req, res) => {
 
 
 // ======================================
-// 6️⃣ USUARIOS POR REGIÓN (Colección users / usuarios)
+//  USUARIOS POR REGIÓN (Colección users / usuarios)
 // ======================================
 router.get("/usuarios-por-region", async (req, res) => {
   try {
@@ -185,7 +185,7 @@ router.get("/usuarios-por-region", async (req, res) => {
 });
 
 // ======================================
-// 7️⃣ USUARIOS POR COMUNA
+//  USUARIOS POR COMUNA
 // ======================================
 router.get("/usuarios-por-comuna", async (req, res) => {
   try {
@@ -198,7 +198,7 @@ router.get("/usuarios-por-comuna", async (req, res) => {
       { $limit: 15 },
     ]);
 
-    // ⭐ Si no hay datos → mensaje especial
+    //  Si no hay datos → mensaje especial
     if (!data || data.length === 0) {
       return res.json({
         ok: false,
@@ -207,7 +207,7 @@ router.get("/usuarios-por-comuna", async (req, res) => {
       });
     }
 
-    // ✔ Hay datos → formato estándar
+    //  Hay datos → formato estándar
     res.json({
       ok: true,
       data
@@ -220,7 +220,7 @@ router.get("/usuarios-por-comuna", async (req, res) => {
 });
 
 // ======================================
-// 🕒 PRODUCTOS POR TIEMPO (día / mes / año)
+// PRODUCTOS POR TIEMPO (día / mes / año)
 // ======================================
 router.get("/productos-por-tiempo", async (req, res) => {
   try {
@@ -282,7 +282,7 @@ router.get("/productos-por-tiempo", async (req, res) => {
 
 
 // ======================================
-// 9️⃣ TENDENCIA SEMANAL (clics por semana ISO)
+//  TENDENCIA SEMANAL (clics por semana ISO)
 // ======================================
 router.get("/tendencia-semanal", async (req, res) => {
   try {
@@ -332,7 +332,7 @@ router.get("/tendencia-semanal", async (req, res) => {
   }
 });
 // ======================================
-// 🔍 TÉRMINOS DE BÚSQUEDA MÁS USADOS
+// TÉRMINOS DE BÚSQUEDA MÁS USADOS
 // ======================================
 router.get("/busquedas-top", async (req, res) => {
   try {
@@ -356,7 +356,7 @@ router.get("/busquedas-top", async (req, res) => {
 
 
 // ======================================
-// 📅 BÚSQUEDAS POR DÍA
+//  BÚSQUEDAS POR DÍA
 // ======================================
 router.get("/busquedas-por-dia", async (req, res) => {
   try {
@@ -384,7 +384,7 @@ router.get("/busquedas-por-dia", async (req, res) => {
 
 
 // ======================================
-// 🗺️ BÚSQUEDAS POR REGIÓN
+//  BÚSQUEDAS POR REGIÓN
 // ======================================
 router.get("/busquedas-por-region", async (req, res) => {
   try {
@@ -407,7 +407,7 @@ router.get("/busquedas-por-region", async (req, res) => {
 
 
 // ======================================
-// 📊 COMPARATIVA ENTRE CLICS & BÚSQUEDAS
+//  COMPARATIVA ENTRE CLICS & BÚSQUEDAS
 // ======================================
 router.get("/comparativa", async (req, res) => {
   try {
@@ -484,7 +484,7 @@ router.get("/comparativa", async (req, res) => {
 
 
 // ======================================
-// 1️⃣ USUARIOS ACTIVOS POR DÍA
+//  USUARIOS ACTIVOS POR DÍA
 // ======================================
 router.get("/usuarios-activos-dia", async (req, res) => {
   try {
@@ -524,7 +524,7 @@ router.get("/usuarios-activos-dia", async (req, res) => {
 
 
 // ======================================
-// 2️⃣ ACTIVIDAD POR HORA DEL DÍA
+//  ACTIVIDAD POR HORA DEL DÍA
 // ======================================
 router.get("/actividad-por-hora", async (req, res) => {
   try {
@@ -568,7 +568,7 @@ router.get("/actividad-por-hora", async (req, res) => {
 
 
 // ======================================
-// 2️⃣ TOP PRODUCTOS POR GÉNERO (NORMALIZADO)
+//  TOP PRODUCTOS POR GÉNERO (NORMALIZADO)
 // ======================================
 router.get("/top-productos-genero", async (req, res) => {
   try {
@@ -583,7 +583,7 @@ router.get("/top-productos-genero", async (req, res) => {
         }
       },
 
-      // 🎭 Normalizar género
+      //  Normalizar género
       {
         $addFields: {
           generoNormalizado: {
@@ -599,7 +599,7 @@ router.get("/top-productos-genero", async (req, res) => {
         }
       },
 
-      // 📌 Agrupar por género + producto
+      //  Agrupar por género + producto
       {
         $group: {
           _id: { genero: "$generoNormalizado", producto: "$titulo" },
@@ -607,7 +607,7 @@ router.get("/top-productos-genero", async (req, res) => {
         }
       },
 
-      // 📌 Re-agrupar: array de productos por género
+      //  Re-agrupar: array de productos por género
       {
         $group: {
           _id: "$_id.genero",
@@ -620,7 +620,7 @@ router.get("/top-productos-genero", async (req, res) => {
         }
       },
 
-      // 🥇 Solo top 5 productos por género
+      //  Solo top 5 productos por género
       { $project: { productos: { $slice: ["$productos", 5] } } },
 
       // 🔽 Ordenar salida (Masculino, Femenino, Otro, No especificado)
@@ -642,7 +642,7 @@ router.get("/top-productos-genero", async (req, res) => {
 
 
 // ======================================
-// 3️⃣ TOP SUPERMERCADOS POR REGIÓN
+//  TOP SUPERMERCADOS POR REGIÓN
 // ======================================
 router.get("/top-supermercados-region", async (req, res) => {
   try {
@@ -677,34 +677,34 @@ router.get("/top-supermercados-region", async (req, res) => {
   }
 });
 // ======================================
-// 🔚 EXPORTACIÓN DE RUTAS — CONTROLADORES EXTERNOS
+//  EXPORTACIÓN DE RUTAS — CONTROLADORES EXTERNOS
 // ======================================
 
-// 📈 Productos con mayor crecimiento
+//  Productos con mayor crecimiento
 router.get("/productos-crecimiento", productosCrecimiento);
 
-// 🧠 Palabras en tendencia (Machine Learning básico)
+//  Palabras en tendencia (Machine Learning básico)
 router.get("/palabras-tendencia", palabrasTendencia);
 
-// 🆕 Ranking de productos nuevos (últimos 30 días)
+//  Ranking de productos nuevos (últimos 30 días)
 router.get("/ranking-productos-nuevos", rankingProductosNuevos);
 
-// 💰 Índice de competitividad de precios
+//  Índice de competitividad de precios
 router.get("/indice-competitividad", indiceCompetitividad);
 
-// 🌎 Cruce de género vs región
+//  Cruce de género vs región
 router.get("/cruce-genero-region", cruceGeneroRegion);
 
-// 👥 Usuarios nuevos vs recurrentes
+//  Usuarios nuevos vs recurrentes
 router.get("/usuarios-nuevos-recurrentes", usuariosNuevosRecurrentes);
 
-// 📊 Insights del sistema
+//  Insights del sistema
 router.get("/insights", insights);
 
-// 🗺️ Distribución de usuarios por región
+//  Distribución de usuarios por región
 router.get("/distribucion-usuarios-region", distribucionUsuariosRegion);
 
-// 🔻 Productos con baja de precio
+//  Productos con baja de precio
 router.get("/bajas", obtenerBajasDePrecio);
 
 router.get("/subidas", obtenerSubidasDePrecio);

@@ -21,14 +21,14 @@ async function logScraping(store, estado) {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 📁 Carpeta donde se guarda el registro del último scraping
+//  Carpeta donde se guarda el registro del último scraping
 const dataDir = path.join(__dirname, "../data");
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
 const scrapingFile = path.join(dataDir, "ultimoScraping.json");
 
 // =============================================================
-// 📘 UTILIDADES PARA REGISTROS LOCALES
+//  UTILIDADES PARA REGISTROS LOCALES
 // =============================================================
 function leerFechas() {
   try {
@@ -36,7 +36,7 @@ function leerFechas() {
       return JSON.parse(fs.readFileSync(scrapingFile, "utf-8"));
     }
   } catch (err) {
-    console.error("❌ Error leyendo archivo scraping:", err);
+    console.error(" Error leyendo archivo scraping:", err);
   }
   return {};
 }
@@ -66,7 +66,7 @@ function guardarScraping(supermercado, { actualizados = 0, nuevos = 0, revisados
   fs.writeFileSync(scrapingFile, JSON.stringify(data, null, 2), "utf-8");
 
   console.log(
-    `💾 Registro actualizado: ${supermercado.toUpperCase()} | Fecha: ${fechaFormateada} | Nuevos: ${nuevos} | Actualizados: ${actualizados} | Revisados: ${revisados}`
+    ` Registro actualizado: ${supermercado.toUpperCase()} | Fecha: ${fechaFormateada} | Nuevos: ${nuevos} | Actualizados: ${actualizados} | Revisados: ${revisados}`
   );
 }
 
@@ -80,23 +80,23 @@ function ejecutarScraping(nombreScript, io) {
     const scriptPath = path.join(__dirname, `../scripts/${nombreScript}-despensa.js`);
 
     if (!fs.existsSync(scriptPath)) {
-      const errMsg = `❌ Script no encontrado: ${scriptPath}`;
+      const errMsg = ` Script no encontrado: ${scriptPath}`;
       console.error(errMsg);
       io.emit("scrape-error", { store: nombreScript, message: errMsg });
       return reject(new Error(errMsg));
     }
  
-    console.log(`▶ Ejecutando scraping: ${scriptPath}`);
+    console.log(` Ejecutando scraping: ${scriptPath}`);
     
     io.emit("scrape-log", { 
       store: nombreScript, 
-      message: `🚀 Iniciando scraping de ${nombreScript}...` 
+      message: ` Iniciando scraping de ${nombreScript}...` 
     });
 
-    // ✅ FIX: Usar comillas dobles para escapar espacios en Windows
+    //  FIX: Usar comillas dobles para escapar espacios en Windows
     const proceso = spawn('node', [scriptPath], {
       cwd: process.cwd(),
-      shell: false, // ✅ CAMBIO: false evita problemas con espacios
+      shell: false, //  CAMBIO: false evita problemas con espacios
       env: { ...process.env, FORCE_COLOR: '0' },
       windowsHide: true // ✅ Oculta ventana en Windows
     });
@@ -132,9 +132,9 @@ function ejecutarScraping(nombreScript, io) {
 proceso.stderr.on("data", (data) => {
   let msg = data.toString().replace(/\x1B\[[0-9;]*[JKmsu]/g, '').trim();
 
-  // ⚠️ SOLO filtramos HTML bruto pero mostramos todo lo demás
+  //  SOLO filtramos HTML bruto pero mostramos todo lo demás
   if (msg.startsWith("<") || msg.includes("<!DOCTYPE")) {
-    io.emit("scrape-log", { store: nombreScript, message: "⚠️ HTML detectado (posible bloqueo o captcha)" });
+    io.emit("scrape-log", { store: nombreScript, message: " HTML detectado (posible bloqueo o captcha)" });
     return;
   }
 
@@ -150,8 +150,8 @@ proceso.stderr.on("data", (data) => {
     proceso.on("exit", (code) => {
       const success = code === 0;
       const mensaje = success 
-        ? `✅ Scraping de ${nombreScript} completado exitosamente` 
-        : `❌ Scraping de ${nombreScript} terminó con código ${code}`;
+        ? ` Scraping de ${nombreScript} completado exitosamente` 
+        : ` Scraping de ${nombreScript} terminó con código ${code}`;
       
       console.log(mensaje);
       
@@ -186,7 +186,7 @@ export default ejecutarScraping;
 
 
 // =============================================================
-// 📡 HANDLERS API (Acuenta / Tottus / Jumbo / Unimarc / Santa Isabel)
+//  HANDLERS API (Acuenta / Tottus / Jumbo / Unimarc / Santa Isabel)
 // =============================================================
 export const scrapeAcuenta = (req, res) =>
   ejecutarScraping("acuenta", req.app.get("io"))
@@ -214,7 +214,7 @@ export const scrapeSantaIsabel = (req, res) =>
     .catch((err) => res.status(500).json({ error: err.message }));
 
 // =============================================================
-// 📅 GET /api/scrape/ultimos
+//  GET /api/scrape/ultimos
 // =============================================================
 export const obtenerUltimosScraping = (req, res) => {
   res.json(leerFechas());
@@ -222,7 +222,7 @@ export const obtenerUltimosScraping = (req, res) => {
 
 
 // =============================================================
-// 📊 ACTIVIDAD SEMANAL (MongoClient Only)
+// ACTIVIDAD SEMANAL (MongoClient Only)
 // =============================================================
 export async function obtenerActividadSemanal(req, res) {
   try {
@@ -268,12 +268,12 @@ export async function obtenerActividadSemanal(req, res) {
 
     res.json({ actividad });
   } catch (err) {
-    console.error("❌ Error en obtenerActividadSemanal:", err);
+    console.error(" Error en obtenerActividadSemanal:", err);
     res.status(500).json({ error: err.message });
   }
 }
 // ===============================================
-// 📌 REGISTRAR ESTADO DEL SCRAPING PARA LA TABLA SEMANAL
+// REGISTRAR ESTADO DEL SCRAPING PARA LA TABLA SEMANAL
 // ===============================================
 export const registrarEstadoScraping = async (req, res) => {
   try {

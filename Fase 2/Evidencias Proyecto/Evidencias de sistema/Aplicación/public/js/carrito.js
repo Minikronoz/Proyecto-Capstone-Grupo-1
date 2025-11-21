@@ -1,5 +1,5 @@
 // ================================
-// 🛒 Manejo de Carrito con LocalStorage
+//  Manejo de Carrito con LocalStorage
 // ================================
 
 // Obtener carrito desde LocalStorage o crear uno vacío
@@ -24,7 +24,7 @@ window.agregarDesdeBoton = function (btn) {
 
   agregarAlCarrito(producto);
   actualizarVistaCarrito();
-  alert(`🛒 "${producto.nombre}" agregado al carrito`);
+  alert(` "${producto.nombre}" agregado al carrito`);
 };
 
 // Agregar producto al carrito

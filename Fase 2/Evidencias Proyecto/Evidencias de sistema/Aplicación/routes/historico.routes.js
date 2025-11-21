@@ -1,5 +1,5 @@
 // ============================================
-// 📁 routes/historico.routes.js
+//  routes/historico.routes.js
 // ============================================
 
 import express from "express";
@@ -13,7 +13,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /**
- * 📌 Muestra la vista historico.html
+ *  Muestra la vista historico.html
  * Se usa con:  /historico?id=XXXX
  */
 router.get("/", (req, res) => {

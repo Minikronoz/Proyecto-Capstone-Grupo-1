@@ -1,17 +1,17 @@
 // =============================================================
-// 🧩 Middleware de Autenticación — Solo para Administradores
+//  Middleware de Autenticación — Solo para Administradores
 // =============================================================
 export function verificarAdmin(req, res, next) {
   // Si no hay sesión activa → redirigir al login
   if (!req.session || !req.session.user) {
-    console.warn("🔒 Intento de acceso sin sesión activa.");
+    console.warn(" Intento de acceso sin sesión activa.");
     return res.redirect("/login");
   }
 
   // Si el usuario no tiene rol admin → acceso denegado
   const { role, correo } = req.session.user;
   if (role !== "admin") {
-    console.warn(`🚫 Acceso denegado a usuario no admin: ${correo}`);
+    console.warn(` Acceso denegado a usuario no admin: ${correo}`);
     return res.status(403).send(`
       <html lang="es">
         <head>
@@ -45,6 +45,6 @@ export function verificarAdmin(req, res, next) {
     `);
   }
 
-  // ✅ Autorizado
+  //  Autorizado
   next();
 }

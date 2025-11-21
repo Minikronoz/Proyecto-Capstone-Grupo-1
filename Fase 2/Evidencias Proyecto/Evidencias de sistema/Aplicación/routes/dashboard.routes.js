@@ -1,5 +1,5 @@
 // =============================================================
-// 📁 routes/dashboard.routes.js — Versión Final Optimizada 2025
+//  routes/dashboard.routes.js — Versión Final Optimizada 2025
 // =============================================================
 import express from "express";
 import fs from "fs";
@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
 const scrapingFile = path.join(__dirname, "../data/ultimoScraping.json");
 
 // =============================================================
-// 📌 Leer archivo último scraping
+//  Leer archivo último scraping
 // =============================================================
 function obtenerScrapingData() {
   try {
@@ -27,16 +27,16 @@ function obtenerScrapingData() {
 }
 
 // =============================================================
-// 📊 GET /api/dashboard → KPIs + Charts + Scraping
+//  GET /api/dashboard → KPIs + Charts + Scraping
 // =============================================================
 router.get("/", async (req, res) => {
   try {
     const db = getDB();
 
-    // 1️⃣ Usuarios REALES desde MongoDB Atlas
+    //  Usuarios REALES desde MongoDB Atlas
     const usuarios = await db.collection("users").find().toArray();
 
-    // 2️⃣ Productos totales
+    //  Productos totales
     let productosTotal = 0;
     try {
       productosTotal = await db.collection("productos").countDocuments();
@@ -44,7 +44,7 @@ router.get("/", async (req, res) => {
       console.warn("⚠️ No se pudo contar productos:", e.message);
     }
 
-    // 3️⃣ Scraping data
+    // Scraping data
     const scraping = obtenerScrapingData();
 
     // ✔ Si no hay usuarios → responder una estructura mínima
@@ -64,7 +64,7 @@ router.get("/", async (req, res) => {
       });
     }
 
-    // 4️⃣ Conteo real de negocios (incrustados)
+    //  Conteo real de negocios (incrustados)
     const totalNegocios = usuarios.reduce((acc, u) => {
       if (Array.isArray(u.negocios) && u.negocios.length > 0) {
         return acc + u.negocios.length;
@@ -72,7 +72,7 @@ router.get("/", async (req, res) => {
       return acc;
     }, 0);
 
-    // 5️⃣ Distribución por región
+    //  Distribución por región
     const distribucionRegion = {};
     const distribucionGenero = { Masculino: 0, Femenino: 0, Otro: 0 };
 
@@ -86,7 +86,7 @@ router.get("/", async (req, res) => {
       else distribucionGenero.Otro++;
     });
 
-    // 6️⃣ Respuesta final al dashboard
+    //  Respuesta final al dashboard
     res.json({
       kpis: {
         total_usuarios: usuarios.length,
@@ -108,7 +108,7 @@ router.get("/", async (req, res) => {
 });
 
 // =============================================================
-// 📂 GET /api/dashboard/scrape/ultimos → Último scraping directo
+//  GET /api/dashboard/scrape/ultimos → Último scraping directo
 // =============================================================
 router.get("/scrape/ultimos", (req, res) => {
   try {

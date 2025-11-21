@@ -23,7 +23,7 @@
       const addNegocioBtn = document.getElementById("addNegocioBtn");
 
       /* =====================================================
-         🔍 FUNCIÓN VALIDAR RUT (PERSONA O TRIBUTARIO)
+          FUNCIÓN VALIDAR RUT (PERSONA O TRIBUTARIO)
       ===================================================== */
       function validarRutChileno(rutCompleto) {
         if (!rutCompleto) return false;
@@ -50,7 +50,7 @@
       }
 
       /* =====================================================
-         🌎 CARGA REGIONES / COMUNAS / SECTORES
+          CARGA REGIONES / COMUNAS / SECTORES
       ===================================================== */
       Object.keys(regiones).forEach(region => {
         const opt = document.createElement("option");
@@ -82,7 +82,7 @@
       });
 
       /* =====================================================
-         🏪 NEGOCIOS DINÁMICOS
+          NEGOCIOS DINÁMICOS
       ===================================================== */
       tieneNegocioCheck.addEventListener("change", e => {
         negociosContainer.style.display = e.target.checked ? "block" : "none";
@@ -107,7 +107,7 @@
       });
 
       /* =====================================================
-         🧩 VALIDACIONES DEL FORMULARIO
+          VALIDACIONES DEL FORMULARIO
       ===================================================== */
       function mostrarError(msg) {
         mensaje.textContent = "❌ " + msg;
@@ -161,7 +161,7 @@
         }
 
         /* =====================================================
-           📤 SI TODO ES VÁLIDO → ENVIAR A LA BASE DE DATOS
+            SI TODO ES VÁLIDO → ENVIAR A LA BASE DE DATOS
         ===================================================== */
         const formData = new FormData(form);
         const data = {};
@@ -179,7 +179,7 @@
           const text = await res.text();
 
           if (res.ok) {
-            mensaje.textContent = "✅ Registro exitoso. Redirigiendo...";
+            mensaje.textContent = " Registro exitoso. Redirigiendo...";
             mensaje.style.color = "green";
             setTimeout(() => (window.location.href = "/login"), 1500);
           } else {

@@ -1,5 +1,4 @@
 // ===============================================
-// ⚡ utils/scraperBase.js (versión ULTRA RÁPIDA)
 // BulkWrite para guardar 1000+ productos en segundos
 // ===============================================
 
@@ -8,7 +7,7 @@ import { PriceHistory } from "../models/PriceHistory.js";
 
 
 // ============================================================
-// 📌 Normalizador de precio por unidad (kg, g, ml, L…)
+//  Normalizador de precio por unidad (kg, g, ml, L…)
 // ============================================================
 export function procesarUnit(pricePerUnit = "") {
   if (!pricePerUnit) return { unitValue: null, unitName: null };
@@ -32,7 +31,7 @@ export function procesarUnit(pricePerUnit = "") {
 
 
 // ============================================================
-// 1️⃣ Normalizador de precios (soporta combos, evita dobles "$")
+//  Normalizador de precios (soporta combos, evita dobles "$")
 // ============================================================
 export function parsePriceUnitario(priceStr = "") {
   if (!priceStr) return null;
@@ -40,7 +39,7 @@ export function parsePriceUnitario(priceStr = "") {
   const texto = priceStr.replace(/\s+/g, "").toLowerCase();
   if (texto.includes("-")) return null;
 
-  // 🟦 Combo 2x, 3x, etc.
+  //  Combo 2x, 3x, etc.
   const combo = texto.match(/(\d+)\s*x\s*\$?([\d\.]+)/i);
   if (combo) {
     const cantidad = parseInt(combo[1], 10);
@@ -48,7 +47,7 @@ export function parsePriceUnitario(priceStr = "") {
     return cantidad > 0 && total > 0 ? Math.round(total / cantidad) : null;
   }
 
-  // 🟥 SOLO PRIMER PRECIO (evita "$2990$3710")
+  //  SOLO PRIMER PRECIO (evita "$2990$3710")
   const primerPrecio = texto.match(/\$?([\d\.]+)/);
   if (!primerPrecio) return null;
 
@@ -59,7 +58,7 @@ export function parsePriceUnitario(priceStr = "") {
 
 
 // ============================================================
-// 2️⃣ BulkWrite Ultrarápido (inserta/actualiza en bloques)
+//  BulkWrite Ultrarápido (inserta/actualiza en bloques)
 // ============================================================
 export async function guardarProductosBulk(productos, store, categoria = "General") {
   const opsProductos = [];
@@ -101,7 +100,7 @@ export async function guardarProductosBulk(productos, store, categoria = "Genera
   }
 
 // ============================================================
-// 🟣 Guardar historial solo cuando cambia precio (más rápido)
+//  Guardar historial solo cuando cambia precio (más rápido)
 // ============================================================
 if (opsProductos.length > 0) {
   const res = await Producto.bulkWrite(opsProductos, { ordered: false });
@@ -110,7 +109,7 @@ if (opsProductos.length > 0) {
   actualizados = res.modifiedCount;
   sinCambio = productos.length - nuevos - actualizados - skip;
 
-  // 🧠 Guardar solo los productos modificados
+  //  Guardar solo los productos modificados
   if (actualizados > 0) {
     const idsActualizados = Object.values(res.upsertedIds);
 
@@ -149,7 +148,7 @@ if (opsProductos.length > 0) {
 
 
 // ============================================================
-// ⚡ Barra de progreso estándar (solo cada 5%)
+//  Barra de progreso estándar (solo cada 5%)
 // ============================================================
 export function renderProgressBar(current, total, prefix = "⏳ Procesando") {
   if (!total || total <= 0) return;

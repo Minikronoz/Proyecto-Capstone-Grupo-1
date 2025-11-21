@@ -1,5 +1,5 @@
 // ===============================================
-// 📁 routes/scrape.routes.js (VERSIÓN FINAL)
+//  routes/scrape.routes.js (VERSIÓN FINAL)
 // ===============================================
 import express from "express";
 import {
@@ -10,13 +10,13 @@ import {
   scrapeSantaIsabel,
   obtenerUltimosScraping,
   obtenerActividadSemanal,
-  registrarEstadoScraping // 🔥 NUEVO
+  registrarEstadoScraping 
 } from "../controllers/scrape.controller.js";
 
 const router = express.Router();
 
 // ================================
-// 🚀 RUTAS DE SCRAPING REALES
+//  RUTAS DE SCRAPING REALES
 // ================================
 router.post("/acuenta", scrapeAcuenta);
 router.post("/tottus", scrapeTottus);
@@ -26,17 +26,17 @@ router.post("/santaisabel", scrapeSantaIsabel);
 
 
 // ================================
-// 📊 ÚLTIMOS REGISTROS PARA KPI
+//  ÚLTIMOS REGISTROS PARA KPI
 // ================================
 router.get("/ultimos", obtenerUltimosScraping);
 
 // ================================
-// 📅 ACTIVIDAD SEMANAL (TABLA 7 DÍAS)
+//  ACTIVIDAD SEMANAL (TABLA 7 DÍAS)
 // ================================
 router.get("/actividad-semanal", obtenerActividadSemanal);
 
 // ================================
-// 🟩 Registrar el estado del scraping del DÍA
+//  Registrar el estado del scraping del DÍA
 // success | fail | warning
 // ================================
 router.post("/registrar-estado", registrarEstadoScraping);

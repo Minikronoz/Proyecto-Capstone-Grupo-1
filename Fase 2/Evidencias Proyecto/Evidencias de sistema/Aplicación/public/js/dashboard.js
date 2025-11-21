@@ -1,11 +1,11 @@
 // =============================================================
-// 📌 CONFIG GLOBAL
+//  CONFIG GLOBAL
 // =============================================================
 const API = "/api";
 const socket = io();
 
 // =============================================================
-// 🔌 Estado backend
+//  Estado backend
 // =============================================================
 socket.on("connect", () => {
   const estado = document.getElementById("estado-backend");
@@ -22,7 +22,7 @@ socket.on("disconnect", () => {
 });
 
 // =============================================================
-// 📝 LOGS SCRAPING
+//  LOGS SCRAPING
 // =============================================================
 function appendLog(store, message, type = "info") {
   const log = document.querySelector(`#log-${store} .log-output`);
@@ -60,12 +60,12 @@ socket.on("scrape-complete", (d) => {
     d.success ? "success" : "error"
   );
 
-  // ❗ Solo actualizamos datos, NO redibujamos los gráficos aquí
+
   cargarDatosDashboard();
 });
 
 // =============================================================
-// 🚀 Ejecutar Scraping
+//  Ejecutar Scraping
 // =============================================================
 async function ejecutarScraping(store) {
   limpiarLog(store);
@@ -80,7 +80,7 @@ async function ejecutarScraping(store) {
 }
 
 // =============================================================
-// 📊 DASHBOARD PRINCIPAL — KPIS + GRÁFICOS
+//  DASHBOARD PRINCIPAL — KPIS + GRÁFICOS
 // =============================================================
 async function cargarDatosDashboard() {
   try {
@@ -120,7 +120,7 @@ async function cargarDatosDashboard() {
 }
 
 // =============================================================
-// 📊 Gráficos
+//  Gráficos
 // =============================================================
 function renderGraficosDashboard(charts) {
   // Destruir gráficos previos
@@ -180,25 +180,25 @@ function renderGraficosDashboard(charts) {
 
 
 // =============================================================
-// 🗓 ACTIVIDAD SEMANAL
+//  ACTIVIDAD SEMANAL
 // =============================================================
 async function cargarActividadSemanal() {
   const cont = document.getElementById("tablaScrapingSemanal");
   cont.innerHTML = "Cargando...";
 
   try {
-    console.log("➡️ Ejecutando cargarActividadSemanal()");
+    console.log(" Ejecutando cargarActividadSemanal()");
 
     const res = await fetch("/api/scrape/actividad-semanal");
 
-    console.log("📡 Status:", res.status);
+    console.log(" Status:", res.status);
 
     const json = await res.json();
 
-    console.log("📦 Datos recibidos:", json);
+    console.log(" Datos recibidos:", json);
 
     if (!json.actividad) {
-      console.error("❌ No existe json.actividad");
+      console.error(" No existe json.actividad");
       cont.innerHTML = "Error cargando actividad";
       return;
     }
@@ -209,7 +209,7 @@ async function cargarActividadSemanal() {
     const inicio = new Date(hoy);
     inicio.setDate(hoy.getDate() - ((hoy.getDay() + 6) % 7));
 
-    console.log("📅 Inicio de semana:", inicio);
+    console.log(" Inicio de semana:", inicio);
 
     const dias = [...Array(7)].map((_, i) => {
       const d = new Date(inicio);
@@ -217,7 +217,7 @@ async function cargarActividadSemanal() {
       return d.toISOString().split("T")[0];
     });
 
-    console.log("🗓️ Días generados:", dias);
+    console.log(" Días generados:", dias);
 
     let html = `
       <table>
@@ -239,19 +239,19 @@ async function cargarActividadSemanal() {
 
     html += `</tbody></table>`;
 
-    console.log("🧱 Tabla generada OK");
+    console.log(" Tabla generada OK");
 
     cont.innerHTML = html;
 
   } catch (err) {
-    console.error("❌ Error en cargarActividadSemanal:", err);
+    console.error(" Error en cargarActividadSemanal:", err);
     cont.innerHTML = "Error cargando actividad";
   }
 }
 
 
 // =============================================================
-// 👤 USUARIOS
+//  USUARIOS
 // =============================================================
 async function cargarUsuarios() {
   const tbody = document.getElementById("usuariosBody");
@@ -345,7 +345,7 @@ function cerrarModal() {
 }
 
 // =============================================================
-// 🏪 NEGOCIOS
+//  NEGOCIOS
 // =============================================================
 async function cargarNegocios() {
   const tbody = document.getElementById("negociosBody");
@@ -451,12 +451,12 @@ async function editarNegocio(negocioId, duenioId) {
     }
     
     const negocios = await res.json();
-    console.log("📦 Negocios recibidos:", negocios);
+    console.log(" Negocios recibidos:", negocios);
 
     // Buscar el negocio por rolTributario (que ahora es el _id)
     const negocio = negocios.find((n) => n._id === negocioId);
     
-    console.log("🔍 Negocio encontrado:", negocio);
+    console.log(" Negocio encontrado:", negocio);
 
     if (!negocio) {
       alert("No se encontró el negocio.");
@@ -471,28 +471,28 @@ async function editarNegocio(negocioId, duenioId) {
     document.getElementById("negocioComuna").value = negocio.comuna || "";
     document.getElementById("negocioSector").value = negocio.sector || "";
 
-    console.log("📝 Formulario rellenado");
+    console.log(" Formulario rellenado");
 
     // Mostrar el modal
     const modal = document.getElementById("modalEditarNegocio");
     modal.classList.remove("oculto");
     
-    console.log("✅ Modal abierto");
+    console.log(" Modal abierto");
 
   } catch (err) {
-    console.error("❌ Error al cargar negocio:", err);
+    console.error(" Error al cargar negocio:", err);
     alert("Error al cargar negocio: " + err.message);
   }
 }
 
 async function guardarNegocio() {
-  console.log("💾 Guardando negocio...");
+  console.log(" Guardando negocio...");
 
   const negocioIdInput = document.getElementById("negocioId");
   const negocioId = negocioIdInput.value; // Este es el rolTributario
   const duenioId = negocioIdInput.getAttribute("data-duenio-id");
 
-  console.log("📋 Datos a guardar:", { negocioId, duenioId });
+  console.log(" Datos a guardar:", { negocioId, duenioId });
 
   if (!negocioId || !duenioId) {
     alert("Error: Faltan datos del negocio");
@@ -510,7 +510,7 @@ async function guardarNegocio() {
   }
 
   const payload = { nombre, giro, comuna, sector };
-  console.log("📦 Payload:", payload);
+  console.log(" Payload:", payload);
 
   try {
     const res = await fetch(`${API}/usuarios/${duenioId}/negocios/${negocioId}`, {
@@ -519,7 +519,7 @@ async function guardarNegocio() {
       body: JSON.stringify(payload),
     });
 
-    console.log("📡 Response status:", res.status);
+    console.log(" Response status:", res.status);
 
     if (!res.ok) {
       const error = await res.json();
@@ -527,39 +527,39 @@ async function guardarNegocio() {
     }
 
     const result = await res.json();
-    console.log("✅ Resultado:", result);
+    console.log(" Resultado:", result);
 
-    alert("✅ Negocio actualizado correctamente.");
+    alert(" Negocio actualizado correctamente.");
     cerrarModalNegocio();
     cargarNegocios();
 
   } catch (err) {
-    console.error("❌ Error guardando negocio:", err);
-    alert("❌ Error: " + err.message);
+    console.error(" Error guardando negocio:", err);
+    alert(" Error: " + err.message);
   }
 }
 
 function cerrarModalNegocio() {
-  console.log("❌ Cerrando modal");
+  console.log(" Cerrando modal");
   document.getElementById("modalEditarNegocio").classList.add("oculto");
 }
 
 // =============================================================
-// 🗑️ ELIMINAR NEGOCIO
+//  ELIMINAR NEGOCIO
 // =============================================================
 async function eliminarNegocio(negocioId, duenioId) {
   console.log("🗑️ Intentando eliminar:", { negocioId, duenioId });
 
-  // ✅ Validación mejorada
+  //  Validación mejorada
   if (!negocioId || !duenioId) {
-    console.error("❌ Datos inválidos:", { negocioId, duenioId });
+    console.error(" Datos inválidos:", { negocioId, duenioId });
     alert("Error: ID de negocio o dueño inválido");
     return;
   }
 
   if (negocioId === "null" || negocioId === "undefined" || 
       duenioId === "null" || duenioId === "undefined") {
-    console.error("❌ IDs son null/undefined");
+    console.error(" IDs son null/undefined");
     alert("Error: ID de negocio o dueño inválido");
     return;
   }
@@ -579,7 +579,7 @@ async function eliminarNegocio(negocioId, duenioId) {
     alert("Negocio eliminado correctamente");
     cargarNegocios();
   } catch (err) {
-    console.error("❌ Error eliminando negocio:", err);
+    console.error(" Error eliminando negocio:", err);
     alert("Error al eliminar negocio: " + err.message);
   }
 }
@@ -593,7 +593,7 @@ window.ejecutarScraping = ejecutarScraping;
 window.limpiarLog = limpiarLog;
 
 // =============================================================
-// 🚀 Navegación
+//  Navegación
 // =============================================================
 document.querySelectorAll(".nav__item").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -622,7 +622,7 @@ document.querySelectorAll(".nav__item").forEach((btn) => {
 
 document.getElementById("formEditarUsuario").addEventListener("submit", guardarUsuario);
 // =============================================================
-// 🚀 Inicialización REAL
+//  Inicialización REAL
 // =============================================================
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("formEditarUsuario");
@@ -640,7 +640,7 @@ window.cerrarModal = cerrarModal;
 });
 
 // =============================================================
-// 🚀 SISTEMA DE CONSOLAS SEPARADAS
+//  SISTEMA DE CONSOLAS SEPARADAS
 // =============================================================
 
 const consolasActivas = new Map();
@@ -670,7 +670,7 @@ function crearConsola(store) {
   consolaDiv.innerHTML = `
     <div class="consola-header">
       <h3>
-        <span>${iconos[store] || '📦'}</span>
+        <span>${iconos[store] || ''}</span>
         <span>${store.toUpperCase()}</span>
       </h3>
       <div class="estado">
@@ -686,7 +686,7 @@ function crearConsola(store) {
       </div>
     </div>
     <div class="log-output-individual" id="log-${store}">
-      <div class="log-line log-info">🚀 Iniciando scraping de ${store}...</div>
+      <div class="log-line log-info"> Iniciando scraping de ${store}...</div>
     </div>
   `;
 

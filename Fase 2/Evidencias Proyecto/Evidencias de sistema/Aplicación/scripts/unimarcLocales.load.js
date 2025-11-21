@@ -1,5 +1,5 @@
 // ======================================================================
-// 🗃️ CARGAR JSON DE TIENDAS UNIMARC A MONGODB
+//  CARGAR JSON DE TIENDAS UNIMARC A MONGODB
 // ======================================================================
 import fs from "fs";
 import path from "path";
@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 async function cargarLocales() {
   try {
     // ============================================
-    // 📌 1) Leer archivo JSON
+    //   Leer archivo JSON
     // ============================================
     const filePath = path.join(__dirname, "../data/unimarc_stores.json");
     if (!fs.existsSync(filePath)) {
@@ -27,16 +27,16 @@ async function cargarLocales() {
     locales = locales.map(l => ({ tienda: "UNIMARC", ...l }));
 
     // ============================================
-    // 🛢️ 2) Conectar a MongoDB e Insertar
+    //  Conectar a MongoDB e Insertar
     // ============================================
     await connectDB();
     const db = getDB();
     const collection = db.collection("supermercados_locales");
 
-    // 🧹 Borra solo los locales de Unimarc
+    //  Borra solo los locales de Unimarc
     await collection.deleteMany({ tienda: "UNIMARC" });
 
-    // 🚀 Inserta nueva data
+    //  Inserta nueva data
     await collection.insertMany(locales);
 
     console.log(`🎉 LOCALIDADES DE UNIMARC GUARDADAS: ${locales.length} registros`);

@@ -1,4 +1,4 @@
-/* ===== 🎨 PALETA PROFESIONAL CALIPSO CORPORATIVO ===== */
+/* =====  PALETA PROFESIONAL CALIPSO CORPORATIVO ===== */
 :root {
   --color-calipso: #009fb0;
   --color-calipso-oscuro: #006b7e;
@@ -405,7 +405,7 @@ footer {
 }
 
 
-/* ===== 📊 Panel lateral fijo — Distribución de usuarios por región ===== */
+/* =====  Panel lateral fijo — Distribución de usuarios por región ===== */
 .panel-lateral {
   position: fixed;
   top: 180px;                /* Mantiene la posición un poco más abajo del header */
@@ -421,7 +421,7 @@ footer {
   transition: all 0.3s ease;
 }
 
-/* 🔹 Ajusta el fondo y espaciado del contenido interno */
+/*  Ajusta el fondo y espaciado del contenido interno */
 .panel-lateral .mapa-chile {
   background: linear-gradient(180deg, #a47c48, #b89254, #c8bb72, #a2d3a8, #4ab58c);
   border-radius: 12px;
@@ -432,7 +432,7 @@ footer {
   gap: 4px;
 }
 
-/* 🔹 Título centrado */
+/*  Título centrado */
 .panel-lateral h2 {
   font-size: 17px;
   text-align: center;
@@ -461,7 +461,7 @@ footer {
   transform: scale(1.01);
 }
 
-/* 🔹 Regiones internas — dejan espacio en los bordes */
+/*  Regiones internas — dejan espacio en los bordes */
 .mapa-chile .bloque-region {
   display: flex;
   justify-content: space-between;
@@ -470,9 +470,9 @@ footer {
   font-size: 13px;
   padding: 6px 10px;
   transition: all 0.25s ease;
-  width: 95%;                     /* 🔹 deja margen para mostrar las esquinas redondeadas */
-  margin: 0 auto;                 /* 🔹 centra las franjas */
-  border-radius: 6px;             /* 🔹 redondeo interno suave */
+  width: 95%;                     /*  deja margen para mostrar las esquinas redondeadas */
+  margin: 0 auto;                 /*  centra las franjas */
+  border-radius: 6px;             /*  redondeo interno suave */
 }
 
 /* Hover */
@@ -564,7 +564,7 @@ footer {
 .card-precio.subida .variacion { color: #dc2626; }
 
 
-/* 🔹 Responsivo */
+/*  Responsivo */
 @media (max-width: 1024px) {
   .panel-lateral {
     position: relative;

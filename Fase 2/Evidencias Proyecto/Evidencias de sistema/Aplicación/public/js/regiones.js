@@ -1,9 +1,7 @@
-// =============================================================
-// 🌎 Catálogo de Regiones, Comunas y Sectores de Chile
-// =============================================================
+
 
 // -------------------------------------------------------------
-// 🗺️ Regiones → Comunas
+//  Regiones → Comunas
 // -------------------------------------------------------------
 const regiones = {
   "Arica y Parinacota": ["Arica", "Camarones", "Putre", "General Lagos"],
@@ -28,7 +26,7 @@ const regiones = {
 };
 
 // -------------------------------------------------------------
-// 🧭 Comunas → Sectores
+//  Comunas → Sectores
 // -------------------------------------------------------------
 const sectoresPorComuna = {
   // Región Metropolitana
@@ -69,7 +67,7 @@ const sectoresPorComuna = {
 };
 
 // -------------------------------------------------------------
-// 🧩 Fallback: genera sectores genéricos si faltan
+//  Fallback: genera sectores genéricos si faltan
 // -------------------------------------------------------------
 Object.entries(regiones).forEach(([region, comunas]) => {
   comunas.forEach((comuna) => {
@@ -80,7 +78,7 @@ Object.entries(regiones).forEach(([region, comunas]) => {
 });
 
 // -------------------------------------------------------------
-// 🌐 Exportar para compatibilidad con formularios o módulos
+//  Exportar para compatibilidad con formularios o módulos
 // -------------------------------------------------------------
 window.regiones = regiones;
 window.sectoresPorComuna = sectoresPorComuna;

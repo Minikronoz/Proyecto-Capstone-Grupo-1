@@ -3,7 +3,7 @@ import { getDB } from "../config/db.js";
 import { ObjectId } from "mongodb";
 
 /**
- * 📊 Historial de precios por tienda (últimos X días)
+ *  Historial de precios por tienda (últimos X días)
  */
 export const obtenerHistoricoPorTienda = async (req, res) => {
   try {
@@ -24,7 +24,7 @@ export const obtenerHistoricoPorTienda = async (req, res) => {
         },
       },
 
-      // 🔥 NORMALIZAR productId → ObjectId si corresponde
+      //  NORMALIZAR productId → ObjectId si corresponde
       {
         $addFields: {
           productIdObj: {
@@ -37,7 +37,7 @@ export const obtenerHistoricoPorTienda = async (req, res) => {
         }
       },
 
-      // 🔍 JOIN con productos
+      //  JOIN con productos
       {
         $lookup: {
           from: "productos",
@@ -50,7 +50,7 @@ export const obtenerHistoricoPorTienda = async (req, res) => {
 
       { $sort: { date: -1 } },
 
-      // 🧹 Formato final limpio
+      //  Formato final limpio
       {
         $project: {
           nombre: { $ifNull: ["$producto.title", "Producto desconocido"] },
@@ -69,7 +69,7 @@ export const obtenerHistoricoPorTienda = async (req, res) => {
 
     res.json(historial);
   } catch (err) {
-    console.error("❌ Error al obtener histórico:", err);
+    console.error(" Error al obtener histórico:", err);
     res.status(500).json({ error: "Error al obtener histórico de precios" });
   }
 };

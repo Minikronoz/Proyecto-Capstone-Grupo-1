@@ -1,5 +1,5 @@
 /* ==============================
-   🎨 PALETA DE COLORES
+    PALETA DE COLORES
    ============================== */
 :root {
   --calipso: #00A7B5;
@@ -22,7 +22,7 @@
 }
 
 /* ==============================
-   🧭 RESET Y BASE
+    RESET Y BASE
    ============================== */
 * {
   box-sizing: border-box;
@@ -37,7 +37,7 @@ body {
 }
 
 /* ==============================
-   📁 SIDEBAR
+    SIDEBAR
    ============================== */
 .sidebar {
   position: fixed;
@@ -131,7 +131,7 @@ body {
   color: var(--calipso);
 }
 
-/* 🔹 Botón Catálogo con sutil realce */
+/*  Botón Catálogo con sutil realce */
 .nav__item i.fa-store {
   color: var(--calipso);
 }
@@ -140,7 +140,7 @@ body {
 }
 
 /* ==============================
-   🧩 LAYOUT GENERAL
+    LAYOUT GENERAL
    ============================== */
 .layout {
   margin-left: var(--sidebar-w);
@@ -204,7 +204,7 @@ body {
 }
 
 /* ==============================
-   🧹 SECCIONES Y CARDS
+    SECCIONES Y CARDS
    ============================== */
 .seccion {
   display: none;
@@ -233,7 +233,7 @@ body {
 }
 
 /* ==============================
-   📊 KPI CARDS
+    KPI CARDS
    ============================== */
 .kpis {
   display: grid;
@@ -348,7 +348,7 @@ body {
 .color-santaisabel { color: #9333ea; }
 
 /* ==============================
-   📈 CHARTS
+    CHARTS
    ============================== */
 .charts-grid {
   display: grid;
@@ -402,7 +402,7 @@ body {
 
 
 /* ==============================
-   🧰 SCRAPING — BOTONES
+    SCRAPING — BOTONES
    ============================== */
 .botones-scraping {
   display: grid;
@@ -522,7 +522,7 @@ body {
 }
 
 /* ==============================
-   🧾 LOG / MULTI-CONSOLA
+    LOG / MULTI-CONSOLA
    ============================== */
 .log-contenedor {
   margin-top: 10px;
@@ -573,7 +573,7 @@ body {
 }
 
 /* ==============================
-   📋 TABLAS
+    TABLAS
    ============================== */
 table {
   width: 100%;
@@ -630,7 +630,7 @@ tr:nth-child(even) {
 }
 
 /* ==============================
-   🪟 MODALES — Versión PRO 2025
+    MODALES — Versión PRO 2025
    ============================== */
 
 .modal {
@@ -871,7 +871,7 @@ tr:nth-child(even) {
 }
 
 /* ============================================================
-   📊 TARJETA ÚLTIMO SCRAPING
+   TARJETA ÚLTIMO SCRAPING
    ============================================================ */
 #kpi-ultimo-scraping {
   display: grid !important;
@@ -937,7 +937,7 @@ tr:nth-child(even) {
 
 
 /* ============================================================
-   📦 TARJETAS BASE REUTILIZABLES
+    TARJETAS BASE REUTILIZABLES
    ============================================================ */
 .scraping-container {
   display: grid;
@@ -976,7 +976,7 @@ tr:nth-child(even) {
 }
 
 /* ============================================================
-   🖥️ LOG OUTPUT COMÚN
+    LOG OUTPUT COMÚN
    ============================================================ */
 .log-output {
   padding: 0.75rem 1rem;
@@ -991,7 +991,7 @@ tr:nth-child(even) {
 }
 
 /* ============================================================
-   🎨 BADGES DE ESTADO
+    BADGES DE ESTADO
    ============================================================ */
 .badge--error {
   background: #fee2e2;
@@ -1006,7 +1006,7 @@ tr:nth-child(even) {
 }
 
 /* ============================================================
-   📋 MODAL DE USUARIO (ESTRUCTURA COMPLETA)
+    MODAL DE USUARIO (ESTRUCTURA COMPLETA)
    ============================================================ */
 .modal {
   position: fixed;
@@ -1141,7 +1141,7 @@ tr:nth-child(even) {
 }
 
 /* ============================================================
-   📋 MODAL DE NEGOCIO (VERSIÓN ALTERNATIVA)
+    MODAL DE NEGOCIO (VERSIÓN ALTERNATIVA)
    ============================================================ */
 .modal-contenido {
   position: fixed;
@@ -1225,7 +1225,7 @@ tr:nth-child(even) {
 }
 
 /* ============================================================
-   🎯 CONSOLAS SEPARADAS POR TIENDA
+    CONSOLAS SEPARADAS POR TIENDA
    ============================================================ */
 .consolas-container {
   display: flex;
@@ -1391,7 +1391,7 @@ tr:nth-child(even) {
 }
 
 /* ============================================================
-   🎨 COLORES ESPECÍFICOS POR TIENDA (CONSOLAS)
+    COLORES ESPECÍFICOS POR TIENDA (CONSOLAS)
    ============================================================ */
 .consola-unimarc .consola-header {
   background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);

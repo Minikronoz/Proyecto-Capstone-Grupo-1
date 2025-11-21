@@ -1,11 +1,11 @@
 // =============================================================
-// 📁 controllers/users.controller.js — versión limpia Atlas (FINAL)
+//  controllers/users.controller.js — versión limpia Atlas (FINAL)
 // =============================================================
 import { getDB } from "../config/db.js";
 import { ObjectId } from "mongodb";
 
 // =============================================================
-// 👥 Obtener todos los usuarios
+//  Obtener todos los usuarios
 // =============================================================
 export async function obtenerUsuarios(req, res) {
   try {
@@ -13,13 +13,13 @@ export async function obtenerUsuarios(req, res) {
     const usuarios = await db.collection("users").find().toArray();
     res.json(usuarios);
   } catch (err) {
-    console.error("❌ Error al obtener usuarios:", err);
+    console.error(" Error al obtener usuarios:", err);
     res.status(500).json({ error: "Error al obtener usuarios" });
   }
 }
 
 // =============================================================
-// 👤 Obtener usuario por ID
+//  Obtener usuario por ID
 // =============================================================
 export async function obtenerUsuarioPorId(req, res) {
   try {
@@ -33,13 +33,13 @@ export async function obtenerUsuarioPorId(req, res) {
 
     res.json(usuario);
   } catch (err) {
-    console.error("❌ Error usuario por ID:", err);
+    console.error(" Error usuario por ID:", err);
     res.status(500).json({ error: "Error al obtener usuario" });
   }
 }
 
 // =============================================================
-// ✏️ Actualizar usuario
+//  Actualizar usuario
 // =============================================================
 export async function actualizarUsuario(req, res) {
   try {
@@ -59,13 +59,13 @@ export async function actualizarUsuario(req, res) {
 
     res.json({ ok: true, mensaje: "Usuario actualizado" });
   } catch (err) {
-    console.error("❌ Error al actualizar usuario:", err);
+    console.error(" Error al actualizar usuario:", err);
     res.status(500).json({ error: "Error al actualizar usuario" });
   }
 }
 
 // =============================================================
-// 📄 Vistas
+//  Vistas
 // =============================================================
 export function mostrarOlvidePassword(req, res) {
   res.sendFile("views/forgot.html", { root: process.cwd() });
@@ -76,7 +76,7 @@ export function historico(req, res) {
 }
 
 // =============================================================
-// 🏪 NEGOCIOS — Obtener negocios con dueño
+//  NEGOCIOS — Obtener negocios con dueño
 // =============================================================
 export async function obtenerNegociosConDuenio(req, res) {
   try {
@@ -107,7 +107,7 @@ export async function obtenerNegociosConDuenio(req, res) {
 }
 
 // =============================================================
-// ✏️ Actualizar negocio específico
+//  Actualizar negocio específico
 // =============================================================
 export async function actualizarNegocio(req, res) {
   try {
@@ -147,7 +147,7 @@ export async function actualizarNegocio(req, res) {
 }
 
 // =============================================================
-// 🗑️ Eliminar usuario
+//  Eliminar usuario
 // =============================================================
 export async function eliminarUsuario(req, res) {
   try {
@@ -168,7 +168,7 @@ export async function eliminarUsuario(req, res) {
 }
 
 // =============================================================
-// 🗑️ Eliminar negocio específico
+//  Eliminar negocio específico
 // =============================================================
 export async function eliminarNegocio(req, res) {
   try {
@@ -195,10 +195,10 @@ export async function eliminarNegocio(req, res) {
 
     res.json({ ok: true, mensaje: "Negocio eliminado" });
   } catch (err) {
-    console.error("❌ Error al eliminar negocio:", err);
+    console.error(" Error al eliminar negocio:", err);
     res.status(500).json({ error: "Error al eliminar negocio" });
   }
 }
 
-// ✅ AQUÍ TERMINA EL ARCHIVO (sin export {} al final)
+//  AQUÍ TERMINA EL ARCHIVO (sin export {} al final)
 

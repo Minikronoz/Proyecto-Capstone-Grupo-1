@@ -8,7 +8,7 @@ const MONGODB_URI = process.env.MONGODB_URI;
 const DB_NAME = process.env.DB_NAME;
 
 // ========================================================
-// 📌 Convertir JSON de Tottus al formato estándar
+//  Convertir JSON de Tottus al formato estándar
 // ========================================================
 function parsearLocalesDesdeJSON(data) {
   return data.stores.map(store => {
@@ -24,7 +24,7 @@ function parsearLocalesDesdeJSON(data) {
 }
 
 // ========================================================
-// 📌 Guardar en MongoDB
+//  Guardar en MongoDB
 // ========================================================
 async function guardarEnMongo(locales) {
   const cliente = new MongoClient(MONGODB_URI);
@@ -45,7 +45,7 @@ async function guardarEnMongo(locales) {
 }
 
 // ========================================================
-// 🚀 MAIN
+//  MAIN
 // ========================================================
 async function main() {
   try {

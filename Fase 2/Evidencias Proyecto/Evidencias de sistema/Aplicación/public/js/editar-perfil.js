@@ -1,5 +1,5 @@
 // =============================================================
-// 👤 EDITAR PERFIL DE USUARIO — Versión Limpia Atlas
+//  EDITAR PERFIL DE USUARIO — Versión Limpia Atlas
 // =============================================================
 
 // ---------- Utilidades ----------

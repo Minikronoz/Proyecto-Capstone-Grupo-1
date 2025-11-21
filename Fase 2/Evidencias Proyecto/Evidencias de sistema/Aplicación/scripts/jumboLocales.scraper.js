@@ -1,5 +1,5 @@
 // ======================================================================
-// 🏬 SCRAPER LOCALES JUMBO — versión FINAL COMPLETA y ESTABLE
+//  SCRAPER LOCALES JUMBO — versión FINAL COMPLETA y ESTABLE
 // ======================================================================
 import { chromium } from "playwright";
 import { getDB, connectDB } from "../config/db.js";
@@ -122,7 +122,7 @@ const STORE = "jumbo_locales";
 const URL = "https://www.jumbo.cl/locales";
 
 // =============================================================
-// 🔤 Normalizar texto (elimina tildes y símbolos)
+//  Normalizar texto (elimina tildes y símbolos)
 // =============================================================
 function normalizar(texto = "") {
   return texto
@@ -133,7 +133,7 @@ function normalizar(texto = "") {
 }
 
 // =============================================================
-// 📍 Detectar Región y Comuna automáticamente
+//  Detectar Región y Comuna automáticamente
 // =============================================================
 function detectarRegionComuna(nombre, direccion) {
   let texto = normalizar(`${nombre} ${direccion}`);
@@ -160,7 +160,7 @@ function detectarRegionComuna(nombre, direccion) {
 }
 
 // =============================================================
-// 🍪 Aceptar cookies
+//  Aceptar cookies
 // =============================================================
 async function aceptarCookiesSiAparecen(page) {
   try {
@@ -176,12 +176,12 @@ async function aceptarCookiesSiAparecen(page) {
       overlays.forEach(el => el.style.display = "none");
     });
   } catch {
-    console.log(`[${STORE}] ⚠ Sin cookies`);
+    console.log(`[${STORE}] Sin cookies`);
   }
 }
 
 // =============================================================
-// 📌 Extraer cards de una página
+//  Extraer cards de una página
 // =============================================================
 async function scrapeCards(page) {
   return await page.$$eval(
@@ -202,18 +202,18 @@ async function scrapeCards(page) {
 }
 
 // =============================================================
-// 🧭 Paginación REAL y ESTABLE
+//  Paginación REAL y ESTABLE
 // =============================================================
 async function obtenerLocales(page) {
   let locales = [];
   let pageIndex = 1;
 
   while (true) {
-    console.log(`\n[${STORE}] 🔎 Scrapeando página ${pageIndex}...`);
+    console.log(`\n[${STORE}]  Scrapeando página ${pageIndex}...`);
     await page.waitForTimeout(1500);
 
     const data = await scrapeCards(page);
-    console.log(`📍 Página ${pageIndex} → ${data.length} locales`);
+    console.log(` Página ${pageIndex} → ${data.length} locales`);
     locales.push(...data);
 
     const botones = await page.$$(".page-number");
@@ -240,14 +240,14 @@ async function obtenerLocales(page) {
     const nextIndex = activeIndex + 1;
 
     if (nextIndex >= botones.length) {
-      console.log(`[${STORE}] ✔ Última página.`);
+      console.log(`[${STORE}]  Última página.`);
       break;
     }
 
-    console.log(`[${STORE}] ▶ Cambiando a página ${pageIndex + 1}`);
+    console.log(`[${STORE}]  Cambiando a página ${pageIndex + 1}`);
 
     await botones[nextIndex].click().catch(() => {
-      console.log(`[${STORE}] ⚠ Error al cambiar página. Fin.`);
+      console.log(`[${STORE}]  Error al cambiar página. Fin.`);
     });
 
     await page.waitForTimeout(2500);
@@ -261,7 +261,7 @@ async function obtenerLocales(page) {
 }
 
 // =============================================================
-// 🚀 MAIN
+//  MAIN
 // =============================================================
 async function main() {
   console.log(`\n🟢 Iniciando SCRAPER ${STORE.toUpperCase()}\n`);
@@ -314,15 +314,15 @@ async function main() {
   }
 
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-  console.log("📊 RESULTADOS FINALES LOCALES JUMBO");
+  console.log(" RESULTADOS FINALES LOCALES JUMBO");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-  console.log(`🆕 Nuevos: ${nuevos}`);
-  console.log(`🔄 Actualizados: ${actualizados}`);
-  console.log(`📍 Total revisados: ${locales.length}`);
+  console.log(` Nuevos: ${nuevos}`);
+  console.log(` Actualizados: ${actualizados}`);
+  console.log(` Total revisados: ${locales.length}`);
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
   await browser.close();
-  console.log(`\n[${STORE}] 🔒 Scraper finalizado\n`);
+  console.log(`\n[${STORE}]  Scraper finalizado\n`);
 }
 
 main().catch(err => console.error(`[${STORE}] ERROR GLOBAL`, err));

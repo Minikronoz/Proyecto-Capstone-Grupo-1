@@ -1,5 +1,5 @@
 // ============================================================
-// 🧩 DEPENDENCIAS BASE
+//  DEPENDENCIAS BASE
 // ============================================================
 import express from "express";
 import http from "http";
@@ -20,7 +20,7 @@ import { connectDB, getDB } from "./config/db.js";
 dotenv.config();
 
 // ============================================================
-// 📦 IMPORTACIÓN DE RUTAS API
+//  IMPORTACIÓN DE RUTAS API
 // ============================================================
 import scrapeRoutes from "./routes/scrape.routes.js";
 import usersRoutes from "./routes/users.routes.js";
@@ -34,13 +34,13 @@ import historicoRoutes from "./routes/historico.routes.js";
 import negociosRoutes from "./routes/negocios.routes.js";
 
 // ============================================================
-// 📁 CONFIG PATHS
+//  CONFIG PATHS
 // ============================================================
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // ============================================================
-// 🚀 APP + SERVER + SOCKET.IO
+//  APP + SERVER + SOCKET.IO
 // ============================================================
 const app = express();
 const server = http.createServer(app);
@@ -48,20 +48,20 @@ const io = new Server(server, { cors: { origin: "*" } });
 app.set("io", io);
 
 // ============================================================
-// 🧠 CONEXIÓN A MONGODB ATLAS
+//  CONEXIÓN A MONGODB ATLAS
 // ============================================================
 await connectDB();
 console.log("📦 Conectado a MongoDB Atlas");
 
 // ============================================================
-// ⚙️ MIDDLEWARES
+//  MIDDLEWARES
 // ============================================================
 app.use(cors({ origin: "*", credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ============================================================
-// 🍪 SESIONES
+//  SESIONES
 // ============================================================
 app.use(
   session({
@@ -84,7 +84,7 @@ app.use(
 );
 
 // ==============================
-// 🔹 RUTAS API (ORDEN IMPORTANTE)
+// RUTAS API (ORDEN IMPORTANTE)
 // ==============================
 
 // Rutas de autenticación y sesión (PRIMERO)
@@ -104,7 +104,7 @@ app.use("/api/negocios", negociosRoutes);
 app.use("/historico", historicoRoutes); 
 
 // ============================================================
-// 🧰 SCRAPING MANUAL
+//  SCRAPING MANUAL
 // ============================================================
 app.post("/api/scrape/ejecutar/:supermercado", (req, res) => {
   const { supermercado } = req.params;
@@ -140,11 +140,11 @@ app.post("/api/scrape/ejecutar/:supermercado", (req, res) => {
 });
 
 // ============================================================
-// 🌐 ARCHIVOS ESTÁTICOS + TODAS LAS VISTAS
+//  ARCHIVOS ESTÁTICOS + TODAS LAS VISTAS
 // ============================================================
 app.use(express.static(path.join(__dirname, "public")));
 
-// 🏠 Página principal → catálogo
+//  Página principal → catálogo
 app.get("/", (req, res) => res.redirect("/catalogo"));
 
 // Catálogo
@@ -195,7 +195,7 @@ app.get("/historico", verificarSesionUsuario, (req, res) =>
 );
 
 // ============================================================
-// 💬 SOCKET.IO
+//  SOCKET.IO
 // ============================================================
 io.on("connection", (socket) => {
   console.log("🟢 Cliente conectado");
@@ -204,7 +204,7 @@ io.on("connection", (socket) => {
 });
 
 // ============================================================
-// 🚀 INICIAR SERVIDOR
+//  INICIAR SERVIDOR
 // ============================================================
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {

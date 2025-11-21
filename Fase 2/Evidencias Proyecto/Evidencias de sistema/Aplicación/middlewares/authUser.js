@@ -1,11 +1,11 @@
 // =============================================================
-// 🔒 Middleware de Autenticación — Sesión de Usuario Activa
+//  Middleware de Autenticación — Sesión de Usuario Activa
 // =============================================================
 export function verificarSesionUsuario(req, res, next) {
   try {
-    // 🧠 Validar existencia de sesión y usuario
+    //  Validar existencia de sesión y usuario
     if (!req.session || !req.session.user) {
-      console.warn("⚠️ Sesión perdida o inexistente. Redirigiendo a login...");
+      console.warn(" Sesión perdida o inexistente. Redirigiendo a login...");
       return res.status(401).send(`
         <html lang="es">
           <head>
@@ -29,7 +29,7 @@ export function verificarSesionUsuario(req, res, next) {
             </style>
           </head>
           <body>
-            <h2>⚠️ Sesión expirada o no iniciada</h2>
+            <h2> Sesión expirada o no iniciada</h2>
             <p>Por tu seguridad, debes iniciar sesión nuevamente.</p>
             <a href="/login">→ Iniciar sesión</a>
             <script>
@@ -40,11 +40,11 @@ export function verificarSesionUsuario(req, res, next) {
       `);
     }
 
-    // ✅ Sesión válida: continuar
-    console.log(`✅ Sesión activa para: ${req.session.user.correo || "Usuario desconocido"}`);
+    //  Sesión válida: continuar
+    console.log(` Sesión activa para: ${req.session.user.correo || "Usuario desconocido"}`);
     next();
   } catch (err) {
-    console.error("❌ Error al verificar sesión:", err);
+    console.error(" Error al verificar sesión:", err);
     res.status(500).send("Error interno al validar sesión.");
   }
 }

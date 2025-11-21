@@ -1,5 +1,5 @@
 // =======================================
-// 📁 models/User.js — Modelo Mongoose
+//  models/User.js — Modelo Mongoose
 // =======================================
 import mongoose from "mongoose";
 

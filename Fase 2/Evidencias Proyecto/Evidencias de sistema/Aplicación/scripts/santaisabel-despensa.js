@@ -1,5 +1,5 @@
 // ======================================================================
-// 🏪 SCRAPER SANTA ISABEL — DESPENSA (FORMATO ESTÁNDAR SISTEMA)
+//  SCRAPER SANTA ISABEL — DESPENSA (FORMATO ESTÁNDAR SISTEMA)
 // ======================================================================
 
 import { chromium } from "playwright";
@@ -46,7 +46,7 @@ function generarGlobalId(title, brand) {
 }
 
 // =============================================================
-// 💰 Normalizar texto de precio para evitar valores locos
+//  Normalizar texto de precio para evitar valores locos
 //    (ej: "$2.990 $3.710" → toma solo el primer precio)
 // =============================================================
 function normalizarTextoPrecio(precioText = "") {
@@ -58,7 +58,7 @@ function normalizarTextoPrecio(precioText = "") {
 }
 
 // ======================================================================
-// 🚀 FUNCIÓN PRINCIPAL
+//  FUNCIÓN PRINCIPAL
 // ======================================================================
 async function scrapeSantaIsabel() {
   await connectDB();
@@ -80,7 +80,7 @@ async function scrapeSantaIsabel() {
   await page.goto(URL, { waitUntil: "load", timeout: 60000 });
   await page.waitForTimeout(2000);
 
-  // 🥠 Aceptar Cookies fuerza bruta
+  //  Aceptar Cookies fuerza bruta
   try {
     await page.waitForFunction(() => {
       return [...document.querySelectorAll("button")].some((b) =>
@@ -97,14 +97,14 @@ async function scrapeSantaIsabel() {
       if (btn) btn.click();
     });
 
-    console.log(`[${STORE}] 🍪 Cookies aceptadas.`);
+    console.log(`[${STORE}]  Cookies aceptadas.`);
     await page.waitForTimeout(1500);
   } catch {
     console.log(`[${STORE}] ⚠️ No apareció modal de cookies.`);
   }
 
   await page.waitForSelector("a.product-card", { timeout: 20000 });
-  console.log(`[${STORE}] 👀 Productos visibles, iniciando scraping...`);
+  console.log(`[${STORE}]  Productos visibles, iniciando scraping...`);
 
   // 📌 Paginación
   let totalPaginas = 1;
@@ -122,7 +122,7 @@ async function scrapeSantaIsabel() {
   let revisados = 0;
 
   // ======================================================================
-  // 🔄 RECORRER PÁGINAS
+  //  RECORRER PÁGINAS
   // ======================================================================
   for (let pagina = 1; pagina <= totalPaginas; pagina++) {
     console.log(`➡️ [${STORE}] Procesando página ${pagina}/${totalPaginas}`);
@@ -151,7 +151,7 @@ async function scrapeSantaIsabel() {
     }
 
     // ======================================================================
-    // 🧠 EXTRACCIÓN DE DATOS (SIN PARSEAR NÚMEROS AQUÍ)
+    //EXTRACCIÓN DE DATOS (SIN PARSEAR NÚMEROS AQUÍ)
 // ======================================================================
     let productos = [];
     for (let intento = 0; intento < 3; intento++) {
@@ -202,7 +202,7 @@ async function scrapeSantaIsabel() {
         }).filter(Boolean)
       );
 
-      // 🔎 Filtro rápido: solo productos con título y string de precio
+      //  Filtro rápido: solo productos con título y string de precio
       productos = productos.filter((p) => p.title && p.formattedPrice);
 
       if (productos.length > 0) break;
@@ -215,15 +215,15 @@ async function scrapeSantaIsabel() {
     );
 
     // ======================================================================
-    // 💾 GUARDAR EN BD + HISTORIAL (CON PARSER UNIFICADO)
+    //  GUARDAR EN BD + HISTORIAL (CON PARSER UNIFICADO)
 // ======================================================================
     for (const p of productos) {
       if (!p.title || !p.formattedPrice) continue;
 
-      // 1️⃣ Limpiamos el texto para evitar que se mezclen dos precios
+      //  Limpiamos el texto para evitar que se mezclen dos precios
       const textoPrecioLimpio = normalizarTextoPrecio(p.formattedPrice);
 
-      // 2️⃣ Aplicamos el parser estándar (soporta "2x$3.000", etc.)
+      //  Aplicamos el parser estándar (soporta "2x$3.000", etc.)
       const precioNum = parsePriceUnitario(textoPrecioLimpio);
       if (!precioNum || isNaN(precioNum) || precioNum <= 0) continue;
 
@@ -272,10 +272,9 @@ async function scrapeSantaIsabel() {
           });
 
           actualizados++;
-          // Si quieres menos ruido, puedes comentar este log:
-          // console.log(`🔄 Precio actualizado: ${p.title}`);
+
         } else {
-          // Solo refrescamos lastUpdate para saber que fue revisado hoy
+
           await productosDB.updateOne(
             { _id: existente._id },
             { $set: { lastUpdate: new Date() } }
@@ -301,7 +300,7 @@ async function scrapeSantaIsabel() {
         });
 
         nuevos++;
-        // console.log(`🆕 Nuevo producto agregado: ${p.title}`);
+
 
         await historialDB.insertOne({
           productId: result.insertedId,

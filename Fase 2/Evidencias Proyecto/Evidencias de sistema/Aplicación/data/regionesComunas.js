@@ -1,5 +1,5 @@
 // =============================================================
-// 🌎 REGIONES Y COMUNAS DE CHILE — Versión para supermercados
+//  REGIONES Y COMUNAS DE CHILE — Versión para supermercados
 // =============================================================
 export const REGIONES_COMUNAS = {
   "Arica y Parinacota": ["Arica", "Camarones", "Putre", "General Lagos"],

@@ -1,9 +1,9 @@
 // =============================================================
-// 🛒 Catálogo de Productos — Versión con filtros inteligentes
+//  Catálogo de Productos — Versión con filtros inteligentes
 // =============================================================
 
 let productosGlobal = [];
-let selectedWeights = new Set(); // ✅ Cambiar a Set para múltiples valores
+let selectedWeights = new Set(); //  Cambiar a Set para múltiples valores
 let filtrosPesoVisibles = false;
 const ALL_STORES = ["unimarc", "tottus", "jumbo", "acuenta", "santaisabel"];
 let selectedStores = new Set(ALL_STORES);
@@ -13,12 +13,12 @@ let pageSize = 200;
 let totalPages = 1;
 
 // ==========================================
-// 🔢 Normalizar peso/volumen desde título
+//  Normalizar peso/volumen desde título
 // ==========================================
 function normalizarPesoDesdeTitulo(title) {
   if (!title) return null;
   
-  // 🔥 Detectar VOLUMEN (litros, ml, cc)
+  //  Detectar VOLUMEN (litros, ml, cc)
   const matchVolumen = title.match(/(\d+(?:[\.,]\d+)?)\s*(l|ml|cc)\b/i);
   if (matchVolumen) {
     let valor = parseFloat(matchVolumen[1].replace(",", "."));
@@ -30,7 +30,7 @@ function normalizarPesoDesdeTitulo(title) {
     return { valor: Math.round(valor), tipo: "volumen", unidadOriginal: unidad };
   }
   
-  // 🔥 Detectar PESO (gramos, kg)
+  //  Detectar PESO (gramos, kg)
   const matchPeso = title.match(/(\d+(?:[\.,]\d+)?)\s*(g|kg)\b/i);
   if (matchPeso) {
     let valor = parseFloat(matchPeso[1].replace(",", "."));
@@ -47,7 +47,7 @@ function normalizarPesoDesdeTitulo(title) {
 }
 
 // ==========================================
-// 🎯 Detectar tipo de producto predominante
+//  Detectar tipo de producto predominante
 // ==========================================
 function detectarTipoProducto(productos) {
   let volumen = 0;
@@ -72,7 +72,7 @@ function detectarTipoProducto(productos) {
 }
 
 // ==========================================
-// 🏷️ Renderizar filtros inteligentes
+//  Renderizar filtros inteligentes
 // ==========================================
 function renderizarFiltrosPeso(productos) {
   const cont = document.querySelector(".filtros-peso");
@@ -173,14 +173,13 @@ function renderizarFiltrosPeso(productos) {
       currentPage = 1;
       renderizarProductos(getFilteredProducts());
       renderizarFiltrosPeso(productosGlobal);
-      cargarMarcasSidebar();
     };
     cont.appendChild(limpiar);
   }
 }
 
 // ==========================================
-// 🔄 Toggle filtro (seleccionar/deseleccionar)
+//  Toggle filtro (seleccionar/deseleccionar)
 // ==========================================
 function toggleFiltro(valor, tipo) {
   // Buscar si ya existe
@@ -189,36 +188,32 @@ function toggleFiltro(valor, tipo) {
   );
   
   if (filtroExistente) {
-    // ❌ Deseleccionar
+    //  Deseleccionar
     selectedWeights.delete(filtroExistente);
   } else {
-    // ✅ Seleccionar
+    //  Seleccionar
     selectedWeights.add({ valor, tipo });
   }
   
   currentPage = 1;
   renderizarProductos(getFilteredProducts());
-  renderizarFiltrosPeso(productosGlobal); 
-  cargarMarcasSidebar(); // 🟢 ACTUALIZA MARCAS SEGÚN PESO// Refrescar para actualizar clases "seleccionado"
+  renderizarFiltrosPeso(productosGlobal); // Refrescar para actualizar clases "seleccionado"
 }
 
 // ==========================================
-// 🎯 Filtrar productos
+//  Filtrar productos
 // ==========================================
 function getFilteredProducts() {
   let lista = [...productosGlobal];
 
-  // 🛒 Filtrar por supermercado (CORREGIDO)
+  // Filtrar por supermercado
   if (selectedStores.size > 0 && selectedStores.size < ALL_STORES.length) {
-    lista = lista.filter((p) => {
-      const tienda = (p.store || "").toLowerCase().trim();
-      return selectedStores.has(tienda);
-    });
+    lista = lista.filter((p) => selectedStores.has((p.store || "").toLowerCase()));
+  } else if (selectedStores.size === 0) {
+    return [];
   }
-  // ❌ NO devolver [], sino mostrar todo si no hay filtros.
-  // Antes lo bloqueabas aquí.
 
-  // 🔥 Filtrar por peso/volumen (múltiples valores)
+  //  Filtrar por peso/volumen (múltiples valores)
   if (selectedWeights.size > 0) {
     lista = lista.filter((p) => {
       const medida = normalizarPesoDesdeTitulo(p.title);
@@ -239,66 +234,7 @@ function getFilteredProducts() {
 }
 
 // ==========================================
-// 🏷️ Obtener marcas disponibles según filtros actuales
-// ==========================================
-function getAvailableBrands() {
-  const productosFiltrados = getFilteredProducts();
-
-  const marcas = new Set();
-  productosFiltrados.forEach(p => {
-    if (p.brand && p.brand !== "null" && p.brand !== "") {
-      marcas.add(p.brand.trim());
-    }
-  });
-
-  return [...marcas].sort();
-}
-
-
-// 🧽 Limpia el precio y deja solo el primero que aparezca (evita $14450$16990)
-function limpiarPrecioFormulario(precio = "") {
-  if (!precio) return null;
-  let txt = precio.toString().replace(/\s+/g, "");
-  const m = txt.match(/\$[\d\.]+/);
-  return m ? m[0] : precio;
-}
-
-
-// 🔢 Extrae solo números para comparar precios correctamente
-function extraerNumero(precio = "") {
-  if (!precio) return null;
-  return parseInt(precio.toString().replace(/\D/g, ""), 10);
-}
-
-
-// 🧽 Limpia un precio y lo convierte a número
-function parsePrecio(valor) {
-  if (!valor) return null;
-  if (typeof valor === "number") return valor;
-
-  let txt = valor.toString().trim();
-
-  // Detecta formato tipo: "2 x $2.200" o "3x$4.500"
-  const promo = txt.match(/(\d+)\s*x\s*\$?\s*([\d\.,]+)/i);
-  if (promo) {
-    const cantidad = parseFloat(promo[1]);
-    const precioTotal = parseFloat(promo[2].replace(/[^\d.,]/g, "").replace(",", "."));
-    return cantidad > 0 ? Math.round(precioTotal / cantidad) : precioTotal;
-  }
-
-  // Limpieza general para precios normales
-  const limpio = txt.replace(/[^\d.,]/g, "").replace(",", ".");
-  return parseFloat(limpio) || null;
-}
-
-// 🧼 Limpia solo para mostrar en HTML (sin cambiar valor numérico)
-function limpiarPrecioMostrar(valor) {
-  if (!valor) return "$ -";
-  return valor.toString().replace(/\s+/g, "").replace("$", "$");
-}
-
-// ==========================================
-// 🎨 Renderizar productos
+//  Renderizar productos
 // ==========================================
 function renderizarProductos(lista) {
   const contenedor = document.getElementById("contenedorProductos");
@@ -310,7 +246,7 @@ function renderizarProductos(lista) {
     return;
   }
 
-  // 📌 Paginación
+  // Paginación
   totalPages = Math.ceil(lista.length / pageSize);
   const listaPaginada = lista.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
@@ -318,8 +254,7 @@ function renderizarProductos(lista) {
     const card = document.createElement("div");
     card.className = "producto-card";
 
-    // 🎨 Color del supermercado (NORMALIZADO: trim + lowercase)
-    const tienda = (p.store || "").toLowerCase().trim();
+    const tienda = (p.store || "").toLowerCase();
     const colorTienda =
       tienda === "unimarc" ? "#d32f2f" :
       tienda === "tottus" ? "#388e3c" :
@@ -327,45 +262,26 @@ function renderizarProductos(lista) {
       tienda === "acuenta" ? "#f57c00" :
       tienda === "santaisabel" ? "#c2185b" : "#616161";
 
-    const storeLabel = `<span class="store-label" style="background:${colorTienda}">${(p.store || "SIN TIENDA").toUpperCase().trim()}</span>`;
-
-    // 🏷️ Marca
+    const storeLabel = `<span class="store-label" style="background:${colorTienda}">${(p.store || "SIN TIENDA").toUpperCase()}</span>`;
     const marca = p.brand && p.brand.trim() && p.brand !== "null" ? p.brand : "Sin marca";
 
-    // 🧮 Calcular precios
-    const precioActualNum = parsePrecio(p.formattedPrice);
-    const precioNormalNum = parsePrecio(p.priceNormal);
-
-    // 📌 Precio numérico final para carrito/clic
     let precioNum = 0;
-    if (typeof p.currentPrice === "number") {
-      precioNum = p.currentPrice;
-    } else if (typeof p.currentPrice === "string") {
+    if (typeof p.currentPrice === "number") precioNum = p.currentPrice;
+    else if (typeof p.currentPrice === "string") {
       precioNum = parseFloat(p.currentPrice.replace(/[^\d.,]/g, "").replace(",", ".")) || 0;
-    } else {
-      precioNum = precioActualNum ?? 0;
+    } else if (p.formattedPrice) {
+      const m = p.formattedPrice.match(/([\d\.,]+)/);
+      if (m) precioNum = parseFloat(m[1].replace(/\./g, "").replace(",", ".")) || 0;
     }
 
-    // 👁️ Solo mostramos el precio normal si es mayor que el actual
-    const mostrarPrecioNormal =
-      precioNormalNum &&
-      limpiarPrecioMostrar(p.priceNormal) !== limpiarPrecioMostrar(p.formattedPrice) &&
-      (!precioActualNum || precioNormalNum > precioActualNum);
-
-    // 🖼️ Render de la tarjeta
     card.innerHTML = `
       <div class="store-container">${storeLabel}</div>
       <img src="${p.image || "/img/no-image.png"}" alt="${p.title}" loading="lazy">
       <h3 class="product-title">${p.title}</h3>
       <p class="brand"><strong>${marca}</strong></p>
-
       <div class="price-box">
-        <p class="price-actual">${limpiarPrecioMostrar(p.formattedPrice) || "$ -"}</p>
-
-        ${mostrarPrecioNormal ? `
-          <p class="price-normal"><span class="tachado">${limpiarPrecioMostrar(p.priceNormal)}</span></p>
-        ` : ""}
-
+        <p class="price-actual">${p.formattedPrice || "$ -"}</p>
+        ${p.priceNormal ? `<p class="price-normal">Normal: ${p.priceNormal}</p>` : ""}
         ${p.pricePerUnit ? `<p class="price-unit"><small>${p.pricePerUnit}</small></p>` : ""}
       </div>
 
@@ -389,7 +305,7 @@ function renderizarProductos(lista) {
         data-url="${p.link || ""}"
         data-supermercado="${tienda}"
         onclick="agregarDesdeBoton(this)">
-        🛒 Agregar al carrito
+         Agregar al carrito
       </button>
 
       <div class="botones-extra">
@@ -406,88 +322,8 @@ function renderizarProductos(lista) {
   renderizarPaginacion();
 }
 
-
-
-
-async function cargarMarcas() {
-  const texto = document.getElementById("busqueda").value.trim();
-  const tiendas = Array.from(selectedStores).join(",");
-  // Serializa los filtros de peso/volumen seleccionados (ej: "volumen:1000,peso:500")
-  const pesoSeleccionado = serializeSelectedWeights();
-
-  const res = await fetch(`/api/productos/marcas?q=${texto}&tiendas=${tiendas}&peso=${pesoSeleccionado}`);
-  const data = await res.json();
-
-  const lista = document.getElementById("listaMarcas");
-
-  if (!data.ok || !data.marcas.length) {
-    lista.innerHTML = "<p style='font-size:13px;color:#777;'>Sin marcas disponibles</p>";
-    return;
-  }
-
-  lista.innerHTML = data.marcas.map(m => `
-    <label><input type="checkbox" class="chkMarca" value="${m}"> ${m}</label>
-  `).join("");
-const totalMarcas = data.marcas.length;
-const sidebar = document.querySelector(".sidebar-marcas");
-
-if (totalMarcas <= 5) {
-  sidebar.classList.add("pocas-marcas");
-} else {
-  sidebar.classList.remove("pocas-marcas");
-}
-
-  document.querySelectorAll(".chkMarca").forEach(cb => {
-    cb.addEventListener("change", () => cargarProductos(texto));
-  });
-}
-
-
-// Buscar dentro del filtro lateral
-document.addEventListener("input", (e) => {
-  if (e.target.id === "filtroMarcasBuscar") cargarMarcas();
-});
-
-// Recargar productos al seleccionar marcas
-document.addEventListener("change", (e) => {
-  if (e.target.classList.contains("chkMarca")) {
-    currentPage = 1;
-    cargarProductos(document.getElementById("busqueda").value.trim());
-  }
-});
-
-function obtenerMarcasSeleccionadas() {
-  return [...document.querySelectorAll(".chkMarca:checked")].map(el => el.value);
-}
-// Serializa los filtros de peso/volumen seleccionados (ej: "volumen:1000,peso:500")
-function serializeSelectedWeights() {
-  if (!selectedWeights || selectedWeights.size === 0) return "";
-  try {
-    return Array.from(selectedWeights)
-      .map(sw => `${sw.tipo}:${sw.valor}`)
-      .join(",");
-  } catch (e) {
-    return "";
-  }
-}
-
-// Función auxiliar que recarga las marcas del sidebar. Antes estaba siendo
-// invocada pero no definida, lo que rompía el flujo.
-function cargarMarcasSidebar() {
-  cargarMarcas();
-}
-
-document.addEventListener("click", (e) => {
-  const drop = document.getElementById("dropdownMarcas");
-  const btn = document.getElementById("btnMarcas");
-  if (drop && !drop.contains(e.target) && !btn.contains(e.target)) {
-    drop.classList.add("oculto");
-  }
-});
-
-
 // ==========================================
-// 📄 Renderizar paginación
+//  Renderizar paginación
 // ==========================================
 function renderizarPaginacion() {
   const cont = document.getElementById("paginacion");
@@ -540,26 +376,23 @@ function cambiarPagina(nuevaPagina) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+// ==========================================
+//  Cargar productos
+// ==========================================
 async function cargarProductos(busqueda = "") {
   try {
-    let url = `/api/catalogo?q=${encodeURIComponent(busqueda)}`;
-
-    const marcas = obtenerMarcasSeleccionadas();
-    if (marcas.length) url += `&marcas=${marcas.join(",")}`;
-
-    const res = await fetch(url);
+    const res = await fetch(`/api/catalogo?q=${encodeURIComponent(busqueda)}`);
     const productos = await res.json();
+    productosGlobal = productos;
 
-    productosGlobal = productos || [];
-
-    selectedWeights.clear();
+    selectedWeights.clear(); //  Limpiar filtros al hacer nueva búsqueda
     currentPage = 1;
-
+    
     renderizarProductos(getFilteredProducts());
 
     const huboBusqueda = busqueda.trim() !== "";
     if (huboBusqueda) {
-      renderizarFiltrosPeso(productosGlobal);
+      renderizarFiltrosPeso(productos);
       filtrosPesoVisibles = true;
     } else if (filtrosPesoVisibles) {
       document.querySelector(".filtros-peso").innerHTML = "";
@@ -570,10 +403,8 @@ async function cargarProductos(busqueda = "") {
   }
 }
 
-
-
 // ==========================================
-// 🖱️ Registrar clic en producto
+//  Registrar clic en producto
 // ==========================================
 async function registrarClickProducto(btn) {
   let precioRaw = btn.getAttribute("data-precio") || "";
@@ -605,9 +436,9 @@ async function registrarClickProducto(btn) {
       credentials: "include",
     });
     const data = await res.json();
-    console.log("✅ Click guardado:", data.msg);
+    console.log(" Click guardado:", data.msg);
   } catch (error) {
-    console.error("❌ Error registrando clic:", error);
+    console.error(" Error registrando clic:", error);
   }
 
   window.open(producto.link, "_blank");
@@ -655,7 +486,7 @@ if (inputBusqueda && contenedorSugerencias) {
           .join("");
         contenedorSugerencias.style.display = "block";
       } catch (err) {
-        console.error("❌ Error sugerencias:", err);
+        console.error(" Error sugerencias:", err);
         contenedorSugerencias.style.display = "none";
       }
     }, 300);
@@ -690,35 +521,28 @@ async function buscar() {
       body: JSON.stringify({ termino }),
     });
   } catch (e) {
-    console.warn("⚠️ No se pudo registrar la búsqueda:", e.message);
+    console.warn(" No se pudo registrar la búsqueda:", e.message);
   }
 
   await cargarProductos(termino);
-  cargarMarcasSidebar();  // 👈 NUEVO: recargar SOLO marcas que existan en este resultado
-
   contenedorSugerencias.innerHTML = "";
   contenedorSugerencias.style.display = "none";
 }
-
-
 
 function leerCheckboxesSuper() {
   const cbs = document.querySelectorAll(".filtro-super");
   selectedStores = new Set(
     Array.from(cbs)
-      .filter(c => c.checked)
-      .map(c => c.value.toLowerCase().trim())
+      .filter((c) => c.checked)
+      .map((c) => c.value.toLowerCase())
   );
 }
-
 
 function aplicarFiltroSupermercado() {
   leerCheckboxesSuper();
   currentPage = 1;
   renderizarProductos(getFilteredProducts());
-  cargarMarcasSidebar(); // 🟢 ACTUALIZA
 }
-
 
 function wireSuperCheckboxes() {
   const cbs = document.querySelectorAll(".filtro-super");
@@ -728,8 +552,4 @@ function wireSuperCheckboxes() {
 window.addEventListener("DOMContentLoaded", () => {
   wireSuperCheckboxes();
   cargarProductos();
-
-  const btnMarcas = document.getElementById("btnMarcas");
-  if (btnMarcas) btnMarcas.addEventListener("click", cargarMarcas);
 });
-

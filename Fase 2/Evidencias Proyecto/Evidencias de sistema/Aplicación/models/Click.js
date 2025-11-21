@@ -2,7 +2,7 @@
 import { getDB } from "../config/db.js";
 
 export const Click = {
-  // 🔹 Registrar un clic (cuando el usuario interactúa con un producto)
+  //  Registrar un clic (cuando el usuario interactúa con un producto)
   async insertOne(data) {
     const db = getDB();
     const nuevoClick = {
@@ -24,7 +24,7 @@ export const Click = {
     return db.collection("clicks").insertOne(nuevoClick);
   },
 
-  // 🔹 Obtener todos los clics (con filtros opcionales)
+  //  Obtener todos los clics (con filtros opcionales)
   async findAll(filtros = {}, limit = 100) {
     const db = getDB();
     return db
@@ -35,7 +35,7 @@ export const Click = {
       .toArray();
   },
 
-  // 🔹 Obtener los clics de un usuario por correo
+  //  Obtener los clics de un usuario por correo
   async findByUser(correo) {
     const db = getDB();
     return db
@@ -45,13 +45,13 @@ export const Click = {
       .toArray();
   },
 
-  // 🔹 Eliminar todos los clics (para pruebas o limpieza)
+  //  Eliminar todos los clics (para pruebas o limpieza)
   async clearAll() {
     const db = getDB();
     return db.collection("clicks").deleteMany({});
   },
 
-  // 🔹 Métrica rápida: contar clics totales o por filtro
+  //  Métrica rápida: contar clics totales o por filtro
   async count(filtros = {}) {
     const db = getDB();
     return db.collection("clicks").countDocuments(filtros);

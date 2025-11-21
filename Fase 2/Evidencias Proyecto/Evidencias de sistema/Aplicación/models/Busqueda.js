@@ -2,7 +2,7 @@
 import { getDB } from "../config/db.js";
 
 export const Busqueda = {
-  // 🔹 Registrar una nueva búsqueda
+  //  Registrar una nueva búsqueda
   async insertOne(data) {
     const db = getDB();
     const nuevaBusqueda = {
@@ -14,7 +14,7 @@ export const Busqueda = {
     return db.collection("busquedas").insertOne(nuevaBusqueda);
   },
 
-  // 🔹 Obtener todas las búsquedas (opcional con filtros)
+  //  Obtener todas las búsquedas (opcional con filtros)
   async findAll(filtros = {}, limit = 100) {
     const db = getDB();
     return db
@@ -25,7 +25,7 @@ export const Busqueda = {
       .toArray();
   },
 
-  // 🔹 Obtener las más populares
+  //  Obtener las más populares
   async topBusquedas(limit = 10) {
     const db = getDB();
     return db

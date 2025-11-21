@@ -1,5 +1,5 @@
 // ======================================================================
-// 🏬 SCRAPER LOCALES SANTA ISABEL — FINAL REAL (98 PÁGINAS)
+//  SCRAPER LOCALES SANTA ISABEL — FINAL REAL (98 PÁGINAS)
 // ======================================================================
 import { chromium } from "playwright";
 import { getDB, connectDB } from "../config/db.js";
@@ -9,21 +9,21 @@ const STORE = "locales_santaisabel";
 const URL = "https://www.santaisabel.cl/locales";
 
 // =============================================================
-// 🍪 Aceptar cookies
+//  Aceptar cookies
 // =============================================================
 async function aceptarCookies(page) {
   try {
     const btn = await page.locator("#onetrust-accept-btn-handler");
     if ((await btn.count()) > 0 && (await btn.isVisible())) {
       await btn.click();
-      console.log("🍪 Cookies aceptadas");
+      console.log(" Cookies aceptadas");
       await page.waitForTimeout(1500);
     }
   } catch {}
 }
 
 // =============================================================
-// 📌 EXTRAER LOCALES VISIBLES DE LA PÁGINA
+//  EXTRAER LOCALES VISIBLES DE LA PÁGINA
 // =============================================================
 async function scrapeLocales(page) {
   return await page.$$eval(
@@ -42,7 +42,7 @@ async function scrapeLocales(page) {
 }
 
 // =============================================================
-// 🔄 CAMBIAR A CADA PÁGINA DEL SELECTOR (1...98)
+//  CAMBIAR A CADA PÁGINA DEL SELECTOR (1...98)
 // =============================================================
 async function irAPagina(page, numero) {
   // abrir el dropdown
@@ -54,14 +54,14 @@ async function irAPagina(page, numero) {
   if (items[numero - 1]) {
     await items[numero - 1].click();
   } else {
-    console.log(`⚠ No existe la página ${numero}`);
+    console.log(` No existe la página ${numero}`);
   }
 
   await page.waitForTimeout(2000);
 }
 
 // =============================================================
-// 🚀 MAIN
+//  MAIN
 // =============================================================
 async function main() {
   console.log("\n🟢 Iniciando SCRAPER SANTA ISABEL...");

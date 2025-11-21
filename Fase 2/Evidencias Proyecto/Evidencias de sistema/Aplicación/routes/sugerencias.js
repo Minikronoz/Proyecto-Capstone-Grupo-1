@@ -6,18 +6,18 @@ const contenedorSugerencias = document.querySelector(".sugerencias");
 let timeout = null;
 
 // =======================================================
-// ✏️ Evento: cada vez que el usuario escribe
+//  Evento: cada vez que el usuario escribe
 // =======================================================
 inputBusqueda.addEventListener("input", async (e) => {
   const texto = e.target.value.trim();
 
-  // 🧹 Si el usuario borra todo → limpiar sugerencias
+  //  Si el usuario borra todo → limpiar sugerencias
   if (!texto) {
     limpiarSugerencias();
     return;
   }
 
-  // 🕓 Evita múltiples peticiones seguidas (debounce)
+  //  Evita múltiples peticiones seguidas (debounce)
   clearTimeout(timeout);
   timeout = setTimeout(async () => {
     try {
@@ -27,7 +27,7 @@ inputBusqueda.addEventListener("input", async (e) => {
       if (!resp.ok) throw new Error("Error al obtener sugerencias");
       const sugerencias = await resp.json();
 
-      // 🚫 Sin resultados
+      //  Sin resultados
       if (!sugerencias.length) {
         contenedorSugerencias.innerHTML =
           "<div class='sin-sugerencias'>Sin resultados</div>";
@@ -35,7 +35,7 @@ inputBusqueda.addEventListener("input", async (e) => {
         return;
       }
 
-      // 🧩 Generar lista de sugerencias dinámicas
+      //  Generar lista de sugerencias dinámicas
       contenedorSugerencias.innerHTML = sugerencias
         .map(
           (s) => `
@@ -51,11 +51,11 @@ inputBusqueda.addEventListener("input", async (e) => {
       console.error("❌ Error cargando sugerencias:", err);
       limpiarSugerencias();
     }
-  }, 250); // ⚡ respuesta rápida sin saturar
+  }, 250); //  respuesta rápida sin saturar
 });
 
 // =======================================================
-// 🖱️ Selección de una sugerencia (delegación de eventos)
+//  Selección de una sugerencia (delegación de eventos)
 // =======================================================
 contenedorSugerencias.addEventListener("click", (e) => {
   const item = e.target.closest(".item-sugerencia");
@@ -66,7 +66,7 @@ contenedorSugerencias.addEventListener("click", (e) => {
 });
 
 // =======================================================
-// 🧠 Función: aplicar la sugerencia seleccionada
+//  Función: aplicar la sugerencia seleccionada
 // =======================================================
 function seleccionarSugerencia(valor) {
   inputBusqueda.value = valor;
@@ -79,7 +79,7 @@ function seleccionarSugerencia(valor) {
 }
 
 // =======================================================
-// 🚪 Cerrar sugerencias al hacer clic fuera del buscador
+//  Cerrar sugerencias al hacer clic fuera del buscador
 // =======================================================
 document.addEventListener("click", (e) => {
   if (!e.target.closest(".buscador")) {
@@ -88,7 +88,7 @@ document.addEventListener("click", (e) => {
 });
 
 // =======================================================
-// 🧹 Helper: limpiar contenedor de sugerencias
+//  Helper: limpiar contenedor de sugerencias
 // =======================================================
 function limpiarSugerencias() {
   contenedorSugerencias.innerHTML = "";
