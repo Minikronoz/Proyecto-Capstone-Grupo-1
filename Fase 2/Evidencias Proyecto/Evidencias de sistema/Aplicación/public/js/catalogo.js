@@ -3,10 +3,11 @@
 // =============================================================
 
 let productosGlobal = [];
-let selectedWeights = new Set(); //  Cambiar a Set para múltiples valores
+let selectedWeights = new Set();
 let filtrosPesoVisibles = false;
 const ALL_STORES = ["unimarc", "tottus", "jumbo", "acuenta", "santaisabel"];
 let selectedStores = new Set(ALL_STORES);
+let selectedBrands = new Set();
 
 let currentPage = 1;
 let pageSize = 200;
@@ -69,6 +70,70 @@ function detectarTipoProducto(productos) {
   if (volumen === 0 && peso === 0) return "ninguno";
   
   return "ambos";
+}
+
+// ==========================================
+// Obtener marcas disponibles normalizadas
+// ==========================================
+function getAvailableBrands() {
+  const marcasMap = new Map(); // Usar Map para almacenar marca normalizada → marca original
+  
+  productosGlobal.forEach((p) => {
+    const marca = p.brand && p.brand.trim() && p.brand !== "null" && p.brand !== "Sin marca" 
+      ? p.brand.trim() 
+      : null;
+    
+    if (marca) {
+      // Normalizar: primera letra mayúscula, resto minúscula
+      const marcaNormalizada = marca.charAt(0).toUpperCase() + marca.slice(1).toLowerCase();
+      
+      // Si ya existe, mantener la primera aparición (evita duplicados)
+      if (!marcasMap.has(marcaNormalizada)) {
+        marcasMap.set(marcaNormalizada, marcaNormalizada);
+      }
+    }
+  });
+
+  return Array.from(marcasMap.values()).sort((a, b) => a.localeCompare(b));
+}
+
+// ==========================================
+// Cargar marcas en el sidebar
+// ==========================================
+function cargarMarcasSidebar() {
+  const lista = document.getElementById("listaMarcas");
+  const marcas = getAvailableBrands();
+
+  if (marcas.length === 0) {
+    lista.innerHTML = "<p style='color:#888;font-size:13px;'>Sin marcas disponibles</p>";
+    return;
+  }
+
+  lista.innerHTML = marcas.map(m => `
+    <label>
+      <input type="checkbox" class="chkMarca" value="${m}" ${selectedBrands.has(m) ? 'checked' : ''}> 
+      ${m}
+    </label>
+  `).join("");
+
+  //  Agregar event listeners
+  document.querySelectorAll(".chkMarca").forEach(cb => {
+    cb.addEventListener("change", aplicarFiltroMarcas);
+  });
+}
+
+// ==========================================
+//  Aplicar filtro de marcas
+// ==========================================
+function aplicarFiltroMarcas() {
+  selectedBrands.clear();
+  
+  document.querySelectorAll(".chkMarca:checked").forEach(cb => {
+    selectedBrands.add(cb.value);
+  });
+
+  currentPage = 1;
+  renderizarProductos(getFilteredProducts());
 }
 
 // ==========================================
@@ -206,24 +271,40 @@ function toggleFiltro(valor, tipo) {
 function getFilteredProducts() {
   let lista = [...productosGlobal];
 
-  // Filtrar por supermercado
+  // 1. Filtrar por supermercado
   if (selectedStores.size > 0 && selectedStores.size < ALL_STORES.length) {
     lista = lista.filter((p) => selectedStores.has((p.store || "").toLowerCase()));
   } else if (selectedStores.size === 0) {
     return [];
   }
 
-  //  Filtrar por peso/volumen (múltiples valores)
+  // 2. Filtrar por MARCAS (comparación normalizada)
+  if (selectedBrands.size > 0) {
+    lista = lista.filter((p) => {
+      const marca = p.brand && p.brand.trim() && p.brand !== "null" ? p.brand.trim() : null;
+      
+      if (!marca) return false;
+      
+      // Normalizar la marca del producto
+      const marcaNormalizada = marca.charAt(0).toUpperCase() + marca.slice(1).toLowerCase();
+      
+      // Comparar con las marcas seleccionadas (también normalizadas)
+      return Array.from(selectedBrands).some(selectedMarca => {
+        const selectedNormalizada = selectedMarca.charAt(0).toUpperCase() + selectedMarca.slice(1).toLowerCase();
+        return marcaNormalizada === selectedNormalizada;
+      });
+    });
+  }
+
+  // 3. Filtrar por peso/volumen (múltiples valores)
   if (selectedWeights.size > 0) {
     lista = lista.filter((p) => {
       const medida = normalizarPesoDesdeTitulo(p.title);
       if (!medida) return false;
       
-      // Verificar si el producto coincide con ALGUNO de los filtros seleccionados
       return Array.from(selectedWeights).some(filtro => {
         if (medida.tipo !== filtro.tipo) return false;
         
-        // Tolerancia de ±10%
         const tolerancia = filtro.valor * 0.1;
         return Math.abs(medida.valor - filtro.valor) <= tolerancia;
       });
@@ -385,10 +466,12 @@ async function cargarProductos(busqueda = "") {
     const productos = await res.json();
     productosGlobal = productos;
 
-    selectedWeights.clear(); //  Limpiar filtros al hacer nueva búsqueda
+    selectedWeights.clear();
+    selectedBrands.clear(); //  Limpiar filtros de marcas
     currentPage = 1;
     
     renderizarProductos(getFilteredProducts());
+    cargarMarcasSidebar(); //  Actualizar sidebar de marcas
 
     const huboBusqueda = busqueda.trim() !== "";
     if (huboBusqueda) {
@@ -553,3 +636,17 @@ window.addEventListener("DOMContentLoaded", () => {
   wireSuperCheckboxes();
   cargarProductos();
 });
+
+// ==========================================
+//  Buscador LOCAL dentro de marcas
+// ==========================================
+const inputBuscarMarca = document.getElementById("filtroMarcasBuscar");
+if (inputBuscarMarca) {
+  inputBuscarMarca.addEventListener("keyup", () => {
+    const filtro = inputBuscarMarca.value.toLowerCase();
+    document.querySelectorAll("#listaMarcas label").forEach(el => {
+      const textoMarca = el.textContent.toLowerCase();
+      el.style.display = textoMarca.includes(filtro) ? "flex" : "none";
+    });
+  });
+}

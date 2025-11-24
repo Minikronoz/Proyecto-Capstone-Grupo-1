@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
-    // 🔒 Si no hay sesión → mostrar iniciar sesión
+    // Si no hay sesión → mostrar iniciar sesión
     navUsuario.innerHTML = `
       <a href="/login" class="btn-nav">🔑 Iniciar sesión</a>
       <a href="/registrar" class="btn-nav btn-registro">📝 Registrarse</a>
@@ -303,60 +303,6 @@ document.addEventListener("DOMContentLoaded", verificarYMostrarPopup);
 
     window.open(producto.link, "_blank");
   }
-</script>
-
-<script>
-// ===== Cargar marcas dinámicamente =====
-async function cargarMarcas() {
-  const texto = document.getElementById("busqueda").value.trim();
-  const tiendas = Array.from(document.querySelectorAll(".filtro-super:checked")).map(t => t.value).join(",");
-
-  const res = await fetch(`/api/productos/marcas?q=${texto}&tiendas=${tiendas}`);
-  const data = await res.json();
-
-  const lista = document.getElementById("listaMarcas");
-  if (!data.ok || !data.marcas.length) {
-    lista.innerHTML = "<p>Sin marcas</p>";
-    return;
-  }
-
-  lista.innerHTML = data.marcas.map(m => `
-    <label><input type="checkbox" class="chkMarca" value="${m}"> ${m}</label>
-  `).join("");
-
-  document.querySelectorAll(".chkMarca").forEach(cb => {
-    cb.addEventListener("change", () => cargarProductos(document.getElementById("busqueda").value.trim()));
-  });
-}
-
-function cargarMarcasSidebar() {
-  const lista = document.getElementById("listaMarcas");
-  const marcas = getAvailableBrands();
-
-  if (marcas.length === 0) {
-    lista.innerHTML = "<p style='color:#888;font-size:13px;'>Sin marcas disponibles</p>";
-    return;
-  }
-
-  lista.innerHTML = marcas.map(m => `
-      <label><input type="checkbox" class="chkMarca" value="${m}"> ${m}</label>
-  `).join("");
-
-  document.querySelectorAll(".chkMarca").forEach(cb => {
-    cb.addEventListener("change", () => renderProductos());
-  });
-}
-
-// ===== Buscador LOCAL dentro de marcas =====
-document.getElementById("filtroMarcasBuscar").addEventListener("keyup", () => {
-  const filtro = document.getElementById("filtroMarcasBuscar").value.toLowerCase();
-  document.querySelectorAll("#listaMarcas label").forEach(el => {
-    el.style.display = el.textContent.toLowerCase().includes(filtro) ? "flex" : "none";
-  });
-});
-
-// === Llamar marcas al iniciar ===
-document.addEventListener("DOMContentLoaded", cargarMarcas);
 </script>
 
 <!--  Script principal -->
