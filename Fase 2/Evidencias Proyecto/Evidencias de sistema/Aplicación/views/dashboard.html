@@ -5,24 +5,27 @@
   <title>📊 Dashboard de Productos y Búsquedas</title>
   <link rel="stylesheet" href="/css/dashboard.css?v=8">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 </head>
+
+<body>
+
 <script>
+// =============================================================
+//  VERIFICACIÓN DE SESIÓN
+// =============================================================
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     const res = await fetch("/yo");
     const data = await res.json();
 
-    // Si no hay sesión → al login
     if (!data.ok) {
       return window.location.href = "/login";
     }
 
     const rol = data.user.role;
 
-    //  Solo permitir ADMIN o CLIENTE
     if (rol !== "admin" && rol !== "cliente") {
       alert("🚫 No tienes permiso para acceder a esta página.");
       return window.location.href = "/catalogo";
@@ -34,11 +37,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
+Chart.register(ChartDataLabels);
 </script>
-<body>
-  <script>
-  Chart.register(ChartDataLabels);
-</script>
+
 <header>
   <div class="header-content">
     <div class="header-left">
@@ -49,6 +50,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     <div class="filtros">
       <button class="btn-volver" onclick="volverAtras()">⬅️ Atrás</button>
 
+      <!-- ✅ AGREGADO: Santa Isabel -->
       <label for="filtroSuper">Supermercado:</label>
       <select id="filtroSuper">
         <option value="">Todos</option>
@@ -56,14 +58,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         <option value="unimarc">Unimarc</option>
         <option value="tottus">Tottus</option>
         <option value="acuenta">A Cuenta</option>
+        <option value="santaisabel">Santa Isabel</option>
       </select>
 
+      <!-- ✅ ESTOS FILTROS SOLO PARA GRÁFICOS (no para tablas de precios) -->
       <label for="filtroGenero">Género:</label>
       <select id="filtroGenero">
         <option value="">Todos</option>
         <option value="Masculino">Masculino</option>
         <option value="Femenino">Femenino</option>
-        <option value="otro">otro</option>
+        <option value="otro">Otro</option>
       </select>
 
       <label for="filtroRegion">Región:</label>
@@ -87,7 +91,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         <option value="Magallanes">Magallanes</option>
       </select>
 
-      <label for="filtroPeriodo">Periodo:</label>
+      <!-- ❌ PERIODO: No aplica para tablas de 7 días -->
+      <label for="filtroPeriodo">Periodo (gráficos):</label>
       <select id="filtroPeriodo">
         <option value="">Personalizado</option>
         <option value="7">Últimos 7 días</option>
@@ -95,144 +100,149 @@ document.addEventListener("DOMContentLoaded", async () => {
         <option value="90">Últimos 90 días</option>
       </select>
 
+      <!-- ✅ FECHAS: Aplican a bajas/subidas -->
       <label for="filtroFecha">Desde:</label>
       <input type="date" id="filtroFecha">
       <label for="filtroHasta">Hasta:</label>
       <input type="date" id="filtroHasta">
-
 
       <button id="btnFiltrar">Filtrar</button>
     </div>
   </div>
 </header>
 
-<script>
-  function volverAtras() {
-    if (document.referrer && document.referrer !== window.location.href) {
-      window.history.back();
-    } else {
-      window.location.href = "/catalogo";
-    }
-  }
-</script>
-<!-- ======================================================
-      BLOQUE VISUAL: MAPA + RETENCIÓN
-====================================================== -->
 <aside class="panel-lateral">
   <h2>🌎 Distribución de usuarios por región</h2>
   <div id="mapaChile" class="mapa-chile"></div>
 </aside>
 
 <main>
-<div class="tabla-card">
-  <h3 class="subtitulo-chart"> Productos con Baja de Precio (últimos 7 días)</h3>
-
-  <div class="tabla-scroll">
-    <table id="tablaBajas" class="tabla-precios tabla-centered">
-      <thead>
-        <tr>
-          <th>Producto</th>
-          <th>Tienda</th>
-          <th>Antes</th>
-          <th>Ahora</th>
-          <th>Baja</th>
-          <th>Fecha</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+  <!-- BAJAS DE PRECIO -->
+  <div class="tabla-card">
+    <h3 class="subtitulo-chart">📉 Productos con Baja de Precio (últimos 7 días)</h3>
+    <div class="tabla-scroll">
+      <table id="tablaBajas" class="tabla-precios tabla-centered">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Tienda</th>
+            <th>Antes</th>
+            <th>Ahora</th>
+            <th>Baja</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="6" style="text-align:center; padding:20px;">Cargando...</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
 
-
-<div class="tabla-card">
-  <h3 class="subtitulo-chart"> Productos con Subida de Precio (últimos 7 días)</h3>
-
-  <div class="tabla-scroll">
-    <table id="tablaSubidas" class="tabla-precios tabla-centered">
-      <thead>
-        <tr>
-          <th>Producto</th>
-          <th>Tienda</th>
-          <th>Antes</th>
-          <th>Ahora</th>
-          <th>Subida</th>
-          <th>Fecha</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+  <!-- SUBIDAS DE PRECIO -->
+  <div class="tabla-card">
+    <h3 class="subtitulo-chart">📈 Productos con Subida de Precio (últimos 7 días)</h3>
+    <div class="tabla-scroll">
+      <table id="tablaSubidas" class="tabla-precios tabla-centered">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Tienda</th>
+            <th>Antes</th>
+            <th>Ahora</th>
+            <th>Subida</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="6" style="text-align:center; padding:20px;">Cargando...</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
 
-
-
-
+  <!-- GRÁFICOS -->
+  <section>
+    <h2 style="text-align:center; font-weight:600;">📊 Índice de competitividad de precios</h2>
+    <div class="chart-container">
+      <canvas id="indiceCompetitividad"></canvas>
+    </div>
+  </section>
 
   <section>
-<h2 style="text-align:center; font-weight:600;">
-   Índice de competitividad de precios
-</h2>
-  <div class="chart-container">
-    <canvas id="indiceCompetitividad"></canvas>
-  </div>
-</section>
-<section>
-  <h2> Ranking de supermercados por variedad de productos nuevos</h2>
-  <div class="chart-container">
-    <canvas id="rankingProductosNuevos"></canvas>
-  </div>
-</section>
+    <h2>🆕 Ranking de supermercados por variedad de productos nuevos</h2>
+    <div class="chart-container">
+      <canvas id="rankingProductosNuevos"></canvas>
+    </div>
+  </section>
 
-  <!-- ======================================================
-        BLOQUES DE ANÁLISIS DE PRODUCTOS
-  ====================================================== -->
   <section>
-    <h2>Productos más consultados</h2>
+    <h2>🔥 Productos más consultados</h2>
     <div class="chart-container"><canvas id="topProductos"></canvas></div>
   </section>
 
   <section>
-    <h2>Búsquedas por supermercado</h2>
+    <h2>🛒 Búsquedas por supermercado</h2>
     <div class="chart-container"><canvas id="porSupermercado"></canvas></div>
   </section>
 
   <section>
-    <h2>Evolución diaria de consultas</h2>
+    <h2>📅 Evolución diaria de consultas</h2>
     <div class="chart-container"><canvas id="porDia"></canvas></div>
   </section>
 
-<section>
-  <h2>Evolución semanal de consultas</h2>
-  <div class="chart-container">
-    <canvas id="chartTendencia"></canvas>
-  </div>
-</section>
+  <section>
+    <h2>📊 Evolución semanal de consultas</h2>
+    <div class="chart-container">
+      <canvas id="chartTendencia"></canvas>
+    </div>
+  </section>
 
-  
-<section>
-
-    <h2>Usuarios por género</h2>
+  <section>
+    <h2>👥 Usuarios por género</h2>
     <div class="chart-container"><canvas id="porGenero"></canvas></div>
   </section>
 
-
-  <!-- ======================================================
-        PRODUCTOS POR TIEMPO + TENDENCIAS + CRECIMIENTO
-  ====================================================== -->
   <section>
-    <h2>Productos más consultados por día/mes/año</h2>
+    <h2>🕒 Productos más consultados por día/mes/año</h2>
     <div class="chart-container"><canvas id="porTiempo"></canvas></div>
   </section>
-
-
 </main>
 
 <footer>© 2025 Sistema de Reportes y Analítica — Dashboard Integrado</footer>
+
 <script>
+// =============================================================
+//  VARIABLES GLOBALES
+// =============================================================
 let charts = {};
 let filtros = {};
 
+// Variables para scroll infinito
+let paginaBajas = 1;
+let paginaSubidas = 1;
+let cargandoBajas = false;
+let cargandoSubidas = false;
+let hayMasBajas = true;
+let hayMasSubidas = true;
+
+// =============================================================
+//  UTILIDADES
+// =============================================================
+function volverAtras() {
+  if (document.referrer && document.referrer !== window.location.href) {
+    window.history.back();
+  } else {
+    window.location.href = "/catalogo";
+  }
+}
+
+function normalizarRegion(nombre) {
+  if (!nombre) return "";
+  nombre = nombre.trim();
+  if (nombre === "Metropolitana") return "Metropolitana de Santiago";
+  return nombre;
+}
 
 async function fetchData(url, filtros = {}) {
   const query = new URLSearchParams(filtros).toString();
@@ -240,201 +250,248 @@ async function fetchData(url, filtros = {}) {
   return await res.json();
 }
 
+function registrarClick(producto) {
+  fetch("http://localhost:4000/api/clicks/registrar", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ producto })
+  }).catch(err => console.error("Error registrando click:", err));
+}
 
-async function renderDistribucionUsuariosRegion(filtros = {}) {
-  const id = "distribucionUsuariosRegion";
-  const canvas = document.getElementById(id);
-  if (!canvas) return console.warn(`⚠️ No existe canvas #${id}`);
+// =============================================================
+//  SCROLL INFINITO: BAJAS DE PRECIO
+// =============================================================
+async function cargarBajas(filtros = {}, append = false) {
+  if (cargandoBajas || !hayMasBajas) return;
+  
+  cargandoBajas = true;
+  const tbody = document.querySelector("#tablaBajas tbody");
+  
+  if (!append) {
+    tbody.innerHTML = `
+      <tr><td colspan="6" style="text-align:center; padding:20px; color:#64748b;">
+        <div class="loader"></div> Cargando ofertas...
+      </td></tr>
+    `;
+    paginaBajas = 1;
+    hayMasBajas = true;
+  } else {
+    const loaderRow = document.createElement('tr');
+    loaderRow.className = 'loader-row';
+    loaderRow.innerHTML = `
+      <td colspan="6" style="text-align:center; padding:15px;">
+        <div class="loader"></div> Cargando más...
+      </td>
+    `;
+    tbody.appendChild(loaderRow);
+  }
 
-  const ctx = canvas.getContext("2d");
-
-  let data = [];
   try {
-    data = await fetchData("/api/estadisticas/distribucion-usuarios-region", filtros);
-  } catch (err) {
-    console.error("❌ Error cargando distribución usuarios región:", err);
-  }
+    const params = new URLSearchParams({
+      ...filtros,
+      page: paginaBajas,
+      limit: 20
+    });
+    
+    const res = await fetch(`/api/estadisticas/bajas?${params}`);
+    const data = await res.json();
 
-  if (charts[id]) charts[id].destroy();
+    const loaderRow = tbody.querySelector('.loader-row');
+    if (loaderRow) loaderRow.remove();
 
-  // ====== Normalizar Región Metropolitana ======
-data = data.map(d => ({
-  region: d.region?.trim() === "Metropolitana" ? "Metropolitana de Santiago" : d.region,
-  total: d.total
-}));
-
-  if (!Array.isArray(data) || !data.length) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = "15px Poppins";
-    ctx.fillStyle = "#64748b";
-    ctx.fillText("Sin datos recientes para mostrar.", 25, 40);
-    return;
-  }
-
-  const labels = data.map(d => d.region);
-  const valores = data.map(d => d.total);
-
-  const colores = [
-    "#00A7B5", "#6AB04A", "#E63946", "#F4A261", "#8E44AD", "#3498DB",
-    "#2ECC71", "#F39C12", "#A3CB38", "#B53471", "#12CBC4", "#FDA7DC"
-  ].slice(0, labels.length);
-
-  const totalGeneral = valores.reduce((a, b) => a + b, 0);
-
-  charts[id] = new Chart(ctx, {
-    type: "doughnut",
-    data: {
-      labels,
-      datasets: [{
-        label: "Usuarios activos",
-        data: valores,
-        backgroundColor: colores,
-        borderWidth: 2,
-        borderColor: "#ffffff"
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: "55%",
-      plugins: {
-        legend: {
-          position: "right",
-          labels: { font: { size: 12 } }
-        },
-        tooltip: {
-          callbacks: {
-            label: ctx => {
-              const valor = ctx.raw;
-              const pct = ((valor / totalGeneral) * 100).toFixed(1);
-              return `${ctx.label}: ${valor} (${pct}%)`;
-            }
-          }
-        }
+    if (!data.ok || !data.data.length) {
+      if (!append) {
+        tbody.innerHTML = `
+          <tr><td colspan="6" style="text-align:center; padding:20px; color:#94a3b8;">
+            📊 No hay bajas de precio recientes
+          </td></tr>
+        `;
       }
+      hayMasBajas = false;
+      return;
     }
-  });
+
+    if (!append) tbody.innerHTML = "";
+
+    data.data.forEach(item => {
+      const fecha = new Date(item.fecha).toLocaleDateString("es-CL");
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td class="col-producto">
+          <a href="${item.link}"
+             target="_blank"
+             class="producto-link"
+             onclick='registrarClick({
+               idProducto: "${item.productId}",
+               titulo: "${item.titulo.replace(/"/g, "&quot;")}",
+               supermercado: "${item.store}",
+               precio: ${item.precioActual},
+               link: "${item.link}",
+               imagen: "${item.image}"
+             })'>
+            <img src="${item.image}" alt="${item.titulo}" loading="lazy">
+            <span>${item.titulo}</span>
+          </a>
+        </td>
+        <td>${item.store}</td>
+        <td>$${item.precioAnterior.toLocaleString("es-CL")}</td>
+        <td>$${item.precioActual.toLocaleString("es-CL")}</td>
+        <td class="precio-baja">-$${item.diferencia.toLocaleString("es-CL")}</td>
+        <td>${fecha}</td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    hayMasBajas = data.pagination.hasMore;
+    paginaBajas++;
+
+  } catch (error) {
+    console.error("Error cargando bajas:", error);
+    if (!append) {
+      tbody.innerHTML = `
+        <tr><td colspan="6" style="text-align:center; padding:20px; color:#ef4444;">
+          ❌ Error al cargar datos
+        </td></tr>
+      `;
+    }
+  } finally {
+    cargandoBajas = false;
+  }
 }
 
-
-
-
-async function renderCompetitividadChart(id, url, label) {
-  const data = await fetchData(url);
-  const canvas = document.getElementById(id);
-  if (!canvas) return;
-
-  const ctx = canvas.getContext("2d");
-  if (charts[id]) charts[id].destroy();
-
-  if (!data?.length) {
-    ctx.font = "16px Poppins";
-    ctx.fillStyle = "#64748b";
-    ctx.fillText("Sin datos suficientes para mostrar.", 50, 50);
-    return;
+// =============================================================
+//  SCROLL INFINITO: SUBIDAS DE PRECIO
+// =============================================================
+async function cargarSubidas(filtros = {}, append = false) {
+  if (cargandoSubidas || !hayMasSubidas) return;
+  
+  cargandoSubidas = true;
+  const tbody = document.querySelector("#tablaSubidas tbody");
+  
+  if (!append) {
+    tbody.innerHTML = `
+      <tr><td colspan="6" style="text-align:center; padding:20px; color:#64748b;">
+        <div class="loader"></div> Cargando aumentos...
+      </td></tr>
+    `;
+    paginaSubidas = 1;
+    hayMasSubidas = true;
+  } else {
+    const loaderRow = document.createElement('tr');
+    loaderRow.className = 'loader-row';
+    loaderRow.innerHTML = `
+      <td colspan="6" style="text-align:center; padding:15px;">
+        <div class="loader"></div> Cargando más...
+      </td>
+    `;
+    tbody.appendChild(loaderRow);
   }
 
-  //  Datos normalizados
-  const etiquetas = data.map(d => d.tienda);
-  const valores = data.map(d => d.promedio);
+  try {
+    const params = new URLSearchParams({
+      ...filtros,
+      page: paginaSubidas,
+      limit: 20
+    });
+    
+    const res = await fetch(`/api/estadisticas/subidas?${params}`);
+    const data = await res.json();
 
-  //  Mejor (más barato)
-  const mejorPrecio = Math.min(...valores);
+    const loaderRow = tbody.querySelector('.loader-row');
+    if (loaderRow) loaderRow.remove();
 
-  //  Colores consistentes
-  const colorNormal = "rgba(0,167,181,0.85)";   // Turquesa institucional
-  const colorNormalBorder = "#007a85";
-  const colorGanador = "rgba(67,160,71,0.9)";    // Verde ganador
-  const colorGanadorBorder = "#2e7d32";
-
-  charts[id] = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: etiquetas,
-      datasets: [{
-        label,
-        data: valores,
-        backgroundColor: valores.map(v => v === mejorPrecio ? colorGanador : colorNormal),
-        borderColor: valores.map(v => v === mejorPrecio ? colorGanadorBorder : colorNormalBorder),
-        borderWidth: 2,
-        borderRadius: 10
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        
-        //  Valores arriba del bar
-        datalabels: {
-          anchor: "end",
-          align: "start",
-          offset: -6,
-          formatter: value => `$${value.toLocaleString("es-CL")}`,
-          color: "#0f172a",
-          font: { weight: "bold", size: 12 }
-        },
-
-        //  Tooltip PRO
-        tooltip: {
-          backgroundColor: "#1E293B",
-          titleColor: "#fff",
-          bodyColor: "#fff",
-          displayColors: false,
-          callbacks: {
-            label: ctx => `Precio promedio: $${ctx.raw.toLocaleString("es-CL")}`
-          }
-        }
-      },
-
-      //  Ejes con formato profesional
-      scales: {
-        y: {
-          beginAtZero: false,
-          ticks: {
-            callback: v => "$" + v.toLocaleString("es-CL"),
-            color: "#334155",
-            font: { size: 13 }
-          },
-          grid: { color: "rgba(0,0,0,0.05)" }
-        },
-        x: {
-          ticks: { color: "#1E293B", font: { size: 14, weight: "bold" } },
-          grid: { color: "transparent" }
-        }
+    if (!data.ok || !data.data.length) {
+      if (!append) {
+        tbody.innerHTML = `
+          <tr><td colspan="6" style="text-align:center; padding:20px; color:#94a3b8;">
+            📊 No hay subidas de precio recientes
+          </td></tr>
+        `;
       }
-    },
-    plugins: [ChartDataLabels]
-  });
+      hayMasSubidas = false;
+      return;
+    }
+
+    if (!append) tbody.innerHTML = "";
+
+    data.data.forEach(item => {
+      const fecha = new Date(item.fecha).toLocaleDateString("es-CL");
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td class="col-producto">
+          <a href="${item.link}" target="_blank" class="producto-link">
+            <img src="${item.image}" alt="${item.titulo}" loading="lazy">
+            <span>${item.titulo}</span>
+          </a>
+        </td>
+        <td>${item.store}</td>
+        <td>$${item.precioAnterior.toLocaleString("es-CL")}</td>
+        <td>$${item.precioActual.toLocaleString("es-CL")}</td>
+        <td class="precio-subida">+$${item.diferencia.toLocaleString("es-CL")}</td>
+        <td>${fecha}</td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    hayMasSubidas = data.pagination.hasMore;
+    paginaSubidas++;
+
+  } catch (error) {
+    console.error("Error cargando subidas:", error);
+    if (!append) {
+      tbody.innerHTML = `
+        <tr><td colspan="6" style="text-align:center; padding:20px; color:#ef4444;">
+          ❌ Error al cargar datos
+        </td></tr>
+      `;
+    }
+  } finally {
+    cargandoSubidas = false;
+  }
 }
 
+// =============================================================
+//  DETECTAR SCROLL INFINITO
+// =============================================================
+function setupInfiniteScroll() {
+  const tablaBajas = document.querySelector('#tablaBajas').closest('.tabla-scroll');
+  const tablaSubidas = document.querySelector('#tablaSubidas').closest('.tabla-scroll');
+  
+  if (tablaBajas) {
+    tablaBajas.addEventListener('scroll', () => {
+      const { scrollTop, scrollHeight, clientHeight } = tablaBajas;
+      
+      if (scrollTop + clientHeight >= scrollHeight - 50 && hayMasBajas && !cargandoBajas) {
+        console.log("🔄 Cargando más bajas...");
+        cargarBajas(filtros, true);
+      }
+    });
+  }
+  
+  if (tablaSubidas) {
+    tablaSubidas.addEventListener('scroll', () => {
+      const { scrollTop, scrollHeight, clientHeight } = tablaSubidas;
+      
+      if (scrollTop + clientHeight >= scrollHeight - 50 && hayMasSubidas && !cargandoSubidas) {
+        console.log("🔄 Cargando más subidas...");
+        cargarSubidas(filtros, true);
+      }
+    });
+  }
+}
 
-
-
+// =============================================================
+//  RENDERIZAR GRÁFICOS (código existente simplificado)
+// =============================================================
 async function renderChart(id, url, label, filtros = {}) {
-
-  // =======================
-  // 1) Obtener elementos DOM
-  // =======================
   const canvas = document.getElementById(id);
   if (!canvas) return console.warn(`⚠️ No existe canvas con id "${id}".`);
 
   const ctx = canvas.getContext("2d");
-
-  // ======================
-  // 2) Obtener datos de API
-  // ======================
   const data = await fetchData(url, filtros);
 
-  // ==========================
-  // 3) Destruir gráfico previo
-  // ==========================
   if (charts[id]) charts[id].destroy();
 
-  // ======================
-  // 4) Manejo: sin datos
-  // ======================
   if (!Array.isArray(data) || data.length === 0) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.font = "15px Poppins";
@@ -443,33 +500,16 @@ async function renderChart(id, url, label, filtros = {}) {
     return;
   }
 
-  // ======================
-  // 5) Extraer valores y etiquetas
-  // ======================
-  const valores = data.map(d =>
-    d.promedio ?? d.total ?? d.value ?? d.valor ?? 0
-  );
+  const valores = data.map(d => d.promedio ?? d.total ?? d.value ?? d.valor ?? 0);
+  const etiquetas = data.map(d => d.tienda ?? d.nombre ?? d._id ?? d.label ?? "—");
 
-  const etiquetas = data.map(d =>
-    d.tienda ?? d.nombre ?? d._id ?? d.label ?? "—"
-  );
-
-  // ======================
-  // 6) Detectar tipo de gráfico
-  // ======================
   const idLineas = ["clicsPorDia", "busquedasPorDia", "comparativaConsultasBusquedas", "actividadPorHora", "usuariosActivosDia"];
   const tipoGrafico = idLineas.includes(id) ? "line" : "bar";
 
-  // ======================
-  // 7) Estilos profesionales
-  // ======================
   const gradient = ctx.createLinearGradient(0, 0, 0, 300);
   gradient.addColorStop(0, "rgba(0,167,181,0.95)");
   gradient.addColorStop(1, "rgba(0,167,181,0.35)");
 
-  // ======================
-  // 8) Crear gráfico
-  // ======================
   charts[id] = new Chart(ctx, {
     type: tipoGrafico,
     data: {
@@ -496,10 +536,7 @@ async function renderChart(id, url, label, filtros = {}) {
           bodyColor: "#fff",
           displayColors: false,
           callbacks: {
-            label: ctx =>
-              id === "indiceCompetitividad"
-                ? `$${ctx.raw.toLocaleString("es-CL")}`
-                : ctx.raw.toLocaleString("es-CL")
+            label: ctx => `${ctx.raw.toLocaleString("es-CL")}`
           }
         }
       },
@@ -513,10 +550,7 @@ async function renderChart(id, url, label, filtros = {}) {
           ticks: {
             color: "#475569",
             font: { size: 12 },
-            callback: v =>
-              id === "indiceCompetitividad"
-                ? `$${v.toLocaleString("es-CL")}`
-                : v.toLocaleString("es-CL")
+            callback: v => v.toLocaleString("es-CL")
           },
           grid: { color: "rgba(0,0,0,0.06)" }
         }
@@ -528,15 +562,12 @@ async function renderChart(id, url, label, filtros = {}) {
 async function renderTopProductos(filtros = {}) {
   const id = "topProductos";
   const canvas = document.getElementById(id);
-  if (!canvas) return console.warn(`⚠️ No existe canvas #${id}`);
+  if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
-
-  //  Obtener datos correctamente
   let data = await fetchData("/api/estadisticas/productos-mas-clickeados", filtros);
   data = data?.data ?? data;
 
-  //  Manejo sin datos
   if (!Array.isArray(data) || data.length === 0) {
     if (charts[id]) charts[id].destroy();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -546,28 +577,17 @@ async function renderTopProductos(filtros = {}) {
     return;
   }
 
-  //  Top 10 productos
   data = data.slice(0, 10);
-
   const etiquetas = data.map(d => d.nombre || d._id);
-  const valores   = data.map(d => d.total);
-
-  //  Producto más clickeado (el verde)
+  const valores = data.map(d => d.total);
   const max = Math.max(...valores);
 
-  //  Colores y degradado visual
   const gradient = ctx.createLinearGradient(0, 0, 0, 300);
   gradient.addColorStop(0, "rgba(0, 167, 181, 0.25)");
   gradient.addColorStop(1, "rgba(0, 167, 181, 0.85)");
 
-  const colorGanador = "rgba(67,160,71,0.85)";
-  const colorGanadorBorder = "#2e7d32";
-  const colorNormalBorder = "#009FB0";
-
-  //  Destruir gráfico previo si existe
   if (charts[id]) charts[id].destroy();
 
-  //  Crear gráfico
   charts[id] = new Chart(ctx, {
     type: "bar",
     data: {
@@ -575,25 +595,17 @@ async function renderTopProductos(filtros = {}) {
       datasets: [{
         label: "Clics",
         data: valores,
-        backgroundColor: valores.map(v =>
-          v === max ? colorGanador : gradient
-        ),
-        borderColor: valores.map(v =>
-          v === max ? colorGanadorBorder : colorNormalBorder
-        ),
+        backgroundColor: valores.map(v => v === max ? "rgba(67,160,71,0.85)" : gradient),
+        borderColor: valores.map(v => v === max ? "#2e7d32" : "#009FB0"),
         borderWidth: 2,
         borderRadius: 12
       }]
     },
     options: {
-      indexAxis: "x", 
       responsive: true,
       maintainAspectRatio: false,
-
       plugins: {
         legend: { display: false },
-
-        //  Valores arriba
         datalabels: {
           anchor: "end",
           align: "top",
@@ -601,8 +613,6 @@ async function renderTopProductos(filtros = {}) {
           color: "#0f172a",
           font: { weight: "bold", size: 12 }
         },
-
-        //  ooltip mostrando supermercado
         tooltip: {
           backgroundColor: "#1E293B",
           titleColor: "#fff",
@@ -618,7 +628,6 @@ async function renderTopProductos(filtros = {}) {
           }
         }
       },
-
       scales: {
         x: {
           ticks: {
@@ -647,17 +656,16 @@ async function renderTopProductos(filtros = {}) {
   });
 }
 
+// ...existing code...
+
 async function renderProductosPorTiempo(filtros = {}) {
   const id = "porTiempo";
   const canvas = document.getElementById(id);
-  if (!canvas) return console.warn(`⚠️ No existe canvas #${id}`);
+  if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
-
-  // 📌 Obtener datos
   let data = await fetchData("/api/estadisticas/productos-por-tiempo", filtros);
 
-  // ⛔ Sin datos
   if (!Array.isArray(data) || data.length === 0) {
     if (charts[id]) charts[id].destroy();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -667,17 +675,14 @@ async function renderProductosPorTiempo(filtros = {}) {
     return;
   }
 
-  // 🗓️ Etiquetas (fechas) y valores (clics)
-  const etiquetas = data.map(d => d._id);        // formato 19/11/2025
-  const valores   = data.map(d => d.total);
+  const etiquetas = data.map(d => d._id);
+  const valores = data.map(d => d.total);
   const productos = data.map(d => d.producto);
 
-  // 🔥 Degradado para la línea
   const gradient = ctx.createLinearGradient(0, 0, 0, 300);
   gradient.addColorStop(0, "rgba(0, 167, 181, 0.30)");
   gradient.addColorStop(1, "rgba(0, 167, 181, 0.05)");
 
-  // ❌ Destruir gráfico previo si existe
   if (charts[id]) charts[id].destroy();
 
   charts[id] = new Chart(ctx, {
@@ -712,7 +717,7 @@ async function renderProductosPorTiempo(filtros = {}) {
               const i = ctx.dataIndex;
               const clicks = valores[i];
               const nombre = productos[i];
-              return `${clicks} Busqueda — 🛒 ${nombre}`;
+              return `${clicks} Búsqueda — 🛒 ${nombre}`;
             }
           }
         }
@@ -724,7 +729,7 @@ async function renderProductosPorTiempo(filtros = {}) {
             font: { size: 11, weight: "600" },
             callback: (value) => {
               const label = etiquetas[value] || "";
-              return label.length > 10 ? label.slice(0,10) : label;
+              return label.length > 10 ? label.slice(0, 10) : label;
             }
           },
           grid: { color: "transparent" }
@@ -740,47 +745,102 @@ async function renderProductosPorTiempo(filtros = {}) {
         }
       }
     }
+  }); 
+}
+
+
+
+async function renderCompetitividadChart(id, url, label, filtros = {}) {
+  const data = await fetchData(url, filtros); // ✅ CORREGIDO: pasar filtros
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  if (charts[id]) charts[id].destroy();
+
+  if (!data?.length) {
+    ctx.font = "16px Poppins";
+    ctx.fillStyle = "#64748b";
+    ctx.fillText("Sin datos suficientes para mostrar.", 50, 50);
+    return;
+  }
+
+  const etiquetas = data.map(d => d.tienda);
+  const valores = data.map(d => d.promedio);
+  const mejorPrecio = Math.min(...valores);
+
+  charts[id] = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: etiquetas,
+      datasets: [{
+        label,
+        data: valores,
+        backgroundColor: valores.map(v => v === mejorPrecio ? "rgba(67,160,71,0.9)" : "rgba(0,167,181,0.85)"),
+        borderColor: valores.map(v => v === mejorPrecio ? "#2e7d32" : "#007a85"),
+        borderWidth: 2,
+        borderRadius: 10
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        datalabels: {
+          anchor: "end",
+          align: "start",
+          offset: -6,
+          formatter: value => `$${value.toLocaleString("es-CL")}`,
+          color: "#0f172a",
+          font: { weight: "bold", size: 12 }
+        },
+        tooltip: {
+          backgroundColor: "#1E293B",
+          titleColor: "#fff",
+          bodyColor: "#fff",
+          displayColors: false,
+          callbacks: {
+            label: ctx => `Precio promedio: $${ctx.raw.toLocaleString("es-CL")}`
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: false,
+          ticks: {
+            callback: v => "$" + v.toLocaleString("es-CL"),
+            color: "#334155",
+            font: { size: 13 }
+          },
+          grid: { color: "rgba(0,0,0,0.05)" }
+        },
+        x: {
+          ticks: { color: "#1E293B", font: { size: 14, weight: "bold" } },
+          grid: { color: "transparent" }
+        }
+      }
+    },
+    plugins: [ChartDataLabels]
   });
 }
 
-
-async function cargarDashboard(filtros = {}) {
-  await Promise.all([
-    renderTopProductos(filtros),
-    renderChart("porSupermercado","/api/estadisticas/clics-por-supermercado","Productos",filtros),
-    renderChart("porDia","/api/estadisticas/clics-por-dia","Consultas",filtros),
-    renderChart("porGenero","/api/estadisticas/usuarios-por-genero","Usuarios",filtros),
-    renderProductosPorTiempo(filtros),
-    renderCompetitividadChart("indiceCompetitividad","/api/estadisticas/indice-competitividad","Precio promedio ($)"),
-    renderChart("rankingProductosNuevos","/api/estadisticas/ranking-productos-nuevos","Nuevos productos",filtros),
-
-  ]);
-}
-
-async function cargarDashboardBusquedas() {
-
-}
-
 async function renderTendencia(filtros = {}) {
-
   const id = "chartTendencia";
   const canvas = document.getElementById(id);
-  if (!canvas) return console.warn(`⚠️ No existe canvas #${id}`);
+  if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
-
-  // 📌 Obtener datos
   let data = [];
+  
   try {
     data = await fetchData("/api/estadisticas/tendencia-semanal", filtros);
   } catch (err) {
     console.error("❌ Error cargando tendencia semanal:", err);
   }
 
-  // 🗑️ Destruir gráfico previo
   if (charts[id]) charts[id].destroy();
 
-  // 🚫 Validación sin datos
   if (!Array.isArray(data) || data.length === 0) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.font = "15px Poppins";
@@ -789,7 +849,6 @@ async function renderTendencia(filtros = {}) {
     return;
   }
 
-  // 🏷 Formatear etiquetas
   const labels = data.map(d => {
     if (String(d._id).includes("W")) {
       const [year, week] = d._id.split("-W");
@@ -800,12 +859,10 @@ async function renderTendencia(filtros = {}) {
 
   const valores = data.map(d => d.total || 0);
 
-  // 🎨 Degradado para la línea
   const gradient = ctx.createLinearGradient(0, 0, 0, 300);
   gradient.addColorStop(0, "rgba(0,167,181,0.30)");
   gradient.addColorStop(1, "rgba(0,167,181,0)");
 
-  // 📊 Crear gráfico
   charts[id] = new Chart(ctx, {
     type: "line",
     data: {
@@ -820,17 +877,14 @@ async function renderTendencia(filtros = {}) {
         tension: 0.35,
         pointRadius: 5,
         pointBackgroundColor: "#007a85",
-        pointHoverRadius: 7,
-        pointHoverBackgroundColor: "#2e7d32"
+        pointHoverRadius: 7
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-
       plugins: {
         legend: { display: false },
-
         tooltip: {
           backgroundColor: "#1E293B",
           titleColor: "#fff",
@@ -841,7 +895,6 @@ async function renderTendencia(filtros = {}) {
           }
         }
       },
-
       scales: {
         x: {
           ticks: {
@@ -864,53 +917,136 @@ async function renderTendencia(filtros = {}) {
   });
 }
 
+async function renderMapaChile(filtros = {}) {
+  const mapa = document.getElementById("mapaChile");
+  mapa.innerHTML = "";
+  
+  const regiones = [
+    "Arica y Parinacota", "Tarapacá", "Antofagasta", "Atacama", "Coquimbo", "Valparaíso",
+    "Metropolitana de Santiago", "O'Higgins", "Maule", "Ñuble", "Biobío", "La Araucanía",
+    "Los Ríos", "Los Lagos", "Aysén", "Magallanes"
+  ];
+  
+  const colores = [
+    "#a47c48", "#b0874d", "#c29a64", "#d3b47a", "#e6ca92", "#d5e7a7",
+    "#b8e0a2", "#8fd78f", "#69ce7e", "#49b66d", "#34a45d", "#2b9655",
+    "#23874b", "#1e7742", "#1a6638", "#14542d"
+  ];
+  
+  const data = await fetchData("/api/estadisticas/usuarios-por-region", filtros); // ✅ PASAR FILTROS
+  const mapaUsuarios = Object.fromEntries(
+    data.map(d => [normalizarRegion(d._id), d.total])
+  );
 
+  const tooltip = document.createElement("div");
+  tooltip.id = "tooltipMapa";
+  tooltip.style.cssText = "position:absolute;padding:6px 10px;background:rgba(0,0,0,0.75);color:#fff;border-radius:4px;pointer-events:none;opacity:0;transition:opacity .2s";
+  mapa.appendChild(tooltip);
 
-
-async function initDashboard() {
-  const filtros = {};
-  await cargarDashboard(filtros);
-  await renderTendencia(filtros);
-  renderMapaChile({});
-  await cargarBajas(filtros);
-  await cargarSubidas(filtros);
+  regiones.forEach((region, i) => {
+    const bloque = document.createElement("div");
+    bloque.className = "bloque-region";
+    bloque.style.background = colores[i];
+    const total = mapaUsuarios[region] || 0;
+    bloque.innerHTML = `<span>${region}</span><span>${total}</span>`;
+    if (total > 0) bloque.classList.add("region-activa");
+    
+    bloque.addEventListener("mousemove", e => {
+      tooltip.style.left = `${e.pageX - mapa.offsetLeft + 20}px`;
+      tooltip.style.top = `${e.pageY - mapa.offsetTop - 10}px`;
+      tooltip.style.opacity = "1";
+      tooltip.innerHTML = `<strong>${region}</strong><br>${total} usuario${total !== 1 ? "s" : ""}`;
+    });
+    
+    bloque.addEventListener("mouseleave", () => tooltip.style.opacity = "0");
+    mapa.appendChild(bloque);
+  });
 }
 
+// =============================================================
+//  CARGAR DASHBOARD COMPLETO (CORREGIDO)
+// =============================================================
+async function cargarDashboard(filtros = {}) {
+  await Promise.all([
+    renderTopProductos(filtros),
+    renderChart("porSupermercado", "/api/estadisticas/clics-por-supermercado", "Productos", filtros),
+    renderChart("porDia", "/api/estadisticas/clics-por-dia", "Consultas", filtros),
+    renderChart("porGenero", "/api/estadisticas/usuarios-por-genero", "Usuarios", filtros),
+    renderProductosPorTiempo(filtros),
+    renderCompetitividadChart("indiceCompetitividad", "/api/estadisticas/indice-competitividad", "Precio promedio ($)", filtros),
+    renderChart("rankingProductosNuevos", "/api/estadisticas/ranking-productos-nuevos", "Nuevos productos", filtros),
+  ]);
+}
 
-// ======================================
-//  FILTROS AVANZADOS — DASHBOARD
-// ======================================
+// =============================================================
+//  INICIALIZACIÓN (CORREGIDO)
+// =============================================================
+async function initDashboard() {
+  await cargarDashboard(filtros);
+  await renderTendencia(filtros);
+  await renderMapaChile(filtros); // ✅ PASAR FILTROS
+  await cargarBajas(filtros);
+  await cargarSubidas(filtros);
+  
+  // ✅ ACTIVAR SCROLL INFINITO
+  setupInfiniteScroll();
+}
+// ...existing code...
+
+// =============================================================
+//  FILTROS (CORREGIDO)
+// =============================================================
 document.getElementById("btnFiltrar").addEventListener("click", () => {
-  filtros = {
-    supermercado: filtroSuper.value || "",
-    genero: filtroGenero.value || "",
-    region: filtroRegion?.value || "",
-    desde: filtroFecha.value || "",
-    hasta: filtroHasta?.value || "",
-    periodo: filtroPeriodo?.value || ""
+  
+  // ✅ FILTROS PARA GRÁFICOS (género, región, período)
+  const filtrosGraficos = {
+    genero: document.getElementById("filtroGenero").value || "",
+    region: document.getElementById("filtroRegion").value || "",
+    desde: document.getElementById("filtroFecha").value || "",
+    hasta: document.getElementById("filtroHasta").value || "",
+    periodo: document.getElementById("filtroPeriodo").value || ""
   };
 
-  if (filtros.periodo) {
+  // ✅ FILTROS PARA TABLAS DE PRECIOS (solo supermercado y fechas)
+  const filtrosPrecios = {
+    supermercado: document.getElementById("filtroSuper").value || "",
+    desde: document.getElementById("filtroFecha").value || "",
+    hasta: document.getElementById("filtroHasta").value || ""
+  };
+
+  // ✅ Si seleccionó período, calcular desde/hasta automáticamente
+  if (filtrosGraficos.periodo) {
     const hoy = new Date();
     const desde = new Date();
-    desde.setDate(hoy.getDate() - parseInt(filtros.periodo));
-    filtros.desde = desde.toISOString().split("T")[0];
-    filtros.hasta = hoy.toISOString().split("T")[0];
+    desde.setDate(hoy.getDate() - parseInt(filtrosGraficos.periodo));
+    filtrosGraficos.desde = desde.toISOString().split("T")[0];
+    filtrosGraficos.hasta = hoy.toISOString().split("T")[0];
   }
 
-  console.log("📌 Filtros aplicados:", filtros);
+  console.log("📌 Filtros gráficos:", filtrosGraficos);
+  console.log("📌 Filtros precios:", filtrosPrecios);
 
-  // 🔥 Recargar panel con filtros
-  cargarDashboard(filtros);
-  renderTendencia(filtros);
-  renderProductosPorTiempo(filtros);
-  renderMapaChile();          
-  cargarBajas(filtros);
-  cargarSubidas(filtros);
+  // Reiniciar variables de paginación
+  paginaBajas = 1;
+  paginaSubidas = 1;
+  hayMasBajas = true;
+  hayMasSubidas = true;
+
+  // ✅ APLICAR FILTROS SEPARADOS
+  cargarDashboard(filtrosGraficos);          // ← Gráficos con género/región/período
+  renderTendencia(filtrosGraficos);
+  renderProductosPorTiempo(filtrosGraficos);
+  renderMapaChile(filtrosGraficos);
+  
+  cargarBajas(filtrosPrecios);               // ← Bajas solo con supermercado/fechas
+  cargarSubidas(filtrosPrecios);             // ← Subidas solo con supermercado/fechas
 });
 
 
 
+// =============================================================
+//  ANIMACIÓN DE CARGA
+// =============================================================
 const main = document.querySelector("main");
 main.style.opacity = 0.4;
 main.style.pointerEvents = "none";
@@ -922,161 +1058,7 @@ setTimeout(() => {
 document.addEventListener("DOMContentLoaded", () => {
   initDashboard();
 });
-
-function normalizarRegion(nombre) {
-  if (!nombre) return "";
-  nombre = nombre.trim();
-  if (nombre === "Metropolitana") return "Metropolitana de Santiago";
-  if (nombre === "O'Higgins" || nombre === "O’Higgins") return "O'Higgins"; // Normalizamos a la versión simple
-  return nombre;
-}
-
-//  Mapa Chile
-async function renderMapaChile() {
-  const mapa=document.getElementById("mapaChile"); mapa.innerHTML="";
-  const regiones=[
-  "Arica y Parinacota","Tarapacá","Antofagasta","Atacama","Coquimbo","Valparaíso",
-  "Metropolitana de Santiago","O'Higgins","Maule","Ñuble","Biobío","La Araucanía",
-  "Los Ríos","Los Lagos","Aysén","Magallanes"
-];
-  const colores=["#a47c48","#b0874d","#c29a64","#d3b47a","#e6ca92","#d5e7a7","#b8e0a2","#8fd78f","#69ce7e","#49b66d","#34a45d","#2b9655","#23874b","#1e7742","#1a6638","#14542d"];
-  const data = await fetchData("/api/estadisticas/usuarios-por-region");
-const mapaUsuarios = Object.fromEntries(
-  data.map(d => [ normalizarRegion(d._id), d.total ])
-);
-
-
-  const tooltip=document.createElement("div");
-  tooltip.id="tooltipMapa"; tooltip.style.cssText="position:absolute;padding:6px 10px;background:rgba(0,0,0,0.75);color:#fff;border-radius:4px;pointer-events:none;opacity:0;transition:opacity .2s";
-  mapa.appendChild(tooltip);
-
-  regiones.forEach((region,i)=>{
-    const bloque=document.createElement("div");
-    bloque.className="bloque-region";
-    bloque.style.background=colores[i];
-    const total=mapaUsuarios[region]||0;
-    bloque.innerHTML=`<span>${region}</span><span>${total}</span>`;
-    if(total>0)bloque.classList.add("region-activa");
-    bloque.addEventListener("mousemove",e=>{
-      tooltip.style.left=`${e.pageX - mapa.offsetLeft + 20}px`;
-      tooltip.style.top=`${e.pageY - mapa.offsetTop - 10}px`;
-      tooltip.style.opacity="1";
-      tooltip.innerHTML=`<strong>${region}</strong><br>${total} usuario${total!==1?"s":""}`;
-    });
-    bloque.addEventListener("mouseleave",()=>tooltip.style.opacity="0");
-    mapa.appendChild(bloque);
-  });
-}
-
-
-function registrarClick(producto) {
-  fetch("http://localhost:4000/api/clicks/registrar", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ producto })
-  }).catch(err => console.error("Error registrando click:", err));
-}
-
-async function cargarBajas(filtros={}) {
-  try {
-    const query = new URLSearchParams(filtros).toString();
-    const res = await fetch(`/api/estadisticas/bajas?${query}`);
-    const data = await res.json();
-
-    if (!data.ok) {
-      console.error("No ok:", data);
-      return;
-    }
-
-    const tbody = document.querySelector("#tablaBajas tbody");
-    tbody.innerHTML = "";
-
-    data.data.forEach(item => {
-      const fecha = new Date(item.fecha).toLocaleDateString("es-CL");
-
-      tbody.innerHTML += `
-        <tr>
-          <td class="col-producto">
-            <a href="${item.link}"
-   target="_blank"
-   class="producto-link"
-   onclick='registrarClick({
-     idProducto: "${item.productId}",
-     titulo: "${item.titulo.replace(/"/g, "&quot;")}",
-     supermercado: "${item.store}",
-     precio: ${item.precioActual},
-     link: "${item.link}",
-     imagen: "${item.image}"
-   })'>
-              <img src="${item.image}" alt="${item.titulo}">
-              <span>${item.titulo}</span>
-            </a>
-          </td>
-
-          <td>${item.store}</td>
-
-          <td>$${item.precioAnterior.toLocaleString("es-CL")}</td>
-          <td>$${item.precioActual.toLocaleString("es-CL")}</td>
-
-          <td class="precio-baja">-${item.diferencia.toLocaleString("es-CL")}</td>
-
-          <td>${fecha}</td>
-        </tr>
-      `;
-    });
-
-  } catch (error) {
-    console.error("Error cargando bajas:", error);
-  }
-}
-
-
-
-async function cargarSubidas(filtros={}) {
-  try {
-    const query = new URLSearchParams(filtros).toString();
-const res = await fetch(`/api/estadisticas/Subidas?${query}`);
-
-    const data = await res.json();
-
-    if (!data.ok) {
-      console.error("No ok:", data);
-      return;
-    }
-
-    const tbody = document.querySelector("#tablaSubidas tbody");
-    tbody.innerHTML = "";
-
-    data.data.forEach(item => {
-      const fecha = new Date(item.fecha).toLocaleDateString("es-CL");
-
-      tbody.innerHTML += `
-        <tr>
-          <td class="col-producto">
-            <a href="${item.link}" target="_blank" class="producto-link">
-              <img src="${item.image}" alt="${item.titulo}">
-              <span>${item.titulo}</span>
-            </a>
-          </td>
-
-          <td>${item.store}</td>
-
-          <td>$${item.precioAnterior.toLocaleString("es-CL")}</td>
-          <td>$${item.precioActual.toLocaleString("es-CL")}</td>
-
-          <td class="precio-subida">+${item.diferencia.toLocaleString("es-CL")}</td>
-
-          <td>${fecha}</td>
-        </tr>
-      `;
-    });
-
-  } catch (error) {
-    console.error("Error cargando subidas:", error);
-  }
-}
-
-
 </script>
+
 </body>
 </html>

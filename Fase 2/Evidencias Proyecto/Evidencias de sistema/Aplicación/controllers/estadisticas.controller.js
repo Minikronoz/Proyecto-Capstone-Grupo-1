@@ -281,182 +281,211 @@ export const productosCrecimiento = async (req, res) => {
 };
 
 
-/** Productos con baja de precio (últimos 7 días) */
+
+/** ✅ Productos con baja de precio CON FILTROS */
 export async function obtenerBajasDePrecio(req, res) {
   try {
     const db = getDB();
-    const hace7dias = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const { page = 1, limit = 20, supermercado, desde, hasta } = req.query;
+    
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    // ✅ Filtro de fecha (por defecto últimos 7 días)
+    let fechaDesde = desde ? new Date(desde) : new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    let fechaHasta = hasta ? new Date(hasta) : new Date();
+
+    const filtro = {
+      fecha: { $gte: fechaDesde, $lte: fechaHasta },
+      $expr: { $lt: ["$price", "$previousPrice"] },
+      price: { $gte: 100, $lte: 200000 },
+      previousPrice: { $gte: 100, $lte: 200000 }
+    };
+
+    // ✅ Filtro de supermercado (si existe)
+    if (supermercado) {
+      filtro.store = supermercado;
+    }
+
+    const pipeline = [
+      { $match: filtro },
+      {
+        $addFields: {
+          diferencia: { $subtract: ["$previousPrice", "$price"] }
+        }
+      },
+      {
+        $match: {
+          diferencia: { $lte: 50000 }
+        }
+      },
+      {
+        $lookup: {
+          from: "productos",
+          localField: "productId",
+          foreignField: "_id",
+          as: "producto"
+        }
+      },
+      { $unwind: "$producto" },
+      {
+        $project: {
+          _id: 0,
+          productId: 1,
+          store: 1,
+          precioAnterior: "$previousPrice",
+          precioActual: "$price",
+          diferencia: 1,
+          fecha: 1,
+          titulo: "$producto.title",
+          image: "$producto.image",
+          categoria: "$producto.categoria",
+          link: "$producto.link",
+        }
+      },
+      { $sort: { diferencia: -1 } }
+    ];
+
+    const totalPipeline = [...pipeline, { $count: "total" }];
+    const totalResult = await db.collection("priceHistory").aggregate(totalPipeline).toArray();
+    const total = totalResult.length > 0 ? totalResult[0].total : 0;
 
     const data = await db.collection("priceHistory")
       .aggregate([
-        {
-          $match: {
-            fecha: { $gte: hace7dias },
-
-            // Precio bajó
-            $expr: { $lt: ["$price", "$previousPrice"] },
-
-            // Filtros anti-scraping corrupto
-            price: { $gte: 100, $lte: 200000 },
-            previousPrice: { $gte: 100, $lte: 200000 }
-          }
-        },
-
-        // Calcular diferencia
-        {
-          $addFields: {
-            diferencia: { $subtract: ["$previousPrice", "$price"] }
-          }
-        },
-
-        // Evitar bajas falsas exageradas
-        {
-          $match: {
-            diferencia: { $lte: 50000 }
-          }
-        },
-
-        // JOIN con productos
-        {
-          $lookup: {
-            from: "productos",
-            localField: "productId",
-            foreignField: "_id",
-            as: "producto"
-          }
-        },
-        { $unwind: "$producto" },
-
-        // Selección de campos
-        {
-          $project: {
-            _id: 0,
-            productId: 1,
-            store: 1,
-            precioAnterior: "$previousPrice",
-            precioActual: "$price",
-            diferencia: 1,
-            fecha: 1,
-            titulo: "$producto.title",
-            image: "$producto.image",
-            categoria: "$producto.categoria",
-            link: "$producto.link",
-
-          }
-        },
-
-        { $sort: { diferencia: -1 } }
+        ...pipeline,
+        { $skip: skip },
+        { $limit: parseInt(limit) }
       ])
       .toArray();
 
-    res.json({ ok: true, data });
+    res.json({ 
+      ok: true, 
+      data,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        hasMore: skip + data.length < total
+      }
+    });
 
   } catch (err) {
-    console.error(" Error en obtenerBajasDePrecio:", err);
+    console.error("❌ Error en obtenerBajasDePrecio:", err);
     res.status(500).json({ ok: false, error: err.message });
   }
 }
 
-/**  Productos con subida de precio (últimos 7 días) */
+/** ✅ Productos con subida de precio CON FILTROS */
 export async function obtenerSubidasDePrecio(req, res) {
   try {
     const db = getDB();
-    const hace7dias = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const { page = 1, limit = 20, supermercado, desde, hasta } = req.query;
+    
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    // ✅ Filtro de fecha (por defecto últimos 7 días)
+    let fechaDesde = desde ? new Date(desde) : new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    let fechaHasta = hasta ? new Date(hasta) : new Date();
+
+    const filtro = {
+      fecha: { $gte: fechaDesde, $lte: fechaHasta },
+      $expr: { $gt: ["$price", "$previousPrice"] },
+      price: { $gte: 50, $lte: 500000 },
+      previousPrice: { $gte: 50, $lte: 500000 }
+    };
+
+    // ✅ Filtro de supermercado (si existe)
+    if (supermercado) {
+      filtro.store = supermercado;
+    }
+
+    const pipeline = [
+      { $match: filtro },
+      {
+        $addFields: {
+          priceNum: {
+            $cond: [
+              { $eq: [{ $type: "$price" }, "string"] },
+              { $toDouble: "$price" },
+              "$price"
+            ]
+          },
+          prevNum: {
+            $cond: [
+              { $eq: [{ $type: "$previousPrice" }, "string"] },
+              { $toDouble: "$previousPrice" },
+              "$previousPrice"
+            ]
+          }
+        }
+      },
+      {
+        $match: {
+          priceNum: { $gte: 50, $lte: 500000 },
+          prevNum: { $gte: 50, $lte: 500000 }
+        }
+      },
+      {
+        $addFields: {
+          diferencia: { $subtract: ["$priceNum", "$prevNum"] }
+        }
+      },
+      {
+        $match: {
+          diferencia: { $lte: 50000 }
+        }
+      },
+      {
+        $lookup: {
+          from: "productos",
+          localField: "productId",
+          foreignField: "_id",
+          as: "producto"
+        }
+      },
+      { $unwind: "$producto" },
+      {
+        $project: {
+          _id: 0,
+          productId: 1,
+          store: 1,
+          precioAnterior: "$prevNum",
+          precioActual: "$priceNum",
+          diferencia: 1,
+          fecha: 1,
+          titulo: "$producto.title",
+          image: "$producto.image",
+          categoria: "$producto.categoria",
+          link: "$producto.link",
+        }
+      },
+      { $sort: { diferencia: -1 } }
+    ];
+
+    const totalPipeline = [...pipeline, { $count: "total" }];
+    const totalResult = await db.collection("priceHistory").aggregate(totalPipeline).toArray();
+    const total = totalResult.length > 0 ? totalResult[0].total : 0;
 
     const data = await db.collection("priceHistory")
       .aggregate([
-        {
-          $match: {
-            fecha: { $gte: hace7dias },
-
-            // Precio subió
-            $expr: { $gt: ["$price", "$previousPrice"] },
-
-            // Filtros anti-precios corruptos
-            price: { $gte: 50, $lte: 500000 },
-            previousPrice: { $gte: 50, $lte: 500000 }
-          }
-        },
-
-        // Convertir strings a número
-        {
-          $addFields: {
-            priceNum: {
-              $cond: [
-                { $eq: [{ $type: "$price" }, "string"] },
-                { $toDouble: "$price" },
-                "$price"
-              ]
-            },
-            prevNum: {
-              $cond: [
-                { $eq: [{ $type: "$previousPrice" }, "string"] },
-                { $toDouble: "$previousPrice" },
-                "$previousPrice"
-              ]
-            }
-          }
-        },
-
-        // Segundo filtro de seguridad
-        {
-          $match: {
-            priceNum: { $gte: 50, $lte: 500000 },
-            prevNum: { $gte: 50, $lte: 500000 }
-          }
-        },
-
-        // Calcular diferencia real
-        {
-          $addFields: {
-            diferencia: { $subtract: ["$priceNum", "$prevNum"] }
-          }
-        },
-
-        // Evitar subidas falsas por scrap roto
-        {
-          $match: {
-            diferencia: { $lte: 50000 }
-          }
-        },
-
-        // JOIN productos
-        {
-          $lookup: {
-            from: "productos",
-            localField: "productId",
-            foreignField: "_id",
-            as: "producto"
-          }
-        },
-        { $unwind: "$producto" },
-
-        // Campos finales
-        {
-          $project: {
-            _id: 0,
-            productId: 1,
-            store: 1,
-            precioAnterior: "$prevNum",
-            precioActual: "$priceNum",
-            diferencia: 1,
-            fecha: 1,
-            titulo: "$producto.title",
-            image: "$producto.image",
-            categoria: "$producto.categoria",
-            link: "$producto.link",
-
-          }
-        },
-
-        { $sort: { diferencia: -1 } }
+        ...pipeline,
+        { $skip: skip },
+        { $limit: parseInt(limit) }
       ])
       .toArray();
 
-    res.json({ ok: true, data });
+    res.json({ 
+      ok: true, 
+      data,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        hasMore: skip + data.length < total
+      }
+    });
 
   } catch (err) {
-    console.error(" Error en obtenerSubidasDePrecio:", err);
+    console.error("❌ Error en obtenerSubidasDePrecio:", err);
     res.status(500).json({ ok: false, error: err.message });
   }
 }
@@ -636,4 +665,35 @@ export const distribucionUsuariosRegion = async (req, res) => {
     res.status(500).json({ error: "Error al obtener distribución de usuarios por región" });
   }
 };
+
+export async function obtenerUsuariosPorRegion(req, res) {
+  try {
+    const db = getDB();
+    const { region, genero, desde, hasta } = req.query; // ✅ RECIBIR FILTROS
+
+    const filtro = {};
+    
+    if (region) filtro.region = region;
+    if (genero) filtro.genero = genero;
+    
+    if (desde || hasta) {
+      filtro.creadoEn = {};
+      if (desde) filtro.creadoEn.$gte = new Date(desde);
+      if (hasta) filtro.creadoEn.$lte = new Date(hasta);
+    }
+
+    const resultado = await db.collection("users")
+      .aggregate([
+        { $match: filtro },
+        { $group: { _id: "$region", total: { $sum: 1 } } },
+        { $sort: { total: -1 } }
+      ])
+      .toArray();
+
+    res.json(resultado);
+  } catch (error) {
+    console.error("❌ Error:", error);
+    res.status(500).json({ error: error.message });
+  }
+}
 
