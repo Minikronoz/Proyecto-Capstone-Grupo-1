@@ -453,11 +453,17 @@ function parsePrice(priceString = "") {
     return cantidad > 0 ? Math.round(total / cantidad) : null;
   }
 
-  // 2) Capturar SOLO el primer precio del string (importante en Jumbo)
+  // 2) Si es "Paga $890" → capturar ese precio
+  const pagaMatch = texto.match(/paga\s*\$?([\d\.]+)/i);
+  if (pagaMatch) {
+    const num = parseInt(pagaMatch[1].replace(/\D/g, ""), 10);
+    return isNaN(num) ? null : num;
+  }
+
+  // 3) Capturar SOLO el primer precio del string
   const primerPrecio = texto.match(/\$?([\d\.]+)/);
   if (!primerPrecio) return null;
 
-  // 3) Convertir ese primer precio a número
   const num = parseInt(primerPrecio[1].replace(/\D/g, ""), 10);
   return isNaN(num) ? null : num;
 }
@@ -577,9 +583,28 @@ async function scrapeCategoria(page, categoria, colProductos, colPriceHistory) {
             //  Selectores limpios
             const title = el.querySelector("h2.product-card-name")?.innerText?.trim() || null;
             const brand = el.querySelector("p.text-sm.text-gray-500")?.innerText?.trim() || "Sin marca";
-            const price = el.querySelector("div.flex.items-baseline.text-neutral700.font-bold")?.innerText?.trim() || null;
-            const priceNormal = el.querySelector(".line-through, .text-neutral500")?.innerText?.trim() || null;
+            
+            // ✅ CORREGIDO: Capturar SOLO el primer precio (no el tachado)
+            const precioContainer = el.querySelector("div.flex.items-baseline.text-neutral700");
+            let price = null;
+            let priceNormal = null;
+            
+            if (precioContainer) {
+              // Capturar el primer precio (el que NO tiene line-through)
+              const precioActual = precioContainer.childNodes[0]?.textContent?.trim() || null;
+              price = precioActual;
+              
+              // Capturar el precio tachado (precio normal antes de descuento)
+              const precioTachado = precioContainer.querySelector(".line-through")?.innerText?.trim() || null;
+              priceNormal = precioTachado;
+            }
+            
+            // ✅ Capturar precio con medio de pago especial (ej: "Paga $890")
+            const offerDescription = el.querySelector(".bg-bgflagoferta span")?.innerText?.trim() || null;
+            
+            // Capturar precio por unidad
             const pricePerUnit = el.querySelector(".ppum-price-container span")?.innerText?.trim() || null;
+            
             const image = el.querySelector("img")?.src || "";
             const href = el.getAttribute("href") || "";
             const link = href.startsWith("http") ? href : `https://www.jumbo.cl${href}`;
@@ -587,7 +612,16 @@ async function scrapeCategoria(page, categoria, colProductos, colPriceHistory) {
             //  Validación final
             if (!title || !price) return null;
             
-            return { title, brand, price, priceNormal, pricePerUnit, image, link };
+            return { 
+              title, 
+              brand, 
+              price, 
+              priceNormal, 
+              pricePerUnit, 
+              offerDescription,
+              image, 
+              link 
+            };
 
           } catch {
             return null;
