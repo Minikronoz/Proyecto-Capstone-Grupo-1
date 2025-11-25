@@ -10,7 +10,7 @@ const regiones = {
   "Atacama": ["Copiapó", "Caldera", "Tierra Amarilla", "Chañaral", "Diego de Almagro", "Vallenar", "Huasco"],
   "Coquimbo": ["La Serena", "Coquimbo", "Andacollo", "Illapel", "Ovalle", "Los Vilos", "Salamanca", "Vicuña"],
   "Valparaíso": ["Valparaíso", "Viña del Mar", "Concón", "Quilpué", "Villa Alemana", "San Antonio", "Los Andes", "Quillota"],
-  "Metropolitana de Santiago": [
+  "Metropolitana": [
     "Santiago", "Puente Alto", "Maipú", "Ñuñoa", "Providencia", "Las Condes", "La Florida",
     "San Bernardo", "Vitacura", "La Reina", "Pudahuel", "Quilicura"
   ],

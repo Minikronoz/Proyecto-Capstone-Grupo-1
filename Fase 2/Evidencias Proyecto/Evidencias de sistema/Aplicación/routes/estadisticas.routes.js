@@ -40,6 +40,7 @@ router.get("/productos-mas-clickeados", async (req, res) => {
         $group: {
           _id: { $toUpper: { $trim: { input: "$titulo", chars: " " } } },
           total: { $sum: 1 },
+          store: { $first: "$supermercado" } // 🔥 SE AGREGA EL SUPERMERCADO
         },
       },
       { $sort: { total: -1 } },
@@ -52,6 +53,7 @@ router.get("/productos-mas-clickeados", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 
 // ======================================
@@ -127,25 +129,27 @@ router.get("/usuarios-por-edad", async (req, res) => {
 // ======================================
 router.get("/usuarios-por-genero", async (req, res) => {
   try {
-    const match = buildMatchFilters(req.query);
+    const db = getDB();
+    const colecciones = await db.listCollections().toArray();
+    const nombre = colecciones.some(c => c.name === "usuarios")
+      ? "usuarios" : "users";
 
-    const data = await aggregateClicks([
-      { 
-        $match: { 
-          ...match, 
-          userGenero: { $exists: true, $nin: [null, ""] }
-        } 
+    const data = await db.collection(nombre).aggregate([
+      {
+        $match: {
+          genero: { $exists: true, $ne: "" }
+        }
       },
-      { $group: { _id: "$userGenero", total: { $sum: 1 } } },
-      { $sort: { total: -1 } },
-    ]);
+      { $group: { _id: "$genero", total: { $sum: 1 } } },
+      { $sort: { total: -1 } }
+    ]).toArray();
 
-    res.json(data);
+    res.json(data.length ? data : []);
   } catch (err) {
-    console.error("❌ Error en /usuarios-por-genero:", err);
     res.status(500).json({ error: err.message });
   }
 });
+
 
 
 
@@ -180,41 +184,6 @@ router.get("/usuarios-por-region", async (req, res) => {
     res.json(data);
   } catch (err) {
     console.error("❌ Error en /usuarios-por-region:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ======================================
-//  USUARIOS POR COMUNA
-// ======================================
-router.get("/usuarios-por-comuna", async (req, res) => {
-  try {
-    const match = buildMatchFilters(req.query);
-
-    const data = await aggregateClicks([
-      { $match: { ...match, userComuna: { $exists: true, $ne: "" } } },
-      { $group: { _id: "$userComuna", total: { $sum: 1 } } },
-      { $sort: { total: -1 } },
-      { $limit: 15 },
-    ]);
-
-    //  Si no hay datos → mensaje especial
-    if (!data || data.length === 0) {
-      return res.json({
-        ok: false,
-        message: "Aún no hay búsquedas registradas por comuna 📍",
-        data: []
-      });
-    }
-
-    //  Hay datos → formato estándar
-    res.json({
-      ok: true,
-      data
-    });
-
-  } catch (err) {
-    console.error("❌ Error en /usuarios-por-comuna:", err);
     res.status(500).json({ error: err.message });
   }
 });

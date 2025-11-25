@@ -8,7 +8,7 @@ import { ObjectId } from "mongodb";
 const router = express.Router();
 
 // =============================================
-//  REGISTRO DE CLICKS DE PRODUCTOS
+//  REGISTRO DE CLICKS DE PRODUCTOS  (CORREGIDO)
 // =============================================
 router.post("/registrar", async (req, res) => {
   try {
@@ -41,24 +41,18 @@ router.post("/registrar", async (req, res) => {
     if (!precioFinal || precioFinal === 0 || !pricePerUnit) {
       let prodDB = null;
 
-      // Buscar por ID
       if (ObjectId.isValid(producto.idProducto)) {
-        prodDB = await db
-          .collection("productos")
-          .findOne(
-            { _id: new ObjectId(producto.idProducto) },
-            { projection: { currentPrice: 1, pricePerUnit: 1 } }
-          );
+        prodDB = await db.collection("productos").findOne(
+          { _id: new ObjectId(producto.idProducto) },
+          { projection: { currentPrice: 1, pricePerUnit: 1 } }
+        );
       }
 
-      // Buscar por link en caso de fallback
       if (!prodDB && producto.link) {
-        prodDB = await db
-          .collection("productos")
-          .findOne(
-            { link: producto.link },
-            { projection: { currentPrice: 1, pricePerUnit: 1 } }
-          );
+        prodDB = await db.collection("productos").findOne(
+          { link: producto.link },
+          { projection: { currentPrice: 1, pricePerUnit: 1 } }
+        );
       }
 
       if (prodDB) {
@@ -103,16 +97,19 @@ router.post("/registrar", async (req, res) => {
       link: producto.link || "",
       imagen: producto.imagen || "",
 
-      //  Información del usuario
+      //  Información del usuario (NORMALIZADA)
       userId: userData?._id?.toString() || sesion?.id || null,
       userCorreo: userData?.correo || sesion?.correo || "anonimo@local.cl",
       userNombre: userData?.nombre || null,
       userApellido: userData?.apellido || null,
-      userGenero: userData?.genero || null,
-      userRegion: userData?.region || null,
-      userComuna: userData?.comuna || null,
-      userSector: userData?.sector || null,
+      userGenero: userData?.genero || "No especificado",
+      userRegion: (userData?.region?.trim() === "Metropolitana")
+  ? "Metropolitana de Santiago"
+  : userData?.region?.trim() || "",
+      userComuna: userData?.comuna?.trim() || "",
+      userSector: userData?.sector?.trim() || "",
       userEdad: edadCalculada,
+
       negocios: userData?.negocios || [],
 
       //  Fecha

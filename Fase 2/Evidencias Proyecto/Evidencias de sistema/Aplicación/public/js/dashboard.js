@@ -211,76 +211,6 @@ if (ctxG) {
 
 
 // =============================================================
-//  ACTIVIDAD SEMANAL
-// =============================================================
-async function cargarActividadSemanal() {
-  const cont = document.getElementById("tablaScrapingSemanal");
-  cont.innerHTML = "Cargando...";
-
-  try {
-    console.log(" Ejecutando cargarActividadSemanal()");
-
-    const res = await fetch("/api/scrape/actividad-semanal");
-
-    console.log(" Status:", res.status);
-
-    const json = await res.json();
-
-    console.log(" Datos recibidos:", json);
-
-    if (!json.actividad) {
-      console.error(" No existe json.actividad");
-      cont.innerHTML = "Error cargando actividad";
-      return;
-    }
-
-    const actividad = json.actividad;
-    const stores = ["unimarc", "tottus", "jumbo", "acuenta"];
-    const hoy = new Date();
-    const inicio = new Date(hoy);
-    inicio.setDate(hoy.getDate() - ((hoy.getDay() + 6) % 7));
-
-    console.log(" Inicio de semana:", inicio);
-
-    const dias = [...Array(7)].map((_, i) => {
-      const d = new Date(inicio);
-      d.setDate(inicio.getDate() + i);
-      return d.toISOString().split("T")[0];
-    });
-
-    console.log(" Días generados:", dias);
-
-    let html = `
-      <table>
-        <thead>
-          <tr><th>Store</th>${dias.map(d => `<th>${d}</th>`).join("")}</tr>
-        </thead>
-        <tbody>
-    `;
-
-    stores.forEach(store => {
-      html += `<tr><td>${store}</td>`;
-      dias.forEach(d => {
-        const st = actividad?.[store]?.[d] || "fail";
-        const icon = st === "success" ? "✔️" : st === "warning" ? "⚠️" : "❌";
-        html += `<td>${icon}</td>`;
-      });
-      html += `</tr>`;
-    });
-
-    html += `</tbody></table>`;
-
-    console.log(" Tabla generada OK");
-
-    cont.innerHTML = html;
-
-  } catch (err) {
-    console.error(" Error en cargarActividadSemanal:", err);
-    cont.innerHTML = "Error cargando actividad";
-  }
-}
-
-// =============================================================
 //  USUARIOS CON PAGINACIÓN (ÚNICA VERSIÓN)
 // =============================================================
 let paginaActual = 1;
@@ -700,7 +630,6 @@ document.querySelectorAll(".nav__item").forEach((btn) => {
 
     if (target === "dashboard") {
       cargarDatosDashboard();
-      cargarActividadSemanal();
     }
 
     if (target === "usuarios") cargarUsuarios();
@@ -720,7 +649,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   cargarDatosDashboard();
-  cargarActividadSemanal();
 
 window.editarUsuario = editarUsuario;
 window.eliminarUsuarioDef = eliminarUsuarioDef;
@@ -942,7 +870,6 @@ socket.on("scrape-complete", (data) => {
   }
 
   cargarDatosDashboard();
-  cargarActividadSemanal();
 });
 
 // Exponer ejecutarScraping globalmente

@@ -1,37 +1,37 @@
 {
   "unimarc": {
-    "fecha": "2025-11-25T00:35:38.435Z",
-    "fechaLocal": "24-11-2025, 9:35:38 p. m.",
+    "fecha": "2025-11-25T18:39:05.552Z",
+    "fechaLocal": "25-11-2025, 3:39:05 p. m.",
     "nuevos": 0,
     "actualizados": 4,
     "total": 1616
   },
   "jumbo": {
-    "fecha": "2025-11-24T23:37:56.379Z",
-    "fechaLocal": "24-11-2025, 8:37:56 p. m.",
-    "nuevos": 148,
-    "actualizados": 25,
-    "total": 3100
+    "fecha": "2025-11-25T18:51:26.956Z",
+    "fechaLocal": "25-11-2025, 3:51:26 p. m.",
+    "nuevos": 8,
+    "actualizados": 760,
+    "total": 3108
   },
   "tottus": {
-    "fecha": "2025-11-24T23:29:23.662Z",
-    "fechaLocal": "24-11-2025, 8:29:23 p. m.",
-    "nuevos": 439,
-    "actualizados": 26,
-    "total": 2016
+    "fecha": "2025-11-25T18:43:32.874Z",
+    "fechaLocal": "25-11-2025, 3:43:32 p. m.",
+    "nuevos": 145,
+    "actualizados": 394,
+    "total": 2161
   },
   "acuenta": {
-    "fecha": "2025-11-24T23:21:15.908Z",
-    "fechaLocal": "24-11-2025, 8:21:15 p. m.",
-    "nuevos": 133,
-    "actualizados": 24,
+    "fecha": "2025-11-25T18:33:15.649Z",
+    "fechaLocal": "25-11-2025, 3:33:15 p. m.",
+    "nuevos": 0,
+    "actualizados": 4,
     "total": 848
   },
   "santaisabel": {
-    "fecha": "2025-11-24T23:25:12.221Z",
-    "fechaLocal": "24-11-2025, 8:25:12 p. m.",
-    "nuevos": 11,
-    "actualizados": 9,
-    "total": 1572
+    "fecha": "2025-11-25T18:37:15.188Z",
+    "fechaLocal": "25-11-2025, 3:37:15 p. m.",
+    "nuevos": 5,
+    "actualizados": 33,
+    "total": 1577
   }
 }
