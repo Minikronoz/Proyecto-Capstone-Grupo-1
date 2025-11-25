@@ -1444,3 +1444,62 @@ tr:nth-child(even) {
   background: linear-gradient(90deg, #00a7b5, #32d4c1);
   border-radius: 50px;
 }
+/* =======================
+   TARJETA DE USUARIOS
+=========================*/
+.usuarios-card {
+  background: #ffffff;
+  padding: 15px 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  margin-top: 25px;
+  max-width: 450px;
+}
+
+.usuarios-card h3 {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #009688;
+  margin-bottom: 15px;
+}
+
+.usuarios-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.usuarios-card li {
+  padding: 8px 4px;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.usuarios-card li:last-child {
+  border-bottom: none;
+}
+
+.usuario-region {
+  font-size: 12px;
+  color: #555;
+}
+/* ===== EVITAR SCROLL INFINITO EN DASHBOARD ===== */
+
+#dashboard {
+  overflow-y: visible !important;
+  height: auto !important;
+}
+
+/* SOLO las tablas y catálogo podrán hacer scroll */
+#usuarios table,
+#negocios table,
+#catalogo,
+#scraping {
+  max-height: calc(100vh - 180px);
+  overflow-y: auto;
+}

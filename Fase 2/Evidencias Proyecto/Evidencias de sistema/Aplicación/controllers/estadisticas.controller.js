@@ -2,7 +2,7 @@
 // CONTROLADOR: Estadísticas Generales del Sistema (versión MongoDB nativa)
 // =============================================================
 import { getDB } from "../config/db.js";
-// 🏪 Ranking de supermercados por variedad de productos nuevos (Atlas compatible)
+//  Ranking de supermercados por variedad de productos nuevos (Atlas compatible)
 export const rankingProductosNuevos = async (req, res) => {
   try {
     const db = getDB();
@@ -47,7 +47,7 @@ export const indiceCompetitividad = async (req, res) => {
   try {
     const db = getDB();
 
-    // 🔎 Detectar colección correcta (compatibilidad con migraciones)
+    //  Detectar colección correcta (compatibilidad con migraciones)
     const colecciones = await db.listCollections().toArray();
     const nombreColeccion = colecciones.some(c => c.name === "priceHistory")
       ? "priceHistory"
@@ -225,7 +225,7 @@ export const productosCrecimiento = async (req, res) => {
       ? "priceHistory"
       : "pricehistories"; // fallback
 
-    // 🔹 Periodo de comparación (últimos 14 días)
+    //  Periodo de comparación (últimos 14 días)
     const hoy = new Date();
     const hace14 = new Date();
     hace14.setDate(hoy.getDate() - 14);

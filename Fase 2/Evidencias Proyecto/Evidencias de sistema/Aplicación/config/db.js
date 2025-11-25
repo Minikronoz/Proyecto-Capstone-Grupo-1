@@ -1,5 +1,5 @@
 // ==============================
-// 📁 config/db.js (versión final CORREGIDA)
+//  config/db.js 
 // ==============================
 import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
