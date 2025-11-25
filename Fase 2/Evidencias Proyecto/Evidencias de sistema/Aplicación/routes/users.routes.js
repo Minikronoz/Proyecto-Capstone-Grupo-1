@@ -234,9 +234,51 @@ router.delete("/api/usuarios/:userId/negocios/:negocioId", eliminarNegocio);
 router.get("/api/usuarios", async (req, res) => {
   try {
     const db = getDB();
-    const users = await db.collection("users").find().toArray();
-    res.json(users);
-  } catch (err) {
+    
+    // Parámetros de paginación
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+    const skip = (page - 1) * limit;
+    
+    // Parámetro de búsqueda
+    const search = req.query.search || "";
+    
+    // Filtro de búsqueda
+    const filtro = search ? {
+      $or: [
+        { nombre: { $regex: search, $options: "i" } },
+        { apellido: { $regex: search, $options: "i" } },
+        { correo: { $regex: search, $options: "i" } },
+        { region: { $regex: search, $options: "i" } },
+        { comuna: { $regex: search, $options: "i" } }
+      ]
+    } : {};
+    
+    // Obtener usuarios
+    const usuarios = await db.collection("users")
+      .find(filtro)
+      .sort({ creadoEn: -1 }) // Más recientes primero
+      .skip(skip)
+      .limit(limit)
+      .toArray();
+    
+    // Contar total de usuarios
+    const total = await db.collection("users").countDocuments(filtro);
+    
+    res.json({
+      usuarios,
+      paginacion: {
+        page,
+        limit,
+        total,
+        totalPaginas: Math.ceil(total / limit),
+        desde: skip + 1,
+        hasta: Math.min(skip + limit, total)
+      }
+    });
+    
+  } catch (error) {
+    console.error("❌ Error obteniendo usuarios:", error);
     res.status(500).json({ error: "Error al obtener usuarios" });
   }
 });

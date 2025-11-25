@@ -280,19 +280,31 @@ async function cargarActividadSemanal() {
   }
 }
 
+// =============================================================
+//  USUARIOS CON PAGINACIÓN (ÚNICA VERSIÓN)
+// =============================================================
+let paginaActual = 1;
+let busquedaActual = "";
 
-// =============================================================
-//  USUARIOS
-// =============================================================
-async function cargarUsuarios() {
+async function cargarUsuarios(page = 1, search = "") {
   const tbody = document.getElementById("usuariosBody");
   tbody.innerHTML = "<tr><td colspan='7'>Cargando usuarios...</td></tr>";
+  
+  paginaActual = page;
+  busquedaActual = search;
 
   try {
-    const res = await fetch("/api/usuarios");
-    const usuarios = await res.json();
-
-    renderUsuarios(usuarios);
+    const params = new URLSearchParams({
+      page: page,
+      limit: 50,
+      search: search
+    });
+    
+    const res = await fetch(`/api/usuarios?${params}`);
+    const data = await res.json();
+    
+    renderUsuarios(data.usuarios || []);
+    renderPaginacion(data.paginacion);
 
   } catch (err) {
     console.error("Error:", err);
@@ -300,33 +312,79 @@ async function cargarUsuarios() {
   }
 }
 
-
-
-
-
 function renderUsuarios(lista) {
   const tbody = document.getElementById("usuariosBody");
-  tbody.innerHTML = "";
-
-  lista.forEach((u) => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${u.nombre} ${u.apellido || ""}</td>
-        <td>${u.correo}</td>
-        <td>${u.genero || "-"}</td>
-        <td>${u.region || "-"}</td>
-        <td>${u.comuna || "-"}</td>
-        <td>${Array.isArray(u.negocios) ? u.negocios.length : 0}</td>
-        <td>
-          <button onclick="editarUsuario('${u._id}')">✏️</button>
-          <button onclick="eliminarUsuarioDef('${u._id}')">🗑️</button>
-        </td>
-      </tr>
-    `;
-  });
+  
+  if (!lista || !lista.length) {
+    tbody.innerHTML = "<tr><td colspan='7'>No se encontraron usuarios</td></tr>";
+    return;
+  }
+  
+  tbody.innerHTML = lista.map((u) => `
+    <tr>
+      <td>${u.nombre} ${u.apellido || ""}</td>
+      <td>${u.correo}</td>
+      <td>${u.genero || "-"}</td>
+      <td>${u.region || "-"}</td>
+      <td>${u.comuna || "-"}</td>
+      <td>${Array.isArray(u.negocios) ? u.negocios.length : 0}</td>
+      <td class="acciones-columna">
+        <button class="btn-mini btn-editar" onclick="editarUsuario('${u._id}')">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </button>
+        <button class="btn-mini btn-eliminar" onclick="eliminarUsuarioDef('${u._id}')">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+  `).join("");
 }
 
+function renderPaginacion(paginacion) {
+  const contenedor = document.getElementById("paginacionUsuarios");
+  
+  if (!contenedor) return;
+  
+  const { page, totalPaginas, desde, hasta, total } = paginacion;
+  
+  contenedor.innerHTML = `
+    <div class="paginacion">
+      <div class="paginacion-info">
+        Mostrando ${desde} - ${hasta} de ${total} usuarios
+      </div>
+      <div class="paginacion-botones">
+        <button 
+          class="btn-paginacion" 
+          onclick="cargarUsuarios(${page - 1}, '${busquedaActual}')"
+          ${page === 1 ? 'disabled' : ''}
+        >
+          <i class="fa-solid fa-chevron-left"></i> Anterior
+        </button>
+        
+        <span class="paginacion-pagina">
+          Página ${page} de ${totalPaginas}
+        </span>
+        
+        <button 
+          class="btn-paginacion" 
+          onclick="cargarUsuarios(${page + 1}, '${busquedaActual}')"
+          ${page === totalPaginas ? 'disabled' : ''}
+        >
+          Siguiente <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  `;
+}
 
+function buscarUsuarios() {
+  const input = document.getElementById("buscarUsuario");
+  const search = input.value.trim();
+  cargarUsuarios(1, search);
+}
+
+window.cargarUsuarios = cargarUsuarios;
+window.buscarUsuarios = buscarUsuarios;
 
 
 

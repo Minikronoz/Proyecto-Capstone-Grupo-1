@@ -216,7 +216,27 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       <!-- USUARIOS -->
       <section id="usuarios" class="seccion">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-users"></i> Gestión de Usuarios</h2>
+          <p class="descripcion">Administra los usuarios registrados en el sistema.</p>
+        </div>
+        
         <div class="card">
+          <!-- Buscador -->
+          <div class="tabla-header">
+            <input 
+              type="text" 
+              id="buscarUsuario" 
+              class="input-busqueda" 
+              placeholder="Buscar por nombre, correo, región o comuna..."
+              onkeyup="if(event.key === 'Enter') buscarUsuarios()"
+            >
+            <button class="btn btn-outline" onclick="buscarUsuarios()">
+              <i class="fa-solid fa-magnifying-glass"></i> Buscar
+            </button>
+          </div>
+          
+          <!-- Tabla -->
           <table>
             <thead>
               <tr>
@@ -233,6 +253,9 @@ document.addEventListener("DOMContentLoaded", async () => {
               <tr><td colspan="7">Cargando usuarios...</td></tr>
             </tbody>
           </table>
+          
+          <!--  AGREGAR ESTE DIV -->
+          <div id="paginacionUsuarios"></div>
         </div>
       </section>
 

@@ -1195,15 +1195,6 @@ tr:nth-child(even) {
   justify-content: flex-end;
 }
 
-.modal-botones button {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
 .btn-guardar {
   background: #00A7B5;
   color: white;
@@ -1502,4 +1493,65 @@ tr:nth-child(even) {
 #scraping {
   max-height: calc(100vh - 180px);
   overflow-y: auto;
+}
+
+/* ==============================
+    PAGINACIÓN
+   ============================== */
+.paginacion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-top: 1px solid var(--gris-medio);
+  background: var(--gris-claro);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.paginacion-info {
+  font-size: 14px;
+  color: var(--gris-texto);
+  font-weight: 500;
+}
+
+.paginacion-botones {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.paginacion-pagina {
+  font-size: 14px;
+  color: var(--petroleo);
+  font-weight: 600;
+  padding: 0 12px;
+}
+
+.btn-paginacion {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--blanco);
+  border: 1px solid var(--gris-medio);
+  border-radius: var(--radius-md);
+  color: var(--petroleo);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-paginacion:hover:not(:disabled) {
+  background: var(--calipso);
+  color: var(--blanco);
+  border-color: var(--calipso);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0,167,181,0.25);
+}
+
+.btn-paginacion:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: var(--gris-claro);
 }
