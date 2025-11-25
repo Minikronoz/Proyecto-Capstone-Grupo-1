@@ -16,7 +16,7 @@ const __dirname = dirname(__filename);
 const STORE = "unimarc";
 
 // =============================================================
-// 🏷️ MARCAS CONOCIDAS (igual que antes)
+// 🏷️ MARCAS CONOCIDAS 
 // =============================================================
 const MARCAS_CONOCIDAS = [
   //  Manzanas, Peras y Kiwis
@@ -152,7 +152,7 @@ const MARCAS_CONOCIDAS = [
   "Maggi","Knorr","Clemente Jacques","Puré Maggi","Acuenta Preparados",
   "Cuisine & Co Preparados","Protteína","Arcor Preparados","Gardein enlatados",
 
- //  Bebidas gaseosas
+  //  Bebidas gaseosas
   "Coca-Cola","Coca-Cola Zero","Coca-Cola Light",
   "Pepsi","Pepsi Black","Seven Up","7Up",
   "Sprite","Sprite Zero","Fanta","Fanta Zero",
@@ -400,7 +400,7 @@ const MARCAS_CONOCIDAS = [
   "Precio Diez",      // Mayorista10
   "Petman",           // Mascotas
   "D’Luca",           // Pastas y alimentos
-  "Don Juan",         // Conservas y abarrotes SMU
+  "Don Juan",         // Conservas y abarrotes SMU",
 
   //  OK Market (SMU)
   "OK Market Marca Propia",
@@ -416,7 +416,6 @@ const MARCAS_CONOCIDAS = [
   "Santa Isabel Marca Propia",
   "Acuenta (pet, alimentos, hogar)"
 ];
-
 
 function generarGlobalId(title, brand) {
   const normalizar = (txt) =>
@@ -440,25 +439,12 @@ function generarGlobalId(title, brand) {
   return crypto.createHash("md5").update(cadena).digest("hex").substring(0, 12);
 }
 
-
 const CATEGORIAS = [
-  // ["https://www.unimarc.cl/category/frutas-y-verduras", "Frutas y Verduras"],
   ["https://www.unimarc.cl/despensa", "Despensa"],
-  // ["https://www.unimarc.cl/category/lacteos-huevos-y-refrigerados", "Lácteos, Huevos y Refrigerados"],
-  // ["https://www.unimarc.cl/category/quesos-y-fiambres", "Quesos y Fiambres"],
-  // ["https://www.unimarc.cl/category/panaderia-y-pasteleria", "Panadería y Pastelería"],
-  // ["https://www.unimarc.cl/category/congelados", "Congelados"],
-  // ["https://www.unimarc.cl/category/desayuno-y-dulces", "Desayuno y Dulces"],
-  // ["https://www.unimarc.cl/category/bebidas-y-licores", "Bebidas y Licores"],
-  // ["https://www.unimarc.cl/category/limpieza", "Limpieza"],
-  // ["https://www.unimarc.cl/category/perfumeria", "Perfumería"],
-  // ["https://www.unimarc.cl/category/bebes-y-ninos", "Bebés y Niños"],
-  // ["https://www.unimarc.cl/category/mascotas", "Mascotas"],
-  // ["https://www.unimarc.cl/category/hogar", "Hogar"],
 ];
 
 // =============================================================
-//  Conversión de precios: "$1.590" / "$3.290$4.290" / "2x$2.500"
+//  Conversión de precios: "$1.590" / "$3.290 $4.290" / "2x$2.500"
 // =============================================================
 function parsePrice(priceString = "") {
   if (!priceString) return null;
@@ -483,7 +469,6 @@ function parsePrice(priceString = "") {
   return isNaN(num) ? null : num;
 }
 
-
 //  Barra de progreso visual
 function renderProgressBar(current, total, prefix = "Progreso") {
   const width = 30;
@@ -494,7 +479,7 @@ function renderProgressBar(current, total, prefix = "Progreso") {
   if (current === total) process.stdout.write("\n");
 }
 
-//  Extraer productos desde el DOM de Unimarc (igual que antes)
+//  Extraer productos desde el DOM de Unimarc
 async function extraerProductos(page) {
   return await page.$$eval(
     "section[id^='shelf__vertical'], div[class*='ProductCard']",
@@ -517,11 +502,10 @@ async function extraerProductos(page) {
           el.querySelector("p.Shelf_nameProduct__0KIRG, p[class*='product-name']")?.innerText?.trim() || null;
         if (!title) continue;
 
-
         const agotado =
-        el.innerText.toLowerCase().includes("agotado") ||
-        el.innerText.toLowerCase().includes("no disponible") ||
-        el.innerText.toLowerCase().includes("sin stock");
+          el.innerText.toLowerCase().includes("agotado") ||
+          el.innerText.toLowerCase().includes("no disponible") ||
+          el.innerText.toLowerCase().includes("sin stock");
 
         if (agotado) continue;
         
@@ -529,7 +513,7 @@ async function extraerProductos(page) {
           el.querySelector("p.Shelf_brandText__vmuWJ, p[class*='brand']")?.innerText?.trim() || "";
         if (!brand || brand.length < 2) brand = detectarMarca(title);
 
-        // 🔢 Precios
+        //  Precios
         let price = el.querySelector("p[id^='listPrice__offerPrice--discountprice'], p[class*='offer-price'], p.Text_text--primary__lzNzV")
           ?.innerText?.trim() || null;
 
@@ -543,15 +527,13 @@ async function extraerProductos(page) {
         const quantity =
           el.querySelector("#shelf__ppum p, p[class*='unit']")?.innerText?.trim() || "";
 
-        // 🖼️ Imagen
+        //  Imagen
         let image = el.querySelector("img")?.src || null;
         if (image && image.startsWith("//")) image = "https:" + image;
 
-        // 🔗 Enlace
+        //  Enlace
         let link = el.querySelector("a[href*='/product/']")?.getAttribute("href") || null;
         if (link && !link.startsWith("http")) link = `https://www.unimarc.cl${link}`;
-
-
 
         productos.push({
           title,
@@ -576,7 +558,7 @@ async function extraerProductos(page) {
 //  Función principal (main) — versión Atlas (sin Mongoose)
 async function main() {
   console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-  console.log(`🛒 Iniciando scraping: ${STORE.toUpperCase()}`);
+  console.log(` Iniciando scraping: ${STORE.toUpperCase()}`);
   console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
 
   //  Conexión MongoDB Atlas nativa
@@ -596,196 +578,195 @@ async function main() {
   let totalGlobal = 0;
   let nuevosGlobal = 0;
   let actualizadosGlobal = 0;
+  let revisadosGlobal = 0;
 
-for (const [url, categoria] of CATEGORIAS) {
-  console.log(`\n[${STORE}]  Iniciando categoría: ${categoria}`);
+  for (const [url, categoria] of CATEGORIAS) {
+    console.log(`\n[${STORE}]  Iniciando categoría: ${categoria}`);
 
-  try {
-    console.log(`[${STORE}]  Abriendo: ${url}`);
-    await page.goto(url, { waitUntil: "domcontentloaded" });
-    await page.waitForTimeout(4000);
+    try {
+      console.log(`[${STORE}]  Abriendo: ${url}`);
+      await page.goto(url, { waitUntil: "domcontentloaded" });
+      await page.waitForTimeout(4000);
 
-    let productosCategoria = [];
-    let paginaActual = 1;
+      let productosCategoria = [];
+      let paginaActual = 1;
 
-    // � Procesar todas las páginas
-    while (true) {
-      console.log(`[${STORE}]  Procesando página ${paginaActual}`);
-      
-      // Esperar a que los productos se carguen
-      try {
-        await page.waitForSelector("section[id^='shelf__vertical']", { timeout: 30000 });
+      //  Procesar todas las páginas
+      while (true) {
+        console.log(`[${STORE}]  Procesando página ${paginaActual}`);
         
-        // Esperar un momento adicional para asegurar que todo se cargue
-        await page.waitForTimeout(3000);
-        
-        // Extraer productos de la página actual
-        const productosPagina = await extraerProductos(page, STORE, MARCAS_CONOCIDAS);
-        productosCategoria.push(...productosPagina);
-        
-        console.log(`[${STORE}]  Página ${paginaActual}: ${productosPagina.length} productos encontrados`);
-        console.log(`[${STORE}]  Total acumulado: ${productosCategoria.length} productos`);
+        try {
+          await page.waitForSelector("section[id^='shelf__vertical']", { timeout: 30000 });
+          await page.waitForTimeout(3000);
+          
+          const productosPagina = await extraerProductos(page);
+          productosCategoria.push(...productosPagina);
+          
+          console.log(`[${STORE}]  Página ${paginaActual}: ${productosPagina.length} productos encontrados`);
+          console.log(`[${STORE}]  Total acumulado: ${productosCategoria.length} productos`);
 
-        // Verificar si hay más páginas
-        const siguientePagina = await page.$(`a[href*='page=${paginaActual + 1}']`);
-        
-        if (siguientePagina) {
-          // Ir a la siguiente página
-          await siguientePagina.click();
-          console.log(`[${STORE}]  Navegando a página ${paginaActual + 1}...`);
-          await page.waitForTimeout(5000); // Esperar a que la nueva página cargue
-          paginaActual++;
-        } else {
-          console.log(`[${STORE}]  Última página alcanzada`);
+          const siguientePagina = await page.$(`a[href*='page=${paginaActual + 1}']`);
+          
+          if (siguientePagina) {
+            await siguientePagina.click();
+            console.log(`[${STORE}]  Navegando a página ${paginaActual + 1}...`);
+            await page.waitForTimeout(5000);
+            paginaActual++;
+          } else {
+            console.log(`[${STORE}]  Última página alcanzada`);
+            break;
+          }
+        } catch (error) {
+          console.error(`[${STORE}]  Error en página ${paginaActual}:`, error.message);
           break;
         }
-      } catch (error) {
-        console.error(`[${STORE}]  Error en página ${paginaActual}:`, error.message);
-        break;
       }
-    }
 
-    console.log(
-      `[${STORE}]  Total detectados en "${categoria}": ${productosCategoria.length}`
-    );
+      console.log(
+        `[${STORE}]  Total detectados en "${categoria}": ${productosCategoria.length}`
+      );
 
-    //  Guardar productos en MongoDB Atlas
-    let nuevos = 0,
-      actualizados = 0,
-      revisados = 0;
+      //  Guardar productos en MongoDB Atlas
+      let nuevos = 0,
+        actualizados = 0,
+        revisados = 0;
 
-for (const prod of productosCategoria) {
-  // ❌ Filtrar sin stock → $ -, $0, null, vacío
-  if (
-    !prod.formattedPrice ||
-    prod.formattedPrice.includes("-") ||
-    prod.formattedPrice.trim() === "" ||
-    /(\$0|\$ 0)/.test(prod.formattedPrice)
-  )
-    continue;
+      for (const prod of productosCategoria) {
+        //  Filtrar sin stock → $ -, $0, null, vacío
+        if (
+          !prod.formattedPrice ||
+          prod.formattedPrice.includes("-") ||
+          prod.formattedPrice.trim() === "" ||
+          /(\$0|\$ 0)/.test(prod.formattedPrice)
+        ) {
+          continue;
+        }
 
-  const priceNum = parsePrice(prod.formattedPrice);
-  if (isNaN(priceNum) || priceNum <= 0) continue;
+        const priceNum = parsePrice(prod.formattedPrice);
+        if (isNaN(priceNum) || priceNum <= 0) continue;
 
-const globalId = generarGlobalId(prod.title, prod.brand);
+        const globalId = generarGlobalId(prod.title, prod.brand);
 
-// 🔎 Buscar por globalId, no por link
-const existente = await colProductos.findOne({
-  globalId,
-  store: STORE
-});
+        //  Buscar por globalId, no por link
+        const existente = await colProductos.findOne({
+          globalId,
+          store: STORE
+        });
 
-if (existente) {
-  const precioAnterior = existente.currentPrice;
-  const cambio = precioAnterior !== priceNum;
+        if (existente) {
+          const precioAnterior = existente.currentPrice;
+          const cambio = precioAnterior !== priceNum;
 
-  await colProductos.updateOne(
-    { _id: existente._id },
-    {
-      $set: {
-        globalId,
-        title: prod.title,
-        brand: prod.brand,
-        currentPrice: priceNum,
-        formattedPrice: prod.formattedPrice,
-        priceNormal: prod.priceNormal,
-        pricePerUnit: prod.pricePerUnit,
-        quantity: prod.quantity,
-        unidadEstandar: prod.unidadEstandar,
-        image: prod.image,
-        link: prod.link,
-        lastUpdate: new Date()
+          await colProductos.updateOne(
+            { _id: existente._id },
+            {
+              $set: {
+                globalId,
+                title: prod.title,
+                brand: prod.brand,
+                currentPrice: priceNum,
+                formattedPrice: prod.formattedPrice,
+                priceNormal: prod.priceNormal,
+                pricePerUnit: prod.pricePerUnit,
+                quantity: prod.quantity,
+                unidadEstandar: prod.unidadEstandar,
+                image: prod.image,
+                link: prod.link,
+                lastUpdate: new Date()
+              }
+            }
+          );
+
+          if (cambio) {
+            await db.collection("priceHistory").insertOne({
+              productId: existente._id,
+              store: STORE,
+              price: priceNum,
+              previousPrice: precioAnterior || null,
+              variation: precioAnterior
+                ? Number((((priceNum - precioAnterior) / precioAnterior) * 100).toFixed(2))
+                : 0,
+              offerDescription: prod.offerDescription || null,
+              fecha: new Date(),
+            });
+            actualizados++;
+          }
+        } else {
+          const resultado = await colProductos.insertOne({
+            globalId,
+            title: prod.title,
+            brand: prod.brand,
+            store: STORE,
+            currentPrice: priceNum,
+            formattedPrice: prod.formattedPrice,
+            priceNormal: prod.priceNormal,
+            pricePerUnit: prod.pricePerUnit,
+            quantity: prod.quantity,
+            unidadEstandar: prod.unidadEstandar,
+            image: prod.image,
+            link: prod.link,
+            categoria: categoria,
+            lastUpdate: new Date(),
+            createdAt: new Date()
+          });
+
+          await db.collection("priceHistory").insertOne({
+            productId: resultado.insertedId,
+            store: STORE,
+            price: priceNum,
+            previousPrice: null,
+            variation: 0,
+            offerDescription: prod.offerDescription || null,
+            fecha: new Date(),
+          });
+
+          nuevos++;
+        }
+
+        revisados++;
+        renderProgressBar(revisados, productosCategoria.length, `[${STORE}] Guardando`);
       }
-    }
-  );
 
-  if (cambio) {
-    await db.collection("priceHistory").insertOne({
-      productId: existente._id,
+      process.stdout.write("\n");
+      totalGlobal += productosCategoria.length;
+      nuevosGlobal += nuevos;
+      actualizadosGlobal += actualizados;
+      revisadosGlobal += revisados;
+
+      console.log(
+        `[${STORE}]  ${categoria}: Nuevos ${nuevos}, Actualizados ${actualizados}, Revisados ${revisados}`
+      );
+    } catch (err) {
+      console.error(`[${STORE}] ❌ Error en categoría "${categoria}":`, err.message);
+    }
+  }
+
+  // ====== RESUMEN FINAL ======
+  const totalDB = await colProductos.countDocuments({ store: STORE });
+
+  console.log(`\n ${STORE.toUpperCase()} — RESULTADOS`);
+  console.log(` Nuevos: ${nuevosGlobal}`);
+  console.log(` Actualizados: ${actualizadosGlobal}`);
+  console.log(` Revisados totales: ${revisadosGlobal}`);
+  console.log(` Total detectados (categorías): ${totalGlobal}`);
+  console.log(` Total en MongoDB (store=${STORE}): ${totalDB}`);
+  console.log(`⏱ Finalizado: ${new Date().toLocaleString("es-CL")}\n`);
+
+  try {
+    await actualizarScrapingArchivo({
       store: STORE,
-      price: priceNum,
-      previousPrice: precioAnterior || null,
-      variation: precioAnterior
-        ? Number((((priceNum - precioAnterior) / precioAnterior) * 100).toFixed(2))
-        : 0,
-      offerDescription: prod.offerDescription || null,
+      nuevos: nuevosGlobal,
+      actualizados: actualizadosGlobal,
+      totalProductos: totalDB,
       fecha: new Date(),
     });
-    actualizados++;
-  }
-} else {
-  const resultado = await colProductos.insertOne({
-    globalId,
-    title: prod.title,
-    brand: prod.brand,
-    store: STORE,
-    currentPrice: priceNum,
-    formattedPrice: prod.formattedPrice,
-    priceNormal: prod.priceNormal,
-    pricePerUnit: prod.pricePerUnit,
-    quantity: prod.quantity,
-    unidadEstandar: prod.unidadEstandar,
-    image: prod.image,
-    link: prod.link,
-    categoria: categoria,
-    lastUpdate: new Date(),
-    createdAt: new Date()
-  });
-
-  await db.collection("priceHistory").insertOne({
-    productId: resultado.insertedId,
-    store: STORE,
-    price: priceNum,
-    previousPrice: null,
-    variation: 0,
-    offerDescription: prod.offerDescription || null,
-    fecha: new Date(),
-  });
-
-  nuevos++;
-}
-
-revisados++;
-renderProgressBar(revisados, productosCategoria.length, `[${STORE}] Guardando`);
-    }
-
-    process.stdout.write("\n");
-    totalGlobal += productosCategoria.length;
-    nuevosGlobal += nuevos;
-    actualizadosGlobal += actualizados;
-
-    console.log(
-      `[${STORE}]  ${categoria}: Nuevos ${nuevos}, Actualizados ${actualizados}`
-    );
+    console.log(`[${STORE}]  Archivo de scraping actualizado correctamente`);
   } catch (err) {
-    console.error(`[${STORE}] ❌ Error en categoría "${categoria}":`, err.message);
+    console.warn(`[${STORE}]  No se pudo actualizar el archivo de scraping:`, err.message);
   }
-}
 
-
-//  Resumen final estandarizado (modo servidor)
-console.log(`\n ${STORE.toUpperCase()} — RESULTADOS`);
-console.log(` Nuevos: ${nuevos}`);
-console.log(` Actualizados: ${actualizados}`);
-console.log(` Revisados: ${revisados}`);
-console.log(` Total en Atlas: ${totalDB}`);
-console.log(`⏱ Finalizado: ${new Date().toLocaleString("es-CL")}\n`);
-
-try {
-  await actualizarScrapingArchivo({
-    store: STORE,
-    nuevos,
-    actualizados,
-    totalProductos: totalDB,
-    fecha: new Date(),
-  });
-  console.log(`[${STORE}]  Archivo de scraping actualizado correctamente`);
-} catch (err) {
-  console.warn(`[${STORE}]  No se pudo actualizar el archivo de scraping:`, err.message);
-}
-
-//  NO CERRAMOS BROWSER NI DB (modo servidor)
-console.log(`[${STORE}]  Navegador y DB permanecen activos (modo servidor)\n`);
+  //  NO CERRAMOS BROWSER NI DB (modo servidor)
+  console.log(`[${STORE}]  Navegador y DB permanecen activos (modo servidor)\n`);
 }
 
 main().catch((err) => {

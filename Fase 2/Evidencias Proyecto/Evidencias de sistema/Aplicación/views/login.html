@@ -4,55 +4,61 @@
   <meta charset="utf-8">
   <title>Iniciar Sesión</title>
   <link rel="stylesheet" href="/css/login.css">
-<script defer>
-  document.addEventListener("DOMContentLoaded", () => {
-    const form = document.querySelector(".form-login");
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+  <style>
+    .error-msg {
+      margin-top: 10px;
+      padding: 8px;
+      background: #ffdddd;
+      border-left: 4px solid #ff4444;
+      color: #a10000;
+      font-size: 14px;
+      border-radius: 5px;
+      display: none;
+      text-align: center;
+    }
+  </style>
 
-      const formData = new FormData(form);
-      const data = Object.fromEntries(formData.entries());
+  <script defer>
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.querySelector(".form-login");
+      const errorBox = document.getElementById("loginError");
 
-      try {
-        const res = await fetch("/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-          credentials: "include"
-        });
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-        // Validaciones internas (solo consola)
-        if (res.status === 404) {
-          console.warn("Usuario no encontrado");
-          return;
-        }
+        errorBox.style.display = "none"; // limpiar errores
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
 
-        if (res.status === 401) {
-          console.warn("Contraseña incorrecta");
-          return;
-        }
+        try {
+          const res = await fetch("/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+            credentials: "include"
+          });
 
-        if (!res.ok) {
-          console.error("Error al iniciar sesión");
-          return;
-        }
+          const result = await res.json();
 
-        const result = await res.json();
-        console.log("Inicio de sesión exitoso");
+          // ⚠️ Muestra errores reales
+          if (!res.ok) {
+            errorBox.textContent = result.error || "Error al iniciar sesión";
+            errorBox.style.display = "block";
+            return;
+          }
 
-        // Redirigir según rol
-        setTimeout(() => {
+          // 🎉 Redirección correcta por rol
           window.location.href = result.redirect || "/catalogo";
-        }, 300);
 
-      } catch (err) {
-        console.error("Error de conexión con el servidor:", err);
-      }
+        } catch (err) {
+          errorBox.textContent = "Error de conexión con el servidor";
+          errorBox.style.display = "block";
+          console.error(err);
+        }
+      });
     });
-  });
-</script>
-
+  </script>
 </head>
 
 <body>
@@ -67,6 +73,8 @@
         <input type="password" name="contraseña" placeholder="Contraseña" required>
 
         <button type="submit" class="btn-catalogo">Ingresar</button>
+
+        <div class="error-msg" id="loginError"></div>
 
         <div class="extra-links">
           <a href="/olvide-password">¿Olvidaste tu contraseña?</a>
