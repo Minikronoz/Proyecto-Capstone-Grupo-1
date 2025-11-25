@@ -1,0 +1,967 @@
+[
+  {
+    "nombre": "14 de Febrero",
+    "direccion": "14 de Febrero 2455",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Agua Santa",
+    "direccion": "Variante Agua Santa 4010",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Alcázar, Ciudad Satélite",
+    "direccion": "Av. Alcalde Luis Infante Larraín 1320",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Alessandri",
+    "direccion": "Arturo Alessandri 1210",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Almirante Riveros",
+    "direccion": "Av. Almirante Riveros 1202",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Alto Hospicio",
+    "direccion": "Tarapacá 2793, Alto Hospicio",
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Anibal Pinto",
+    "direccion": "Anibal Pinto 1551",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Apoquindo",
+    "direccion": "Av. Apoquindo 7200",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Arica Lynch",
+    "direccion": "Av. 21 de Mayo 501",
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Artesanos",
+    "direccion": "Manquehue Sur 329",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Avenida Alemania",
+    "direccion": "Av. Alemania 686, Los Ángeles",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos 08:30-21:00 Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Balmaceda",
+    "direccion": "Av. Balmaceda 3039",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Bandera",
+    "direccion": "Bandera 201, Esquina Agustinas",
+    "horario": "Lunes a Sábados 07:30-21:00 Festivos 10:00-21:00\nDomingos cerrados"
+  },
+  {
+    "nombre": "Barrio Inglés",
+    "direccion": "Jorge Kendrick 35, San Roque Valparaíso",
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Barros Arana",
+    "direccion": "Barros Arana 883, Block 899",
+    "horario": "Lunes a Sábado y Festivos 08:30-21:00\nDomingos cerrados"
+  },
+  {
+    "nombre": "Bilbao",
+    "direccion": "Av. Francisco Bilbao 2855",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Bosques De San Francisco",
+    "direccion": "Lourdes Esquina Santa Filomena 1540",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Brasil",
+    "direccion": "Av. Brasil 1601, Valparaíso",
+    "horario": "Lunes a Sábados 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Bulnes",
+    "direccion": "Manuel Bulnes 279",
+    "horario": "Lunes a Sábado 08:00 a 21:00 hrs\nDomingos y Festivos 09:00 a 21:00 hrs"
+  },
+  {
+    "nombre": "Bustamante",
+    "direccion": "Av. Vicuña Mackenna 1048",
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Calama",
+    "direccion": "Av. Granaderos 3671",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Calera de Tango",
+    "direccion": "Av. Calera de Tango esq. Lonquen s/n",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Calle Quillota",
+    "direccion": "Quillota 441",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Camilo Henríquez",
+    "direccion": "Camilo Henríquez 627",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Cantagallo",
+    "direccion": "Av. Las Condes 12207",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Carlos Valdovinos",
+    "direccion": "Carlos Valdovinos 2020",
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Carrera",
+    "direccion": "Carrera 499",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-19:00"
+  },
+  {
+    "nombre": "Casablanca",
+    "direccion": "Diego Portales 519/551",
+    "horario": "Lunes a Sábados 08:00-21:00\nDomingos y Festivos 08:00-21:00"
+  },
+  {
+    "nombre": "Catamarca",
+    "direccion": "Salvador Gutiérrez 5496",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Caupolicán",
+    "direccion": "Caupolicán 650",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Centro Rex",
+    "direccion": "Av. José Manuel Astorga 360",
+    "horario": "Lunes a Viernes 09:00-21:00 Sábados y Festivos 10:00-21:00\nDomingos cerrado"
+  },
+  {
+    "nombre": "Chacabuco",
+    "direccion": "Chacabuco 555",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Chiguayante",
+    "direccion": "Manuel Rodríguez 2150, Chiguayante",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Cienfuegos",
+    "direccion": "Cienfuegos 527",
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Ciudad Satélite",
+    "direccion": "Av. P. Central Poniente 1040",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Claudio Vicuña",
+    "direccion": "Claudio Vicuña 696",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados y Festivos 08:30-21:00\nDomingos cerrado"
+  },
+  {
+    "nombre": "Colina",
+    "direccion": "Caletera Oriente, Autopista Los Liberadores 22909",
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Collao",
+    "direccion": "Av. General Novoa 530",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Colín",
+    "direccion": "Av. Colín 0691",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Colón",
+    "direccion": "Colón 1500",
+    "horario": "Lunes a Sábados 08:00-21:00\nDomingo y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Compañía",
+    "direccion": "Compañía 2305",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Con Con",
+    "direccion": "Av. Manantiales 1021",
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Conchalí",
+    "direccion": "Av. Cardenal Caro 1771",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Consistorial",
+    "direccion": "Av. Consistorial 2100",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Coronel",
+    "direccion": "Manuel Montt 221",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Curacaví",
+    "direccion": "Ambrosio O'Higgins 1689",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Curauma",
+    "direccion": "Av. Cardenal Samoré 2335",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Curicó Centro",
+    "direccion": "Merced 487",
+    "horario": "Lunes a Sábados y Festivos 10:00-21:00\nDomingos cerrado"
+  },
+  {
+    "nombre": "César Ercilla",
+    "direccion": "Av. César Ercilla 1075",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Diagonal",
+    "direccion": "Diagonal P.A.Cerda 1107",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 10:00-21:00"
+  },
+  {
+    "nombre": "Diego Portales",
+    "direccion": "Diego Portales 1040",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Dorsal",
+    "direccion": "Av. Independencia 3160, Dorsal",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Down Town",
+    "direccion": "Av. Bernardo O'Higgins 1449, Down Town",
+    "horario": "Lunes a Sábados 07:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Doñihue",
+    "direccion": "Av. Estación 334",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-17:00"
+  },
+  {
+    "nombre": "El Alba",
+    "direccion": "Av. La Florida 10149",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 8:30-21:00"
+  },
+  {
+    "nombre": "El Belloto",
+    "direccion": "Freire 496, El Belloto",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "El Bosque",
+    "direccion": "Gran Avenida 9863, Parad. 29 1/2",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "El Bosque, Maipú",
+    "direccion": "Capellán Florencio Infante 3330",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "El Gabino",
+    "direccion": "El Gabino13551",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "El Mirador",
+    "direccion": "Vicuña Mackenna 890",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "El Peñón",
+    "direccion": "Av. Camino San José de Maipo 07722 -  Local 1",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "El Roble",
+    "direccion": "El Roble 770",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Estación Central",
+    "direccion": "Alameda 3390",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Eucaliptus",
+    "direccion": "Eucaliptus 273",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Fleming",
+    "direccion": "Av. Padre Hurtado 1621",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Florida",
+    "direccion": "Av. Panorámica 820, La Florida",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Franklin",
+    "direccion": "Santa Rosa 2055",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:30-19:00"
+  },
+  {
+    "nombre": "Freire",
+    "direccion": "Freire 455",
+    "horario": "Lunes a Viernes 09:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Fundo El Carmen",
+    "direccion": "Los Creadores 0191, Fdo. El Carmen",
+    "horario": "Lunes a Sábado 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Grajales",
+    "direccion": "Almirante Latorre 310, Grajales",
+    "horario": "Lunes a Sábados 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Grecia",
+    "direccion": "Av. Grecia 5791",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Huasco",
+    "direccion": "Arturo Prat 327",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Huérfanos",
+    "direccion": "Huérfanos 1437",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Intermodal",
+    "direccion": "Av. Ossa 36, Intermodal",
+    "horario": "Lunes a Sábado 07:00-21:00\nDomingos y Festivos 08:00-21:00"
+  },
+  {
+    "nombre": "J.J.Perez",
+    "direccion": "J.J.Perez 102",
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados y Festivos 08:30-21:00\nDomingos cerrado"
+  },
+  {
+    "nombre": "Januario Espinoza",
+    "direccion": "Januario Espinoza 1183, Linares",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "La Cantera",
+    "direccion": "Av. La Cantera 1965",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "La Cisterna, Paradero 18",
+    "direccion": "Av. José Miguel Carrera 6610",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "La Cruz",
+    "direccion": "Av. 21 de Mayo 3524",
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "La Farfana",
+    "direccion": "Av. El Rosal 3999",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "La Florida, Enrique Olivares",
+    "direccion": "Av. La Florida 9385",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "La Granja",
+    "direccion": "Santa Rosa 7668",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábado 9:00-21:00\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "La Herradura",
+    "direccion": "Carretera 5 norte con Av. Héctor Arce s/n",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "La Islita",
+    "direccion": "Av. Balmaceda 4316",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "La Ligua",
+    "direccion": "Serrano 251",
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "La Pintana",
+    "direccion": "Av. Santa Rosa 13015",
+    "horario": "Lunes a Sábado 08:00-20:30\nDomingos y Festivos 09:00-20:30"
+  },
+  {
+    "nombre": "La Travesía",
+    "direccion": "Isla Portezuelo 615",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "La Unión",
+    "direccion": "Av. Augusto Grob 1080",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Labranza",
+    "direccion": "Las Perdices 0547",
+    "horario": "Lunes a Sábados 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Larraín",
+    "direccion": "Av. Larraín 6677",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Las Araucarias",
+    "direccion": "Valparaíso 529, Quillota, Valparaíso",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Las Compañías",
+    "direccion": "Av. El Libertador 1401, Las Compañías",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Las Mariposas",
+    "direccion": "Av. Alonso de Ercilla 2780",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Las Palmas",
+    "direccion": "Manuel Rodriguez 335-C",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Las Rejas",
+    "direccion": "Ecuador 5455",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Limache Viejo",
+    "direccion": "Palmira Romano 405",
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Lo Campino",
+    "direccion": "Av. Las Torres 450, Local 1",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Lo Marcoleta",
+    "direccion": "Av. Lo Marcoleta 361, Lo Marcoleta",
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Lomas de San Andrés",
+    "direccion": "Ramón Carrasco 52, Lomas de San Andrés",
+    "horario": "Lunes a Viernes 09:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Los Boldos",
+    "direccion": "Av. León Juan Luis Diez 1900",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Los Carreras",
+    "direccion": "Carrera 811",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados y Festivos 08:30-21:00\nDomingos cerrado"
+  },
+  {
+    "nombre": "Los Dominicos",
+    "direccion": "Apoquindo 8450",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Los Pensamientos",
+    "direccion": "Los Pensamientos 10260",
+    "horario": "Lunes a Sábado 08:30-20:30\nDomingos y Festivos 09:00-20:30"
+  },
+  {
+    "nombre": "Los Pinos",
+    "direccion": "Las Barrancas 2464, Los Pinos",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Machalí",
+    "direccion": "Arturo Prat 116, esquina Miranda",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Maipú",
+    "direccion": "Maipú 646",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Maipú Centro",
+    "direccion": "Av. Pajaritos 1948",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Mall El Trébol",
+    "direccion": "Av. Jorge Alessandri 3177",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Mall Marina",
+    "direccion": "Av. Libertad 1348, Local 305",
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Mall Talcahuano",
+    "direccion": "Colón 180",
+    "horario": "Lunes a\nDomingo 10:00-20:00"
+  },
+  {
+    "nombre": "Manso",
+    "direccion": "Av. Manso 533",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Manuel Montt",
+    "direccion": "Montt 1132",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingo Cerrado Festivos 11:00-19:30"
+  },
+  {
+    "nombre": "Mapocho",
+    "direccion": "Av. Ismael Valdés Vergara 838",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Merced",
+    "direccion": "Merced 25",
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Molina",
+    "direccion": "Luis Cruz Martínez 1563",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Mulchén",
+    "direccion": "Villagran 690",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábado 09:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Ochagavía",
+    "direccion": "Av. José Joaquín Prieto 5531",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Olmué",
+    "direccion": "Blanco Encalada esq. Diego Portales 4212, Olmué.",
+    "horario": "Lunes a\nDomingo 08:00-21:00"
+  },
+  {
+    "nombre": "Ovalle Centro",
+    "direccion": "Vicuña Mackenna 1, local 1",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "P. Aguirre Cerda",
+    "direccion": "P. Aguirre Cerda 1010",
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Padre Hurtado",
+    "direccion": "Camino Melipilla 2390",
+    "horario": "Lunes a Sábado 08:30-20:30\nDomingos y Festivos 09:00-20:30"
+  },
+  {
+    "nombre": "Padre Las Casas",
+    "direccion": "Maquehue 850, Padre las Casas",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Paine",
+    "direccion": "Av. General Baquedano 502",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Pajarito Las Parcelas",
+    "direccion": "Av. Pajaritos 4909",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Pajarito Vespucio",
+    "direccion": "Av. Américo Vespucio Norte 51",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Palomar",
+    "direccion": "Av. Henríquez 611",
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Pascual Baburizza",
+    "direccion": "Av. Pascual Baburizza 510",
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Patio La Reina",
+    "direccion": "Av. Larraín 8751, Laura Rodríguez",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Pedro Fontova",
+    "direccion": "Pedro Fontova 7789",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Pedro Montt",
+    "direccion": "Pedro Montt 1845",
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Peñablanca",
+    "direccion": "Bernardo Leighton 71, Peña Blanca",
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Peñaflor",
+    "direccion": "Av. Vicuña Mackenna 2005",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Pirque",
+    "direccion": "Virginia Subercaseux 447",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Placeres",
+    "direccion": "Av. Matta 2460 Cerro Los Placeres",
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Playa Ancha",
+    "direccion": "Av. Levarte 840, Playa Ancha Valparaíso",
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Plaza Don Carlos",
+    "direccion": "Av. Carlos Ossandón 1301",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Plaza Echaurren",
+    "direccion": "Alte Riveros del 17 al 31, Esq. San Martin",
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Plaza Viña",
+    "direccion": "Av. Valparaíso 740",
+    "horario": "Cerrado temporalmente"
+  },
+  {
+    "nombre": "Plazuela Independencia",
+    "direccion": "Av. Concha y Toro 1036",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Portal El Belloto",
+    "direccion": "Av. Ramón Freire 2414, El Belloto",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Portal Quillota",
+    "direccion": "Ariztía 530",
+    "horario": "Sin horario"
+  },
+  {
+    "nombre": "Portugal",
+    "direccion": "Portugal 112",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Prat",
+    "direccion": "Prat 95",
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Providencia",
+    "direccion": "Providencia 2178",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Puerto Varas",
+    "direccion": "Del Salvador 451",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 9:00-21:00"
+  },
+  {
+    "nombre": "Rahue",
+    "direccion": "República 360",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Recoleta",
+    "direccion": "Av. Recoleta 2746",
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Renato Rocca",
+    "direccion": "Alejandro Azola 2899",
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Renca",
+    "direccion": "Av. Domingo Santa Maria 3962",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "República de Chile",
+    "direccion": "Av. República de Chile 450",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Reñaca",
+    "direccion": "Rafael Sotomayor 230",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Rodríguez",
+    "direccion": "Rodríguez 1190",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 10:00-20:30"
+  },
+  {
+    "nombre": "Rubén Darío",
+    "direccion": "Av. Picarte 3057",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "San Antonio",
+    "direccion": "Ramón Barros Luco 105, Mall Arauco S. Antonio",
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "San Diego",
+    "direccion": "San Diego 235",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "San Fernando",
+    "direccion": "Av. Manuel Rodríguez 806",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "San Francisco De Mostazal",
+    "direccion": "Independencia 540",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "San Joaquín",
+    "direccion": "Av. Gabriela Mistral 3251",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "San Pablo",
+    "direccion": "Av. San Pablo 4870",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "San Pedro De La Paz",
+    "direccion": "Michimalonco 1040",
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "San Pedro Del Mar",
+    "direccion": "Av. Portal de San Pedro 6950",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Santa Isabel Quilín",
+    "direccion": "Avda. Quilín 5.400",
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Santa Isabel Vicuña Mackenna",
+    "direccion": "Av. Vicuña Mackenna 780",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Sargento Silva",
+    "direccion": "Av. Austral 1400",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Sevilla",
+    "direccion": "Av. Pablo Neruda 2050",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Talagante",
+    "direccion": "Av. Bernardo O'Higgins 200, Esquina Darwin Vargas",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-20:00"
+  },
+  {
+    "nombre": "Talca Centro",
+    "direccion": "1 Norte 1201",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Tarapacá",
+    "direccion": "Tarapacá 465-495",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Tobalaba",
+    "direccion": "Av. Tobalaba 13949",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Tres Poniente, Maipú",
+    "direccion": "3 Poniente 2600",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Trinidad",
+    "direccion": "Av. Trinidad 125",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Troncos Viejos",
+    "direccion": "Alcalde Rodolfo Galleguillo 1099",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Uno Poniente",
+    "direccion": "1 Poniente 811",
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Urmeneta",
+    "direccion": "Urmeneta 430",
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Uruguay",
+    "direccion": "Uruguay 350",
+    "horario": "Lunes a Sábados 08:00-20:30\nDomingos y Festivos 09:00-20:30"
+  },
+  {
+    "nombre": "Valencia",
+    "direccion": "Los Carrera 01031, Quilpué",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Valle Grande",
+    "direccion": "Av. General San Martin 47, Valle Grande",
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Valle Volcanes",
+    "direccion": "Cerro Tronador 4981",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Vallenar",
+    "direccion": "Serranos 1052",
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Vega Monumental",
+    "direccion": "Av. 21 Mayo 3225",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Viana",
+    "direccion": "Viana 1215, Viña del Mar",
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Victoria",
+    "direccion": "Av. Prat 1472",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Vicuña Mackena",
+    "direccion": "Av. Vicuña Mackena 220, Local 20",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Villa Alemana",
+    "direccion": "Valparaíso 569",
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Villa El Teniente",
+    "direccion": "Av. El Sol 01834",
+    "horario": "Lunes a Sábado 08:30-20:30\nDomingos y Festivos 09:00-20:30"
+  },
+  {
+    "nombre": "Villagrán",
+    "direccion": "Villagrán 558, Los Ángeles",
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Villanelo",
+    "direccion": "Local Villanelo 236",
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Villarrica",
+    "direccion": "Camino Segunda Faja al Volcán N° 205, Local 8",
+    "horario": "Lunes a sábado 08:30-21:00\nDomingo y festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Vitacura",
+    "direccion": "Av. Vitacura 6255",
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Vivaceta",
+    "direccion": "Vivaceta 957",
+    "horario": "Lunes a Sábados 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Viña Arlegui",
+    "direccion": "Arlegui 948",
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+  },
+  {
+    "nombre": "Yungay",
+    "direccion": "Av. Yungay 1150",
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  },
+  {
+    "nombre": "Zenteno",
+    "direccion": "Zenteno 232-242",
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+  }
+]

@@ -1,39 +1,31 @@
-// ======================================================================
-//  SCRAPER LOCALES SANTA ISABEL — FINAL REAL (98 PÁGINAS)
-// ======================================================================
 import { chromium } from "playwright";
-import { getDB, connectDB } from "../config/db.js";
-import { obtenerGeoData } from "../utils/geocode.js";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const STORE = "locales_santaisabel";
-const URL = "https://www.santaisabel.cl/locales";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// =============================================================
-//  Aceptar cookies
-// =============================================================
 async function aceptarCookies(page) {
   try {
-    const btn = await page.locator("#onetrust-accept-btn-handler");
-    if ((await btn.count()) > 0 && (await btn.isVisible())) {
-      await btn.click();
-      console.log(" Cookies aceptadas");
-      await page.waitForTimeout(1500);
-    }
-  } catch {}
+    await page.waitForSelector("#onetrust-accept-btn-handler", { timeout: 5000 });
+    await page.click("#onetrust-accept-btn-handler");
+    console.log(" Cookies aceptadas");
+    await page.waitForTimeout(2000);
+  } catch (error) {
+    console.log(" No se encontró el botón de cookies");
+  }
 }
 
-// =============================================================
-//  EXTRAER LOCALES VISIBLES DE LA PÁGINA
-// =============================================================
 async function scrapeLocales(page) {
   return await page.$$eval(
     ".localities-wrapper.bg-white.p-5.rounded-lg.cursor-pointer",
     cards => cards.map(card => {
       try {
-        const name = card.querySelector(".title-with-bar-text")?.innerText?.trim() || null;
-        const direccion = card.querySelector(".text-lg.leading-5.py-4")?.innerText?.trim() || null;
-        const horario = card.querySelector(".text-base.leading-5")?.innerText?.replace(/Horario:/i,"").trim() || null;
-        return { name, direccion, horario };
+        const nombre = card.querySelector(".title-with-bar-text")?.innerText?.trim() || "Sin nombre";
+        const direccion = card.querySelector(".text-lg.leading-5.py-4")?.innerText?.trim() || "Sin dirección";
+        const horario = card.querySelector(".text-base.leading-5")?.innerText?.replace(/Horario:/i,"").trim() || "Sin horario";
+        return { nombre, direccion, horario };
       } catch {
         return null;
       }
@@ -41,80 +33,77 @@ async function scrapeLocales(page) {
   );
 }
 
-// =============================================================
-//  CAMBIAR A CADA PÁGINA DEL SELECTOR (1...98)
-// =============================================================
-async function irAPagina(page, numero) {
-  // abrir el dropdown
-  await page.click(".select-page-button");
-  await page.waitForTimeout(500);
-
-  // seleccionar el item
-  const items = await page.$$(".select-page-dropdown-content .select-page-dropdown-item");
-  if (items[numero - 1]) {
-    await items[numero - 1].click();
-  } else {
-    console.log(` No existe la página ${numero}`);
-  }
-
-  await page.waitForTimeout(2000);
-}
-
-// =============================================================
-//  MAIN
-// =============================================================
-async function main() {
-  console.log("\n🟢 Iniciando SCRAPER SANTA ISABEL...");
-
-  await connectDB();
-  const db = getDB();
-  const col = db.collection(STORE);
-
+(async () => {
+  console.log("\n Scrapeando locales de Santa Isabel...");
+  
   const browser = await chromium.launch({ headless: false });
   const page = await browser.newPage();
 
-  await page.goto(URL, { waitUntil: "networkidle" });
-  await aceptarCookies(page);
-  await page.waitForTimeout(2000);
+  try {
+    await page.goto("https://www.santaisabel.cl/locales", { waitUntil: "domcontentloaded", timeout: 60000 });
+    
+    // Aceptar cookies
+    await aceptarCookies(page);
+    
+    // Esperar que cargue el contenido
+    await page.waitForTimeout(3000);
 
-  const TOTAL_PAGINAS = 98;
-  let total = 0;
+    let todosLosLocales = [];
+    let paginaActual = 1;
 
-  for (let p = 1; p <= TOTAL_PAGINAS; p++) {
-    console.log(`\n📍 Página ${p} de ${TOTAL_PAGINAS}`);
-    await irAPagina(page, p);
+    // Scrapear todas las páginas
+    while (true) {
+      console.log(` Scrapeando página ${paginaActual}...`);
+      
+      const locales = await scrapeLocales(page);
+      todosLosLocales.push(...locales);
+      
+      console.log(` Página ${paginaActual}: ${locales.length} locales`);
 
-    const locales = await scrapeLocales(page);
-    console.log(`📦 Locales encontrados en página ${p}: ${locales.length}`);
+      // Buscar botones de paginación
+      const botones = await page.$$(".page-number");
+      if (botones.length === 0) {
+        console.log(" No hay más páginas");
+        break;
+      }
 
-    for (const loc of locales) {
-      if (!loc.name || !loc.direccion) continue;
+      // Encontrar el botón activo
+      let activeIndex = -1;
+      for (let i = 0; i < botones.length; i++) {
+        const cls = await botones[i].getAttribute("class");
+        if (cls && cls.includes("active")) {
+          activeIndex = i;
+          break;
+        }
+      }
 
-      // Obtener comuna, región y coords desde geocode
-      const geo = await obtenerGeoData(loc.direccion);
-      await new Promise(r => setTimeout(r, 1200)); // evitar bloqueo
+      // Ir a la siguiente página
+      const nextIndex = activeIndex + 1;
+      if (nextIndex >= botones.length) {
+        console.log(" Última página alcanzada");
+        break;
+      }
 
-      const doc = {
-        name: loc.name,
-        direccion: loc.direccion,
-        horario: loc.horario,
-        comuna: geo?.comuna || null,
-        region: geo?.region || null,
-        coords: geo ? { lat: geo.lat, lng: geo.lng } : null,
-        lastUpdate: new Date()
-      };
-
-      await col.updateOne({ name: loc.name }, { $set: doc }, { upsert: true });
-      total++;
-
-      console.log(`💾 Guardado → ${loc.name}`);
+      await botones[nextIndex].click();
+      await page.waitForTimeout(2500);
+      paginaActual++;
     }
+
+    // Eliminar duplicados
+    const localesUnicos = todosLosLocales.filter(
+      (v, i, arr) => arr.findIndex(x => x.nombre === v.nombre) === i
+    );
+
+    const outputPath = path.join(__dirname, "../data/santaisabel_stores.json");
+    fs.writeFileSync(outputPath, JSON.stringify(localesUnicos, null, 2), "utf-8");
+    
+    console.log(`\n Santa Isabel: ${localesUnicos.length} locales guardados`);
+
+  } catch (error) {
+    console.error(" Error:", error.message);
+  } finally {
+    await browser.close();
   }
+})();
 
-  console.log(`\n🎉 FINALIZADO: SANTA ISABEL`);
-  console.log(`🛒 Total locales guardados: ${total}`);
 
-  await browser.close();
-}
-
-main().catch(err => console.error(err));

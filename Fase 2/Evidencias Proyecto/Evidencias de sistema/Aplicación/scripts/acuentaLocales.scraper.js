@@ -1,96 +1,63 @@
+import { chromium } from "playwright";
 import fs from "fs";
-import { MongoClient } from "mongodb";
-import * as dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const MONGODB_URI = process.env.MONGODB_URI;
-const DB_NAME = process.env.DB_NAME;
+(async () => {
+  console.log("\n Scrapeando locales de Acuenta...");
+  
+  const browser = await chromium.launch({ headless: false }); // headless: false para ver qué pasa
+  const page = await browser.newPage();
 
-// ========================================================
-//  Función que convierte un bloque de texto en objetos limpitos
-// ========================================================
-function parsearLocales(texto) {
-  const lineas = texto.trim().split("\n");
-
-  const locales = lineas.map((linea) => {
-    const partes = linea.split("\t");
-
-    // Estructura esperada:
-    // 0 supermercado
-    // 1 comuna
-    // 2 direccion
-    // 3 estado
-    // 4 region
-    // 5 hora apertura
-    // 6 hora cierre
-
-    const [
-      tipo,
-      comuna,
-      direccion,
-      estado,
-      region,
-      apertura,
-      cierre,
-    ] = partes.map((v) => v.trim());
-
-    return {
-      name: tipo
-  .split(" ")
-  .map(p => p.charAt(0).toUpperCase() + p.slice(1))
-  .join(" "),
-      direccion,
-      info: `Horario: ${apertura} – ${cierre}\nEstado: ${estado}`,
-      region,
-      comuna,
-      lastUpdate: new Date(),
-    };
-  });
-
-  return locales;
-}
-
-// ========================================================
-//  Guardar en MongoDB
-// ========================================================
-async function guardarEnMongo(locales) {
-  const cliente = new MongoClient(MONGODB_URI);
-
-  await cliente.connect();
-  const db = cliente.db(DB_NAME);
-
-  const coleccion = db.collection("locales_acuenta");
-
-  console.log(" Limpiando colección...");
-  await coleccion.deleteMany({});
-
-  console.log(` Insertando ${locales.length} locales...`);
-  await coleccion.insertMany(locales);
-
-  console.log(" Datos guardados correctamente");
-  await cliente.close();
-}
-
-// ========================================================
-//  MAIN
-// ========================================================
-async function main() {
   try {
-    console.log("📄 Leyendo archivo...");
-    const texto = fs.readFileSync("./data/locales_acuenta_raw.txt", "utf8");
+    await page.goto("https://www.acuenta.cl/locales", { waitUntil: "domcontentloaded", timeout: 60000 });
+    await page.waitForTimeout(5000);
 
-    console.log("🔎 Parseando locales...");
-    const locales = parsearLocales(texto);
+    // Tomar captura para ver qué tiene la página
+    await page.screenshot({ path: path.join(__dirname, "../data/acuenta_debug.png") });
+    console.log("📸 Captura guardada en data/acuenta_debug.png");
 
-    console.log(`📌 Locales listos para guardar: ${locales.length}`);
+    const locales = await page.evaluate(() => {
+      const tiendas = [];
+      
+      // Intentar diferentes selectores
+      const selectors = [
+        ".local-item",
+        ".store-card",
+        ".tienda-card",
+        "[class*='local']",
+        "[class*='store']"
+      ];
 
-    await guardarEnMongo(locales);
+      for (const selector of selectors) {
+        const elements = document.querySelectorAll(selector);
+        if (elements.length > 0) {
+          console.log(` Encontrado selector: ${selector} (${elements.length} elementos)`);
+          
+          elements.forEach(el => {
+            const nombre = el.textContent?.trim() || "Sin nombre";
+            tiendas.push({ nombre, direccion: "Por definir", comuna: "Por definir", region: "Por definir" });
+          });
+          
+          break;
+        }
+      }
 
-    console.log("🎉 Finalizado con éxito");
+      return tiendas;
+    });
+
+    // Guardar en JSON
+    const outputPath = path.join(__dirname, "../data/acuenta_stores.json");
+    fs.writeFileSync(outputPath, JSON.stringify(locales, null, 2), "utf-8");
+    
+    console.log(` Acuenta: ${locales.length} locales guardados en ${outputPath}`);
+
   } catch (error) {
-    console.error("❌ Error:", error);
+    console.error(" Error:", error.message);
+  } finally {
+    await browser.close();
   }
-}
-
-main();
+})();

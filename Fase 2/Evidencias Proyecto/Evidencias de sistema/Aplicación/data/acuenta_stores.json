@@ -1,0 +1,1026 @@
+[
+  {
+    "nombre": "superbodega acuenta Paine",
+    "direccion": "Av. 18 de Septiembre # 311",
+    "comuna": "Paine",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Parral",
+    "direccion": "Avenida Las Delicias Sur 302",
+    "comuna": "Parral",
+    "region": "Maule",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Temuco",
+    "direccion": "Pedro de Valdivia",
+    "comuna": "Temuco",
+    "region": "La Araucanía",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Ovalle",
+    "direccion": "Peñafiel con Padre Damián Heredia",
+    "comuna": "Ovalle",
+    "region": "Coquimbo",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta San Javier",
+    "direccion": "Av. Cienfuegos # 1475",
+    "comuna": "San Javier",
+    "region": "Maule",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Talca",
+    "direccion": "El Arenal #686, Talca",
+    "comuna": "Talca",
+    "region": "O’Higgins",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Quillota",
+    "direccion": "Diego Echeverría # 085",
+    "comuna": "Quillota",
+    "region": "Valparaíso",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Puente Alto",
+    "direccion": "Eyzaguirre Oriente",
+    "comuna": "Puente Alto",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Hualpén",
+    "direccion": "Gran Bretaña 4041, Hualpen",
+    "comuna": "Hualpén",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Mulchén",
+    "direccion": "Villagran 951-957",
+    "comuna": "Mulchén",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Quilicura",
+    "direccion": "Avenida Matta 1400",
+    "comuna": "Quilicura",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta San Bernardo",
+    "direccion": "Eucaliptus 81",
+    "comuna": "San Bernardo",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Maipú",
+    "direccion": "Av. Rinconada 2525",
+    "comuna": "Maipú",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta El Bosque",
+    "direccion": "Lo Martines/Tucapel",
+    "comuna": "El Bosque",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Puerto Montt",
+    "direccion": "Jorge Alessandri sitio 3 y 4",
+    "comuna": "Puerto Montt",
+    "region": "Los Lagos",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Conchalí",
+    "direccion": "Santa Inés 2189",
+    "comuna": "Conchalí",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta El Quisco",
+    "direccion": "Av. I. Dubournais # 0398",
+    "comuna": "El Quisco",
+    "region": "Valparaíso",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Lebu",
+    "direccion": "Andres Bello #140",
+    "comuna": "Lebu",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Melipilla",
+    "direccion": "Merced 999",
+    "comuna": "Melipilla",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Lautaro",
+    "direccion": "Avenida Matta 1202",
+    "comuna": "Lautaro",
+    "region": "La Araucanía",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Ovalle",
+    "direccion": "Calle Maestranza S/N Lote 4",
+    "comuna": "Ovalle",
+    "region": "Coquimbo",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Coronel",
+    "direccion": "Carlos Prats 0901",
+    "comuna": "Coronel",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Isla de Maipo",
+    "direccion": "Manuel Rodriguez 684",
+    "comuna": "Isla de Maipo",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Viña del Mar",
+    "direccion": "Calle Estero Maitenlahue 925 Reñaca Alto",
+    "comuna": "Viña del Mar",
+    "region": "Valparaíso",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Temuco",
+    "direccion": "Av. Manuel Antonio Matta 025",
+    "comuna": "Temuco",
+    "region": "La Araucanía",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Linares",
+    "direccion": "Januario Espinoza 759",
+    "comuna": "Linares",
+    "region": "Maule",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Puente Alto",
+    "direccion": "Gabriela Poniente Nº 03960",
+    "comuna": "Puente Alto",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Pudahuel",
+    "direccion": "Av. Travesía Nº 7217",
+    "comuna": "Pudahuel",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Concepción",
+    "direccion": "Av. Andalién Nº 950",
+    "comuna": "Concepción",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta La Calera",
+    "direccion": "Av. Latorre 280",
+    "comuna": "La Calera",
+    "region": "Valparaíso",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Quinta Normal",
+    "direccion": "Av. Carrascal Nº 6015",
+    "comuna": "Quinta Normal",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Talca",
+    "direccion": "Avenida Lircay N°2301",
+    "comuna": "Talca",
+    "region": "Maule",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Independencia",
+    "direccion": "Av. Fermín Vivaceta Nº 827",
+    "comuna": "Independencia",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Peñaflor",
+    "direccion": "Av. 21 de Mayo Nº 4075",
+    "comuna": "Peñaflor",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Padre las Casas",
+    "direccion": "Av. Maquehue 1243",
+    "comuna": "Padre las Casas",
+    "region": "La Araucanía",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "central mayorista Peñalolén",
+    "direccion": "San Luis de Macul 4335",
+    "comuna": "Peñalolén",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Castro",
+    "direccion": "Galvarino Riveros 1703",
+    "comuna": "Castro",
+    "region": "Los Lagos",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Valdivia",
+    "direccion": "Carlos Anwandter 930",
+    "comuna": "Valdivia",
+    "region": "Los Ríos",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Chillán",
+    "direccion": "Maipón Nº 873",
+    "comuna": "Chillán",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Curicó",
+    "direccion": "Av. Camilo Henríquez N° 469",
+    "comuna": "Curicó",
+    "region": "Maule",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Curicó",
+    "direccion": "Av. Maipú N° 798",
+    "comuna": "Curicó",
+    "region": "Maule",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Lo Espejo",
+    "direccion": "Lo Ovalle Nº 02356",
+    "comuna": "Lo Espejo",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Chiguayante",
+    "direccion": "Av. Manuel Rodriguez N° 2550",
+    "comuna": "Chiguayante",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Maipú",
+    "direccion": "Av. Sur Nº 411",
+    "comuna": "Maipú",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Puerto Montt",
+    "direccion": "Calle Parque Alerce Andino Nº 1901",
+    "comuna": "Puerto Montt",
+    "region": "Los Lagos",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Maipú",
+    "direccion": "Camino Melipilla Nº 18500",
+    "comuna": "Maipú",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Osorno",
+    "direccion": "Calle República Nº 870",
+    "comuna": "Osorno",
+    "region": "Los Lagos",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Peñalolén",
+    "direccion": "Av. Tobalaba N° 10831",
+    "comuna": "Peñalolén",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Huechuraba",
+    "direccion": "Av. Recoleta N° 5200",
+    "comuna": "Huechuraba",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Renca",
+    "direccion": "Av. Caupolicán Nº 1520",
+    "comuna": "Renca",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta San Felipe",
+    "direccion": "Av. Maipú N° 1121",
+    "comuna": "San Felipe",
+    "region": "Valparaíso",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Puerto Montt",
+    "direccion": "Pto Montt Terminal",
+    "comuna": "Puerto Montt",
+    "region": "Los Lagos",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Talcahuano",
+    "direccion": "Gomez Carreño 3425",
+    "comuna": "Talcahuano",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Buin",
+    "direccion": "Condell",
+    "comuna": "Buin",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Hualpén",
+    "direccion": "Av. Cristobal Colón 8831",
+    "comuna": "Hualpén",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Limache",
+    "direccion": "Echaurren",
+    "comuna": "Limache",
+    "region": "Valparaíso",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Rancagua",
+    "direccion": "Av. El Sol 1071",
+    "comuna": "Rancagua",
+    "region": "O’Higgins",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Valdivia",
+    "direccion": "Av Pedro Montt 4300",
+    "comuna": "Valdivia",
+    "region": "Los Ríos",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Valdivia",
+    "direccion": "Picarte 2661",
+    "comuna": "Valdivia",
+    "region": "La Araucanía",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Villarrica",
+    "direccion": "Aviador Acevedo 1258",
+    "comuna": "Villarrica",
+    "region": "La Araucanía",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Quillota",
+    "direccion": "Av. J. B. Alberdi 2000",
+    "comuna": "Quillota",
+    "region": "Valparaíso",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta San Fernando",
+    "direccion": "Av. Manuel Rodríguez 770",
+    "comuna": "San Fernando",
+    "region": "O’Higgins",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Angol",
+    "direccion": "O´higgins esq Riquelme",
+    "comuna": "Angol",
+    "region": "La Araucanía",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Chillán",
+    "direccion": "Av Los Puelches 1691",
+    "comuna": "Chillán",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Alto Hospicio",
+    "direccion": "Ruta A-16 S/N",
+    "comuna": "Alto Hospicio",
+    "region": "Tarapacá",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Molina",
+    "direccion": "Maipu 2083",
+    "comuna": "Molina",
+    "region": "Maule",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Talca",
+    "direccion": "San Miguel",
+    "comuna": "Talca",
+    "region": "Maule",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Cauquenes",
+    "direccion": "Claudina Urrutia",
+    "comuna": "Cauquenes",
+    "region": "Maule",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Alto Hospicio",
+    "direccion": "Centro",
+    "comuna": "Alto Hospicio",
+    "region": "Tarapacá",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Arauco",
+    "direccion": "Caupolican, esquina Yungay",
+    "comuna": "Arauco",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Nueva Imperial",
+    "direccion": "Anibal Pinto / Arturo Prat",
+    "comuna": "Nueva Imperial",
+    "region": "La Araucanía",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta La Serena",
+    "direccion": "Av Viña del Mar 2950",
+    "comuna": "La Serena",
+    "region": "Coquimbo",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Rengo",
+    "direccion": "Calle Riquelme",
+    "comuna": "Rengo",
+    "region": "O’Higgins",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Valparaíso",
+    "direccion": "Luis Guevara Ortuzar 2002",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Lampa",
+    "direccion": "Av Baquedano 862",
+    "comuna": "Lampa",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta El Monte",
+    "direccion": "Av Los Libertadores 453",
+    "comuna": "El Monte",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Coquimbo",
+    "direccion": "Los Clarines S/N",
+    "comuna": "Coquimbo",
+    "region": "Coquimbo",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta San Carlos",
+    "direccion": "Independencia II",
+    "comuna": "San Carlos",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Constitución",
+    "direccion": "Rosas/Blanco",
+    "comuna": "Constitución",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Cartagena",
+    "direccion": "San Miguel #781",
+    "comuna": "Cartagena",
+    "region": "Valparaíso",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Penco",
+    "direccion": "Infante 205",
+    "comuna": "Penco",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Tomé",
+    "direccion": "Avenida Egaña",
+    "comuna": "Tomé",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Los Angeles",
+    "direccion": "Las Azaleas",
+    "comuna": "Los Angeles",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta La Ligua",
+    "direccion": "Av. Portales 1271",
+    "comuna": "La Ligua",
+    "region": "Valparaíso",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta San Pedro de la Paz",
+    "direccion": "Av. Michaihue",
+    "comuna": "San Pedro de la Paz",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Los Angeles",
+    "direccion": "Los Carrera #1420",
+    "comuna": "Los Angeles",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Talca",
+    "direccion": "12 Oriente N°848",
+    "comuna": "Talca",
+    "region": "Maule",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Talca",
+    "direccion": "Ignacio Carrera Pinto Nº0170",
+    "comuna": "Talca",
+    "region": "Maule",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta La Unión",
+    "direccion": "Comercio, Riquelme",
+    "comuna": "La Unión",
+    "region": "Los Ríos",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Salamanca",
+    "direccion": "Manuel Bulnes 340",
+    "comuna": "Salamanca",
+    "region": "Coquimbo",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Graneros",
+    "direccion": "Avenida la compañía 459",
+    "comuna": "Graneros",
+    "region": "O’Higgins",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Quinta Normal",
+    "direccion": "Mapocho 5041",
+    "comuna": "Quinta Normal",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Copiapó",
+    "direccion": "Los Loros esquina Condell",
+    "comuna": "Copiapó",
+    "region": "Atacama",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Victoria",
+    "direccion": "O'Higgins 240",
+    "comuna": "Victoria",
+    "region": "La Araucanía",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Illapel",
+    "direccion": "Salvador Allende 824",
+    "comuna": "Illapel",
+    "region": "Coquimbo",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Pichilemu",
+    "direccion": "Ortúzar 323",
+    "comuna": "Pichilemu",
+    "region": "O’Higgins",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Nacimiento",
+    "direccion": "Villa Alegre 675",
+    "comuna": "Nacimiento",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Casablanca",
+    "direccion": "Avenida Arturo Prat 81",
+    "comuna": "Casablanca",
+    "region": "Valparaíso",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Mostazal",
+    "direccion": "Avenida Luco 365",
+    "comuna": "Mostazal",
+    "region": "O’Higgins",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Coquimbo",
+    "direccion": "Ruta 43 a Ovalle lote 59",
+    "comuna": "Coquimbo",
+    "region": "Coquimbo",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Villa Alemana",
+    "direccion": "Huanhualí 1331",
+    "comuna": "Villa Alemana",
+    "region": "Valparaíso",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Los Andes",
+    "direccion": "Pascual Baburizza 716",
+    "comuna": "Los Andes",
+    "region": "Valparaíso",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Valparaíso",
+    "direccion": "Rodelillo 6071",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Vicuña",
+    "direccion": "Yungay 303",
+    "comuna": "Vicuña",
+    "region": "Coquimbo",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Curacaví",
+    "direccion": "Av. Ambrosio O'Higgins 2100",
+    "comuna": "Curacaví",
+    "region": "Metropolitana",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Río Bueno",
+    "direccion": "Pedro Lagos 1219",
+    "comuna": "Río Bueno",
+    "region": "Los Ríos",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Curanilahue",
+    "direccion": "Avenida Libertador Bernardo O'Higgins 814",
+    "comuna": "Curanilahue",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta San Antonio",
+    "direccion": "Avenida 21 de Mayo 950",
+    "comuna": "San Antonio",
+    "region": "Valparaíso",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Hualqui",
+    "direccion": "Bombero Perret 248",
+    "comuna": "Hualqui",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Purranque",
+    "direccion": "Eleuterio Ramirez 156",
+    "comuna": "Purranque",
+    "region": "Los Lagos",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Cabildo",
+    "direccion": "Humeres 266",
+    "comuna": "Cabildo",
+    "region": "Valparaíso",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Las Cabras",
+    "direccion": "Avenida Estadio 859",
+    "comuna": "Las Cabras",
+    "region": "O’Higgins",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Mariquina",
+    "direccion": "Alejo Carrillo s/n",
+    "comuna": "Mariquina",
+    "region": "Los Ríos",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Temuco Labranza II",
+    "direccion": "Calle 1 Norte 070",
+    "comuna": "Temuco Labranza II",
+    "region": "La Araucanía",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Quillón",
+    "direccion": "Av. Cayumanqui 341",
+    "comuna": "Quillón",
+    "region": "Ñuble",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Collipulli",
+    "direccion": "Alcázar 1278",
+    "comuna": "Collipulli",
+    "region": "La Araucanía",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Victoria",
+    "direccion": "General Lagos 1278",
+    "comuna": "Victoria",
+    "region": "La Araucanía",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta San Vicente",
+    "direccion": "Comalle 515",
+    "comuna": "San Vicente",
+    "region": "O’Higgins",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Los Ángeles",
+    "direccion": "Las Violetas 887",
+    "comuna": "Los Ángeles",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Viña del Mar",
+    "direccion": "Eduardo Frei 4025",
+    "comuna": "Viña del Mar",
+    "region": "Valparaíso",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Quintero",
+    "direccion": "Camino Del Sol Loteo Antares s/n sitios 1-3",
+    "comuna": "Quintero",
+    "region": "Valparaíso",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Chimbarongo",
+    "direccion": "Javiera Carrera 330",
+    "comuna": "Chimbarongo",
+    "region": "O’Higgins",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Longaví",
+    "direccion": "Calle Oriente 2 N°228",
+    "comuna": "Longaví",
+    "region": "Maule",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Carahue",
+    "direccion": "Villagrán 420",
+    "comuna": "Carahue",
+    "region": "La Araucanía",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Frutillar",
+    "direccion": "Av. Alessandri 197",
+    "comuna": "Frutillar",
+    "region": "Los Lagos",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Loncoche",
+    "direccion": "Av. José Manuel Balmaceda 751",
+    "comuna": "Loncoche",
+    "region": "La Araucanía",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta San Clemente",
+    "direccion": "Huamachuco s/n",
+    "comuna": "San Clemente",
+    "region": "Maule",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  },
+  {
+    "nombre": "superbodega acuenta Lota",
+    "direccion": "Arturo Prat 402",
+    "comuna": "Lota",
+    "region": "Biobío",
+    "horario": "08:00 - 21:30",
+    "estado": "Abierto"
+  }
+]
