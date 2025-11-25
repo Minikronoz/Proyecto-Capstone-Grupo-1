@@ -344,41 +344,66 @@ document.addEventListener("DOMContentLoaded", async () => {
     const disponibles = data.disponibles || [];
     const todasLasTiendas = ["unimarc", "tottus", "jumbo", "acuenta", "santaisabel"];
     
-    // Filtrar y deshabilitar supermercados no disponibles
+    // Filtrar y marcar supermercados no disponibles (pero NO deshabilitar)
     todasLasTiendas.forEach(tienda => {
       const label = document.getElementById(`label-${tienda}`);
       const checkbox = label.querySelector(".filtro-super");
       
       if (!disponibles.includes(tienda)) {
-        // ❌ Supermercado NO disponible
-        label.style.opacity = "0.4";
-        label.style.cursor = "not-allowed";
-        label.style.filter = "grayscale(100%)";
+        // ❌ Supermercado NO disponible (pero se puede activar)
+        label.style.opacity = "0.6";
+        label.style.filter = "grayscale(80%)";
+        label.classList.add("no-disponible");
+        
+        // Desmarcar por defecto
         checkbox.checked = false;
-        checkbox.disabled = true;
         
         // Agregar tooltip
-        label.title = `No disponible en tu región`;
+        label.title = `⚠️ No hay locales en tu región, pero puedes activarlo para explorar`;
+        
+        // Agregar badge visual
+        if (!label.querySelector(".badge-no-disponible")) {
+          const badge = document.createElement("span");
+          badge.className = "badge-no-disponible";
+          badge.textContent = "⚠️";
+          badge.title = "Sin locales en tu región";
+          label.appendChild(badge);
+        }
+        
+        // Evento al activar un supermercado no disponible
+        checkbox.addEventListener("change", (e) => {
+          if (e.target.checked) {
+            mostrarAdvertencia(tienda, data.usuario);
+          }
+        });
+        
       } else {
         // ✅ Supermercado disponible
         label.style.opacity = "1";
-        label.style.cursor = "pointer";
         label.style.filter = "none";
-        checkbox.disabled = false;
-        label.title = "";
+        label.classList.remove("no-disponible");
+        checkbox.checked = true;
+        label.title = "✅ Disponible en tu región";
+        
+        // Remover badge si existe
+        const badge = label.querySelector(".badge-no-disponible");
+        if (badge) badge.remove();
       }
     });
     
-    // Mostrar mensaje informativo
+    // Mostrar mensaje informativo general
     if (data.mensaje) {
       const mensajeDiv = document.getElementById("mensaje-supermercados");
-      mensajeDiv.textContent = data.mensaje;
+      mensajeDiv.innerHTML = `
+        <strong> Información:</strong> ${data.mensaje}
+        <br><small>Puedes activar otros supermercados para explorar su catálogo completo.</small>
+      `;
       mensajeDiv.style.display = "block";
       
-      // Ocultar mensaje después de 8 segundos
+      // Ocultar mensaje después de 10 segundos
       setTimeout(() => {
         mensajeDiv.style.display = "none";
-      }, 8000);
+      }, 10000);
     }
     
     // Aplicar filtro inicial
@@ -388,6 +413,40 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Error cargando supermercados:", error);
   }
 });
+
+// Función para mostrar advertencia al activar supermercado no disponible
+function mostrarAdvertencia(tienda, usuario) {
+  const tiendaNombre = {
+    "unimarc": "Unimarc",
+    "tottus": "Tottus",
+    "jumbo": "Jumbo",
+    "acuenta": "Acuenta",
+    "santaisabel": "Santa Isabel"
+  }[tienda] || tienda;
+  
+  const mensajeDiv = document.getElementById("mensaje-supermercados");
+  
+  let ubicacion = "";
+  if (usuario && usuario.comuna && usuario.region) {
+    ubicacion = `en ${usuario.comuna}, ${usuario.region}`;
+  } else {
+    ubicacion = "en tu región";
+  }
+  
+  mensajeDiv.innerHTML = `
+    <strong>⚠️ Advertencia:</strong> ${tiendaNombre} no tiene locales ${ubicacion}.
+    <br><small>Los productos que veas pueden no estar disponibles para entrega/retiro cercano.</small>
+  `;
+  mensajeDiv.style.background = "#fff3cd";
+  mensajeDiv.style.color = "#856404";
+  mensajeDiv.style.borderBottom = "2px solid #ffc107";
+  mensajeDiv.style.display = "block";
+  
+  // Ocultar después de 6 segundos
+  setTimeout(() => {
+    mensajeDiv.style.display = "none";
+  }, 6000);
+}
 </script>
 
 </body>
