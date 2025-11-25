@@ -61,25 +61,25 @@ router.post("/registrar", async (req, res) => {
       }
     }
 
-    // =============================================
-    //  INFORMACIÓN DEL USUARIO (SI TIENE SESIÓN)
-    // =============================================
-    const sesion = req.session?.user || null;
-    let userData = null;
 
-    if (sesion?.correo) {
-      userData = await db.collection("usuarios").findOne({ correo: sesion.correo });
-    }
+const sesion = req.session?.user || null;
+let userData = null;
 
-    // ✓ Cálculo de edad si existe fecha de nacimiento
-    let edadCalculada = null;
-    if (userData?.fechaNacimiento) {
-      const nacimiento = new Date(userData.fechaNacimiento);
-      const hoy = new Date();
-      edadCalculada = hoy.getFullYear() - nacimiento.getFullYear();
-      const m = hoy.getMonth() - nacimiento.getMonth();
-      if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) edadCalculada--;
-    }
+
+if (sesion?.correo) {
+  userData = await db.collection("users").findOne({ correo: sesion.correo });
+}
+
+// ✓ Calcular edad
+let edadCalculada = null;
+if (userData?.fechaNacimiento) {
+  const nacimiento = new Date(userData.fechaNacimiento);
+  const hoy = new Date();
+  edadCalculada = hoy.getFullYear() - nacimiento.getFullYear();
+  const m = hoy.getMonth() - nacimiento.getMonth();
+  if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) edadCalculada--;
+}
+
 
     // =============================================
     //  DOCUMENTO FINAL A GUARDAR
@@ -100,16 +100,16 @@ router.post("/registrar", async (req, res) => {
       //  Información del usuario (NORMALIZADA)
       userId: userData?._id?.toString() || sesion?.id || null,
       userCorreo: userData?.correo || sesion?.correo || "anonimo@local.cl",
-      userNombre: userData?.nombre || null,
-      userApellido: userData?.apellido || null,
-      userGenero: userData?.genero || "No especificado",
-      userRegion: (userData?.region?.trim() === "Metropolitana")
-  ? "Metropolitana de Santiago"
-  : userData?.region?.trim() || "",
-      userComuna: userData?.comuna?.trim() || "",
-      userSector: userData?.sector?.trim() || "",
-      userEdad: edadCalculada,
+      userNombre: userData?.nombre || "Usuario",
+      userApellido: userData?.apellido || "",
+      userGenero: userData?.genero?.trim() || "No especificado",
 
+      userRegion: userData?.region?.trim() === "Metropolitana"
+        ? "Metropolitana de Santiago"
+        : userData?.region?.trim() || "Sin región",
+      userComuna: userData?.comuna?.trim() || "Sin comuna",
+      userSector: userData?.sector?.trim() || "Sin sector",
+      userEdad: edadCalculada,
       negocios: userData?.negocios || [],
 
       //  Fecha
