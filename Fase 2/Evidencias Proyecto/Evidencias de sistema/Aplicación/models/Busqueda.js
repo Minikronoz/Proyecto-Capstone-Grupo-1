@@ -2,15 +2,28 @@
 import { getDB } from "../config/db.js";
 
 export const Busqueda = {
-  //  Registrar una nueva búsqueda
+  //  Registrar una nueva búsqueda (CON DATOS DEL USUARIO)
   async insertOne(data) {
     const db = getDB();
+
+    const user = data.usuario || {}; // ⚠ Se pasa desde el backend al llamar
+
     const nuevaBusqueda = {
-      usuarioEmail: data.usuarioEmail,
       termino: data.termino?.trim() || "",
       palabrasClave: data.palabrasClave || [],
       fecha: new Date(),
+
+      // 🎯 Datos completos del usuario
+      usuarioEmail: user.correo || "anonimo@local.cl",
+      usuarioGenero: user.genero || "No especificado",
+      usuarioEdad: user.edad || null,
+      usuarioRegion: user.region || "",
+      usuarioComuna: user.comuna || "",
+      usuarioSector: user.sector || "",
+      usuarioTieneNegocio: user.tieneNegocio || false,
+      negocios: user.negocios || []
     };
+
     return db.collection("busquedas").insertOne(nuevaBusqueda);
   },
 
@@ -39,7 +52,7 @@ export const Busqueda = {
       .toArray();
   },
 
-  // 🔹 Borrar todas (por si haces reseteo de métricas)
+  // 🔹 Limpiar búsqueda (por si reseteas métricas)
   async clearAll() {
     const db = getDB();
     return db.collection("busquedas").deleteMany({});

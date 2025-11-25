@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             label: "Precio",
             data: precios,
             borderColor: colorVariacion,
-            backgroundColor: bgColor,
+            backgroundColor: "transparent",
             borderWidth: 2,
             fill: true,
             tension: 0.35,
