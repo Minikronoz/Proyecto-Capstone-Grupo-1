@@ -365,6 +365,93 @@ router.get("/yo", (req, res) => {
   });
 });
 
+// =======================================================
+//  NUEVO ENDPOINT: Obtener supermercados disponibles para el usuario
+// =======================================================
+router.get("/api/supermercados-disponibles", async (req, res) => {
+  try {
+    const db = getDB();
+    
+    // ✅ CORREGIDO: Verificar si hay sesión activa
+    if (!req.session || !req.session.user || !req.session.user.id) {
+      // Usuario no autenticado → mostrar todos
+      return res.json({
+        disponibles: ["unimarc", "tottus", "jumbo", "acuenta", "santaisabel"],
+        mensaje: "Inicia sesión para ver supermercados en tu región"
+      });
+    }
+    
+    // ✅ CORREGIDO: Obtener usuario de la sesión
+    const usuario = await db.collection("users").findOne(
+      { _id: new ObjectId(req.session.user.id) }  // ← user.id en lugar de userId
+    );
+    
+    if (!usuario || !usuario.region || !usuario.comuna) {
+      return res.json({
+        disponibles: ["unimarc", "tottus", "jumbo", "acuenta", "santaisabel"],
+        mensaje: "Completa tu perfil para ver supermercados en tu región"
+      });
+    }
+    
+    console.log(`🔍 Buscando supermercados en ${usuario.comuna}, ${usuario.region}`); // ← Para debug
+    
+    // Buscar supermercados en la región/comuna del usuario
+    const locales = await db.collection("locales_supermercados")
+      .find({
+        region: usuario.region,
+        comuna: usuario.comuna
+      })
+      .toArray();
+    
+    console.log(`📍 Locales encontrados: ${locales.length}`); // ← Para debug
+    
+    // Extraer tiendas únicas
+    const tiendasDisponibles = [...new Set(locales.map(l => l.tienda))];
+    
+    console.log(`🏪 Tiendas disponibles:`, tiendasDisponibles); // ← Para debug
+    
+    // Si no hay locales en la comuna exacta, buscar en toda la región
+    let mensaje = "";
+    if (tiendasDisponibles.length === 0) {
+      const localesRegion = await db.collection("locales_supermercados")
+        .find({ region: usuario.region })
+        .toArray();
+      
+      const tiendasRegion = [...new Set(localesRegion.map(l => l.tienda))];
+      
+      console.log(`🗺️ Tiendas en región ${usuario.region}:`, tiendasRegion); // ← Para debug
+      
+      return res.json({
+        disponibles: tiendasRegion,
+        mensaje: `No hay supermercados en ${usuario.comuna}, mostrando los disponibles en ${usuario.region}`
+      });
+    }
+    
+    const todasLasTiendas = ["unimarc", "tottus", "jumbo", "acuenta", "santaisabel"];
+    const noDisponibles = todasLasTiendas.filter(t => !tiendasDisponibles.includes(t));
+    
+    if (noDisponibles.length > 0) {
+      mensaje = `Los siguientes supermercados no tienen locales en ${usuario.comuna}: ${noDisponibles.join(", ")}`;
+    }
+    
+    res.json({
+      disponibles: tiendasDisponibles,
+      mensaje,
+      usuario: {
+        region: usuario.region,
+        comuna: usuario.comuna
+      }
+    });
+    
+  } catch (error) {
+    console.error("❌ Error obteniendo supermercados:", error);
+    res.status(500).json({
+      disponibles: ["unimarc", "tottus", "jumbo", "acuenta", "santaisabel"],
+      mensaje: "Error al verificar disponibilidad"
+    });
+  }
+});
+
 
 
 export default router;

@@ -121,14 +121,40 @@ async function cerrarSesion(event) {
   Última actualización: <strong></strong>
 </div>
 
-<!--  Filtros supermercados -->
+<!--  Filtros supermercados (actualizado con atributo disabled) -->
 <div class="filtro-superior">
-    <label><input type="checkbox" class="filtro-super" value="unimarc" checked><span class="tag unimarc">Unimarc</span></label>
-    <label><input type="checkbox" class="filtro-super" value="tottus" checked><span class="tag tottus">Tottus</span></label>
-    <label><input type="checkbox" class="filtro-super" value="jumbo" checked><span class="tag jumbo">Jumbo</span></label>
-    <label><input type="checkbox" class="filtro-super" value="acuenta" checked><span class="tag acuenta">Acuenta</span></label>
-    <label><input type="checkbox" class="filtro-super" value="santaisabel" checked><span class="tag santaisabel">Santa Isabel</span></label>
+    <label id="label-unimarc">
+      <input type="checkbox" class="filtro-super" value="unimarc" checked>
+      <span class="tag unimarc">Unimarc</span>
+    </label>
+    <label id="label-tottus">
+      <input type="checkbox" class="filtro-super" value="tottus" checked>
+      <span class="tag tottus">Tottus</span>
+    </label>
+    <label id="label-jumbo">
+      <input type="checkbox" class="filtro-super" value="jumbo" checked>
+      <span class="tag jumbo">Jumbo</span>
+    </label>
+    <label id="label-acuenta">
+      <input type="checkbox" class="filtro-super" value="acuenta" checked>
+      <span class="tag acuenta">Acuenta</span>
+    </label>
+    <label id="label-santaisabel">
+      <input type="checkbox" class="filtro-super" value="santaisabel" checked>
+      <span class="tag santaisabel">Santa Isabel</span>
+    </label>
 </div>
+
+<!-- ✅ Mensaje informativo -->
+<div id="mensaje-supermercados" style="
+  background: #fff3cd;
+  color: #856404;
+  padding: 12px 20px;
+  text-align: center;
+  border-bottom: 2px solid #ffc107;
+  font-size: 14px;
+  display: none;
+"></div>
 
 <section class="zona-busqueda">
   <div class="bloque-busqueda">
@@ -307,6 +333,62 @@ document.addEventListener("DOMContentLoaded", verificarYMostrarPopup);
 
 <!--  Script principal -->
 <script src="/js/catalogo.js"></script>
+
+<!--  Script de carga de supermercados disponibles -->
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const res = await fetch("/api/supermercados-disponibles", { credentials: "include" });
+    const data = await res.json();
+    
+    const disponibles = data.disponibles || [];
+    const todasLasTiendas = ["unimarc", "tottus", "jumbo", "acuenta", "santaisabel"];
+    
+    // Filtrar y deshabilitar supermercados no disponibles
+    todasLasTiendas.forEach(tienda => {
+      const label = document.getElementById(`label-${tienda}`);
+      const checkbox = label.querySelector(".filtro-super");
+      
+      if (!disponibles.includes(tienda)) {
+        // ❌ Supermercado NO disponible
+        label.style.opacity = "0.4";
+        label.style.cursor = "not-allowed";
+        label.style.filter = "grayscale(100%)";
+        checkbox.checked = false;
+        checkbox.disabled = true;
+        
+        // Agregar tooltip
+        label.title = `No disponible en tu región`;
+      } else {
+        // ✅ Supermercado disponible
+        label.style.opacity = "1";
+        label.style.cursor = "pointer";
+        label.style.filter = "none";
+        checkbox.disabled = false;
+        label.title = "";
+      }
+    });
+    
+    // Mostrar mensaje informativo
+    if (data.mensaje) {
+      const mensajeDiv = document.getElementById("mensaje-supermercados");
+      mensajeDiv.textContent = data.mensaje;
+      mensajeDiv.style.display = "block";
+      
+      // Ocultar mensaje después de 8 segundos
+      setTimeout(() => {
+        mensajeDiv.style.display = "none";
+      }, 8000);
+    }
+    
+    // Aplicar filtro inicial
+    aplicarFiltroSupermercado();
+    
+  } catch (error) {
+    console.error("Error cargando supermercados:", error);
+  }
+});
+</script>
 
 </body>
 </html>

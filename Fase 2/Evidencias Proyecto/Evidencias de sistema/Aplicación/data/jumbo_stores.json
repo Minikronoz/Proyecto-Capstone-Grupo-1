@@ -2,296 +2,414 @@
   {
     "nombre": "Jumbo 14 Norte",
     "direccion": "14 norte 976",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Viña del Mar",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Jumbo Antofagasta",
     "direccion": "Angamos 745 - 777",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Antofagasta",
+    "region": "Antofagasta"
   },
   {
     "nombre": "Jumbo Antofagasta de Punto de Encuentro",
     "direccion": "Av. Pedro Aguirre Cerda 9400",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Antofagasta",
+    "region": "Antofagasta"
   },
   {
     "nombre": "Jumbo Arica",
     "direccion": "Avenida Diego Portales 161",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Arica",
+    "region": "Arica y Parinacota"
   },
   {
     "nombre": "Jumbo Bilbao",
     "direccion": "Avda. Francisco Bilbao 4144, Las Condes.",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Las Condes",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo Calama",
     "direccion": "Avenida Chorrillos 1759",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Calama",
+    "region": "Antofagasta"
   },
   {
     "nombre": "Jumbo Chamisero",
     "direccion": "Av. Santa María 14.601, Colina.",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Colina",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo Chillán",
     "direccion": "Longitudinal Norte N°134 Chillán, Chile",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Chillán",
+    "region": "Ñuble"
   },
   {
     "nombre": "Jumbo Chillán (Vicente Mendez)",
     "direccion": "Av. Vicente Mendez N°1160, Chile",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Chillán",
+    "region": "Ñuble"
   },
   {
     "nombre": "Jumbo Concepción (Mall del Centro)",
     "direccion": "Barros Arana 1068, Concepción.",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Concepción",
+    "region": "Biobío"
   },
   {
     "nombre": "Jumbo Concepción (Pedro de Valdivia)",
     "direccion": "Av. Pedro Valdivia N°1010 , Concepción de Chile",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Concepción",
+    "region": "Biobío"
   },
   {
     "nombre": "Jumbo Concha y Toro",
     "direccion": "Av. Concha y Toro 3854",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Puente Alto",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo Concón",
     "direccion": "Av. Concón Reñaca 3850, Concón",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Viña del Mar",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Jumbo Copiapó",
     "direccion": "Copayapu 2406",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Copiapó",
+    "region": "Atacama"
   },
   {
     "nombre": "Jumbo Copiapó (Pedro de Valdivia)",
     "direccion": "Los Carreras 3356, Copiapó",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Copiapó",
+    "region": "Atacama"
   },
   {
     "nombre": "Jumbo Costanera Center",
     "direccion": "Avda. Andrés Bello 2465, Providencia",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Providencia",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo Curicó",
     "direccion": "Av. B.O´Higgins N°201 Curicó, Chile",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Curicó",
+    "region": "Maule"
   },
   {
     "nombre": "Jumbo El Belloto",
     "direccion": "Avda. Ramón Freire 1851, Quilpué",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Quilpué",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Jumbo El LLano",
     "direccion": "El Llano Subercaseaux 3519, San Miguel.",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "San Miguel",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo Hualpén",
     "direccion": "Av. Costanera Norte 9781, Hualpén",
-    "horario": "Horario:\nLunes a sábado 8:30 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:30 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Hualpén",
+    "region": "Biobío"
   },
   {
     "nombre": "Jumbo Independencia",
     "direccion": "Av Independencia 565",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Independencia",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo Iquique",
     "direccion": "Héroes de la Concepción 2855",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Iquique",
+    "region": "Tarapacá"
   },
   {
     "nombre": "Jumbo Kennedy",
     "direccion": "Avda. Kennedy 9001, Las Condes",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Las Condes",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo La Dehesa",
     "direccion": "Av. La Dehesa 1445, Lo Barnechea",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Lo Barnechea",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo La Florida",
     "direccion": "Avda. Vicuña Mackenna 6100, La Florida",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "La Florida",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo La Reina",
     "direccion": "Av. Francisco Bilbao 8750, Las Condes",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "La Reina",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo La Serena",
     "direccion": "Av. El Santo 1726",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "La Serena",
+    "region": "Coquimbo"
   },
   {
     "nombre": "Jumbo La Serena (Ulriksen)",
     "direccion": "Av. Guillermo Ulriksen 1634",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "La Serena",
+    "region": "Coquimbo"
   },
   {
     "nombre": "Jumbo Lo Castillo",
     "direccion": "Eduardo Marquina 3412, Vitacura.",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Vitacura",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo Los Andes",
     "direccion": "Av. Hermanos Maristas Nº805",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Los Andes",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Jumbo Los Dominicos",
     "direccion": "Avda. Camino el Alba 11.969, local 101, Las Condes",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Las Condes",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo Los Jardines del Sur",
     "direccion": "Avenida Angamos 2170",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "San Bernardo",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo Los Trapenses",
     "direccion": "Av. Camino Los Trapenses #3515, Lo Barnechea.",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Lo Barnechea",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo Los Ángeles",
     "direccion": "Av. Ercilla 193, Los Ángeles",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Los Ángeles",
+    "region": "Biobío"
   },
   {
     "nombre": "Jumbo Maipú",
     "direccion": "Av. Américo Vespucio 1001, Maipú.",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Maipú",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo Maitencillo",
     "direccion": "Eje Vía F-124 (Camino Aguas Blancas) con ruta F-30, Puchuncaví, Región de Valparaíso",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Puchuncaví",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Jumbo Membrillar (Rancagua)",
     "direccion": "Membrillar 450, Chile",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Rancagua",
+    "region": "O'Higgins"
   },
   {
     "nombre": "Jumbo Miraflores",
     "direccion": "Av. Miraflores 2332",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "La Florida",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo Osorno",
     "direccion": "Plaza Yungay 645",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Osorno",
+    "region": "Los Lagos"
   },
   {
     "nombre": "Jumbo Pajaritos",
     "direccion": "Av. Pajaritos 3302, Maipú",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Maipú",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo Peñalolén",
     "direccion": "Av. Sánchez Fontecilla 12.000, Peñalolén.",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Peñalolén",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo Pie Andino",
     "direccion": "Av. Paseo Pie Andino 4850, Lo Barnechea.",
-    "horario": "Horario:\nLunes a sábado 8:00-21:00\nDomingo 9:00-21:00"
+    "horario": "Horario:\nLunes a sábado 8:00-21:00\nDomingo 9:00-21:00",
+    "comuna": "Lo Barnechea",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo Puente Alto (Plaza Puente)",
     "direccion": "Santo Domingo 67, Puente Alto",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Puente Alto",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo Puertas de Chicureo",
     "direccion": "Avendida Chicureo 130, Chicureo",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Colina",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo Puerto Montt",
     "direccion": "Avda. Ejército 470, Puerto Montt.",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Puerto Montt",
+    "region": "Los Lagos"
   },
   {
     "nombre": "Jumbo Puerto Varas",
     "direccion": "Km 1.5 camino Ensenada, Centro Comercial Doña Ema, Puerto Varas.",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Puerto Varas",
+    "region": "Los Lagos"
   },
   {
     "nombre": "Jumbo Quillota",
     "direccion": "Rafael Ariztia 587, Quillota, Quinta región",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Quillota",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Jumbo Rancagua",
     "direccion": "Av. Presidente Frei Montalva N°750 Rancagua, Chile",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Rancagua",
+    "region": "O'Higgins"
   },
   {
     "nombre": "Jumbo San Bernardo",
     "direccion": "Av. Portales 3698, Mall Plaza Sur, San Bernardo.",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "San Bernardo",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Jumbo Santa Cruz",
     "direccion": "Orlandi 34, Santa Cruz",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Santa Cruz",
+    "region": "O'Higgins"
   },
   {
     "nombre": "Jumbo Talca",
     "direccion": "El Arenal 411",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Talca",
+    "region": "Maule"
   },
   {
     "nombre": "Jumbo Talca Las Rastras",
     "direccion": "Av. 2 norte 3230 local A, Talca",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Talca",
+    "region": "Maule"
   },
   {
     "nombre": "Jumbo Temuco",
     "direccion": "Av. Alemania N°633, Chile",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Temuco",
+    "region": "La Araucanía"
   },
   {
     "nombre": "Jumbo Temuco (Los Pablos)",
     "direccion": "Av. Los Pablos N°1800, Chile",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Temuco",
+    "region": "La Araucanía"
   },
   {
     "nombre": "Jumbo Valdivia",
     "direccion": "Errazuriz N°1040, Chile",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Valdivia",
+    "region": "Los Ríos"
   },
   {
     "nombre": "Jumbo Valparaíso",
     "direccion": "Av. Argentina 51",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Jumbo Viña del Mar",
     "direccion": "Avda. 1 Norte 2901, Viña del Mar",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Viña Del Mar",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Jumbo Ñuñoa",
     "direccion": "Av. José Pedro Alessandri 1166",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Ñuñoa",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Talcahuano (Mallplaza Trébol)",
     "direccion": "Av. Jorge Alessandri 3177",
-    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00"
+    "horario": "Horario:\nLunes a sábado 8:00 – 21:00\nDomingos y festivos 9:00 – 21:00",
+    "comuna": "Talcahuano",
+    "region": "Biobío"
   }
 ]

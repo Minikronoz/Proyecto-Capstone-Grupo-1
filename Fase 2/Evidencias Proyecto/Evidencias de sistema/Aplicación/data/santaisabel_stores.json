@@ -2,966 +2,1352 @@
   {
     "nombre": "14 de Febrero",
     "direccion": "14 de Febrero 2455",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Concepción",
+    "region": "Biobío"
   },
   {
     "nombre": "Agua Santa",
     "direccion": "Variante Agua Santa 4010",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Puente Alto",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Alcázar, Ciudad Satélite",
     "direccion": "Av. Alcalde Luis Infante Larraín 1320",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Maipú",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Alessandri",
     "direccion": "Arturo Alessandri 1210",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Talca",
+    "region": "Maule"
   },
   {
     "nombre": "Almirante Riveros",
     "direccion": "Av. Almirante Riveros 1202",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Concepción",
+    "region": "Biobío"
   },
   {
     "nombre": "Alto Hospicio",
     "direccion": "Tarapacá 2793, Alto Hospicio",
-    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Alto Hospicio",
+    "region": "Tarapacá"
   },
   {
     "nombre": "Anibal Pinto",
     "direccion": "Anibal Pinto 1551",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Apoquindo",
     "direccion": "Av. Apoquindo 7200",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Las Condes",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Arica Lynch",
     "direccion": "Av. 21 de Mayo 501",
-    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Arica",
+    "region": "Arica y Parinacota"
   },
   {
     "nombre": "Artesanos",
     "direccion": "Manquehue Sur 329",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Las Condes",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Avenida Alemania",
     "direccion": "Av. Alemania 686, Los Ángeles",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos 08:30-21:00 Festivos 08:30-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos 08:30-21:00 Festivos 08:30-21:00",
+    "comuna": "Los Ángeles",
+    "region": "Biobío"
   },
   {
     "nombre": "Balmaceda",
     "direccion": "Av. Balmaceda 3039",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Concepción",
+    "region": "Biobío"
   },
   {
     "nombre": "Bandera",
     "direccion": "Bandera 201, Esquina Agustinas",
-    "horario": "Lunes a Sábados 07:30-21:00 Festivos 10:00-21:00\nDomingos cerrados"
+    "horario": "Lunes a Sábados 07:30-21:00 Festivos 10:00-21:00\nDomingos cerrados",
+    "comuna": "Santiago",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Barrio Inglés",
     "direccion": "Jorge Kendrick 35, San Roque Valparaíso",
-    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Barros Arana",
     "direccion": "Barros Arana 883, Block 899",
-    "horario": "Lunes a Sábado y Festivos 08:30-21:00\nDomingos cerrados"
+    "horario": "Lunes a Sábado y Festivos 08:30-21:00\nDomingos cerrados",
+    "comuna": "Concepción",
+    "region": "Biobío"
   },
   {
     "nombre": "Bilbao",
     "direccion": "Av. Francisco Bilbao 2855",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Ñuñoa",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Bosques De San Francisco",
     "direccion": "Lourdes Esquina Santa Filomena 1540",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Huechuraba",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Brasil",
     "direccion": "Av. Brasil 1601, Valparaíso",
-    "horario": "Lunes a Sábados 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Bulnes",
     "direccion": "Manuel Bulnes 279",
-    "horario": "Lunes a Sábado 08:00 a 21:00 hrs\nDomingos y Festivos 09:00 a 21:00 hrs"
+    "horario": "Lunes a Sábado 08:00 a 21:00 hrs\nDomingos y Festivos 09:00 a 21:00 hrs",
+    "comuna": "Bulnes",
+    "region": "Ñuble"
   },
   {
     "nombre": "Bustamante",
     "direccion": "Av. Vicuña Mackenna 1048",
-    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "La Florida",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Calama",
     "direccion": "Av. Granaderos 3671",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Calama",
+    "region": "Antofagasta"
   },
   {
     "nombre": "Calera de Tango",
     "direccion": "Av. Calera de Tango esq. Lonquen s/n",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Calera de Tango",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Calle Quillota",
     "direccion": "Quillota 441",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Quillota",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Camilo Henríquez",
     "direccion": "Camilo Henríquez 627",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Talca",
+    "region": "Maule"
   },
   {
     "nombre": "Cantagallo",
     "direccion": "Av. Las Condes 12207",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Las Condes",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Carlos Valdovinos",
     "direccion": "Carlos Valdovinos 2020",
-    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Lo Espejo",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Carrera",
     "direccion": "Carrera 499",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-19:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-19:00",
+    "comuna": "Linares",
+    "region": "Maule"
   },
   {
     "nombre": "Casablanca",
     "direccion": "Diego Portales 519/551",
-    "horario": "Lunes a Sábados 08:00-21:00\nDomingos y Festivos 08:00-21:00"
+    "horario": "Lunes a Sábados 08:00-21:00\nDomingos y Festivos 08:00-21:00",
+    "comuna": "Casablanca",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Catamarca",
     "direccion": "Salvador Gutiérrez 5496",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Santiago",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Caupolicán",
     "direccion": "Caupolicán 650",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Chillán",
+    "region": "Ñuble"
   },
   {
     "nombre": "Centro Rex",
     "direccion": "Av. José Manuel Astorga 360",
-    "horario": "Lunes a Viernes 09:00-21:00 Sábados y Festivos 10:00-21:00\nDomingos cerrado"
+    "horario": "Lunes a Viernes 09:00-21:00 Sábados y Festivos 10:00-21:00\nDomingos cerrado",
+    "comuna": "Valdivia",
+    "region": "Los Ríos"
   },
   {
     "nombre": "Chacabuco",
     "direccion": "Chacabuco 555",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Antofagasta",
+    "region": "Antofagasta"
   },
   {
     "nombre": "Chiguayante",
     "direccion": "Manuel Rodríguez 2150, Chiguayante",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Chiguayante",
+    "region": "Biobío"
   },
   {
     "nombre": "Cienfuegos",
     "direccion": "Cienfuegos 527",
-    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Ciudad Satélite",
     "direccion": "Av. P. Central Poniente 1040",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Maipú",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Claudio Vicuña",
     "direccion": "Claudio Vicuña 696",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados y Festivos 08:30-21:00\nDomingos cerrado"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados y Festivos 08:30-21:00\nDomingos cerrado",
+    "comuna": "Vicuña",
+    "region": "Coquimbo"
   },
   {
     "nombre": "Colina",
     "direccion": "Caletera Oriente, Autopista Los Liberadores 22909",
-    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Colina",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Collao",
     "direccion": "Av. General Novoa 530",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Coquimbo",
+    "region": "Coquimbo"
   },
   {
     "nombre": "Colín",
     "direccion": "Av. Colín 0691",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Colón",
     "direccion": "Colón 1500",
-    "horario": "Lunes a Sábados 08:00-21:00\nDomingo y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:00-21:00\nDomingo y Festivos 09:00-21:00",
+    "comuna": "Talca",
+    "region": "Maule"
   },
   {
     "nombre": "Compañía",
     "direccion": "Compañía 2305",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Concepción",
+    "region": "Biobío"
   },
   {
     "nombre": "Con Con",
     "direccion": "Av. Manantiales 1021",
-    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Concón",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Conchalí",
     "direccion": "Av. Cardenal Caro 1771",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Conchalí",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Consistorial",
     "direccion": "Av. Consistorial 2100",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Peñalolén",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Coronel",
     "direccion": "Manuel Montt 221",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Coronel",
+    "region": "Biobío"
   },
   {
     "nombre": "Curacaví",
     "direccion": "Ambrosio O'Higgins 1689",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Curacaví",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Curauma",
     "direccion": "Av. Cardenal Samoré 2335",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Curicó Centro",
     "direccion": "Merced 487",
-    "horario": "Lunes a Sábados y Festivos 10:00-21:00\nDomingos cerrado"
+    "horario": "Lunes a Sábados y Festivos 10:00-21:00\nDomingos cerrado",
+    "comuna": "Curicó",
+    "region": "Maule"
   },
   {
     "nombre": "César Ercilla",
     "direccion": "Av. César Ercilla 1075",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Chillán",
+    "region": "Ñuble"
   },
   {
     "nombre": "Diagonal",
     "direccion": "Diagonal P.A.Cerda 1107",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 10:00-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 10:00-21:00",
+    "comuna": "Temuco",
+    "region": "La Araucanía"
   },
   {
     "nombre": "Diego Portales",
     "direccion": "Diego Portales 1040",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Puerto Montt",
+    "region": "Los Lagos"
   },
   {
     "nombre": "Dorsal",
     "direccion": "Av. Independencia 3160, Dorsal",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Independencia",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Down Town",
     "direccion": "Av. Bernardo O'Higgins 1449, Down Town",
-    "horario": "Lunes a Sábados 07:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 07:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Santiago",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Doñihue",
     "direccion": "Av. Estación 334",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-17:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-17:00",
+    "comuna": "Doñihue",
+    "region": "O'Higgins"
   },
   {
     "nombre": "El Alba",
     "direccion": "Av. La Florida 10149",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 8:30-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 8:30-21:00",
+    "comuna": "La Florida",
+    "region": "Metropolitana"
   },
   {
     "nombre": "El Belloto",
     "direccion": "Freire 496, El Belloto",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Quilpué",
+    "region": "Valparaíso"
   },
   {
     "nombre": "El Bosque",
     "direccion": "Gran Avenida 9863, Parad. 29 1/2",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "El Bosque",
+    "region": "Metropolitana"
   },
   {
     "nombre": "El Bosque, Maipú",
     "direccion": "Capellán Florencio Infante 3330",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Maipú",
+    "region": "Metropolitana"
   },
   {
     "nombre": "El Gabino",
     "direccion": "El Gabino13551",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "La Florida",
+    "region": "Metropolitana"
   },
   {
     "nombre": "El Mirador",
     "direccion": "Vicuña Mackenna 890",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "La Florida",
+    "region": "Metropolitana"
   },
   {
     "nombre": "El Peñón",
     "direccion": "Av. Camino San José de Maipo 07722 -  Local 1",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 08:30-21:00",
+    "comuna": "La Florida",
+    "region": "Metropolitana"
   },
   {
     "nombre": "El Roble",
     "direccion": "El Roble 770",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Concepción",
+    "region": "Biobío"
   },
   {
     "nombre": "Estación Central",
     "direccion": "Alameda 3390",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Estación Central",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Eucaliptus",
     "direccion": "Eucaliptus 273",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Peñalolén",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Fleming",
     "direccion": "Av. Padre Hurtado 1621",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Padre Hurtado",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Florida",
     "direccion": "Av. Panorámica 820, La Florida",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "La Florida",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Franklin",
     "direccion": "Santa Rosa 2055",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:30-19:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:30-19:00",
+    "comuna": "Santiago",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Freire",
     "direccion": "Freire 455",
-    "horario": "Lunes a Viernes 09:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Viernes 09:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Valdivia",
+    "region": "Los Ríos"
   },
   {
     "nombre": "Fundo El Carmen",
     "direccion": "Los Creadores 0191, Fdo. El Carmen",
-    "horario": "Lunes a Sábado 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00",
+    "comuna": "El Carmen",
+    "region": "Ñuble"
   },
   {
     "nombre": "Grajales",
     "direccion": "Almirante Latorre 310, Grajales",
-    "horario": "Lunes a Sábados 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Chillán",
+    "region": "Ñuble"
   },
   {
     "nombre": "Grecia",
     "direccion": "Av. Grecia 5791",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Ñuñoa",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Huasco",
     "direccion": "Arturo Prat 327",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Huasco",
+    "region": "Atacama"
   },
   {
     "nombre": "Huérfanos",
     "direccion": "Huérfanos 1437",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Santiago",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Intermodal",
     "direccion": "Av. Ossa 36, Intermodal",
-    "horario": "Lunes a Sábado 07:00-21:00\nDomingos y Festivos 08:00-21:00"
+    "horario": "Lunes a Sábado 07:00-21:00\nDomingos y Festivos 08:00-21:00",
+    "comuna": "La Serena",
+    "region": "Coquimbo"
   },
   {
     "nombre": "J.J.Perez",
     "direccion": "J.J.Perez 102",
-    "horario": "Lunes a Viernes 08:00-21:00 Sábados y Festivos 08:30-21:00\nDomingos cerrado"
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados y Festivos 08:30-21:00\nDomingos cerrado",
+    "comuna": "Rancagua",
+    "region": "O'Higgins"
   },
   {
     "nombre": "Januario Espinoza",
     "direccion": "Januario Espinoza 1183, Linares",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Linares",
+    "region": "Maule"
   },
   {
     "nombre": "La Cantera",
     "direccion": "Av. La Cantera 1965",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Peñalolén",
+    "region": "Metropolitana"
   },
   {
     "nombre": "La Cisterna, Paradero 18",
     "direccion": "Av. José Miguel Carrera 6610",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "La Cisterna",
+    "region": "Metropolitana"
   },
   {
     "nombre": "La Cruz",
     "direccion": "Av. 21 de Mayo 3524",
-    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso"
   },
   {
     "nombre": "La Farfana",
     "direccion": "Av. El Rosal 3999",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Maipú",
+    "region": "Metropolitana"
   },
   {
     "nombre": "La Florida, Enrique Olivares",
     "direccion": "Av. La Florida 9385",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "La Florida",
+    "region": "Metropolitana"
   },
   {
     "nombre": "La Granja",
     "direccion": "Santa Rosa 7668",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábado 9:00-21:00\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábado 9:00-21:00\nDomingos y Festivos 08:30-21:00",
+    "comuna": "La Granja",
+    "region": "Metropolitana"
   },
   {
     "nombre": "La Herradura",
     "direccion": "Carretera 5 norte con Av. Héctor Arce s/n",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Coquimbo",
+    "region": "Coquimbo"
   },
   {
     "nombre": "La Islita",
     "direccion": "Av. Balmaceda 4316",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Valdivia",
+    "region": "Los Ríos"
   },
   {
     "nombre": "La Ligua",
     "direccion": "Serrano 251",
-    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "La Ligua",
+    "region": "Valparaíso"
   },
   {
     "nombre": "La Pintana",
     "direccion": "Av. Santa Rosa 13015",
-    "horario": "Lunes a Sábado 08:00-20:30\nDomingos y Festivos 09:00-20:30"
+    "horario": "Lunes a Sábado 08:00-20:30\nDomingos y Festivos 09:00-20:30",
+    "comuna": "La Pintana",
+    "region": "Metropolitana"
   },
   {
     "nombre": "La Travesía",
     "direccion": "Isla Portezuelo 615",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "San Pedro de la Paz",
+    "region": "Biobío"
   },
   {
     "nombre": "La Unión",
     "direccion": "Av. Augusto Grob 1080",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "La Unión",
+    "region": "Los Ríos"
   },
   {
     "nombre": "Labranza",
     "direccion": "Las Perdices 0547",
-    "horario": "Lunes a Sábados 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Temuco",
+    "region": "La Araucanía"
   },
   {
     "nombre": "Larraín",
     "direccion": "Av. Larraín 6677",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "La Reina",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Las Araucarias",
     "direccion": "Valparaíso 529, Quillota, Valparaíso",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Quillota",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Las Compañías",
     "direccion": "Av. El Libertador 1401, Las Compañías",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Rancagua",
+    "region": "O'Higgins"
   },
   {
     "nombre": "Las Mariposas",
     "direccion": "Av. Alonso de Ercilla 2780",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Temuco",
+    "region": "La Araucanía"
   },
   {
     "nombre": "Las Palmas",
     "direccion": "Manuel Rodriguez 335-C",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Limache",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Las Rejas",
     "direccion": "Ecuador 5455",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Estación Central",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Limache Viejo",
     "direccion": "Palmira Romano 405",
-    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Limache",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Lo Campino",
     "direccion": "Av. Las Torres 450, Local 1",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Quilicura",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Lo Marcoleta",
     "direccion": "Av. Lo Marcoleta 361, Lo Marcoleta",
-    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Talca",
+    "region": "Maule"
   },
   {
     "nombre": "Lomas de San Andrés",
     "direccion": "Ramón Carrasco 52, Lomas de San Andrés",
-    "horario": "Lunes a Viernes 09:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Viernes 09:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Concepción",
+    "region": "Biobío"
   },
   {
     "nombre": "Los Boldos",
     "direccion": "Av. León Juan Luis Diez 1900",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Chillán",
+    "region": "Ñuble"
   },
   {
     "nombre": "Los Carreras",
     "direccion": "Carrera 811",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados y Festivos 08:30-21:00\nDomingos cerrado"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados y Festivos 08:30-21:00\nDomingos cerrado",
+    "comuna": "Linares",
+    "region": "Maule"
   },
   {
     "nombre": "Los Dominicos",
     "direccion": "Apoquindo 8450",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Las Condes",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Los Pensamientos",
     "direccion": "Los Pensamientos 10260",
-    "horario": "Lunes a Sábado 08:30-20:30\nDomingos y Festivos 09:00-20:30"
+    "horario": "Lunes a Sábado 08:30-20:30\nDomingos y Festivos 09:00-20:30",
+    "comuna": "La Florida",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Los Pinos",
     "direccion": "Las Barrancas 2464, Los Pinos",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Maipú",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Machalí",
     "direccion": "Arturo Prat 116, esquina Miranda",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Machalí",
+    "region": "O'Higgins"
   },
   {
     "nombre": "Maipú",
     "direccion": "Maipú 646",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Maipú",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Maipú Centro",
     "direccion": "Av. Pajaritos 1948",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Maipú",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Mall El Trébol",
     "direccion": "Av. Jorge Alessandri 3177",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Talcahuano",
+    "region": "Biobío"
   },
   {
     "nombre": "Mall Marina",
     "direccion": "Av. Libertad 1348, Local 305",
-    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Viña del Mar",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Mall Talcahuano",
     "direccion": "Colón 180",
-    "horario": "Lunes a\nDomingo 10:00-20:00"
+    "horario": "Lunes a\nDomingo 10:00-20:00",
+    "comuna": "Talcahuano",
+    "region": "Biobío"
   },
   {
     "nombre": "Manso",
     "direccion": "Av. Manso 533",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Valdivia",
+    "region": "Los Ríos"
   },
   {
     "nombre": "Manuel Montt",
     "direccion": "Montt 1132",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingo Cerrado Festivos 11:00-19:30"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingo Cerrado Festivos 11:00-19:30",
+    "comuna": "Chillán",
+    "region": "Ñuble"
   },
   {
     "nombre": "Mapocho",
     "direccion": "Av. Ismael Valdés Vergara 838",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Santiago",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Merced",
     "direccion": "Merced 25",
-    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Santiago",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Molina",
     "direccion": "Luis Cruz Martínez 1563",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Molina",
+    "region": "Maule"
   },
   {
     "nombre": "Mulchén",
     "direccion": "Villagran 690",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábado 09:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábado 09:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Mulchén",
+    "region": "Biobío"
   },
   {
     "nombre": "Ochagavía",
     "direccion": "Av. José Joaquín Prieto 5531",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Santiago",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Olmué",
     "direccion": "Blanco Encalada esq. Diego Portales 4212, Olmué.",
-    "horario": "Lunes a\nDomingo 08:00-21:00"
+    "horario": "Lunes a\nDomingo 08:00-21:00",
+    "comuna": "Olmué",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Ovalle Centro",
     "direccion": "Vicuña Mackenna 1, local 1",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Ovalle",
+    "region": "Coquimbo"
   },
   {
     "nombre": "P. Aguirre Cerda",
     "direccion": "P. Aguirre Cerda 1010",
-    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Concepción",
+    "region": "Biobío"
   },
   {
     "nombre": "Padre Hurtado",
     "direccion": "Camino Melipilla 2390",
-    "horario": "Lunes a Sábado 08:30-20:30\nDomingos y Festivos 09:00-20:30"
+    "horario": "Lunes a Sábado 08:30-20:30\nDomingos y Festivos 09:00-20:30",
+    "comuna": "Padre Hurtado",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Padre Las Casas",
     "direccion": "Maquehue 850, Padre las Casas",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Padre Las Casas",
+    "region": "La Araucanía"
   },
   {
     "nombre": "Paine",
     "direccion": "Av. General Baquedano 502",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Paine",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Pajarito Las Parcelas",
     "direccion": "Av. Pajaritos 4909",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Maipú",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Pajarito Vespucio",
     "direccion": "Av. Américo Vespucio Norte 51",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Pudahuel",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Palomar",
     "direccion": "Av. Henríquez 611",
-    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Temuco",
+    "region": "La Araucanía"
   },
   {
     "nombre": "Pascual Baburizza",
     "direccion": "Av. Pascual Baburizza 510",
-    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Patio La Reina",
     "direccion": "Av. Larraín 8751, Laura Rodríguez",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "La Reina",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Pedro Fontova",
     "direccion": "Pedro Fontova 7789",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Cerrillos",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Pedro Montt",
     "direccion": "Pedro Montt 1845",
-    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Peñablanca",
     "direccion": "Bernardo Leighton 71, Peña Blanca",
-    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Peñaflor",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Peñaflor",
     "direccion": "Av. Vicuña Mackenna 2005",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Peñaflor",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Pirque",
     "direccion": "Virginia Subercaseux 447",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Pirque",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Placeres",
     "direccion": "Av. Matta 2460 Cerro Los Placeres",
-    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Playa Ancha",
     "direccion": "Av. Levarte 840, Playa Ancha Valparaíso",
-    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Plaza Don Carlos",
     "direccion": "Av. Carlos Ossandón 1301",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Antofagasta",
+    "region": "Antofagasta"
   },
   {
     "nombre": "Plaza Echaurren",
     "direccion": "Alte Riveros del 17 al 31, Esq. San Martin",
-    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Plaza Viña",
     "direccion": "Av. Valparaíso 740",
-    "horario": "Cerrado temporalmente"
+    "horario": "Cerrado temporalmente",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Plazuela Independencia",
     "direccion": "Av. Concha y Toro 1036",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Puente Alto",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Portal El Belloto",
     "direccion": "Av. Ramón Freire 2414, El Belloto",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Quilpué",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Portal Quillota",
     "direccion": "Ariztía 530",
-    "horario": "Sin horario"
+    "horario": "Sin horario",
+    "comuna": "Quillota",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Portugal",
     "direccion": "Portugal 112",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Santiago",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Prat",
     "direccion": "Prat 95",
-    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Coquimbo",
+    "region": "Coquimbo"
   },
   {
     "nombre": "Providencia",
     "direccion": "Providencia 2178",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Providencia",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Puerto Varas",
     "direccion": "Del Salvador 451",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 9:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 9:00-21:00",
+    "comuna": "Puerto Varas",
+    "region": "Los Lagos"
   },
   {
     "nombre": "Rahue",
     "direccion": "República 360",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Osorno",
+    "region": "Los Lagos"
   },
   {
     "nombre": "Recoleta",
     "direccion": "Av. Recoleta 2746",
-    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Recoleta",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Renato Rocca",
     "direccion": "Alejandro Azola 2899",
-    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Pudahuel",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Renca",
     "direccion": "Av. Domingo Santa Maria 3962",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Renca",
+    "region": "Metropolitana"
   },
   {
     "nombre": "República de Chile",
     "direccion": "Av. República de Chile 450",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Antofagasta",
+    "region": "Antofagasta"
   },
   {
     "nombre": "Reñaca",
     "direccion": "Rafael Sotomayor 230",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Viña del Mar",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Rodríguez",
     "direccion": "Rodríguez 1190",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 10:00-20:30"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 10:00-20:30",
+    "comuna": "Curicó",
+    "region": "Maule"
   },
   {
     "nombre": "Rubén Darío",
     "direccion": "Av. Picarte 3057",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Temuco",
+    "region": "La Araucanía"
   },
   {
     "nombre": "San Antonio",
     "direccion": "Ramón Barros Luco 105, Mall Arauco S. Antonio",
-    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "San Antonio",
+    "region": "Valparaíso"
   },
   {
     "nombre": "San Diego",
     "direccion": "San Diego 235",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Santiago",
+    "region": "Metropolitana"
   },
   {
     "nombre": "San Fernando",
     "direccion": "Av. Manuel Rodríguez 806",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "San Fernando",
+    "region": "O'Higgins"
   },
   {
     "nombre": "San Francisco De Mostazal",
     "direccion": "Independencia 540",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "San Francisco de Mostazal",
+    "region": "O'Higgins"
   },
   {
     "nombre": "San Joaquín",
     "direccion": "Av. Gabriela Mistral 3251",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "San Joaquín",
+    "region": "Metropolitana"
   },
   {
     "nombre": "San Pablo",
     "direccion": "Av. San Pablo 4870",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Quinta Normal",
+    "region": "Metropolitana"
   },
   {
     "nombre": "San Pedro De La Paz",
     "direccion": "Michimalonco 1040",
-    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 09:00-21:00",
+    "comuna": "San Pedro de la Paz",
+    "region": "Biobío"
   },
   {
     "nombre": "San Pedro Del Mar",
     "direccion": "Av. Portal de San Pedro 6950",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "San Pedro de la Paz",
+    "region": "Biobío"
   },
   {
     "nombre": "Santa Isabel Quilín",
     "direccion": "Avda. Quilín 5.400",
-    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Macul",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Santa Isabel Vicuña Mackenna",
     "direccion": "Av. Vicuña Mackenna 780",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "La Florida",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Sargento Silva",
     "direccion": "Av. Austral 1400",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Puerto Montt",
+    "region": "Los Lagos"
   },
   {
     "nombre": "Sevilla",
     "direccion": "Av. Pablo Neruda 2050",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Temuco",
+    "region": "La Araucanía"
   },
   {
     "nombre": "Talagante",
     "direccion": "Av. Bernardo O'Higgins 200, Esquina Darwin Vargas",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-20:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-20:00",
+    "comuna": "Talagante",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Talca Centro",
     "direccion": "1 Norte 1201",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Talca",
+    "region": "Maule"
   },
   {
     "nombre": "Tarapacá",
     "direccion": "Tarapacá 465-495",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Santiago",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Tobalaba",
     "direccion": "Av. Tobalaba 13949",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "La Florida",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Tres Poniente, Maipú",
     "direccion": "3 Poniente 2600",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Talca",
+    "region": "Maule"
   },
   {
     "nombre": "Trinidad",
     "direccion": "Av. Trinidad 125",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "La Reina",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Troncos Viejos",
     "direccion": "Alcalde Rodolfo Galleguillo 1099",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "San Pedro de la Paz",
+    "region": "Biobío"
   },
   {
     "nombre": "Uno Poniente",
     "direccion": "1 Poniente 811",
-    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Talca",
+    "region": "Maule"
   },
   {
     "nombre": "Urmeneta",
     "direccion": "Urmeneta 430",
-    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Uruguay",
     "direccion": "Uruguay 350",
-    "horario": "Lunes a Sábados 08:00-20:30\nDomingos y Festivos 09:00-20:30"
+    "horario": "Lunes a Sábados 08:00-20:30\nDomingos y Festivos 09:00-20:30",
+    "comuna": "Concepción",
+    "region": "Biobío"
   },
   {
     "nombre": "Valencia",
     "direccion": "Los Carrera 01031, Quilpué",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Quilpué",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Valle Grande",
     "direccion": "Av. General San Martin 47, Valle Grande",
-    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "La Serena",
+    "region": "Coquimbo"
   },
   {
     "nombre": "Valle Volcanes",
     "direccion": "Cerro Tronador 4981",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Maipú",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Vallenar",
     "direccion": "Serranos 1052",
-    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Vallenar",
+    "region": "Atacama"
   },
   {
     "nombre": "Vega Monumental",
     "direccion": "Av. 21 Mayo 3225",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Valparaíso",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Viana",
     "direccion": "Viana 1215, Viña del Mar",
-    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Viña Del Mar",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Victoria",
     "direccion": "Av. Prat 1472",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Victoria",
+    "region": "La Araucanía"
   },
   {
     "nombre": "Vicuña Mackena",
     "direccion": "Av. Vicuña Mackena 220, Local 20",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Vicuña",
+    "region": "Coquimbo"
   },
   {
     "nombre": "Villa Alemana",
     "direccion": "Valparaíso 569",
-    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:30-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Villa Alemana",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Villa El Teniente",
     "direccion": "Av. El Sol 01834",
-    "horario": "Lunes a Sábado 08:30-20:30\nDomingos y Festivos 09:00-20:30"
+    "horario": "Lunes a Sábado 08:30-20:30\nDomingos y Festivos 09:00-20:30",
+    "comuna": "Rancagua",
+    "region": "O'Higgins"
   },
   {
     "nombre": "Villagrán",
     "direccion": "Villagrán 558, Los Ángeles",
-    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Los Ángeles",
+    "region": "Biobío"
   },
   {
     "nombre": "Villanelo",
     "direccion": "Local Villanelo 236",
-    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Valdivia",
+    "region": "Los Ríos"
   },
   {
     "nombre": "Villarrica",
     "direccion": "Camino Segunda Faja al Volcán N° 205, Local 8",
-    "horario": "Lunes a sábado 08:30-21:00\nDomingo y festivos 09:00-21:00"
+    "horario": "Lunes a sábado 08:30-21:00\nDomingo y festivos 09:00-21:00",
+    "comuna": "Villarrica",
+    "region": "La Araucanía"
   },
   {
     "nombre": "Vitacura",
     "direccion": "Av. Vitacura 6255",
-    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábado 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Vitacura",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Vivaceta",
     "direccion": "Vivaceta 957",
-    "horario": "Lunes a Sábados 08:00-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:00-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Conchalí",
+    "region": "Metropolitana"
   },
   {
     "nombre": "Viña Arlegui",
     "direccion": "Arlegui 948",
-    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00"
+    "horario": "Lunes a Sábados 08:30-21:00\nDomingos y Festivos 09:00-21:00",
+    "comuna": "Viña del Mar",
+    "region": "Valparaíso"
   },
   {
     "nombre": "Yungay",
     "direccion": "Av. Yungay 1150",
-    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Osorno",
+    "region": "Los Lagos"
   },
   {
     "nombre": "Zenteno",
     "direccion": "Zenteno 232-242",
-    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00"
+    "horario": "Lunes a Viernes 08:00-21:00 Sábados,\nDomingos y Festivos 08:30-21:00",
+    "comuna": "Curicó",
+    "region": "Maule"
   }
 ]
