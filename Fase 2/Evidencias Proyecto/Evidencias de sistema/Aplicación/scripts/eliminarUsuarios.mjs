@@ -6,13 +6,15 @@ async function main() {
   const col = db.collection("users");
 
   const result = await col.deleteMany({
-    direccion: { $regex: /(Av\.|Calle|Pasaje)/i },
-    correo: { $regex: /\d\d@(gmail|hotmail|outlook|yahoo)\.com$/i },
-    edad: { $gte: 18, $lte: 70 }
+    // Usuarios generados
+    creadoEn: { $exists: true },
+    actualizadoEn: { $exists: true },
+
+    // Y que sean clientes/usuarios (no administradores reales)
+    role: { $in: ["usuario", "cliente"] }
   });
 
-  console.log(`🗑️ Usuarios ficticios eliminados: ${result.deletedCount}`);
-
+  console.log(`🗑️ Usuarios de prueba eliminados: ${result.deletedCount}`);
   process.exit();
 }
 

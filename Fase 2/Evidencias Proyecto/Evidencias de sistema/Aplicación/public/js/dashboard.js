@@ -153,29 +153,60 @@ function renderGraficosDashboard(charts) {
     });
   }
 
-  // GENERO
-  const ctxG = document.getElementById("chartGenero");
-  if (ctxG && Object.keys(gen).length) {
+// ======================
+//  GRÁFICO DE GÉNERO
+// ======================
+const ctxG = document.getElementById("chartGenero");
+if (ctxG) {
+  let datosGenero = charts.genero;
+
+  // 🔎 Soporta tanto objetos como arrays [{ genero: "M", total: 10 }]
+  if (Array.isArray(datosGenero)) {
+    datosGenero = datosGenero.reduce((acc, obj) => {
+      if (obj.genero) acc[obj.genero] = obj.total || 0;
+      return acc;
+    }, {});
+  }
+
+  // 🚨 Si no hay datos, no dibujar
+  if (!datosGenero || !Object.keys(datosGenero).length) {
+    ctxG.parentNode.innerHTML = "<p class='no-data'>Sin datos para mostrar</p>";
+  } else {
+    const labels = Object.keys(datosGenero);
+    const valores = Object.values(datosGenero);
+
     window.graficoGenero = new Chart(ctxG, {
       type: "doughnut",
       data: {
-        labels: Object.keys(gen),
+        labels,
         datasets: [
           {
-            label: "Usuarios por Género",   // opcional, por prolijidad
-            data: Object.values(gen),
-            backgroundColor: ["#00A7B5", "#71C562", "#004D61"],
+            data: valores,
+            backgroundColor: ["#009688", "#71C562", "#FF6F61"],
+            borderWidth: 2,
+            borderColor: "#fff",
           },
         ],
       },
       options: {
         responsive: true,
-        cutout: "45%",
-        animation: false,
         maintainAspectRatio: false,
+        cutout: "55%", // círculo más limpio
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
+              boxWidth: 15,
+              font: { size: 12 },
+            },
+          },
+          tooltip: { enabled: true },
+        },
       },
     });
   }
+}
+
 }
 
 

@@ -1,12 +1,12 @@
 // ======================================================================
-// GENERADOR DE USUARIOS COMPLETOS (SIN LIBRERÍAS EXTERNAS - MÁXIMO 300)
+// GENERADOR DE USUARIOS COMPLETOS (SIN LIBRERÍAS EXTERNAS)
 // ======================================================================
 
 import { connectDB, getDB } from "../config/db.js";
 import { REGIONES_COMUNAS } from "../data/regionesComunas.js";
 
 // CONFIG
-const TOTAL_MAX = 300;          // 📌 MÁXIMO DE USUARIOS A GENERAR
+const USUARIOS_POR_COMUNA = 10;
 const COLECCION_USUARIOS = "users";
 
 // ========================== DATOS ===============================
@@ -33,7 +33,6 @@ const GIROS_NEGOCIO = ["Minimarket","Verdulería","Carnicería","Panadería","Bo
 function randomItem(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 function randomInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
 
-// RUT realista según edad
 function generarRUTsegunNacimiento(fecha) {
   const año = parseInt(fecha.split("-")[0]);
   let base;
@@ -64,12 +63,9 @@ function generarCorreo(nombre, apellido, comuna) {
 // ===================== GENERAR NEGOCIOS ========================
 
 function generarNegocio(region, comuna, dueñoCorreo) {
-  const nombreLocal = `${randomItem(APELLIDOS)} Market`;
   return {
-    nombre: nombreLocal,
-    rolTributario: "Persona Natural",
+    nombre: `${randomItem(APELLIDOS)} Market`,
     giro: randomItem(GIROS_NEGOCIO),
-    web: `https://www.${nombreLocal.toLowerCase().replace(/\s+/g, "")}.cl`,
     comuna,
     region,
     sector: randomItem(SECTORES),
@@ -88,7 +84,9 @@ async function generarUsuario(region, comuna) {
   const rut = generarRUTsegunNacimiento(fecha);
   const genero = randomItem(GENEROS);
   const sector = randomItem(SECTORES);
+
   const correo = generarCorreo(nombre, apellido, comuna);
+
   const ahora = new Date();
 
   const tieneNegocio = Math.random() < 0.25;
@@ -105,8 +103,7 @@ async function generarUsuario(region, comuna) {
     comuna,
     sector,
     correo,
-    contraseña: "123456",   // Sin bcrypt
-    esGenerado: true,       // 📌 Etiqueta para eliminar luego
+    contraseña: "$2b$10$Ao7wJpn1EmGdwPI6NnBxPufYsS.rwBMmBCvMqtguLXsGC3nlOLpFu", // hash de "123456"
     role: "cliente",
     tieneNegocio,
     negocios,
@@ -118,32 +115,31 @@ async function generarUsuario(region, comuna) {
 // =========================== MAIN ================================
 
 async function main() {
-  console.log("\n🟢 Generando usuarios completos (hasta 300) SIN instalar nada...\n");
+  console.log("\n🟢 Generando usuarios completos SIN instalar nada...\n");
 
   await connectDB();
   const db = getDB();
   const col = db.collection(COLECCION_USUARIOS);
 
-  let agregados = 0;
+  let totalFinal = 0;
 
   for (const region in REGIONES_COMUNAS) {
     for (const comuna of REGIONES_COMUNAS[region]) {
-
-      if (agregados >= TOTAL_MAX) break;
-
       const existentes = await col.countDocuments({ region, comuna });
-      if (existentes >= 5) continue; // deja espacio, pero no satura
+      const faltan = USUARIOS_POR_COMUNA - existentes;
 
-      const usuario = await generarUsuario(region, comuna);
-      await col.insertOne(usuario);
-      agregados++;
-
-      console.log(`➕ ${region} / ${comuna} → 1 usuario agregado`);
+      if (faltan > 0) {
+        console.log(`➕ ${region} / ${comuna} → ${faltan} usuarios`);
+        const nuevos = [];
+        for (let i = 0; i < faltan; i++) nuevos.push(await generarUsuario(region, comuna));
+        await col.insertMany(nuevos);
+        totalFinal += nuevos.length;
+      }
     }
-    if (agregados >= TOTAL_MAX) break;
   }
 
-  console.log(`\n🎉 Listo → ${agregados} usuarios generados.\n📌 Colección "${COLECCION_USUARIOS}" actualizada.\n`);
+  console.log(`\n🎉 Listo → ${totalFinal} usuarios agregados`);
+  console.log(`📌 Colección "${COLECCION_USUARIOS}" actualizada.\n`);
 }
 
 main().catch(err => console.error("❌ ERROR:", err));
