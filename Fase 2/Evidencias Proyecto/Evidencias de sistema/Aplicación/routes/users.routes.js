@@ -54,6 +54,9 @@ router.get("/olvide-password", (req, res) =>
 // =======================================================
 //  LOGIN (POST)
 // =======================================================
+// =======================================================
+//  LOGIN (POST) — Arreglado para guardar datos completos
+// =======================================================
 router.post("/login", async (req, res) => {
   try {
     const db = getDB();
@@ -68,22 +71,33 @@ router.post("/login", async (req, res) => {
     const passOK = await bcrypt.compare(contraseña, user.contraseña);
     if (!passOK) return res.status(401).json({ error: "Contraseña incorrecta" });
 
-    // Guardar sesión
+    // 🔐 GUARDAR SESIÓN con TODOS los datos necesarios
     req.session.user = {
       id: user._id.toString(),
       nombre: user.nombre,
+      apellido: user.apellido || "",
       correo: user.correo,
       role: user.role || "usuario",
+
+      // 📌 Información para métricas, dashboard y cotizaciones
+      genero: user.genero || "No especificado",
+      edad: user.edad || null,
+      region: user.region || "",
+      comuna: user.comuna || "",
+      sector: user.sector || "",
+      tieneNegocio: user.tieneNegocio || false,
+      negocios: user.negocios || []
     };
 
     const redirect = user.role === "admin" ? "/principal" : "/catalogo";
-
     res.json({ ok: true, redirect });
+
   } catch (err) {
     console.error("❌ Error login:", err);
     res.status(500).json({ error: "Error interno" });
   }
 });
+
 
 // =======================================================
 //  REGISTRO COMPLETO

@@ -32,6 +32,7 @@ import dashboardRoutes from "./routes/dashboard.routes.js";
 import busquedasRoutes from "./routes/busquedas.routes.js";
 import historicoRoutes from "./routes/historico.routes.js";
 import negociosRoutes from "./routes/negocios.routes.js";
+import cotizacionesRoutes from "./routes/cotizaciones.js";
 
 // ============================================================
 //  CONFIG PATHS
@@ -202,7 +203,7 @@ io.on("connection", (socket) => {
   socket.emit("scraping-log", "📡 Conexión establecida con el servidor.");
   socket.on("disconnect", () => console.log("🔴 Cliente desconectado"));
 });
-
+app.use("/api/cotizaciones", cotizacionesRoutes);
 // ============================================================
 //  INICIAR SERVIDOR
 // ============================================================

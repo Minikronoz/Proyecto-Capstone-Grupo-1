@@ -1702,3 +1702,224 @@ button:active, .btn-ver:active {
   justify-items: center;
   align-items: stretch;
 }
+#filtros-peso {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  padding: 10px 5px;
+  scrollbar-width: thin;
+}
+
+#filtros-peso::-webkit-scrollbar {
+  height: 6px;
+}
+
+#filtros-peso::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+#filtros-peso::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chip-filtro {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 16px;
+  border: 1px solid #00a7b5;
+  background: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.chip-filtro.seleccionado {
+  background: #00a7b5;
+  color: #fff;
+  border-color: #007a86;
+}
+
+.filtro-titulo {
+  font-size: 13px;
+  font-weight: bold;
+  margin-right: 10px;
+  white-space: nowrap;
+  position: relative;
+  top: 6px;
+}
+
+.btn-limpiar-filtro {
+  padding: 6px 14px;
+  border: none;
+  background: #ff5757;
+  color: #fff;
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-recargar {
+  background: #007a9c;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.15s;
+}
+
+.btn-recargar:hover {
+  background: #005f77;
+}
+
+.btn-recargar:active {
+  transform: scale(0.96);
+}
+/* 🌌 Modal Fondo Oscuro */
+.modal-confirm {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.65);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* 📦 Caja Modal */
+.modal-content-confirm {
+  background: #fff;
+  padding: 22px 25px;
+  border-radius: 12px;
+  width: 330px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+  text-align: center;
+  animation: popUp 0.25s ease-out;
+}
+
+.modal-content-confirm h3 {
+  margin-bottom: 8px;
+  font-size: 19px;
+  color: #202020;
+}
+
+.modal-content-confirm p {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 18px;
+}
+
+/* 🎛 Botones */
+.modal-btns {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.btn-cancelar,
+.btn-confirmar {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+/* ❌ Cancelar */
+.btn-cancelar {
+  border: 1px solid #b7b7b7;
+  background: #f2f2f2;
+  color: #555;
+}
+.btn-cancelar:hover {
+  background: #e6e6e6;
+}
+
+/* 🗑 Confirmar */
+.btn-confirmar {
+  background: #d32f2f;
+  border: none;
+  color: white;
+}
+.btn-confirmar:hover {
+  background: #b71c1c;
+}
+
+/* 🪄 Animación */
+@keyframes popUp {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+/* 🔔 Toast notificación */
+.toast-noti {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #009688;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-weight: bold;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: 0.3s;
+  z-index: 3000;
+}
+
+.toast-noti.mostrar {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* 🎨 Sidebar marcas con degradado */
+#sidebar-marcas {
+  background: linear-gradient(to bottom, #b6f4ff, #ffffff);
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* 🔘 Checkbox redondo estilo celeste */
+.chkMarca {
+  appearance: none;       /* Quita el estilo por defecto */
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;      /* Lo hace redondo */
+  border: 2px solid #00a7b5; /* Borde celeste */
+  cursor: pointer;
+  margin-right: 6px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+/* 🔵 Efecto al hacer hover */
+.chkMarca:hover {
+  box-shadow: 0 0 4px rgba(0, 167, 181, 0.8);
+}
+
+/* 🟢 Cuando está seleccionado */
+.chkMarca:checked {
+  background-color: #00a7b5;
+  border-color: #008e9a;
+}
+
+/* ✔ Agrega un check blanco dentro */
+.chkMarca:checked::after {
+  content: "✔";
+  color: white;
+  font-size: 12px;
+  position: absolute;
+  top: -2px;
+  left: 2px;
+}
+#sidebar-marcas label {
+  font-size: 14px;
+  color: #004953;
+}

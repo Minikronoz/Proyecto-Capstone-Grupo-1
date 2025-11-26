@@ -169,10 +169,14 @@ async function cerrarSesion(event) {
       <button onclick="buscar()">Buscar</button>
     </div>
   </div>
+  <div style="text-align:right; padding:6px 12px;">
+  <button id="btn-recargar" class="btn-recargar">🔄 Actualizar productos</button>
+</div>
 </section>
 
 <!--  Filtro de PESO debajo del buscador -->
-<section class="filtros-peso"></section>
+<section id="filtros-peso"></section>
+
 
 <div class="catalogo-layout">
 
@@ -195,7 +199,7 @@ async function cerrarSesion(event) {
   <aside id="carritoRapidoPanel" class="carrito-rapido">
     <div class="carrito-header">
       <h3>🧮 Carrito cotizador</h3>
-      <button id="cerrarCarritoRapido" class="cerrar-btn" onclick="vaciarCarrito()">🗑 Vaciar</button>
+      <button id="cerrarCarritoRapido" class="cerrar-btn" onclick="mostrarModalVaciar()">🗑 Vaciar</button>
     </div>
     <div id="carritoRapidoContenido" class="carrito-contenido">
       <p>Selecciona productos para cotizar y comparar precios entre supermercados.</p>
@@ -203,11 +207,23 @@ async function cerrarSesion(event) {
   </aside>
 
 </div>
+<!-- 🗑 Modal Vaciar Carrito -->
+<div class="modal-confirm" id="modalVaciarCarrito" style="display:none;">
+  <div class="modal-content-confirm">
+    <h3>¿Vaciar cotización?</h3>
+    <p>Se eliminarán todos los productos del cotizador.</p>
+    <div class="modal-btns">
+      <button class="btn-cancelar" onclick="cerrarModalVaciar()">Cancelar</button>
+      <button class="btn-confirmar" onclick="confirmarVaciarCarrito()">Vaciar</button>
+    </div>
+  </div>
+</div>
 
 
 <!--  Paginación -->
 <div id="paginacion" class="paginacion"></div>
 
+<div id="toast-notificacion" class="toast-noti"></div>
 
 <!--  Footer -->
 <footer>
@@ -305,6 +321,8 @@ document.addEventListener("DOMContentLoaded", verificarYMostrarPopup);
 <!--  Registro de clic -->
 <script>
   async function registrarClickProducto(btn) {
+
+    // 📌 Crear producto base
     const producto = {
       idProducto: btn.getAttribute("data-id"),
       titulo: btn.getAttribute("data-titulo"),
@@ -315,6 +333,26 @@ document.addEventListener("DOMContentLoaded", verificarYMostrarPopup);
       imagen: btn.getAttribute("data-imagen"),
     };
 
+    // ⭐ NUEVO: Adjuntar información completa del usuario
+    try {
+      const ses = await fetch("/api/auth/yo", { credentials: "include" }).then(r => r.json());
+      if (ses.ok && ses.user) {
+        producto.usuario = {
+          correo: ses.user.correo,
+          nombre: ses.user.nombre,
+          apellido: ses.user.apellido,
+          region: ses.user.region,
+          comuna: ses.user.comuna,
+          genero: ses.user.genero,
+          edad: ses.user.edad,
+          tieneNegocio: ses.user.tieneNegocio,
+        };
+      }
+    } catch (e) {
+      console.warn("⚠ No se pudieron obtener datos de usuario", e);
+    }
+
+    // 💾 Registrar el click en el backend
     try {
       const res = await fetch("/api/clicks/registrar", {
         method: "POST",
@@ -328,12 +366,12 @@ document.addEventListener("DOMContentLoaded", verificarYMostrarPopup);
       console.error("Error registrando clic:", error);
     }
 
+    // 🔗 Abrir página del producto
     window.open(producto.link, "_blank");
   }
 </script>
 
-<!--  Script principal -->
-<script src="/js/catalogo.js"></script>
+
 
 <!--  Script de carga de supermercados disponibles -->
 <script>
@@ -448,6 +486,45 @@ function mostrarAdvertencia(tienda, usuario) {
     mensajeDiv.style.display = "none";
   }, 6000);
 }
+</script>
+<!--  Script principal -->
+<script src="/js/catalogo.js"></script>
+
+<script>
+document.getElementById("btn-recargar").addEventListener("click", () => {
+
+  // 🧹 Limpiar texto del buscador
+  document.getElementById("busqueda").value = "";
+  document.getElementById("sugerencias").innerHTML = "";
+
+  // 🔄 Resetear selección de tiendas
+  selectedStores = new Set(ALL_STORES);
+  document.querySelectorAll(".filtro-super").forEach(cb => cb.checked = true);
+
+  // 🧼 Limpiar filtros de marcas y peso
+  selectedWeights.clear();
+  selectedBrands.clear();
+  filtrosPesoVisibles = false;
+
+  // 🧽 Borrar sección de filtros de peso visual
+  document.getElementById("filtros-peso").innerHTML = "";
+
+  // 🧽 Vaciar buscador de marcas
+  document.getElementById("filtroMarcasBuscar").value = "";
+
+  // 📌 Reiniciar paginación
+  currentPage = 1;
+
+  // 🚀 Recargar productos SIN búsqueda
+  cargarProductos("");
+
+  // 🆕 Regenerar marcas después de carga
+  setTimeout(() => {
+    if (window.cargarMarcasSidebar) cargarMarcasSidebar();
+  }, 150);
+});
+
+
 </script>
 
 </body>

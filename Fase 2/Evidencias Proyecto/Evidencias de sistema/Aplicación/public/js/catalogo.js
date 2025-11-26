@@ -219,12 +219,33 @@ function aplicarFiltroMarcas() {
   currentPage = 1;
   renderizarProductos(getFilteredProducts());
 }
+// ==========================================
+// 🧠 Detectar si hay productos con peso, volumen o ambos
+// ==========================================
+function detectarTipoProducto(productos) {
+  let tienePeso = false;
+  let tieneVolumen = false;
+
+  productos.forEach((p) => {
+    const medida = normalizarPesoDesdeTitulo(p.title);
+    if (!medida) return;
+
+    if (medida.tipo === "peso") tienePeso = true;
+    if (medida.tipo === "volumen") tieneVolumen = true;
+  });
+
+  if (tienePeso && tieneVolumen) return "ambos";
+  if (tienePeso) return "peso";
+  if (tieneVolumen) return "volumen";
+  return "ninguno";
+}
 
 // ==========================================
 //  Renderizar filtros inteligentes
 // ==========================================
 function renderizarFiltrosPeso(productos) {
-  const cont = document.querySelector(".filtros-peso");
+  const cont = document.querySelector("#filtros-peso");
+
   cont.innerHTML = "";
 
   const pesosVolumen = new Map();
@@ -579,6 +600,18 @@ function guardarCarritoEnStorage() {
     console.warn("No se pudo guardar el carrito en localStorage", e);
   }
 }
+// ❌ Cerrar Modal sin vaciar
+function cerrarModalVaciar() {
+  document.getElementById("modalVaciarCarrito").style.display = "none";
+}
+
+function confirmarVaciarCarrito() {
+  carritoCotizador = [];
+  guardarCarritoEnStorage();
+  renderCarritoCotizador();
+  cerrarModalVaciar();
+  mostrarToast("Carrito limpiado (cotizaciones guardadas)");
+}
 
 // Carga desde localStorage
 function cargarCarritoDesdeStorage() {
@@ -601,7 +634,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Agregar producto al carrito (desde el botón en la tarjeta)
-function agregarAlCarrito(btn) {
+async function agregarAlCarrito(btn) {
   const producto = {
     idProducto: btn.getAttribute("data-id"),
     titulo: btn.getAttribute("data-titulo"),
@@ -621,6 +654,12 @@ function agregarAlCarrito(btn) {
     existente.cantidad += 1;
     guardarCarritoEnStorage();
     renderCarritoCotizador();
+
+    // Guardar cotización actualizada en el servidor
+    guardarCotizacionEnServidor().catch(err =>
+      console.warn("No se pudo guardar cotización:", err)
+    );
+
     return;
   }
 
@@ -632,7 +671,7 @@ function agregarAlCarrito(btn) {
     uid: `${producto.idProducto || producto.titulo}`,
     titulo: producto.titulo,
     marca: producto.marca,
-    cantidad: 1,                      // 🔥 NUEVO
+    cantidad: 1,
     pesoTexto: (typeof normalizarPesoDesdeTitulo === "function"
       ? pesoToText(normalizarPesoDesdeTitulo(producto.titulo))
       : ""),
@@ -644,6 +683,30 @@ function agregarAlCarrito(btn) {
   carritoCotizador.push(item);
   guardarCarritoEnStorage();
   renderCarritoCotizador();
+
+  // Guardar cotización completa en el servidor
+  guardarCotizacionEnServidor().catch(err =>
+    console.warn("No se pudo guardar cotización:", err)
+  );
+}
+let ultimaCotizacionJSON = "";
+
+async function guardarCotizacionEnServidor() {
+  const json = JSON.stringify(carritoCotizador);
+  if (json === ultimaCotizacionJSON) return; // ⚠ Evita guardar duplicado
+
+  ultimaCotizacionJSON = json;
+
+  try {
+    await fetch("/api/cotizaciones/guardar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ carrito: carritoCotizador })
+    });
+  } catch (e) {
+    console.warn("⚠ No se pudo guardar la cotización:", e);
+  }
 }
 
 
@@ -662,7 +725,31 @@ function vaciarCarrito() {
   guardarCarritoEnStorage();
   renderCarritoCotizador();
 }
+function mostrarModalVaciar() {
+  if (!carritoCotizador.length) return;
+  document.getElementById("modalVaciarCarrito").style.display = "flex";
+}
+function mostrarModalVaciar() {
+  document.getElementById("modalVaciarCarrito").style.display = "flex";
+}
 
+function cerrarModalVaciar() {
+  document.getElementById("modalVaciarCarrito").style.display = "none";
+}
+
+function confirmarVaciarCarrito() {
+  carritoCotizador = [];
+  guardarCarritoEnStorage();
+  renderCarritoCotizador();
+  cerrarModalVaciar();
+  mostrarToast("Cotización vaciada");
+}
+function mostrarToast(msg) {
+  const toast = document.getElementById("toast-notificacion");
+  toast.textContent = msg;
+  toast.classList.add("mostrar");
+  setTimeout(() => toast.classList.remove("mostrar"), 2200);
+}
 // Renderizar el carrito completo
 function renderCarritoCotizador() {
   const cont = document.getElementById("carritoRapidoContenido");
@@ -834,7 +921,7 @@ cont.innerHTML = html + mensajeAdvertencia;
 }
 
 // ==========================================
-//  Cargar productos
+//  Cargar productos (filtro solo si se busca)
 // ==========================================
 async function cargarProductos(busqueda = "") {
   try {
@@ -843,24 +930,26 @@ async function cargarProductos(busqueda = "") {
     productosGlobal = productos;
     window.registrarProductosGlobales(productos);
     selectedWeights.clear();
-    selectedBrands.clear(); //  Limpiar filtros de marcas
+    selectedBrands.clear(); // Limpiar filtros de marcas
     currentPage = 1;
     
     renderizarProductos(getFilteredProducts());
-    cargarMarcasSidebar(); //  Actualizar sidebar de marcas
+    cargarMarcasSidebar(); // Actualizar marcas dinámicamente
 
     const huboBusqueda = busqueda.trim() !== "";
-    if (huboBusqueda) {
-      renderizarFiltrosPeso(productos);
-      filtrosPesoVisibles = true;
-    } else if (filtrosPesoVisibles) {
-      document.querySelector(".filtros-peso").innerHTML = "";
-      filtrosPesoVisibles = false;
-    }
+    const contFiltros = document.querySelector("#filtros-peso");
+      if (huboBusqueda) {
+        const cont = document.querySelector("#filtros-peso");
+        cont.innerHTML = "";                     // ← limpia cualquier filtro anterior
+        renderizarFiltrosPeso(productos);        // ← pinta solo el del nuevo producto
+        filtrosPesoVisibles = true;
+      }
+
   } catch (err) {
     console.error("Error cargando productos:", err);
   }
 }
+
 
 // ==========================================
 //  Registrar clic en producto
