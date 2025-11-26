@@ -797,8 +797,40 @@ function renderCarritoCotizador() {
   `;
 
   html += htmlTotales;
+// ==============================
+// ⚠ DETECTAR SUPERMERCADOS INCOMPLETOS
+// ==============================
+let alertasFaltantes = {};
 
-  cont.innerHTML = html;
+TIENDAS_COMPARACION.forEach(tienda => {
+  alertasFaltantes[tienda] = [];
+});
+
+carritoCotizador.forEach(item => {
+  const qty = item.cantidad || 1;
+  TIENDAS_COMPARACION.forEach(tienda => {
+    const det = item.similares && item.similares[tienda];
+    if (!det || det.porcentaje < 80) {
+      alertasFaltantes[tienda].push(item.titulo);
+    }
+  });
+});
+
+// Construir mensaje de alerta
+let mensajeAdvertencia = "";
+let supermercadosAfectados = Object.keys(alertasFaltantes).filter(t => alertasFaltantes[t].length > 0);
+
+if (supermercadosAfectados.length > 0) {
+  mensajeAdvertencia += `
+  <div class="alerta-carrito">
+    ⚠ Algunos supermercados no tienen todos los productos comparables.
+    <br><small style="color:#475569;">El total podría no reflejar una compra completa.</small>
+  </div>
+  `;
+}
+
+cont.innerHTML = html + mensajeAdvertencia;
+
 }
 
 // ==========================================
