@@ -13,88 +13,172 @@ let currentPage = 1;
 let pageSize = 200;
 let totalPages = 1;
 
-// ==========================================
-//  Normalizar peso/volumen desde título
-// ==========================================
+
+/// ===============================
+// 🔢 CARRITO COTIZADOR - VARIABLES GLOBALES
+// ===============================
+const TIENDAS_COMPARACION = ["unimarc", "tottus", "jumbo", "acuenta", "santaisabel"];
+const STORAGE_KEY_CARRITO = "carritoCotizadorV1";
+
+// Universo de productos global
+window.__todosLosProductos = [];
+let carritoCotizador = [];
+
+// Registrar productos cargados
+window.registrarProductosGlobales = function (lista) {
+  if (Array.isArray(lista)) window.__todosLosProductos = lista;
+};
+
+// ===============================
+// 🔤 NORMALIZACIÓN TEXTO
+// ===============================
+function normalizarTexto(str = "") {
+  return str
+    .toString()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// ===============================
+// 🧾 FORMATEAR CLP
+// ===============================
+function formatearCLP(valor) {
+  if (typeof valor !== "number" || isNaN(valor)) return "-";
+  return valor.toLocaleString("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 });
+}
+
+// ===============================
+// 💵 OBTENER PRECIO NÚMERO
+// ===============================
+function precioNumeroDesdeProducto(p) {
+  if (!p) return null;
+  const campo = p.currentPrice ?? p.price;
+  if (typeof campo === "number") return campo;
+  if (typeof campo === "string") {
+    const limpio = campo.replace(/\./g, "").replace(",", ".").replace(/[^0-9.]/g, "");
+    const num = parseFloat(limpio);
+    return isNaN(num) ? null : num;
+  }
+  return null;
+}
+
+// ===============================
+// ⚖️ NORMALIZAR PESO / VOLUMEN
+// ===============================
 function normalizarPesoDesdeTitulo(title) {
   if (!title) return null;
-  
-  //  Detectar VOLUMEN (litros, ml, cc)
-  const matchVolumen = title.match(/(\d+(?:[\.,]\d+)?)\s*(l|ml|cc)\b/i);
-  if (matchVolumen) {
-    let valor = parseFloat(matchVolumen[1].replace(",", "."));
-    const unidad = matchVolumen[2].toLowerCase();
-    
-    // Convertir todo a mililitros
+
+  const matchVol = title.match(/(\d+(?:[\.,]\d+)?)\s*(l|ml|cc)\b/i);
+  if (matchVol) {
+    let valor = parseFloat(matchVol[1].replace(",", "."));
+    const unidad = matchVol[2].toLowerCase();
     if (unidad === "l") valor *= 1000;
-    
-    return { valor: Math.round(valor), tipo: "volumen", unidadOriginal: unidad };
+    return { valor: Math.round(valor), tipo: "volumen" };
   }
-  
-  //  Detectar PESO (gramos, kg)
+
   const matchPeso = title.match(/(\d+(?:[\.,]\d+)?)\s*(g|kg)\b/i);
   if (matchPeso) {
     let valor = parseFloat(matchPeso[1].replace(",", "."));
     const unidad = matchPeso[2].toLowerCase();
-    
-    // Convertir todo a gramos
     if (unidad === "kg") valor *= 1000;
-    
     if (valor < 50 || valor > 50000) return null;
-    return { valor: Math.round(valor), tipo: "peso", unidadOriginal: unidad };
+    return { valor: Math.round(valor), tipo: "peso" };
   }
-  
+
   return null;
 }
 
-// ==========================================
-//  Detectar tipo de producto predominante
-// ==========================================
-function detectarTipoProducto(productos) {
-  let volumen = 0;
-  let peso = 0;
-  
-  productos.forEach((p) => {
-    const medida = normalizarPesoDesdeTitulo(p.title);
-    if (medida) {
-      if (medida.tipo === "volumen") volumen++;
-      else if (medida.tipo === "peso") peso++;
-    }
-  });
-  
-  // Si hay más productos con volumen, priorizar volumen
-  if (volumen > peso) return "volumen";
-  if (peso > volumen) return "peso";
-  
-  // Si no hay ninguno, no mostrar filtros
-  if (volumen === 0 && peso === 0) return "ninguno";
-  
-  return "ambos";
+// Convertir peso en texto
+function pesoToText(m) {
+  if (!m || !m.valor) return "";
+  return `${m.valor}${m.tipo === "peso" ? "g" : "ml"}`;
 }
 
-// ==========================================
-// Obtener marcas disponibles normalizadas
-// ==========================================
-function getAvailableBrands() {
-  const marcasMap = new Map(); // Usar Map para almacenar marca normalizada → marca original
-  
-  productosGlobal.forEach((p) => {
-    const marca = p.brand && p.brand.trim() && p.brand !== "null" && p.brand !== "Sin marca" 
-      ? p.brand.trim() 
-      : null;
-    
-    if (marca) {
-      // Normalizar: primera letra mayúscula, resto minúscula
-      const marcaNormalizada = marca.charAt(0).toUpperCase() + marca.slice(1).toLowerCase();
-      
-      // Si ya existe, mantener la primera aparición (evita duplicados)
-      if (!marcasMap.has(marcaNormalizada)) {
-        marcasMap.set(marcaNormalizada, marcaNormalizada);
-      }
+// ===============================
+// 🔍 STOPWORDS Y LIMPIEZA DE TÍTULO
+// ===============================
+const STOPWORDS = ["de","para","sin","con","azucar","harina","selecta","fina","light","sal",
+  "azúcar","blanca","iodada","lobos","pasta","polvos","sin polvos","producto","500","1kg","sucralosa"];
+
+function limpiarTextoClave(str = "") {
+  let txt = normalizarTexto(str);
+  STOPWORDS.forEach(sw => txt = txt.replace(new RegExp("\\b" + sw + "\\b", "g"), " "));
+  return txt.replace(/\s+/g, " ").trim();
+}
+
+// ===============================
+// 📌 SIMILITUDES
+// ===============================
+function similitudMarca(m1 = "", m2 = "") {
+  m1 = normalizarTexto(m1); 
+  m2 = normalizarTexto(m2);
+  if (!m1 || !m2) return 0;
+  if (m1 === m2) return 100;
+  if (m1.includes(m2) || m2.includes(m1)) return 85;
+  return 0;
+}
+
+function similitudPalabras(a, b) {
+  const A = new Set(a.split(" "));
+  const B = new Set(b.split(" "));
+  const inter = [...A].filter(p => B.has(p));
+  return (inter.length * 2) / (A.size + B.size || 1) * 100;
+}
+
+function compararPesos(p1, p2) {
+  if (!p1 || !p2 || p1.tipo !== p2.tipo) return 0;
+  const dif = Math.abs(p1.valor - p2.valor);
+  return dif <= p1.valor * 0.12 ? 100 : 0; // 12% tolerancia
+}
+
+// ===============================
+// 🧠 BUSCAR SIMILAR EN TODAS LAS TIENDAS
+// ===============================
+function encontrarSimilaresEnTodasLasTiendas(prod) {
+  const res = {};
+  const pesoBase = normalizarPesoDesdeTitulo(prod.titulo);
+  const claveBase = limpiarTextoClave(prod.titulo);
+
+  TIENDAS_COMPARACION.forEach(tienda => {
+    let mejor = null, mejorScore = 0;
+
+    window.__todosLosProductos
+      .filter(p => (p.store || "").toLowerCase() === tienda)
+      .forEach(p => {
+        const claveP = limpiarTextoClave(p.title);
+        const pesoP = normalizarPesoDesdeTitulo(p.title);
+
+        const score = (
+          similitudMarca(prod.marca, p.brand) * 0.40 +
+          similitudPalabras(claveBase, claveP) * 0.30 +
+          compararPesos(pesoBase, pesoP) * 0.30
+        );
+
+        if (score > mejorScore) {
+          mejorScore = score;
+          mejor = p;
+        }
+      });
+
+    if (!mejor || mejorScore < 58) {
+      res[tienda] = { porcentaje: mejorScore, precio: null };
+    } else {
+      res[tienda] = {
+        porcentaje: Math.round(mejorScore),
+        precio: precioNumeroDesdeProducto(mejor),
+        imagen: mejor.image || "/img/placeholder.png",
+        link: mejor.link || "#",
+        titulo: mejor.title,
+        marca: mejor.brand
+      };
     }
   });
 
-  return Array.from(marcasMap.values()).sort((a, b) => a.localeCompare(b));
+  return res;
 }
 
 // ==========================================
@@ -242,6 +326,30 @@ function renderizarFiltrosPeso(productos) {
     cont.appendChild(limpiar);
   }
 }
+// ==========================================
+// Obtener marcas disponibles normalizadas
+// ==========================================
+function getAvailableBrands() {
+  const marcasMap = new Map(); // Usar Map para almacenar marca normalizada → marca original
+  
+  window.__todosLosProductos.forEach((p) => {
+    const marca = p.brand && p.brand.trim() && p.brand !== "null" && p.brand !== "Sin marca" 
+      ? p.brand.trim() 
+      : null;
+    
+    if (marca) {
+      // Normalizar: primera letra mayúscula, resto minúscula
+      const marcaNormalizada = marca.charAt(0).toUpperCase() + marca.slice(1).toLowerCase();
+      
+      // Si ya existe, mantener la primera aparición (evita duplicados)
+      if (!marcasMap.has(marcaNormalizada)) {
+        marcasMap.set(marcaNormalizada, marcaNormalizada);
+      }
+    }
+  });
+
+  return Array.from(marcasMap.values()).sort((a, b) => a.localeCompare(b));
+}
 
 // ==========================================
 //  Toggle filtro (seleccionar/deseleccionar)
@@ -378,16 +486,19 @@ function renderizarProductos(lista) {
         Ver producto
       </button>
 
-      <button class="btn-carrito"
-        data-id="${p._id || p.id || ""}"
-        data-nombre="${p.title || ""}"
-        data-precio="${precioNum}"
-        data-imagen="${p.image || ""}"
-        data-url="${p.link || ""}"
-        data-supermercado="${tienda}"
-        onclick="agregarDesdeBoton(this)">
-         Agregar al carrito
-      </button>
+          <button class="btn-carrito"
+            data-id="${p._id || p.id || ""}"
+            data-titulo="${p.title || ""}"
+            data-marca="${marca || ""}"
+            data-precio="${precioNum}"
+            data-supermercado="${tienda}"
+            data-link="${p.link || ""}"
+            data-imagen="${p.image || ""}"
+            onclick="agregarAlCarrito(this)">
+            🧮 Cotizar
+          </button>
+
+
 
       <div class="botones-extra">
         <button class="btn-secundario"
@@ -456,6 +567,239 @@ function cambiarPagina(nuevaPagina) {
   renderizarProductos(getFilteredProducts());
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
+// ===============================
+// 🛒 CARRITO COTIZADOR - CORE
+// ===============================
+
+// Guarda en localStorage
+function guardarCarritoEnStorage() {
+  try {
+    localStorage.setItem(STORAGE_KEY_CARRITO, JSON.stringify(carritoCotizador));
+  } catch (e) {
+    console.warn("No se pudo guardar el carrito en localStorage", e);
+  }
+}
+
+// Carga desde localStorage
+function cargarCarritoDesdeStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_CARRITO);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (Array.isArray(data)) {
+      carritoCotizador = data;
+      renderCarritoCotizador();
+    }
+  } catch (e) {
+    console.warn("No se pudo leer el carrito desde localStorage", e);
+  }
+}
+
+// Llamamos al cargar la página
+document.addEventListener("DOMContentLoaded", () => {
+  cargarCarritoDesdeStorage();
+});
+
+// Agregar producto al carrito (desde el botón en la tarjeta)
+function agregarAlCarrito(btn) {
+  const producto = {
+    idProducto: btn.getAttribute("data-id"),
+    titulo: btn.getAttribute("data-titulo"),
+    marca: btn.getAttribute("data-marca"),
+    precio: parseFloat(btn.getAttribute("data-precio")),
+    supermercado: (btn.getAttribute("data-supermercado") || "").toLowerCase(),
+    imagen: btn.getAttribute("data-imagen"),
+    link: btn.getAttribute("data-link")
+  };
+
+  // 1️⃣ Buscar si YA existe en el carrito (mismo nombre y marca)
+  const existente = carritoCotizador.find(
+    i => i.titulo === producto.titulo && i.marca === producto.marca
+  );
+
+  if (existente) {
+    existente.cantidad += 1;
+    guardarCarritoEnStorage();
+    renderCarritoCotizador();
+    return;
+  }
+
+  // 2️⃣ Si es nuevo, buscar similares
+  const similares = encontrarSimilaresEnTodasLasTiendas(producto);
+
+  // 3️⃣ Crear registro nuevo en el carrito
+  const item = {
+    uid: `${producto.idProducto || producto.titulo}`,
+    titulo: producto.titulo,
+    marca: producto.marca,
+    cantidad: 1,                      // 🔥 NUEVO
+    pesoTexto: (typeof normalizarPesoDesdeTitulo === "function"
+      ? pesoToText(normalizarPesoDesdeTitulo(producto.titulo))
+      : ""),
+    imagen: producto.imagen,
+    link: producto.link,
+    similares
+  };
+
+  carritoCotizador.push(item);
+  guardarCarritoEnStorage();
+  renderCarritoCotizador();
+}
+
+
+// Eliminar un item por uid
+function eliminarDelCarrito(uid) {
+  carritoCotizador = carritoCotizador.filter(i => i.uid !== uid);
+  guardarCarritoEnStorage();
+  renderCarritoCotizador();
+}
+
+// Vaciar carrito completo
+function vaciarCarrito() {
+  if (!carritoCotizador.length) return;
+  if (!confirm("¿Seguro que deseas vaciar toda la cotización?")) return;
+  carritoCotizador = [];
+  guardarCarritoEnStorage();
+  renderCarritoCotizador();
+}
+
+// Renderizar el carrito completo
+function renderCarritoCotizador() {
+  const cont = document.getElementById("carritoRapidoContenido");
+  const panel = document.getElementById("carritoRapidoPanel");
+  if (!cont || !panel) return;
+
+  if (!carritoCotizador.length) {
+    cont.innerHTML = `
+      <p>🧮 Aún no has agregado productos.</p>
+      <p style="font-size:12px;color:#64748b;">
+        Usa el botón <strong>"Cotizar"</strong> en las tarjetas para comparar precios entre supermercados.
+      </p>`;
+    return;
+  }
+
+  let html = "";
+  const totalesPorTienda = {};
+  TIENDAS_COMPARACION.forEach(t => totalesPorTienda[t] = 0);
+
+  carritoCotizador.forEach(item => {
+    const qty = item.cantidad || 1;
+
+    html += `
+      <div class="carrito-item">
+        <div class="carrito-item-header">
+          <img src="${item.imagen || "/img/placeholder.png"}" alt="Producto" class="carrito-img" onerror="this.src='/img/placeholder.png'">
+          <div class="carrito-info">
+            <div class="carrito-titulo" title="${item.titulo}">
+              ${item.titulo} <span style="color:#007bff;">x${qty}</span>
+            </div>
+            <div class="carrito-detalle">
+              ${item.marca ? `<strong>${item.marca}</strong>` : "Sin marca"}
+              ${item.pesoTexto ? " • " + item.pesoTexto : ""}
+            </div>
+          </div>
+          <button class="carrito-eliminar" onclick="eliminarDelCarrito('${item.uid}')">✖</button>
+        </div>
+        <div class="carrito-precios">
+    `;
+
+    // Precios por tienda
+    TIENDAS_COMPARACION.forEach(t => {
+      const det = item.similares && item.similares[t];
+      if (!det || typeof det.precio !== "number") return;
+
+      const precioTotalItem = det.precio * qty;
+      totalesPorTienda[t] += precioTotalItem;
+
+      const nombreTienda =
+        t === "unimarc" ? "Unimarc" :
+        t === "tottus" ? "Tottus" :
+        t === "jumbo" ? "Jumbo" :
+        t === "acuenta" ? "Acuenta" :
+        t === "santaisabel" ? "Santa Isabel" : t;
+
+      // Mostrar similitud baja
+      if (det.porcentaje < 80) {
+        html += `
+          <div class="carrito-precio-tienda" style="color:#b91c1c;font-size:12px;">
+            <span>${nombreTienda}</span>
+            <span>❗ Sin coincidencia compatible</span>
+          </div>
+        `;
+      } else {
+        html += `
+          <div class="carrito-precio-tienda">
+            <span>
+              <img src="${det.imagen}" style="width:18px;height:18px;border-radius:4px;vertical-align:middle;margin-right:4px;" onerror="this.src='/img/placeholder.png'">
+              <a href="${det.link}" target="_blank" style="text-decoration:none;color:#0ea5e9;">
+                ${nombreTienda}
+              </a>
+            </span>
+            <span>${formatearCLP(det.precio)} c/u</span>
+          </div>
+        `;
+      }
+    });
+
+    html += `
+        </div>
+      </div>
+    `;
+  });
+
+  // Totales por supermercado
+  let totalGeneral = 0;
+  let htmlTotales = `
+    <div class="carrito-totales">
+      <h4>Totales por supermercado</h4>
+  `;
+
+  // Detectar el más barato
+  let minPrecio = Infinity;
+  let mejorSuper = null;
+
+  TIENDAS_COMPARACION.forEach(t => {
+    const totalT = totalesPorTienda[t] || 0;
+    if (totalT <= 0) return;
+    if (totalT < minPrecio) {
+      minPrecio = totalT;
+      mejorSuper = t;
+    }
+  });
+
+  TIENDAS_COMPARACION.forEach(t => {
+    const totalT = totalesPorTienda[t] || 0;
+    if (totalT <= 0) return;
+
+    const nombreTienda =
+      t === "unimarc" ? "Unimarc" :
+      t === "tottus" ? "Tottus" :
+      t === "jumbo" ? "Jumbo" :
+      t === "acuenta" ? "Acuenta" :
+      t === "santaisabel" ? "Santa Isabel" : t;
+
+    totalGeneral += totalT;
+
+    htmlTotales += `
+      <div class="carrito-total-linea" style="${t === mejorSuper ? "background:#dcfce7;font-weight:700;border-radius:6px;" : ""}">
+        <span>${nombreTienda}${t === mejorSuper ? " 🏆" : ""}</span>
+        <span>${formatearCLP(totalT)}</span>
+      </div>
+    `;
+  });
+
+  htmlTotales += `
+      <div class="carrito-total-general">
+        <span>Total 5 supermercados</span>
+        <span>${formatearCLP(totalGeneral)}</span>
+      </div>
+    </div>
+  `;
+
+  html += htmlTotales;
+
+  cont.innerHTML = html;
+}
 
 // ==========================================
 //  Cargar productos
@@ -465,7 +809,7 @@ async function cargarProductos(busqueda = "") {
     const res = await fetch(`/api/catalogo?q=${encodeURIComponent(busqueda)}`);
     const productos = await res.json();
     productosGlobal = productos;
-
+    window.registrarProductosGlobales(productos);
     selectedWeights.clear();
     selectedBrands.clear(); //  Limpiar filtros de marcas
     currentPage = 1;

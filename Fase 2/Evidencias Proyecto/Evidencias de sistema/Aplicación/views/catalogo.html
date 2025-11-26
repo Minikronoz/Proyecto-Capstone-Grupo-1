@@ -174,7 +174,6 @@ async function cerrarSesion(event) {
 <!--  Filtro de PESO debajo del buscador -->
 <section class="filtros-peso"></section>
 
-<!--  LAYOUT: Sidebar + Productos -->
 <div class="catalogo-layout">
 
   <!--  PANEL LATERAL DE MARCAS -->
@@ -192,21 +191,23 @@ async function cerrarSesion(event) {
     <!-- Productos dinámicos -->
   </section>
 
+  <!-- 🧮 Carrito Cotizador (nuevo) -->
+  <aside id="carritoRapidoPanel" class="carrito-rapido">
+    <div class="carrito-header">
+      <h3>🧮 Carrito cotizador</h3>
+      <button id="cerrarCarritoRapido" class="cerrar-btn" onclick="vaciarCarrito()">🗑 Vaciar</button>
+    </div>
+    <div id="carritoRapidoContenido" class="carrito-contenido">
+      <p>Selecciona productos para cotizar y comparar precios entre supermercados.</p>
+    </div>
+  </aside>
+
 </div>
+
 
 <!--  Paginación -->
 <div id="paginacion" class="paginacion"></div>
 
-<!--  Carrito rápido -->
-<div id="carritoRapidoPanel" class="carrito-rapido oculto">
-  <div class="carrito-header">
-    <h3>Carrito rápido</h3>
-    <button id="cerrarCarritoRapido" class="cerrar-btn">✖</button>
-  </div>
-  <div id="carritoRapidoContenido" class="carrito-contenido">
-    <p>Selecciona un producto para comparar precios.</p>
-  </div>
-</div>
 
 <!--  Footer -->
 <footer>

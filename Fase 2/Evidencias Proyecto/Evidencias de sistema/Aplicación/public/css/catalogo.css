@@ -554,29 +554,31 @@ body {
 
 .productos {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 25px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 22px;
   justify-items: center;
   padding: 24px;
   background: linear-gradient(180deg, #f7fbfc, #ffffff);
 }
 
+/* 🟩 TARJETAS INDIVIDUALES */
 .producto-card {
-  background: var(--blanco);
-  border-radius: var(--radius);
-  box-shadow: var(--sombra);
-  width: 220px;
-  padding: 16px;
-  text-align: center;
-  transition: var(--transition);
+  width: 100%;
+  max-width: 210px;    /* 💡 No más ancho que esto */
+  min-width: 200px;    /* 💡 No menos ancho */
   display: flex;
   flex-direction: column;
-  align-items: center;
+  background: #fff;
+  border-radius: 10px;
   border: 1px solid #e3ebee;
+  box-shadow: var(--sombra);
+  padding: 14px;
+  text-align: center;
+  transition: var(--transition);
 }
 
 .producto-card:hover {
-  transform: translateY(-6px);
+  transform: translateY(-4px);
   box-shadow: var(--sombra-strong);
   border-color: var(--calipso-200);
 }
@@ -592,15 +594,26 @@ body {
   margin-bottom: 8px;
 }
 
+/* 🖼 IMAGEN RESPONSIVA */
 .producto-card img {
   width: 100%;
-  height: 160px;
+  height: 140px;
   object-fit: contain;
   margin-bottom: 10px;
-  transition: transform 0.25s ease;
 }
 .producto-card:hover img {
   transform: scale(1.04);
+}
+@media (max-width: 1400px) {
+  #contenedorProductos {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 1024px) {
+  #contenedorProductos {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
 }
 
 .producto-card h3 {
@@ -608,7 +621,7 @@ body {
   margin: 6px 0;
   color: var(--gris-oscuro);
   font-weight: 600;
-  height: 40px;
+  min-height: 38px;
   overflow: hidden;
 }
 
@@ -1236,15 +1249,24 @@ button:active, .btn-ver:active {
 .buscador {
   position: relative;
 }
-/* ===============  LAYOUT CATÁLOGO CON SIDEBAR =============== */
 .catalogo-layout {
   display: grid;
-  grid-template-columns: 240px 1fr;
+  grid-template-columns: 220px 1fr 260px; /* 🟢 centra más espacio */
   gap: 18px;
   width: 100%;
-  max-width: 1600px;
-  margin: auto;
-  padding: 10px;
+  max-width: 1800px; /* 🟢 permitir pantalla grande */
+  margin: 0 auto 30px auto;
+  padding: 10px 15px 25px 15px;
+  align-items: flex-start;
+}
+/* 💻 Pantallas grandes → 6 productos */
+@media (min-width: 1500px) {
+  .productos {
+    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+  }
+  .producto-card img {
+    height: 130px;
+  }
 }
 
 .sidebar-marcas {
@@ -1434,4 +1456,240 @@ button:active, .btn-ver:active {
 #mensaje-supermercados small {
   font-size: 13px;
   opacity: 0.9;
+}
+
+/* =============== 📐 LAYOUT CATÁLOGO 3 COLUMNAS: MARCAS – PRODUCTOS – CARRITO =============== */
+
+.catalogo-layout {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr) 320px;
+  gap: 18px;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto 30px auto;
+  padding: 10px 15px 25px 15px;
+  align-items: flex-start;
+}
+
+/* Sidebar de marcas se mantiene pero nos aseguramos que quede alineado arriba */
+.sidebar-marcas {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-self: flex-start;
+  position: sticky;
+  top: 100px;
+}
+
+/* ✅ Carrito cotizador a la derecha, sticky */
+.carrito-rapido {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  border: 1px solid #dde5ea;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  position: sticky;
+  top: 100px;
+  align-self: flex-start;
+  width: 100%;
+}
+
+/* ya no queremos que .oculto lo esconda, por si quedó en alguna parte */
+.carrito-rapido.oculto {
+  display: block;
+}
+
+.carrito-header {
+  background: var(--petroleo);
+  color: white;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.carrito-header h3 {
+  font-size: 15px;
+  margin: 0;
+}
+.cerrar-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+.cerrar-btn:hover {
+  color: #ffb3b3;
+}
+
+/* Contenido del carrito */
+.carrito-contenido {
+  padding: 12px 14px 16px 14px;
+  font-size: 13px;
+  color: #333;
+}
+
+/* Cada ítem del carrito */
+.carrito-item {
+  border-bottom: 1px solid #e5edf0;
+  padding: 8px 0 10px;
+}
+
+.carrito-item-header {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.carrito-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.carrito-info {
+  flex: 1;
+}
+
+.carrito-titulo {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gris-oscuro);
+  margin-bottom: 2px;
+}
+
+.carrito-detalle {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.carrito-eliminar {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 4px;
+}
+.carrito-eliminar:hover {
+  color: #b91c1c;
+}
+
+/* Precios por supermercado dentro del ítem */
+.carrito-precios {
+  margin-top: 6px;
+  padding-left: 4px;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.carrito-precio-tienda {
+  display: flex;
+  justify-content: space-between;
+}
+
+.carrito-precio-tienda span:first-child {
+  font-weight: 600;
+}
+
+.carrito-precio-tienda span:last-child {
+  font-weight: 600;
+  color: var(--calipso-600);
+}
+
+/* Totales generales */
+.carrito-totales {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 2px solid #e2e8f0;
+}
+
+.carrito-totales h4 {
+  font-size: 13px;
+  margin: 0 0 6px 0;
+  color: var(--gris-oscuro);
+}
+
+.carrito-total-linea {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 2px;
+}
+
+.carrito-total-linea span:first-child {
+  font-weight: 600;
+}
+
+.carrito-total-linea span:last-child {
+  font-weight: 600;
+}
+
+.carrito-total-general {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px dashed #cbd5e1;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+/* Botón vaciar en el footer del carrito (ya lo usamos en el header como ejemplo) */
+.carrito-acciones {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.carrito-acciones button {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.carrito-acciones button:hover {
+  background: #b91c1c;
+}
+
+/* Responsive: en pantallas chicas el carrito baja abajo de todo */
+@media (max-width: 1024px) {
+  .catalogo-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar-marcas {
+    position: static;
+    top: auto;
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .carrito-rapido {
+    position: static;
+    max-height: none;
+    margin-top: 10px;
+  }
+}
+/* 🟦 CONTENEDOR DE TARJETAS */
+#contenedorProductos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 26px;
+  padding: 20px;
+  justify-items: center;
+  align-items: stretch;
 }
