@@ -21,6 +21,16 @@ socket.on("disconnect", () => {
   estado.classList.add("badge--error");
 });
 
+
+const coloresSegmentos = {
+  "Despensa": "#00a7b5",
+  "Lácteos": "#5bc0be",
+  "Carnes": "#006b7e",
+  "Bebidas": "#40c7d2",
+  "Hogar": "#89cff0",
+  "Sin categoría": "#cbd5e1"
+};
+
 // =============================================================
 //  LOGS SCRAPING
 // =============================================================
@@ -871,6 +881,106 @@ socket.on("scrape-complete", (data) => {
 
   cargarDatosDashboard();
 });
+async function renderSegmentacion() {
+  const res = await fetch("/api/estadisticas/segmentacion-productos");
+  const json = await res.json();
+  const data = json.data;
+
+  if (!data?.length) return;
+
+  // 📌 Agrupar totales por categoría
+  const totalesPorCategoria = {};
+  data.forEach(item => {
+    if (!totalesPorCategoria[item.categoria]) totalesPorCategoria[item.categoria] = 0;
+    totalesPorCategoria[item.categoria] += item.totalClicks;
+  });
+
+  const labels = Object.keys(totalesPorCategoria);
+  const valores = Object.values(totalesPorCategoria);
+  const colores = labels.map(cat => coloresSegmentos[cat] || "#dadada");
+
+  // =======================
+  // 📦 BARRA DE CATEGORÍAS
+  // =======================
+  const ctx1 = document.getElementById("chartSegmentoProductos");
+  new Chart(ctx1, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{
+        label: "Clicks por categoría",
+        data: valores,
+        backgroundColor: colores,
+        borderRadius: 10
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return `Clicks: ${context.raw}`;
+            },
+            afterLabel: function(context) {
+              return `→ Preferencia hacia ${context.label}`;
+            }
+          }
+        },
+        legend: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+
+  // =======================
+  // 🥧 PIE SEGMENTADO
+  // =======================
+  const ctx2 = document.getElementById("chartSegmentoPie");
+  new Chart(ctx2, {
+    type: "pie",
+    data: {
+      labels,
+      datasets: [{
+        data: valores,
+        backgroundColor: colores
+      }]
+    },
+    options: {
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: (ctx) =>
+              `${ctx.label}: ${ctx.raw} clicks (${(
+                (ctx.raw / valores.reduce((a, b) => a + b)) * 100
+              ).toFixed(1)}%)`
+          }
+        }
+      }
+    }
+  });
+
+  // =======================
+  // 📋 TABLA SEGMENTADA
+  // =======================
+  const tbody = document.querySelector("#tablaSegmentacion tbody");
+  tbody.innerHTML = data
+    .sort((a, b) => b.totalClicks - a.totalClicks)
+    .map(item => `
+      <tr>
+        <td>${item.comuna || "Sin información"}</td>
+        <td>${item.genero}</td>
+        <td>${item.edad ?? "No registrada"}</td>
+        <td>${item.categoria}</td>
+        <td><strong>${item.totalClicks}</strong></td>
+      </tr>
+    `).join("");
+}
+
+document.addEventListener("DOMContentLoaded", renderSegmentacion);
+
 
 // Exponer ejecutarScraping globalmente
 window.ejecutarScraping = ejecutarScraping;

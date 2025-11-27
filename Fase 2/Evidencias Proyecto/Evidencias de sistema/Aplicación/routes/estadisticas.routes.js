@@ -607,8 +607,98 @@ router.get("/top-productos-genero", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// ======================================
+//  📌 SEGMENTACIÓN DEMOGRÁFICA (INTELIGENTE)
+// ======================================
+router.get("/segmentacion-productos", async (req, res) => {
+  try {
+    const db = getDB();
+    const clicks = db.collection("clicks");
 
+    // 🧠 Diccionario reutilizado de categorías
+    const CATEGORIAS = {
+      "Despensa": ["azucar","harina","pasta","fideos","arroz","aceite","sal","pan",
+        "porotos","lentejas","arvejas","sopa","galletas","cereal","mayonesa",
+        "mermelada","atun","conserva","manteca","pure","salsa","mani","avena"
+      ],
+      "Lácteos": ["leche","queso","yogurt","crema","mantequilla","margarina","manjar"],
+      "Carnes": ["pollo","trutro","pechuga","carne","pescado","cerdo","hamburguesa"],
+      "Bebidas": ["bebida","agua","jugo","coca","cola","te","cafe","cerveza","vino"],
+      "Hogar": ["detergente","jabon","shampoo","papel","higienico","lavaloza","cloro"],
+    };
 
+    function detectarCategoria(nombre = "") {
+      const clean = nombre
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+      for (const [cat, palabras] of Object.entries(CATEGORIAS)) {
+        if (palabras.some(p => clean.includes(p))) return cat;
+      }
+      return "Sin categoría";
+    }
+
+    const data = await clicks.aggregate([
+      // ➕ Convertir idProducto a ObjectId si es necesario
+      {
+        $addFields: {
+          idProdObj: {
+            $cond: {
+              if: { $eq: [{ $type: "$idProducto" }, "string"] },
+              then: { $toObjectId: "$idProducto" },
+              else: "$idProducto"
+            }
+          }
+        }
+      },
+
+      // 🔗 Unir con la información del producto real
+      {
+        $lookup: {
+          from: "productos",
+          localField: "idProdObj",
+          foreignField: "_id",
+          as: "productoInfo"
+        }
+      },
+      { $unwind: "$productoInfo" },
+
+      // 🧮 Preparar campos (aquí no inferimos aún)
+      {
+        $project: {
+          userGenero: 1,
+          userEdad: 1,
+          userComuna: 1,
+          nombre: "$productoInfo.title"
+        }
+      }
+    ]).toArray();
+
+    // 🧠 INFERIR CATEGORÍA EN JS (100% control)
+    const resultado = data.map(item => {
+      return {
+        comuna: item.userComuna ?? "No especificada",
+        genero: item.userGenero ?? "No especificado",
+        edad: item.userEdad ?? null,
+        categoria: detectarCategoria(item.nombre),
+      };
+    });
+
+    // 📊 Agrupar y contar
+    const agrupado = {};
+    resultado.forEach(r => {
+      const key = `${r.comuna}|${r.genero}|${r.edad}|${r.categoria}`;
+      if (!agrupado[key]) agrupado[key] = { ...r, totalClicks: 0 };
+      agrupado[key].totalClicks++;
+    });
+
+    res.json({ ok: true, data: Object.values(agrupado) });
+
+  } catch (err) {
+    console.error("❌ Error en segmentación:", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
 
 // ======================================
 //  TOP SUPERMERCADOS POR REGIÓN
@@ -645,6 +735,8 @@ router.get("/top-supermercados-region", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
 // ======================================
 //  EXPORTACIÓN DE RUTAS — CONTROLADORES EXTERNOS
 // ======================================

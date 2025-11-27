@@ -9,15 +9,25 @@ const router = express.Router();
 // -------------------------------------------------------------
 //  Palabras clave principales (ampliadas)
 // -------------------------------------------------------------
-const PALABRAS_CLAVE = [
-  "azucar", "harina", "pasta", "fideos", "leche", "cafe", "arroz",
-  "aceite", "sal", "pan", "queso", "yogurt", "pollo", "carne",
-  "atun", "sopa", "galletas", "mantequilla", "detergente",
-  "jabon", "shampoo", "papel", "higienico", "toalla", "limón",
-  "cereal", "mermelada", "mayonesa", "arvejas", "porotos", "lentejas",
-  "vino", "cerveza", "bebida", "agua", "jugos", "huevo", "tomate",
-  "manteca", "manjar", "crema", "margarina"
-];
+const CATEGORIAS = {
+  "Despensa": [
+    "azucar","harina","pasta","fideos","arroz","aceite","sal","pan","porotos","lentejas","arvejas",
+    "sopa","galletas","cereal","mayonesa","mermelada","atun","conserva","manteca"
+  ],
+  "Lácteos": [
+    "leche","queso","yogurt","crema","mantequilla","margarina","manjar"
+  ],
+  "Carnes": [
+    "pollo","carne","pescado","cerdo","hamburguesa","trutro"
+  ],
+  "Bebidas": [
+    "bebida","agua","jugo","coca","cola","fanta","sprite","te","cafe","cerveza","vino"
+  ],
+  "Hogar": [
+    "detergente","jabon","shampoo","papel","higienico","toalla"
+  ]
+};
+
 
 // -------------------------------------------------------------
 //  POST /api/busquedas → Registrar búsqueda
@@ -27,42 +37,53 @@ router.post("/", async (req, res) => {
     const db = getDB();
     const { usuarioEmail, termino } = req.body;
 
-    // Validaciones básicas
     if (!termino || typeof termino !== "string") {
       return res.status(400).json({ msg: "Debe ingresar un término válido." });
     }
 
-    const terminoLimpio = termino.toLowerCase().trim();
-    if (terminoLimpio.length < 3) {
+    // 🧼 Normalizar búsqueda (minúsculas y sin acentos)
+    const clean = termino
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase().trim();
+
+    if (clean.length < 3)
       return res.status(400).json({ msg: "El término es demasiado corto." });
+
+    const palabras = clean.split(/\s+/);
+
+    // 📌 Detectar categoría principal
+    let categoria = "Sin categoría";
+    for (const [nombreCategoria, lista] of Object.entries(CATEGORIAS)) {
+      if (palabras.some(p => lista.includes(p))) {
+        categoria = nombreCategoria;
+        break;
+      }
     }
 
-    // Detectar coincidencias con palabras clave conocidas
-    const palabras = terminoLimpio.split(/\s+/);
-    const coincidencias = palabras.filter(p => PALABRAS_CLAVE.includes(p));
+    // 📌 Detectar palabra clave específica para estudios
+    const coincidencia = palabras.find(p =>
+      Object.values(CATEGORIAS).flat().includes(p)
+    );
 
-    // Guardar igual aunque no tenga coincidencias → sirve para analítica
-    const busqueda = {
+    await db.collection("busquedas").insertOne({
       usuarioEmail: usuarioEmail || "invitado@anonimo.cl",
-      termino: terminoLimpio,
-      palabrasClave: coincidencias,
+      termino: clean,
+      categoria,
+      palabraClave: coincidencia || null,
       fecha: new Date()
-    };
-
-    await db.collection("busquedas").insertOne(busqueda);
-    console.log("🔎 Nueva búsqueda registrada:", terminoLimpio);
+    });
 
     res.json({
       ok: true,
-      msg: coincidencias.length
-        ? "Búsqueda registrada con coincidencias."
-        : "Búsqueda registrada sin coincidencias relevantes.",
+      msg: `Búsqueda registrada como categoría: ${categoria}`,
     });
+
   } catch (error) {
     console.error("❌ Error al registrar búsqueda:", error);
     res.status(500).json({ msg: "Error interno del servidor." });
   }
 });
+
 
 // -------------------------------------------------------------
 //  GET /api/busquedas → Obtener últimas búsquedas (para admin o dashboard)

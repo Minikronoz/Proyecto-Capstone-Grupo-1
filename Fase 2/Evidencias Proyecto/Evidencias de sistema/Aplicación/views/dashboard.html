@@ -202,6 +202,34 @@ Chart.register(ChartDataLabels);
     <h2>👥 Usuarios por género</h2>
     <div class="chart-container"><canvas id="porGenero"></canvas></div>
   </section>
+<section class="card-analitica">
+  <h2>👥 Productos por Segmentos Demográficos</h2>
+
+  <div class="segmentacion-layout">
+    <div class="chart-box">
+      <canvas id="chartSegmentoProductos"></canvas>
+    </div>
+    <div class="chart-box">
+      <canvas id="chartSegmentoPie"></canvas>
+    </div>
+  </div>
+
+  <div class="tabla-card-segmentacion">
+    <table id="tablaSegmentacion" class="tabla-segmentacion">
+      <thead>
+        <tr>
+          <th>Comuna</th>
+          <th>Género</th>
+          <th>Edad</th>
+          <th>Categoría</th>
+          <th>Busquedas</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
 
   <section>
     <h2>🕒 Productos más consultados por día/mes/año</h2>
@@ -481,7 +509,7 @@ function setupInfiniteScroll() {
 }
 
 // =============================================================
-//  RENDERIZAR GRÁFICOS (código existente simplificado)
+//  RENDERIZAR GRÁFICOS GENERALES (OPTIMIZADO)
 // =============================================================
 async function renderChart(id, url, label, filtros = {}) {
   const canvas = document.getElementById(id);
@@ -506,9 +534,10 @@ async function renderChart(id, url, label, filtros = {}) {
   const idLineas = ["clicsPorDia", "busquedasPorDia", "comparativaConsultasBusquedas", "actividadPorHora", "usuariosActivosDia"];
   const tipoGrafico = idLineas.includes(id) ? "line" : "bar";
 
-  const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-  gradient.addColorStop(0, "rgba(0,167,181,0.95)");
-  gradient.addColorStop(1, "rgba(0,167,181,0.35)");
+  // 🎨 Gradiente corporativo elegante
+  const gradient = ctx.createLinearGradient(0, 0, 0, 320);
+  gradient.addColorStop(0, "rgba(0,167,181,0.9)");
+  gradient.addColorStop(1, "rgba(0,167,181,0.25)");
 
   charts[id] = new Chart(ctx, {
     type: tipoGrafico,
@@ -517,12 +546,13 @@ async function renderChart(id, url, label, filtros = {}) {
       datasets: [{
         label,
         data: valores,
-        backgroundColor: tipoGrafico === "bar" ? gradient : "rgba(0,167,181,0.25)",
-        borderColor: "#009FB0",
+        backgroundColor: tipoGrafico === "bar" ? gradient : "rgba(0,167,181,0.18)",
+        borderColor: "#007a85",
         borderWidth: 2,
-        borderRadius: tipoGrafico === "bar" ? 12 : 0,
+        fill: tipoGrafico === "line",
         tension: 0.35,
-        fill: tipoGrafico === "line"
+        borderRadius: tipoGrafico === "bar" ? 14 : 0,
+        pointBackgroundColor: "#009FB0"
       }]
     },
     options: {
@@ -546,7 +576,7 @@ async function renderChart(id, url, label, filtros = {}) {
           grid: { color: "transparent" }
         },
         y: {
-          beginAtZero: false,
+          beginAtZero: true,
           ticks: {
             color: "#475569",
             font: { size: 12 },
@@ -558,6 +588,7 @@ async function renderChart(id, url, label, filtros = {}) {
     }
   });
 }
+
 
 async function renderTopProductos(filtros = {}) {
   const id = "topProductos";
@@ -977,6 +1008,110 @@ async function cargarDashboard(filtros = {}) {
     renderChart("rankingProductosNuevos", "/api/estadisticas/ranking-productos-nuevos", "Nuevos productos", filtros),
   ]);
 }
+// =============================================================
+//  SEGMENTACIÓN DEMOGRÁFICA DE PRODUCTOS (ESTÉTICA CORPORATIVA)
+// =============================================================
+async function renderSegmentacion(filtros = {}) {
+
+  const canvasBar = document.getElementById("chartSegmentoProductos");
+  const canvasPie = document.getElementById("chartSegmentoPie");
+  const tablaBody = document.querySelector("#tablaSegmentacion tbody");
+
+  if (!canvasBar || !canvasPie || !tablaBody) return;
+
+  try {
+    const res = await fetch(`/api/estadisticas/segmentacion-productos?${new URLSearchParams(filtros)}`);
+    const json = await res.json();
+    console.log("📌 Segmentación recibida:", json);
+
+    if (!json.ok || !json.data || !json.data.length) return;
+
+    // 🧼 Filtrar valores útiles reales
+    const data = json.data.filter(d =>
+      d.genero !== "No especificado" &&
+      d.comuna !== "No especificada" &&
+      d.comuna !== "" &&
+      d.edad !== null
+    );
+    if (!data.length) return;
+
+    // ================================
+    // 🔷 BARRA: Interés por Género
+    // ================================
+    const generoLabels = [...new Set(data.map(d => d.genero))];
+    const generoValues = generoLabels.map(g =>
+      data.filter(d => d.genero === g).reduce((acc, curr) => acc + curr.totalClicks, 0)
+    );
+
+    if (charts["chartSegmentoProductos"]) charts["chartSegmentoProductos"].destroy();
+    charts["chartSegmentoProductos"] = new Chart(canvasBar.getContext("2d"), {
+      type: "bar",
+      data: {
+        labels: generoLabels,
+        datasets: [{
+          label: "Interés por Género",
+          data: generoValues,
+          backgroundColor: ["#009fb0", "#5bc0be", "#89cff0"],
+          borderColor: "#006b7e",
+          borderWidth: 2,
+          borderRadius: 14
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+
+    // ================================
+    // 🟢 PIE: Categorías Consultadas
+    // ================================
+    const catLabels = [...new Set(data.map(d => d.categoria))];
+    const catValues = catLabels.map(c =>
+      data.filter(d => d.categoria === c).reduce((acc, curr) => acc + curr.totalClicks, 0)
+    );
+
+    if (charts["chartSegmentoPie"]) charts["chartSegmentoPie"].destroy();
+    charts["chartSegmentoPie"] = new Chart(canvasPie.getContext("2d"), {
+      type: "pie",
+      data: {
+        labels: catLabels,
+        datasets: [{
+          data: catValues,
+          backgroundColor: ["#006b7e", "#00a7b5", "#5bc0be", "#009FB0"],
+          borderWidth: 2,
+          borderColor: "#ffffff"
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: "bottom", labels: { padding: 12, font: { size: 13 } } },
+          tooltip: { enabled: true }
+        }
+      }
+    });
+
+    // ================================
+    // 📋 TABLA
+    // ================================
+    tablaBody.innerHTML = data.map(d => `
+      <tr>
+        <td>${d.comuna}</td>
+        <td>${d.genero}</td>
+        <td>${d.edad}</td>
+        <td>${d.categoria}</td>
+        <td>${d.totalClicks}</td>
+      </tr>
+    `).join("");
+
+  } catch (err) {
+    console.error("❌ Error en renderSegmentacion:", err);
+  }
+}
+
+
 
 // =============================================================
 //  INICIALIZACIÓN (CORREGIDO)
@@ -984,9 +1119,10 @@ async function cargarDashboard(filtros = {}) {
 async function initDashboard() {
   await cargarDashboard(filtros);
   await renderTendencia(filtros);
-  await renderMapaChile(filtros); // ✅ PASAR FILTROS
+  await renderMapaChile(filtros); 
   await cargarBajas(filtros);
   await cargarSubidas(filtros);
+  await renderSegmentacion(); 
   
   // ✅ ACTIVAR SCROLL INFINITO
   setupInfiniteScroll();
@@ -1037,23 +1173,12 @@ document.getElementById("btnFiltrar").addEventListener("click", () => {
   renderTendencia(filtrosGraficos);
   renderProductosPorTiempo(filtrosGraficos);
   renderMapaChile(filtrosGraficos);
-  
+  renderSegmentacion(filtrosGraficos);
   cargarBajas(filtrosPrecios);               // ← Bajas solo con supermercado/fechas
   cargarSubidas(filtrosPrecios);             // ← Subidas solo con supermercado/fechas
 });
 
 
-
-// =============================================================
-//  ANIMACIÓN DE CARGA
-// =============================================================
-const main = document.querySelector("main");
-main.style.opacity = 0.4;
-main.style.pointerEvents = "none";
-setTimeout(() => {
-  main.style.opacity = 1;
-  main.style.pointerEvents = "auto";
-}, 1200);
 
 document.addEventListener("DOMContentLoaded", () => {
   initDashboard();

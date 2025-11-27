@@ -1,0 +1,218 @@
+{
+  "cotizaciones": {
+    "exampleSchema": {
+      "_id": "object",
+      "usuario": "object",
+      "carrito": "array",
+      "fecha": "object"
+    },
+    "indexes": [
+      {
+        "v": 2,
+        "key": {
+          "_id": 1
+        },
+        "name": "_id_"
+      }
+    ]
+  },
+  "users": {
+    "exampleSchema": {
+      "_id": "object",
+      "correo": "string",
+      "contraseña": "string",
+      "role": "string",
+      "nombre": "string",
+      "apellido": "string",
+      "genero": "string",
+      "region": "string",
+      "comuna": "string",
+      "sector": "string",
+      "tieneNegocio": "boolean",
+      "negocios": "array",
+      "creadoEn": "object",
+      "actualizadoEn": "object",
+      "edad": "number",
+      "fechaNacimiento": "string",
+      "rut": "string"
+    },
+    "indexes": [
+      {
+        "v": 2,
+        "key": {
+          "_id": 1
+        },
+        "name": "_id_"
+      }
+    ]
+  },
+  "productos": {
+    "exampleSchema": {
+      "_id": "object",
+      "globalId": "string",
+      "title": "string",
+      "brand": "string",
+      "store": "string",
+      "currentPrice": "number",
+      "formattedPrice": "string",
+      "priceNormal": "string",
+      "pricePerUnit": "string",
+      "quantity": "string",
+      "unidadEstandar": "string",
+      "image": "string",
+      "link": "string",
+      "categoria": "string",
+      "lastUpdate": "object",
+      "createdAt": "object"
+    },
+    "indexes": [
+      {
+        "v": 2,
+        "key": {
+          "_id": 1
+        },
+        "name": "_id_"
+      }
+    ]
+  },
+  "locales_supermercados": {
+    "exampleSchema": {
+      "_id": "object",
+      "tienda": "string",
+      "nombre": "string",
+      "direccion": "string",
+      "comuna": "string",
+      "region": "string",
+      "latitud": "null",
+      "longitud": "null",
+      "horario": "string",
+      "telefono": "null",
+      "servicios": "array"
+    },
+    "indexes": [
+      {
+        "v": 2,
+        "key": {
+          "_id": 1
+        },
+        "name": "_id_"
+      },
+      {
+        "v": 2,
+        "key": {
+          "tienda": 1,
+          "comuna": 1
+        },
+        "name": "tienda_1_comuna_1"
+      },
+      {
+        "v": 2,
+        "key": {
+          "tienda": 1,
+          "region": 1
+        },
+        "name": "tienda_1_region_1"
+      }
+    ]
+  },
+  "sesiones": {
+    "exampleSchema": {
+      "_id": "string",
+      "expires": "object",
+      "session": "string"
+    },
+    "indexes": [
+      {
+        "v": 2,
+        "key": {
+          "_id": 1
+        },
+        "name": "_id_"
+      },
+      {
+        "v": 2,
+        "key": {
+          "expires": 1
+        },
+        "name": "expires_1",
+        "background": true,
+        "expireAfterSeconds": 0
+      }
+    ]
+  },
+  "busquedas": {
+    "exampleSchema": {
+      "_id": "object",
+      "usuarioEmail": "string",
+      "termino": "string",
+      "palabrasClave": "array",
+      "fecha": "object"
+    },
+    "indexes": [
+      {
+        "v": 2,
+        "key": {
+          "_id": 1
+        },
+        "name": "_id_"
+      }
+    ]
+  },
+  "priceHistory": {
+    "exampleSchema": {
+      "_id": "object",
+      "productId": "object",
+      "store": "string",
+      "price": "number",
+      "previousPrice": "null",
+      "variation": "number",
+      "offerDescription": "null",
+      "fecha": "object"
+    },
+    "indexes": [
+      {
+        "v": 2,
+        "key": {
+          "_id": 1
+        },
+        "name": "_id_"
+      }
+    ]
+  },
+  "clicks": {
+    "exampleSchema": {
+      "_id": "object",
+      "idProducto": "string",
+      "titulo": "string",
+      "marca": "string",
+      "precio": "number",
+      "precioPorUnidad": "string",
+      "supermercado": "string",
+      "link": "string",
+      "imagen": "string",
+      "userId": "null",
+      "userCorreo": "string",
+      "userNombre": "null",
+      "userApellido": "null",
+      "userGenero": "null",
+      "userRegion": "null",
+      "userComuna": "null",
+      "userSector": "null",
+      "userEdad": "null",
+      "negocios": "array",
+      "createdAt": "object",
+      "fecha": "object",
+      "ip": "string",
+      "ua": "string"
+    },
+    "indexes": [
+      {
+        "v": 2,
+        "key": {
+          "_id": 1
+        },
+        "name": "_id_"
+      }
+    ]
+  }
+}

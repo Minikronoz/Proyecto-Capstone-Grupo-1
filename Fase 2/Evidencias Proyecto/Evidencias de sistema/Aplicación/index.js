@@ -103,6 +103,7 @@ app.use("/api/negocios", negociosRoutes);
 
 // Rutas de vistas HTML
 app.use("/historico", historicoRoutes); 
+app.use("/api/analitica", estadisticasRoutes);
 
 // ============================================================
 //  SCRAPING MANUAL

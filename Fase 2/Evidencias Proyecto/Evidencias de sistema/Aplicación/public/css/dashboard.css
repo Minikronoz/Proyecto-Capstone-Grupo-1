@@ -153,30 +153,6 @@ h2 {
   font-weight: 600;
   letter-spacing: 0.4px;
 }
-
-/* ===== TARJETAS DE GRÁFICOS ===== */
-#chartGenero {
-  width: 230px !important;
-  height: 230px !important;
-  margin: 0 auto;
-}
-
-/* ===== AJUSTES VISUALES DE GRÁFICOS ===== */
-.chart-container {
-  width: 85%;
-  max-width: 1100px;
-  margin: 0 auto;
-  border: 1.5px solid #d1d5db;
-  border-radius: 16px;
-  background: #ffffff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  padding: 25px 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: all 0.25s ease;
-}
-
 .chart-container:hover {
   transform: scale(1.02);
   box-shadow: 0 6px 14px rgba(0,0,0,0.08);
@@ -197,12 +173,13 @@ h2 {
 .chart-panel:hover {
   transform: scale(1.01);
 }
-/* ===== PIE CHART ===== */
+/* ✔️ CANVAS FIJO PARA EVITAR SALTOS */
 canvas {
   width: 100% !important;
-  height: auto !important;
-  max-height: 420px; /* más grandes pero no invasivos */
+  height: 320px !important;   /* altura fija */
+  max-height: 380px !important;
 }
+
 
 /* ===== FOOTER ===== */
 footer {
@@ -698,4 +675,297 @@ footer {
 .tabla-precios {
   width: 100%;
   table-layout: fixed; /* columnas uniformes */
+}
+.segmentacion-layout {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 40px;
+  margin: 0 auto;
+  padding: 10px 0 20px;
+  width: 100%;
+  max-width: 1100px;
+}
+
+.segmentacion-layout canvas {
+  width: 380px !important;
+  height: 300px !important;
+  background: white;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+.segmentacion-layout .chart-box {
+  flex: 1;
+  max-width: 480px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 25px 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border: 1.5px solid #d1d5db;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#tablaSegmentacion {
+  width: 85%;
+  margin: 18px auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.tabla-segmentacion {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 18px;
+  font-size: 14px;
+}
+
+.tabla-segmentacion th {
+  background: var(--calipso);
+  color: white;
+  padding: 8px;
+}
+
+.tabla-segmentacion td {
+  border-bottom: 1px solid #ddd;
+  padding: 6px;
+}
+@media (max-width: 768px) {
+  canvas {
+    height: 260px !important;
+  }
+  .chart-container {
+    min-height: 260px !important;
+    padding: 15px 20px;
+  }
+}
+/* Tarjeta contenedora */
+.card-analitica {
+  max-width: 1200px;
+  margin: 40px auto;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 35px 40px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border: 1px solid #e2e8f0;
+}
+
+/* Título */
+.card-analitica h2 {
+  text-align: center;
+  margin-bottom: 28px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #0f172a;
+  border-bottom: 3px solid #00a7b5;
+  padding-bottom: 8px;
+  letter-spacing: 0.4px;
+}
+
+/* Gráficos lado a lado */
+.segmentacion-layout {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  flex-wrap: nowrap;
+  margin-bottom: 30px;
+}
+
+/* Propiedades comunes de los canvas */
+.segmentacion-layout canvas {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border: 1px solid #e5e7eb;
+  height: 310px !important;
+  width: 100% !important;
+  max-width: 48%;
+}
+
+/* Responsive ajuste */
+@media (max-width: 950px) {
+  .segmentacion-layout {
+    flex-wrap: wrap;
+  }
+  .segmentacion-layout canvas {
+    max-width: 100%;
+  }
+}
+
+/* ============================
+   📋 TABLA DE RESULTADOS
+============================= */
+
+.tabla-segmentacion {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  color: #334155;
+  overflow: hidden;
+  margin-top: 10px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+/* Cabecera */
+.tabla-segmentacion thead th {
+  background: #009fb0;
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.tabla-segmentacion thead th:last-child {
+  border-right: none;
+}
+
+/* Celdas */
+.tabla-segmentacion tbody td {
+  text-align: center;
+  padding: 8px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* Hover filas */
+.tabla-segmentacion tbody tr:hover {
+  background: #f8fafc;
+  transition: 0.15s;
+}
+/* 📋 Tabla en formato profesional */
+.tabla-card-segmentacion {
+  max-width: 1100px;
+  margin: 20px auto 60px auto;
+  padding: 10px 0 30px;
+}
+
+#tablaSegmentacion {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 14px;
+}
+
+#tablaSegmentacion th {
+  background: var(--color-calipso);
+  color: white;
+  padding: 10px;
+  text-align: center;
+}
+
+#tablaSegmentacion td {
+  text-align: center;
+  padding: 8px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+#tablaSegmentacion tr:hover {
+  background: #f6fbfc;
+}
+/* ============================
+   RESPONSIVE
+============================= */
+@media (max-width: 920px) {
+  .card-analitica {
+    padding: 20px;
+  }
+
+  .segmentacion-layout canvas {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+}
+/* =====================================================
+   🔄 SEGMENTACIÓN — GRÁFICOS ALINEADOS Y ESTILO UNIFICADO
+====================================================== */
+
+/* Tarjeta general */
+.card-analitica {
+  max-width: 1100px;
+  margin: 0 auto 60px auto;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 30px 35px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  border: 1px solid #e2e8f0;
+}
+
+/* Título */
+.card-analitica h2 {
+  text-align: center;
+  margin-bottom: 22px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #0f172a;
+  border-bottom: 3px solid #00a7b5;
+  padding-bottom: 8px;
+}
+
+/* Layout de los gráficos: lado a lado */
+.segmentacion-layout {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 25px;
+  flex-wrap: nowrap;
+}
+
+/* Propiedades comunes de los gráficos */
+.segmentacion-layout canvas {
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border: 1px solid #e5e7eb;
+  height: 260px !important;
+  width: 100% !important;
+  max-width: 48%;       /* ❗ Hace que entren al lado */
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 950px) {
+  .segmentacion-layout {
+    flex-wrap: wrap;
+  }
+  .segmentacion-layout canvas {
+    max-width: 100%;
+  }
+}
+
+/* Tabla */
+.tabla-segmentacion {
+  margin-top: 8px;
+  border-radius: 10px;
+  overflow: hidden;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+/* Cabecera tabla */
+.tabla-segmentacion thead th {
+  background: #009fb0;
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Celdas */
+.tabla-segmentacion tbody td {
+  text-align: center;
+  padding: 8px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* Hover filas */
+.tabla-segmentacion tbody tr:hover {
+  background: #f8fafc;
+  transition: 0.15s;
 }
