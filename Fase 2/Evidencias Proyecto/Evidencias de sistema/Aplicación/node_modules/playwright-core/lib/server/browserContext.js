@@ -69,7 +69,6 @@ class BrowserContext extends import_instrumentation.SdkObject {
     this._creatingStorageStatePage = false;
     this.initScripts = [];
     this._routesInFlight = /* @__PURE__ */ new Set();
-    this._playwrightBindingExposed = false;
     this.attribution.context = this;
     this._browser = browser;
     this._options = options;
@@ -231,17 +230,17 @@ if (navigator.serviceWorker) navigator.serviceWorker.register = async () => { co
     return this._pageBindings.get(name)?.forClient;
   }
   async exposePlaywrightBindingIfNeeded() {
-    if (this._playwrightBindingExposed)
-      return;
-    this._playwrightBindingExposed = true;
-    await this.doExposePlaywrightBinding();
-    this.bindingsInitScript = import_page2.PageBinding.createInitScript();
-    this.initScripts.push(this.bindingsInitScript);
-    await this.doAddInitScript(this.bindingsInitScript);
-    await this.safeNonStallingEvaluateInAllFrames(this.bindingsInitScript.source, "main");
+    this._playwrightBindingExposed ??= (async () => {
+      await this.doExposePlaywrightBinding();
+      this.bindingsInitScript = import_page2.PageBinding.createInitScript();
+      this.initScripts.push(this.bindingsInitScript);
+      await this.doAddInitScript(this.bindingsInitScript);
+      await this.safeNonStallingEvaluateInAllFrames(this.bindingsInitScript.source, "main");
+    })();
+    return await this._playwrightBindingExposed;
   }
   needsPlaywrightBinding() {
-    return this._playwrightBindingExposed;
+    return this._playwrightBindingExposed !== void 0;
   }
   async exposeBinding(progress, name, needsHandle, playwrightBinding, forClient) {
     if (this._pageBindings.has(name))

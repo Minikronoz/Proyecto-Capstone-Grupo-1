@@ -62,12 +62,16 @@ class BidiBrowser extends import_browser.Browser {
     browser._bidiSessionInfo = await browser._browserSession.send("session.new", {
       capabilities: {
         alwaysMatch: {
-          acceptInsecureCerts: options.persistent?.internalIgnoreHTTPSErrors || options.persistent?.ignoreHTTPSErrors,
-          proxy: getProxyConfiguration(options.originalLaunchOptions.proxyOverride ?? options.proxy),
-          unhandledPromptBehavior: {
+          "acceptInsecureCerts": options.persistent?.internalIgnoreHTTPSErrors || options.persistent?.ignoreHTTPSErrors,
+          "proxy": getProxyConfiguration(options.originalLaunchOptions.proxyOverride ?? options.proxy),
+          "unhandledPromptBehavior": {
             default: bidi.Session.UserPromptHandlerType.Ignore
           },
-          webSocketUrl: true
+          "webSocketUrl": true,
+          // Chrome with WebDriver BiDi does not support prerendering
+          // yet because WebDriver BiDi behavior is not specified. See
+          // https://github.com/w3c/webdriver-bidi/issues/321.
+          "goog:prerenderingDisabled": true
         }
       }
     });
@@ -76,7 +80,8 @@ class BidiBrowser extends import_browser.Browser {
         "browsingContext",
         "network",
         "log",
-        "script"
+        "script",
+        "input"
       ]
     });
     await browser._browserSession.send("network.addDataCollector", {
@@ -122,16 +127,13 @@ class BidiBrowser extends import_browser.Browser {
   _onBrowsingContextCreated(event) {
     if (event.parent) {
       const parentFrameId = event.parent;
-      for (const page2 of this._bidiPages.values()) {
-        const parentFrame = page2._page.frameManager.frame(parentFrameId);
-        if (!parentFrame)
-          continue;
+      const page2 = this._findPageForFrame(parentFrameId);
+      if (page2) {
         page2._session.addFrameBrowsingContext(event.context);
         page2._page.frameManager.frameAttached(event.context, parentFrameId);
         const frame = page2._page.frameManager.frame(event.context);
         if (frame)
           frame._url = event.url;
-        return;
       }
       return;
     }
@@ -141,7 +143,7 @@ class BidiBrowser extends import_browser.Browser {
     if (!context)
       return;
     const session = this._connection.createMainFrameBrowsingContextSession(event.context);
-    const opener = event.originalOpener && this._bidiPages.get(event.originalOpener);
+    const opener = event.originalOpener && this._findPageForFrame(event.originalOpener);
     const page = new import_bidiPage.BidiPage(context, session, opener || null);
     page._page.mainFrame()._url = event.url;
     this._bidiPages.set(event.context, page);
@@ -169,6 +171,12 @@ class BidiBrowser extends import_browser.Browser {
     for (const page of this._bidiPages.values()) {
       if (page._onRealmDestroyed(event))
         return;
+    }
+  }
+  _findPageForFrame(frameId) {
+    for (const page of this._bidiPages.values()) {
+      if (page._page.frameManager.frame(frameId))
+        return page;
     }
   }
 }
@@ -207,6 +215,8 @@ class BidiBrowserContext extends import_browserContext.BrowserContext {
         userContexts: [this._userContextId()]
       }));
     }
+    if (this._options.extraHTTPHeaders)
+      promises.push(this.doUpdateExtraHTTPHeaders());
     await Promise.all(promises);
   }
   possiblyUninitializedPages() {
@@ -300,6 +310,11 @@ class BidiBrowserContext extends import_browserContext.BrowserContext {
     });
   }
   async doUpdateExtraHTTPHeaders() {
+    const allHeaders = this._options.extraHTTPHeaders || [];
+    await this._browser._browserSession.send("network.setExtraHeaders", {
+      headers: allHeaders.map(({ name, value }) => ({ name, value: { type: "string", value } })),
+      userContexts: [this._userContextId()]
+    });
   }
   async setUserAgent(userAgent) {
     this._options.userAgent = userAgent;

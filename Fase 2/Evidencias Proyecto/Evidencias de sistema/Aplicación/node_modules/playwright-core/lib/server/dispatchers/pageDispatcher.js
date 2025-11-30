@@ -103,19 +103,6 @@ class PageDispatcher extends import_dispatcher.Dispatcher {
   page() {
     return this._page;
   }
-  serializeConsoleMessage(message) {
-    return {
-      type: message.type(),
-      text: message.text(),
-      args: message.args().map((a) => {
-        const elementHandle = a.asElement();
-        if (elementHandle)
-          return import_elementHandlerDispatcher.ElementHandleDispatcher.from(import_frameDispatcher.FrameDispatcher.from(this.parentScope(), elementHandle._frame), elementHandle);
-        return import_jsHandleDispatcher.JSHandleDispatcher.fromJSHandle(this, a);
-      }),
-      location: message.location()
-    };
-  }
   async exposeBinding(params, progress) {
     const binding = await this._page.exposeBinding(progress, params.name, !!params.needsHandle, (source, ...args) => {
       if (this._disposed)
@@ -237,7 +224,7 @@ class PageDispatcher extends import_dispatcher.Dispatcher {
   }
   async consoleMessages(params, progress) {
     this._subscriptions.add("console");
-    return { messages: this._page.consoleMessages().map((message) => this.serializeConsoleMessage(message)) };
+    return { messages: this._page.consoleMessages().map((message) => this.parentScope().serializeConsoleMessage(message, this)) };
   }
   async pageErrors(params, progress) {
     return { errors: this._page.pageErrors().map((error) => (0, import_errors.serializeError)(error)) };
@@ -265,13 +252,6 @@ class PageDispatcher extends import_dispatcher.Dispatcher {
     progress.metadata.point = { x: params.x, y: params.y };
     await this._page.touchscreen.tap(progress, params.x, params.y);
   }
-  async accessibilitySnapshot(params, progress) {
-    const rootAXNode = await progress.race(this._page.accessibility.snapshot({
-      interestingOnly: params.interestingOnly,
-      root: params.root ? params.root._elementHandle : void 0
-    }));
-    return { rootAXNode: rootAXNode || void 0 };
-  }
   async pdf(params, progress) {
     if (!this._page.pdf)
       throw new Error("PDF generation is only supported for Headless Chromium");
@@ -283,7 +263,7 @@ class PageDispatcher extends import_dispatcher.Dispatcher {
     return { requests: this._page.networkRequests().map((request) => import_networkDispatchers.RequestDispatcher.from(this.parentScope(), request)) };
   }
   async snapshotForAI(params, progress) {
-    return { snapshot: await this._page.snapshotForAI(progress) };
+    return await this._page.snapshotForAI(progress, params);
   }
   async bringToFront(params, progress) {
     await progress.race(this._page.bringToFront());
@@ -351,6 +331,8 @@ class WorkerDispatcher extends import_dispatcher.Dispatcher {
       url: worker.url
     });
     this._type_Worker = true;
+    this._type_EventTarget = true;
+    this._subscriptions = /* @__PURE__ */ new Set();
     this.addObjectListener(import_page.Worker.Events.Close, () => this._dispatchEvent("close"));
   }
   static fromNullable(scope, worker) {
@@ -364,6 +346,12 @@ class WorkerDispatcher extends import_dispatcher.Dispatcher {
   }
   async evaluateExpressionHandle(params, progress) {
     return { handle: import_jsHandleDispatcher.JSHandleDispatcher.fromJSHandle(this, await progress.race(this._object.evaluateExpressionHandle(params.expression, params.isFunction, (0, import_jsHandleDispatcher.parseArgument)(params.arg)))) };
+  }
+  async updateSubscription(params, progress) {
+    if (params.enabled)
+      this._subscriptions.add(params.event);
+    else
+      this._subscriptions.delete(params.event);
   }
 }
 class BindingCallDispatcher extends import_dispatcher.Dispatcher {

@@ -58,18 +58,18 @@ function httpRequest(params, onResponse, onError) {
     options.rejectUnauthorized = params.rejectUnauthorized;
   const proxyURL = (0, import_utilsBundle.getProxyForUrl)(params.url);
   if (proxyURL) {
-    const parsedProxyURL = import_url.default.parse(proxyURL);
     if (params.url.startsWith("http:")) {
+      const parsedProxyURL = import_url.default.parse(proxyURL);
       options = {
         path: parsedUrl.href,
         host: parsedProxyURL.hostname,
         port: parsedProxyURL.port,
+        protocol: parsedProxyURL.protocol || "http:",
         headers: options.headers,
         method: options.method
       };
     } else {
-      parsedProxyURL.secureProxy = parsedProxyURL.protocol === "https:";
-      options.agent = new import_utilsBundle.HttpsProxyAgent(parsedProxyURL);
+      options.agent = new import_utilsBundle.HttpsProxyAgent(normalizeProxyURL(proxyURL));
       options.rejectUnauthorized = false;
     }
   }
@@ -134,27 +134,33 @@ function shouldBypassProxy(url2, bypass) {
   const domain = "." + url2.hostname;
   return domains.some((d) => domain.endsWith(d));
 }
+function normalizeProxyURL(proxy) {
+  proxy = proxy.trim();
+  if (!/^\w+:\/\//.test(proxy))
+    proxy = "http://" + proxy;
+  return new URL(proxy);
+}
 function createProxyAgent(proxy, forUrl) {
   if (!proxy)
     return;
   if (forUrl && proxy.bypass && shouldBypassProxy(forUrl, proxy.bypass))
     return;
-  let proxyServer = proxy.server.trim();
-  if (!/^\w+:\/\//.test(proxyServer))
-    proxyServer = "http://" + proxyServer;
-  const proxyOpts = import_url.default.parse(proxyServer);
-  if (proxyOpts.protocol?.startsWith("socks")) {
-    return new import_utilsBundle.SocksProxyAgent({
-      host: proxyOpts.hostname,
-      port: proxyOpts.port || void 0
-    });
+  const proxyURL = normalizeProxyURL(proxy.server);
+  if (proxyURL.protocol?.startsWith("socks")) {
+    if (proxyURL.protocol === "socks5:")
+      proxyURL.protocol = "socks5h:";
+    else if (proxyURL.protocol === "socks4:")
+      proxyURL.protocol = "socks4a:";
+    return new import_utilsBundle.SocksProxyAgent(proxyURL);
   }
-  if (proxy.username)
-    proxyOpts.auth = `${proxy.username}:${proxy.password || ""}`;
+  if (proxy.username) {
+    proxyURL.username = proxy.username;
+    proxyURL.password = proxy.password || "";
+  }
   if (forUrl && ["ws:", "wss:"].includes(forUrl.protocol)) {
-    return new import_utilsBundle.HttpsProxyAgent(proxyOpts);
+    return new import_utilsBundle.HttpsProxyAgent(proxyURL);
   }
-  return new import_utilsBundle.HttpsProxyAgent(proxyOpts);
+  return new import_utilsBundle.HttpsProxyAgent(proxyURL);
 }
 function createHttpServer(...args) {
   const server = import_http.default.createServer(...args);

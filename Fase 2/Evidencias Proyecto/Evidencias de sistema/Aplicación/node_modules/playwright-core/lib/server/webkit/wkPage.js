@@ -45,7 +45,6 @@ var import_errors = require("../errors");
 var import_helper = require("../helper");
 var network = __toESM(require("../network"));
 var import_page = require("../page");
-var import_wkAccessibility = require("./wkAccessibility");
 var import_wkConnection = require("./wkConnection");
 var import_wkExecutionContext = require("./wkExecutionContext");
 var import_wkInput = require("./wkInput");
@@ -519,7 +518,7 @@ class WKPage {
         location
       } = this._lastConsoleMessage;
       for (let i = count; i < event.count; ++i)
-        this._page.addConsoleMessage(derivedType, handles, location, handles.length ? void 0 : text);
+        this._page.addConsoleMessage(null, derivedType, handles, location, handles.length ? void 0 : text);
       this._lastConsoleMessage.count = event.count;
     }
   }
@@ -901,9 +900,6 @@ class WKPage {
     if (!result || result.object.subtype === "null")
       throw new Error(dom.kUnableToAdoptErrorMessage);
     return (0, import_wkExecutionContext.createHandle)(to, result.object);
-  }
-  async getAccessibilityTree(needle) {
-    return (0, import_wkAccessibility.getAccessibilityTree)(this._session, needle);
   }
   async inputActionEpilogue() {
   }

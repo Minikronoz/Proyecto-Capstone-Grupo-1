@@ -55,10 +55,21 @@ var import_fileUtils = require("../utils/fileUtils");
 var import_processLauncher = require("../utils/processLauncher");
 const ARTIFACTS_FOLDER = import_path.default.join(import_os.default.tmpdir(), "playwright-artifacts-");
 class Chromium extends import_browserType.BrowserType {
-  constructor(parent) {
+  constructor(parent, bidiChromium) {
     super(parent, "chromium");
+    this._bidiChromium = bidiChromium;
     if ((0, import_utils.debugMode)() === "inspector")
       this._devtools = this._createDevTools();
+  }
+  launch(progress, options, protocolLogger) {
+    if (options.channel?.startsWith("bidi-"))
+      return this._bidiChromium.launch(progress, options, protocolLogger);
+    return super.launch(progress, options, protocolLogger);
+  }
+  async launchPersistentContext(progress, userDataDir, options) {
+    if (options.channel?.startsWith("bidi-"))
+      return this._bidiChromium.launchPersistentContext(progress, userDataDir, options);
+    return super.launchPersistentContext(progress, userDataDir, options);
   }
   async connectOverCDP(progress, endpointURL, options) {
     return await this._connectOverCDPInternal(progress, endpointURL, options);

@@ -103,35 +103,6 @@ import_validatorPrimitives.scheme.SelectorEngine = (0, import_validatorPrimitive
   source: import_validatorPrimitives.tString,
   contentScript: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean)
 });
-import_validatorPrimitives.scheme.AXNode = (0, import_validatorPrimitives.tObject)({
-  role: import_validatorPrimitives.tString,
-  name: import_validatorPrimitives.tString,
-  valueString: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tString),
-  valueNumber: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tFloat),
-  description: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tString),
-  keyshortcuts: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tString),
-  roledescription: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tString),
-  valuetext: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tString),
-  disabled: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean),
-  expanded: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean),
-  focused: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean),
-  modal: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean),
-  multiline: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean),
-  multiselectable: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean),
-  readonly: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean),
-  required: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean),
-  selected: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean),
-  checked: (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tEnum)(["checked", "unchecked", "mixed"])),
-  pressed: (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tEnum)(["pressed", "released", "mixed"])),
-  level: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tInt),
-  valuemin: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tFloat),
-  valuemax: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tFloat),
-  autocomplete: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tString),
-  haspopup: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tString),
-  invalid: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tString),
-  orientation: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tString),
-  children: (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tArray)((0, import_validatorPrimitives.tType)("AXNode")))
-});
 import_validatorPrimitives.scheme.SetNetworkCookie = (0, import_validatorPrimitives.tObject)({
   name: import_validatorPrimitives.tString,
   value: import_validatorPrimitives.tString,
@@ -351,7 +322,8 @@ import_validatorPrimitives.scheme.LocalUtilsConnectResult = (0, import_validator
 });
 import_validatorPrimitives.scheme.LocalUtilsTracingStartedParams = (0, import_validatorPrimitives.tObject)({
   tracesDir: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tString),
-  traceName: import_validatorPrimitives.tString
+  traceName: import_validatorPrimitives.tString,
+  live: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean)
 });
 import_validatorPrimitives.scheme.LocalUtilsTracingStartedResult = (0, import_validatorPrimitives.tObject)({
   stacksId: import_validatorPrimitives.tString
@@ -383,8 +355,6 @@ import_validatorPrimitives.scheme.PlaywrightInitializer = (0, import_validatorPr
   chromium: (0, import_validatorPrimitives.tChannel)(["BrowserType"]),
   firefox: (0, import_validatorPrimitives.tChannel)(["BrowserType"]),
   webkit: (0, import_validatorPrimitives.tChannel)(["BrowserType"]),
-  _bidiChromium: (0, import_validatorPrimitives.tChannel)(["BrowserType"]),
-  _bidiFirefox: (0, import_validatorPrimitives.tChannel)(["BrowserType"]),
   android: (0, import_validatorPrimitives.tChannel)(["Android"]),
   electron: (0, import_validatorPrimitives.tChannel)(["Electron"]),
   utils: (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tChannel)(["LocalUtils"])),
@@ -847,12 +817,14 @@ import_validatorPrimitives.scheme.EventTargetWaitForEventInfoParams = (0, import
 });
 import_validatorPrimitives.scheme.BrowserContextWaitForEventInfoParams = (0, import_validatorPrimitives.tType)("EventTargetWaitForEventInfoParams");
 import_validatorPrimitives.scheme.PageWaitForEventInfoParams = (0, import_validatorPrimitives.tType)("EventTargetWaitForEventInfoParams");
+import_validatorPrimitives.scheme.WorkerWaitForEventInfoParams = (0, import_validatorPrimitives.tType)("EventTargetWaitForEventInfoParams");
 import_validatorPrimitives.scheme.WebSocketWaitForEventInfoParams = (0, import_validatorPrimitives.tType)("EventTargetWaitForEventInfoParams");
 import_validatorPrimitives.scheme.ElectronApplicationWaitForEventInfoParams = (0, import_validatorPrimitives.tType)("EventTargetWaitForEventInfoParams");
 import_validatorPrimitives.scheme.AndroidDeviceWaitForEventInfoParams = (0, import_validatorPrimitives.tType)("EventTargetWaitForEventInfoParams");
 import_validatorPrimitives.scheme.EventTargetWaitForEventInfoResult = (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tObject)({}));
 import_validatorPrimitives.scheme.BrowserContextWaitForEventInfoResult = (0, import_validatorPrimitives.tType)("EventTargetWaitForEventInfoResult");
 import_validatorPrimitives.scheme.PageWaitForEventInfoResult = (0, import_validatorPrimitives.tType)("EventTargetWaitForEventInfoResult");
+import_validatorPrimitives.scheme.WorkerWaitForEventInfoResult = (0, import_validatorPrimitives.tType)("EventTargetWaitForEventInfoResult");
 import_validatorPrimitives.scheme.WebSocketWaitForEventInfoResult = (0, import_validatorPrimitives.tType)("EventTargetWaitForEventInfoResult");
 import_validatorPrimitives.scheme.ElectronApplicationWaitForEventInfoResult = (0, import_validatorPrimitives.tType)("EventTargetWaitForEventInfoResult");
 import_validatorPrimitives.scheme.AndroidDeviceWaitForEventInfoResult = (0, import_validatorPrimitives.tType)("EventTargetWaitForEventInfoResult");
@@ -931,7 +903,8 @@ import_validatorPrimitives.scheme.BrowserContextConsoleEvent = (0, import_valida
     lineNumber: import_validatorPrimitives.tInt,
     columnNumber: import_validatorPrimitives.tInt
   }),
-  page: (0, import_validatorPrimitives.tChannel)(["Page"])
+  page: (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tChannel)(["Page"])),
+  worker: (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tChannel)(["Worker"]))
 });
 import_validatorPrimitives.scheme.BrowserContextCloseEvent = (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tObject)({}));
 import_validatorPrimitives.scheme.BrowserContextDialogEvent = (0, import_validatorPrimitives.tObject)({
@@ -1433,13 +1406,6 @@ import_validatorPrimitives.scheme.PageTouchscreenTapParams = (0, import_validato
   y: import_validatorPrimitives.tFloat
 });
 import_validatorPrimitives.scheme.PageTouchscreenTapResult = (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tObject)({}));
-import_validatorPrimitives.scheme.PageAccessibilitySnapshotParams = (0, import_validatorPrimitives.tObject)({
-  interestingOnly: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean),
-  root: (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tChannel)(["ElementHandle"]))
-});
-import_validatorPrimitives.scheme.PageAccessibilitySnapshotResult = (0, import_validatorPrimitives.tObject)({
-  rootAXNode: (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tType)("AXNode"))
-});
 import_validatorPrimitives.scheme.PagePageErrorsParams = (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tObject)({}));
 import_validatorPrimitives.scheme.PagePageErrorsResult = (0, import_validatorPrimitives.tObject)({
   errors: (0, import_validatorPrimitives.tArray)((0, import_validatorPrimitives.tType)("SerializedError"))
@@ -1473,10 +1439,12 @@ import_validatorPrimitives.scheme.PageRequestsResult = (0, import_validatorPrimi
   requests: (0, import_validatorPrimitives.tArray)((0, import_validatorPrimitives.tChannel)(["Request"]))
 });
 import_validatorPrimitives.scheme.PageSnapshotForAIParams = (0, import_validatorPrimitives.tObject)({
+  track: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tString),
   timeout: import_validatorPrimitives.tFloat
 });
 import_validatorPrimitives.scheme.PageSnapshotForAIResult = (0, import_validatorPrimitives.tObject)({
-  snapshot: import_validatorPrimitives.tString
+  full: import_validatorPrimitives.tString,
+  incremental: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tString)
 });
 import_validatorPrimitives.scheme.PageStartJSCoverageParams = (0, import_validatorPrimitives.tObject)({
   resetOnNavigation: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean),
@@ -1607,7 +1575,8 @@ import_validatorPrimitives.scheme.FrameClickParams = (0, import_validatorPrimiti
   button: (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tEnum)(["left", "right", "middle"])),
   clickCount: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tInt),
   timeout: import_validatorPrimitives.tFloat,
-  trial: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean)
+  trial: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean),
+  steps: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tInt)
 });
 import_validatorPrimitives.scheme.FrameClickResult = (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tObject)({}));
 import_validatorPrimitives.scheme.FrameContentParams = (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tObject)({}));
@@ -1622,7 +1591,8 @@ import_validatorPrimitives.scheme.FrameDragAndDropParams = (0, import_validatorP
   trial: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean),
   sourcePosition: (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tType)("Point")),
   targetPosition: (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tType)("Point")),
-  strict: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean)
+  strict: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean),
+  steps: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tInt)
 });
 import_validatorPrimitives.scheme.FrameDragAndDropResult = (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tObject)({}));
 import_validatorPrimitives.scheme.FrameDblclickParams = (0, import_validatorPrimitives.tObject)({
@@ -1634,7 +1604,8 @@ import_validatorPrimitives.scheme.FrameDblclickParams = (0, import_validatorPrim
   delay: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tFloat),
   button: (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tEnum)(["left", "right", "middle"])),
   timeout: import_validatorPrimitives.tFloat,
-  trial: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean)
+  trial: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean),
+  steps: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tInt)
 });
 import_validatorPrimitives.scheme.FrameDblclickResult = (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tObject)({}));
 import_validatorPrimitives.scheme.FrameDispatchEventParams = (0, import_validatorPrimitives.tObject)({
@@ -1953,6 +1924,11 @@ import_validatorPrimitives.scheme.WorkerEvaluateExpressionHandleParams = (0, imp
 import_validatorPrimitives.scheme.WorkerEvaluateExpressionHandleResult = (0, import_validatorPrimitives.tObject)({
   handle: (0, import_validatorPrimitives.tChannel)(["ElementHandle", "JSHandle"])
 });
+import_validatorPrimitives.scheme.WorkerUpdateSubscriptionParams = (0, import_validatorPrimitives.tObject)({
+  event: (0, import_validatorPrimitives.tEnum)(["console"]),
+  enabled: import_validatorPrimitives.tBoolean
+});
+import_validatorPrimitives.scheme.WorkerUpdateSubscriptionResult = (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tObject)({}));
 import_validatorPrimitives.scheme.JSHandleInitializer = (0, import_validatorPrimitives.tObject)({
   preview: import_validatorPrimitives.tString
 });
@@ -2049,7 +2025,8 @@ import_validatorPrimitives.scheme.ElementHandleClickParams = (0, import_validato
   button: (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tEnum)(["left", "right", "middle"])),
   clickCount: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tInt),
   timeout: import_validatorPrimitives.tFloat,
-  trial: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean)
+  trial: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean),
+  steps: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tInt)
 });
 import_validatorPrimitives.scheme.ElementHandleClickResult = (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tObject)({}));
 import_validatorPrimitives.scheme.ElementHandleContentFrameParams = (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tObject)({}));
@@ -2063,7 +2040,8 @@ import_validatorPrimitives.scheme.ElementHandleDblclickParams = (0, import_valid
   delay: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tFloat),
   button: (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tEnum)(["left", "right", "middle"])),
   timeout: import_validatorPrimitives.tFloat,
-  trial: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean)
+  trial: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tBoolean),
+  steps: (0, import_validatorPrimitives.tOptional)(import_validatorPrimitives.tInt)
 });
 import_validatorPrimitives.scheme.ElementHandleDblclickResult = (0, import_validatorPrimitives.tOptional)((0, import_validatorPrimitives.tObject)({}));
 import_validatorPrimitives.scheme.ElementHandleDispatchEventParams = (0, import_validatorPrimitives.tObject)({

@@ -34,7 +34,6 @@ __export(page_exports, {
   Worker: () => Worker
 });
 module.exports = __toCommonJS(page_exports);
-var accessibility = __toESM(require("./accessibility"));
 var import_browserContext = require("./browserContext");
 var import_console = require("./console");
 var import_errors = require("./errors");
@@ -78,11 +77,9 @@ class Page extends import_instrumentation.SdkObject {
     // Aiming at 25 fps by default - each frame is 40ms, but we give some slack with 35ms.
     // When throttling for tracing, 200ms between frames, except for 10 frames around the action.
     this._frameThrottler = new FrameThrottler(10, 35, 200);
-    this.lastSnapshotFrameIds = [];
     this.attribution.page = this;
     this.delegate = delegate;
     this.browserContext = browserContext;
-    this.accessibility = new accessibility.Accessibility(delegate.getAccessibilityTree.bind(delegate));
     this.keyboard = new input.Keyboard(delegate.rawKeyboard, this);
     this.mouse = new input.Mouse(delegate.rawMouse, this);
     this.touchscreen = new input.Touchscreen(delegate.rawTouchscreen, this);
@@ -253,8 +250,8 @@ class Page extends import_instrumentation.SdkObject {
       return;
     await PageBinding.dispatch(this, payload, context);
   }
-  addConsoleMessage(type, args, location, text) {
-    const message = new import_console.ConsoleMessage(this, type, text, args, location);
+  addConsoleMessage(worker, type, args, location, text) {
+    const message = new import_console.ConsoleMessage(this, worker, type, text, args, location);
     const intercepted = this.frameManager.interceptConsoleMessage(message);
     if (intercepted) {
       args.forEach((arg) => arg.dispose());
@@ -351,6 +348,8 @@ class Page extends import_instrumentation.SdkObject {
     await this._performWaitForNavigationCheck(progress);
   }
   async _performWaitForNavigationCheck(progress) {
+    if (process.env.PLAYWRIGHT_SKIP_NAVIGATION_CHECK)
+      return;
     const mainFrame = this.frameManager.mainFrame();
     if (!mainFrame || !mainFrame.pendingDocument())
       return;
@@ -582,7 +581,8 @@ class Page extends import_instrumentation.SdkObject {
       this.closeReason = options.reason;
     const runBeforeUnload = !!options.runBeforeUnload;
     if (this._closedState !== "closing") {
-      this._closedState = "closing";
+      if (!runBeforeUnload)
+        this._closedState = "closing";
       await this.delegate.closePage(runBeforeUnload).catch((e) => import_debugLogger.debugLogger.log("error", e));
     }
     if (!runBeforeUnload)
@@ -665,21 +665,19 @@ class Page extends import_instrumentation.SdkObject {
     await Promise.all(this.frames().map((frame) => frame.hideHighlight().catch(() => {
     })));
   }
-  async snapshotForAI(progress) {
-    this.lastSnapshotFrameIds = [];
-    const snapshot = await snapshotFrameForAI(progress, this.mainFrame(), 0, this.lastSnapshotFrameIds);
-    return snapshot.join("\n");
+  async snapshotForAI(progress, options) {
+    const snapshot = await snapshotFrameForAI(progress, this.mainFrame(), options);
+    return { full: snapshot.full.join("\n"), incremental: snapshot.incremental?.join("\n") };
   }
 }
 class Worker extends import_instrumentation.SdkObject {
   constructor(parent, url) {
     super(parent, "worker");
+    this._executionContextPromise = new import_manualPromise.ManualPromise();
+    this._workerScriptLoaded = false;
     this.existingExecutionContext = null;
     this.openScope = new import_utils.LongStandingScope();
     this.url = url;
-    this._executionContextCallback = () => {
-    };
-    this._executionContextPromise = new Promise((x) => this._executionContextCallback = x);
   }
   static {
     this.Events = {
@@ -688,8 +686,14 @@ class Worker extends import_instrumentation.SdkObject {
   }
   createExecutionContext(delegate) {
     this.existingExecutionContext = new js.ExecutionContext(this, delegate, "worker");
-    this._executionContextCallback(this.existingExecutionContext);
+    if (this._workerScriptLoaded)
+      this._executionContextPromise.resolve(this.existingExecutionContext);
     return this.existingExecutionContext;
+  }
+  workerScriptLoaded() {
+    this._workerScriptLoaded = true;
+    if (this.existingExecutionContext)
+      this._executionContextPromise.resolve(this.existingExecutionContext);
   }
   didClose() {
     if (this.existingExecutionContext)
@@ -808,17 +812,17 @@ class FrameThrottler {
     }
   }
 }
-async function snapshotFrameForAI(progress, frame, frameOrdinal, frameIds) {
+async function snapshotFrameForAI(progress, frame, options) {
   const snapshot = await frame.retryWithProgressAndTimeouts(progress, [1e3, 2e3, 4e3, 8e3], async (continuePolling) => {
     try {
       const context = await progress.race(frame._utilityContext());
       const injectedScript = await progress.race(context.injectedScript());
-      const snapshotOrRetry = await progress.race(injectedScript.evaluate((injected, refPrefix) => {
+      const snapshotOrRetry = await progress.race(injectedScript.evaluate((injected, options2) => {
         const node = injected.document.body;
         if (!node)
           return true;
-        return injected.ariaSnapshot(node, { mode: "ai", refPrefix });
-      }, frameOrdinal ? "f" + frameOrdinal : ""));
+        return injected.incrementalAriaSnapshot(node, { mode: "ai", ...options2 });
+      }, { refPrefix: frame.seq ? "f" + frame.seq : "", track: options.track }));
       if (snapshotOrRetry === true)
         return continuePolling;
       return snapshotOrRetry;
@@ -828,33 +832,45 @@ async function snapshotFrameForAI(progress, frame, frameOrdinal, frameIds) {
       return continuePolling;
     }
   });
-  const lines = snapshot.split("\n");
-  const result = [];
-  for (const line of lines) {
+  const childSnapshotPromises = snapshot.iframeRefs.map((ref) => snapshotFrameRefForAI(progress, frame, ref, options));
+  const childSnapshots = await Promise.all(childSnapshotPromises);
+  const full = [];
+  let incremental;
+  if (snapshot.incremental !== void 0) {
+    incremental = snapshot.incremental.split("\n");
+    for (let i = 0; i < snapshot.iframeRefs.length; i++) {
+      const childSnapshot = childSnapshots[i];
+      if (childSnapshot.incremental)
+        incremental.push(...childSnapshot.incremental);
+      else if (childSnapshot.full.length)
+        incremental.push("- <changed> iframe [ref=" + snapshot.iframeRefs[i] + "]:", ...childSnapshot.full.map((l) => "  " + l));
+    }
+  }
+  for (const line of snapshot.full.split("\n")) {
     const match = line.match(/^(\s*)- iframe (?:\[active\] )?\[ref=([^\]]*)\]/);
     if (!match) {
-      result.push(line);
+      full.push(line);
       continue;
     }
     const leadingSpace = match[1];
     const ref = match[2];
-    const frameSelector = `aria-ref=${ref} >> internal:control=enter-frame`;
-    const frameBodySelector = `${frameSelector} >> body`;
-    const child = await progress.race(frame.selectors.resolveFrameForSelector(frameBodySelector, { strict: true }));
-    if (!child) {
-      result.push(line);
-      continue;
-    }
-    const frameOrdinal2 = frameIds.length + 1;
-    frameIds.push(child.frame._id);
-    try {
-      const childSnapshot = await snapshotFrameForAI(progress, child.frame, frameOrdinal2, frameIds);
-      result.push(line + ":", ...childSnapshot.map((l) => leadingSpace + "  " + l));
-    } catch {
-      result.push(line);
-    }
+    const childSnapshot = childSnapshots[snapshot.iframeRefs.indexOf(ref)] ?? { full: [] };
+    full.push(childSnapshot.full.length ? line + ":" : line);
+    full.push(...childSnapshot.full.map((l) => leadingSpace + "  " + l));
   }
-  return result;
+  return { full, incremental };
+}
+async function snapshotFrameRefForAI(progress, parentFrame, frameRef, options) {
+  const frameSelector = `aria-ref=${frameRef} >> internal:control=enter-frame`;
+  const frameBodySelector = `${frameSelector} >> body`;
+  const child = await progress.race(parentFrame.selectors.resolveFrameForSelector(frameBodySelector, { strict: true }));
+  if (!child)
+    return { full: [] };
+  try {
+    return await snapshotFrameForAI(progress, child.frame, options);
+  } catch {
+    return { full: [] };
+  }
 }
 function ensureArrayLimit(array, limit) {
   if (array.length > limit)

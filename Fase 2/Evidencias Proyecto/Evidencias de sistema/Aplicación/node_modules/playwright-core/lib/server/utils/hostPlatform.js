@@ -29,7 +29,8 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var hostPlatform_exports = {};
 __export(hostPlatform_exports, {
   hostPlatform: () => hostPlatform,
-  isOfficiallySupportedPlatform: () => isOfficiallySupportedPlatform
+  isOfficiallySupportedPlatform: () => isOfficiallySupportedPlatform,
+  shortPlatform: () => shortPlatform
 });
 module.exports = __toCommonJS(hostPlatform_exports);
 var import_os = __toESM(require("os"));
@@ -97,15 +98,26 @@ function calculatePlatform() {
       if (distroInfo?.version === "")
         return { hostPlatform: "debian13" + archSuffix, isOfficiallySupportedPlatform: isOfficiallySupportedPlatform2 };
     }
-    return { hostPlatform: "ubuntu20.04" + archSuffix, isOfficiallySupportedPlatform: false };
+    return { hostPlatform: "ubuntu24.04" + archSuffix, isOfficiallySupportedPlatform: false };
   }
   if (platform === "win32")
     return { hostPlatform: "win64", isOfficiallySupportedPlatform: true };
   return { hostPlatform: "<unknown>", isOfficiallySupportedPlatform: false };
 }
 const { hostPlatform, isOfficiallySupportedPlatform } = calculatePlatform();
+function toShortPlatform(hostPlatform2) {
+  if (hostPlatform2 === "<unknown>")
+    return "<unknown>";
+  if (hostPlatform2 === "win64")
+    return "win-x64";
+  if (hostPlatform2.startsWith("mac"))
+    return hostPlatform2.endsWith("arm64") ? "mac-arm64" : "mac-x64";
+  return hostPlatform2.endsWith("arm64") ? "linux-arm64" : "linux-x64";
+}
+const shortPlatform = toShortPlatform(hostPlatform);
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   hostPlatform,
-  isOfficiallySupportedPlatform
+  isOfficiallySupportedPlatform,
+  shortPlatform
 });

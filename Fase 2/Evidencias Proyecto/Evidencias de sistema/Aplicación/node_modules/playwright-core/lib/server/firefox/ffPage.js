@@ -37,7 +37,6 @@ var dialog = __toESM(require("../dialog"));
 var dom = __toESM(require("../dom"));
 var import_page = require("../page");
 var import_page2 = require("../page");
-var import_ffAccessibility = require("./ffAccessibility");
 var import_ffConnection = require("./ffConnection");
 var import_ffExecutionContext = require("./ffExecutionContext");
 var import_ffInput = require("./ffInput");
@@ -201,7 +200,7 @@ class FFPage {
     const context = this._contextIdToContext.get(executionContextId);
     if (!context)
       return;
-    this._page.addConsoleMessage(type === "warn" ? "warning" : type, args.map((arg) => (0, import_ffExecutionContext.createHandle)(context, arg)), location);
+    this._page.addConsoleMessage(null, type === "warn" ? "warning" : type, args.map((arg) => (0, import_ffExecutionContext.createHandle)(context, arg)), location);
   }
   _onDialogOpened(params) {
     this._page.browserContext.dialogManager.dialogDidOpen(new dialog.Dialog(
@@ -246,11 +245,12 @@ class FFPage {
     this._page.addWorker(workerId, worker);
     workerSession.once("Runtime.executionContextCreated", (event2) => {
       worker.createExecutionContext(new import_ffExecutionContext.FFExecutionContext(workerSession, event2.executionContextId));
+      worker.workerScriptLoaded();
     });
     workerSession.on("Runtime.console", (event2) => {
       const { type, args, location } = event2;
       const context = worker.existingExecutionContext;
-      this._page.addConsoleMessage(type, args.map((arg) => (0, import_ffExecutionContext.createHandle)(context, arg)), location);
+      this._page.addConsoleMessage(worker, type, args.map((arg) => (0, import_ffExecutionContext.createHandle)(context, arg)), location);
     });
   }
   _onWorkerDestroyed(event) {
@@ -467,9 +467,6 @@ class FFPage {
     if (!result.remoteObject)
       throw new Error(dom.kUnableToAdoptErrorMessage);
     return (0, import_ffExecutionContext.createHandle)(to, result.remoteObject);
-  }
-  async getAccessibilityTree(needle) {
-    return (0, import_ffAccessibility.getAccessibilityTree)(this._session, needle);
   }
   async inputActionEpilogue() {
   }

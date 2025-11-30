@@ -42,6 +42,7 @@ var import_bidiInput = require("./bidiInput");
 var import_bidiNetworkManager = require("./bidiNetworkManager");
 var import_bidiPdf = require("./bidiPdf");
 var bidi = __toESM(require("./third_party/bidiProtocol"));
+var network = __toESM(require("../network"));
 const UTILITY_WORLD_NAME = "__playwright_utility_world__";
 const kPlaywrightBindingChannel = "playwrightChannel";
 class BidiPage {
@@ -75,7 +76,8 @@ class BidiPage {
       import_eventsHelper.eventsHelper.addEventListener(bidiSession, "browsingContext.downloadWillBegin", this._onDownloadWillBegin.bind(this)),
       import_eventsHelper.eventsHelper.addEventListener(bidiSession, "browsingContext.downloadEnd", this._onDownloadEnded.bind(this)),
       import_eventsHelper.eventsHelper.addEventListener(bidiSession, "browsingContext.userPromptOpened", this._onUserPromptOpened.bind(this)),
-      import_eventsHelper.eventsHelper.addEventListener(bidiSession, "log.entryAdded", this._onLogEntryAdded.bind(this))
+      import_eventsHelper.eventsHelper.addEventListener(bidiSession, "log.entryAdded", this._onLogEntryAdded.bind(this)),
+      import_eventsHelper.eventsHelper.addEventListener(bidiSession, "input.fileDialogOpened", this._onFileDialogOpened.bind(this))
     ];
     this._initialize().then(
       () => this._page.reportAsNew(this._opener?._page),
@@ -113,6 +115,7 @@ class BidiPage {
       const delegate2 = new import_bidiExecutionContext.BidiExecutionContext(this._session, realmInfo);
       const worker = new import_page.Worker(this._page, realmInfo.origin);
       this._realmToWorkerContext.set(realmInfo.realm, worker.createExecutionContext(delegate2));
+      worker.workerScriptLoaded();
       this._page.addWorker(realmInfo.realm, worker);
       return;
     }
@@ -260,7 +263,17 @@ ${params.stackTrace?.callFrames.map((f) => {
       return;
     const callFrame = params.stackTrace?.callFrames[0];
     const location = callFrame ?? { url: "", lineNumber: 1, columnNumber: 1 };
-    this._page.addConsoleMessage(entry.method, entry.args.map((arg) => (0, import_bidiExecutionContext.createHandle)(context, arg)), location, params.text || void 0);
+    this._page.addConsoleMessage(null, entry.method, entry.args.map((arg) => (0, import_bidiExecutionContext.createHandle)(context, arg)), location, params.text || void 0);
+  }
+  async _onFileDialogOpened(params) {
+    if (!params.element)
+      return;
+    const frame = this._page.frameManager.frame(params.context);
+    if (!frame)
+      return;
+    const executionContext = await frame._mainContext();
+    const handle = await toBidiExecutionContext(executionContext).remoteObjectForNodeId(executionContext, { sharedId: params.element.sharedId });
+    await this._page._onFileChooserOpened(handle);
   }
   async navigateFrame(frame, url, referrer) {
     const { navigation } = await this._session.send("browsingContext.navigate", {
@@ -270,6 +283,14 @@ ${params.stackTrace?.callFrames.map((f) => {
     return { newDocumentId: navigation || void 0 };
   }
   async updateExtraHTTPHeaders() {
+    const allHeaders = network.mergeHeaders([
+      this._browserContext._options.extraHTTPHeaders,
+      this._page.extraHTTPHeaders()
+    ]);
+    await this._session.send("network.setExtraHeaders", {
+      headers: allHeaders.map(({ name, value }) => ({ name, value: { type: "string", value } })),
+      contexts: [this._session.sessionId]
+    });
   }
   async updateEmulateMedia() {
   }
@@ -379,6 +400,8 @@ ${params.stackTrace?.callFrames.map((f) => {
     }
   }
   async setBackgroundColor(color) {
+    if (color)
+      throw new Error("Not implemented");
   }
   async takeScreenshot(progress, format, documentRect, viewportRect, quality, fitsViewport, scale) {
     const rect = documentRect || viewportRect;
@@ -502,9 +525,6 @@ ${params.stackTrace?.callFrames.map((f) => {
     const nodeId = await fromContext.nodeIdForElementHandle(handle);
     const executionContext = toBidiExecutionContext(to);
     return await executionContext.remoteObjectForNodeId(to, nodeId);
-  }
-  async getAccessibilityTree(needle) {
-    throw new Error("Method not implemented.");
   }
   async inputActionEpilogue() {
   }

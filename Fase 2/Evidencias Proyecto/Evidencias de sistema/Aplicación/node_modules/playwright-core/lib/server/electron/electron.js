@@ -97,7 +97,7 @@ class ElectronApplication extends import_instrumentation.SdkObject {
     if (!this._nodeExecutionContext)
       return;
     const args = event.args.map((arg) => (0, import_crExecutionContext.createHandle)(this._nodeExecutionContext, arg));
-    const message = new import_console.ConsoleMessage(null, event.type, void 0, args, (0, import_crProtocolHelper.toConsoleMessageLocation)(event.stackTrace));
+    const message = new import_console.ConsoleMessage(null, null, event.type, void 0, args, (0, import_crProtocolHelper.toConsoleMessageLocation)(event.stackTrace));
     this.emit(ElectronApplication.Events.Console, message);
   }
   async initialize() {

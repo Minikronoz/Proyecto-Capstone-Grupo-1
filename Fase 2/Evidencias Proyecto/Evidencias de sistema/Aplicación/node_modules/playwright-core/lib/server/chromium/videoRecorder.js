@@ -30,9 +30,9 @@ class VideoRecorder {
     this._process = null;
     this._gracefullyClose = null;
     this._lastWritePromise = Promise.resolve();
-    this._lastFrameTimestamp = 0;
-    this._lastFrameBuffer = null;
-    this._lastWriteTimestamp = 0;
+    this._firstFrameTimestamp = 0;
+    this._lastFrame = null;
+    this._lastWriteNodeTime = 0;
     this._frameQueue = [];
     this._isStopped = false;
     this._ffmpegPath = ffmpegPath;
@@ -77,16 +77,17 @@ class VideoRecorder {
     (0, import_utils.assert)(this._process);
     if (this._isStopped)
       return;
-    if (this._lastFrameBuffer) {
-      const durationSec = timestamp - this._lastFrameTimestamp;
-      const repeatCount = Math.max(1, Math.round(fps * durationSec));
+    if (!this._firstFrameTimestamp)
+      this._firstFrameTimestamp = timestamp;
+    const frameNumber = Math.floor((timestamp - this._firstFrameTimestamp) * fps);
+    if (this._lastFrame) {
+      const repeatCount = frameNumber - this._lastFrame.frameNumber;
       for (let i = 0; i < repeatCount; ++i)
-        this._frameQueue.push(this._lastFrameBuffer);
+        this._frameQueue.push(this._lastFrame.buffer);
       this._lastWritePromise = this._lastWritePromise.then(() => this._sendFrames());
     }
-    this._lastFrameBuffer = frame;
-    this._lastFrameTimestamp = timestamp;
-    this._lastWriteTimestamp = (0, import_utils.monotonicTime)();
+    this._lastFrame = { buffer: frame, timestamp, frameNumber };
+    this._lastWriteNodeTime = (0, import_utils.monotonicTime)();
   }
   async _sendFrames() {
     while (this._frameQueue.length)
@@ -99,9 +100,10 @@ class VideoRecorder {
     });
   }
   async stop() {
-    if (this._isStopped)
+    if (this._isStopped || !this._lastFrame)
       return;
-    this.writeFrame(Buffer.from([]), this._lastFrameTimestamp + ((0, import_utils.monotonicTime)() - this._lastWriteTimestamp) / 1e3);
+    const addTime = Math.max(((0, import_utils.monotonicTime)() - this._lastWriteNodeTime) / 1e3, 1);
+    this.writeFrame(Buffer.from([]), this._lastFrame.timestamp + addTime);
     this._isStopped = true;
     await this._lastWritePromise;
     await this._gracefullyClose();

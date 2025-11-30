@@ -38,7 +38,6 @@ var import_ascii = require("../utils/ascii");
 var import_browserType = require("../browserType");
 var import_wkBrowser = require("../webkit/wkBrowser");
 var import_spawnAsync = require("../utils/spawnAsync");
-var import_registry = require("../registry");
 class WebKit extends import_browserType.BrowserType {
   constructor(parent) {
     super(parent, "webkit");
@@ -49,8 +48,7 @@ class WebKit extends import_browserType.BrowserType {
   amendEnvironment(env, userDataDir, isPersistent, options) {
     return {
       ...env,
-      CURL_COOKIE_JAR_PATH: process.platform === "win32" && isPersistent ? import_path.default.join(userDataDir, "cookiejar.db") : void 0,
-      WEBKIT_EXECUTABLE: options.channel === "webkit-wsl" ? import_registry.registry.findExecutable("webkit-wsl").wslExecutablePath : void 0
+      CURL_COOKIE_JAR_PATH: process.platform === "win32" && isPersistent ? import_path.default.join(userDataDir, "cookiejar.db") : void 0
     };
   }
   doRewriteStartupLog(error) {
@@ -71,13 +69,6 @@ class WebKit extends import_browserType.BrowserType {
     if (args.find((arg) => !arg.startsWith("-")))
       throw new Error("Arguments can not specify page to be opened");
     const webkitArguments = ["--inspector-pipe"];
-    if (options.channel === "webkit-wsl") {
-      if (options.executablePath)
-        throw new Error('Cannot specify executablePath when using the "webkit-wsl" channel.');
-      webkitArguments.unshift(
-        import_path.default.join(__dirname, "wsl/webkit-wsl-transport-server.js")
-      );
-    }
     if (process.platform === "win32" && options.channel !== "webkit-wsl")
       webkitArguments.push("--disable-accelerated-compositing");
     if (headless)

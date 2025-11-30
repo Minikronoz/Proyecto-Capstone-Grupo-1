@@ -65,8 +65,12 @@ class FrameManager {
     this._consoleMessageTags = /* @__PURE__ */ new Map();
     this._signalBarriers = /* @__PURE__ */ new Set();
     this._webSockets = /* @__PURE__ */ new Map();
+    this._nextFrameSeq = 0;
     this._page = page;
     this._mainFrame = void 0;
+  }
+  nextFrameSeq() {
+    return this._nextFrameSeq++;
   }
   createDummyMainFrameIfNeeded() {
     if (!this._mainFrame)
@@ -361,6 +365,7 @@ class Frame extends import_instrumentation.SdkObject {
     this._raceAgainstEvaluationStallingEventsPromises = /* @__PURE__ */ new Set();
     this._redirectedNavigations = /* @__PURE__ */ new Map();
     this.attribution.frame = this;
+    this.seq = page.frameManager.nextFrameSeq();
     this._id = id;
     this._page = page;
     this._parentFrame = parentFrame;
@@ -969,7 +974,7 @@ class Frame extends import_instrumentation.SdkObject {
     }));
     dom.assertDone(await this._retryWithProgressIfNotConnected(progress, target, options.strict, false, async (handle) => {
       return handle._retryPointerAction(progress, "move and up", false, async (point) => {
-        await this._page.mouse.move(progress, point.x, point.y);
+        await this._page.mouse.move(progress, point.x, point.y, { steps: options.steps });
         await this._page.mouse.up(progress);
       }, {
         ...options,
@@ -1200,10 +1205,12 @@ class Frame extends import_instrumentation.SdkObject {
     if (log)
       progress.log(log);
     if (matches === options.isNot) {
-      if (missingReceived)
+      if (missingReceived) {
         lastIntermediateResult.errorMessage = "Error: element(s) not found";
-      else
+      } else {
+        lastIntermediateResult.errorMessage = void 0;
         lastIntermediateResult.received = received;
+      }
       lastIntermediateResult.isSet = true;
       if (!missingReceived && !Array.isArray(received))
         progress.log(`  unexpected value "${renderUnexpectedValue(options.expression, received)}"`);

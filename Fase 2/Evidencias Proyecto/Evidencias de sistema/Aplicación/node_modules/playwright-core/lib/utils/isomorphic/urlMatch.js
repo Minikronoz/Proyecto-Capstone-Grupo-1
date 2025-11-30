@@ -38,15 +38,26 @@ function globToRegexPattern(glob) {
       continue;
     }
     if (c === "*") {
+      const charBefore = glob[i - 1];
       let starCount = 1;
       while (glob[i + 1] === "*") {
         starCount++;
         i++;
       }
-      if (starCount > 1)
-        tokens.push("(.*)");
-      else
+      if (starCount > 1) {
+        const charAfter = glob[i + 1];
+        if (charAfter === "/") {
+          if (charBefore === "/")
+            tokens.push("((.+/)|)");
+          else
+            tokens.push("(.*/)");
+          ++i;
+        } else {
+          tokens.push("(.*)");
+        }
+      } else {
         tokens.push("([^/]*)");
+      }
       continue;
     }
     switch (c) {
@@ -123,8 +134,11 @@ function resolveGlobBase(baseURL, match) {
     const relativePath = match.split("/").map((token, index) => {
       if (token === "." || token === ".." || token === "")
         return token;
-      if (index === 0 && token.endsWith(":"))
-        return mapToken2(token, "http:");
+      if (index === 0 && token.endsWith(":")) {
+        if (token.indexOf("*") !== -1 || token.indexOf("{") !== -1)
+          return mapToken2(token, "http:");
+        return token;
+      }
       const questionIndex = token.indexOf("?");
       if (questionIndex === -1)
         return mapToken2(token, `$_${index}_$`);
