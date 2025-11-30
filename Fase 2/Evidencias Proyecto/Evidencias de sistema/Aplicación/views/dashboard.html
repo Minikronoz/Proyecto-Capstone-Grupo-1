@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const rol = data.user.role;
 
     if (rol !== "admin" && rol !== "cliente") {
-      alert("🚫 No tienes permiso para acceder a esta página.");
+      alert("No tienes permiso para acceder a esta página.");
       return window.location.href = "/catalogo";
     }
 
@@ -50,7 +50,7 @@ Chart.register(ChartDataLabels);
     <div class="filtros">
       <button class="btn-volver" onclick="volverAtras()">⬅️ Atrás</button>
 
-      <!-- ✅ AGREGADO: Santa Isabel -->
+      <!-- AGREGADO: Santa Isabel -->
       <label for="filtroSuper">Supermercado:</label>
       <select id="filtroSuper">
         <option value="">Todos</option>
@@ -61,7 +61,7 @@ Chart.register(ChartDataLabels);
         <option value="santaisabel">Santa Isabel</option>
       </select>
 
-      <!-- ✅ ESTOS FILTROS SOLO PARA GRÁFICOS (no para tablas de precios) -->
+      <!--  ESTOS FILTROS SOLO PARA GRÁFICOS (no para tablas de precios) -->
       <label for="filtroGenero">Género:</label>
       <select id="filtroGenero">
         <option value="">Todos</option>
@@ -91,7 +91,7 @@ Chart.register(ChartDataLabels);
         <option value="Magallanes">Magallanes</option>
       </select>
 
-      <!-- ❌ PERIODO: No aplica para tablas de 7 días -->
+      <!--  PERIODO: No aplica para tablas de 7 días -->
       <label for="filtroPeriodo">Periodo (gráficos):</label>
       <select id="filtroPeriodo">
         <option value="">Personalizado</option>
@@ -100,7 +100,7 @@ Chart.register(ChartDataLabels);
         <option value="90">Últimos 90 días</option>
       </select>
 
-      <!-- ✅ FECHAS: Aplican a bajas/subidas -->
+      <!--  FECHAS: Aplican a bajas/subidas -->
       <label for="filtroFecha">Desde:</label>
       <input type="date" id="filtroFecha">
       <label for="filtroHasta">Hasta:</label>
@@ -112,14 +112,14 @@ Chart.register(ChartDataLabels);
 </header>
 
 <aside class="panel-lateral">
-  <h2>🌎 Distribución de usuarios por región</h2>
+  <h2>Distribución de usuarios por región</h2>
   <div id="mapaChile" class="mapa-chile"></div>
 </aside>
 
 <main>
   <!-- BAJAS DE PRECIO -->
   <div class="tabla-card">
-    <h3 class="subtitulo-chart">📉 Productos con Baja de Precio (últimos 7 días)</h3>
+    <h3 class="subtitulo-chart">Productos con Baja de Precio (últimos 7 días)</h3>
     <div class="tabla-scroll">
       <table id="tablaBajas" class="tabla-precios tabla-centered">
         <thead>
@@ -170,40 +170,40 @@ Chart.register(ChartDataLabels);
   </section>
 
   <section>
-    <h2>🆕 Ranking de supermercados por variedad de productos nuevos</h2>
+    <h2>Ranking de supermercados por variedad de productos nuevos</h2>
     <div class="chart-container">
       <canvas id="rankingProductosNuevos"></canvas>
     </div>
   </section>
 
   <section>
-    <h2>🔥 Productos más consultados</h2>
+    <h2>Productos más consultados</h2>
     <div class="chart-container"><canvas id="topProductos"></canvas></div>
   </section>
 
   <section>
-    <h2>🛒 Búsquedas por supermercado</h2>
+    <h2>Búsquedas por supermercado</h2>
     <div class="chart-container"><canvas id="porSupermercado"></canvas></div>
   </section>
 
   <section>
-    <h2>📅 Evolución diaria de consultas</h2>
+    <h2>Evolución diaria de consultas</h2>
     <div class="chart-container"><canvas id="porDia"></canvas></div>
   </section>
 
   <section>
-    <h2>📊 Evolución semanal de consultas</h2>
+    <h2>Evolución semanal de consultas</h2>
     <div class="chart-container">
       <canvas id="chartTendencia"></canvas>
     </div>
   </section>
 
   <section>
-    <h2>👥 Usuarios por género</h2>
+    <h2>Usuarios por género</h2>
     <div class="chart-container"><canvas id="porGenero"></canvas></div>
   </section>
-<section class="card-analitica">
-  <h2>👥 Productos por Segmentos Demográficos</h2>
+<section class="card-analitica full-width">
+  <h2>Productos por Segmentos Demográficos</h2>
 
   <div class="segmentacion-layout">
     <div class="chart-box">
@@ -231,8 +231,8 @@ Chart.register(ChartDataLabels);
 </section>
 
 
-  <section>
-    <h2>🕒 Productos más consultados por día/mes/año</h2>
+  <section class="full-width">
+    <h2>Productos más consultados por día/mes/año</h2>
     <div class="chart-container"><canvas id="porTiempo"></canvas></div>
   </section>
 </main>
@@ -687,7 +687,7 @@ async function renderTopProductos(filtros = {}) {
   });
 }
 
-// ...existing code...
+
 
 async function renderProductosPorTiempo(filtros = {}) {
   const id = "porTiempo";

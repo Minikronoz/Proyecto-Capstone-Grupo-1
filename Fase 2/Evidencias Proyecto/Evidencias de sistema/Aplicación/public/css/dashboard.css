@@ -115,71 +115,104 @@ h1 {
 
 /* ===== MAIN ===== */
 main {
-  padding-right: 360px; /* deja espacio suficiente para el panel */
+  padding: 20px 40px;
+  padding-right: 380px; /* espacio para panel lateral */
   box-sizing: border-box;
 }
-/* Título centrado con línea elegante */
-section h2 {
-  text-align: center;
-  font-weight: 600;
-  color: #0f172a;
-  font-size: 20px;
-  position: relative;
-  margin-bottom: 20px;
-}
-section h2::after {
-  content: "";
-  display: block;
-  width: 180px;
-  height: 3px;
-  background: #00a7b5;
-  margin: 6px auto 0 auto;
-  border-radius: 10px;
+
+/* ✅ GRID DE SECCIONES: 2 COLUMNAS */
+main {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columnas iguales */
+  gap: 30px; /* espacio entre gráficos */
+  padding: 20px 40px;
+  padding-right: 380px;
 }
 
+/* ✅ Las tablas de bajas/subidas ocupan el ancho completo (2 columnas) */
+.tabla-card {
+  grid-column: span 2; /* ocupa las 2 columnas */
+  max-width: 100%;
+  margin: 0;
+}
+
+/* ✅ Cada section (gráfico) ocupa 1 columna */
 section {
+  grid-column: span 1; /* 1 columna por defecto */
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-bottom: 60px;
+  align-items: stretch;
+  margin-bottom: 0; /* ya no necesitamos margin porque usamos gap */
 }
 
-h2 {
-  color: var(--color-titulos);
-  border-bottom: 3px solid var(--color-calipso);
-  padding-bottom: 6px;
-  margin-bottom: 24px;
-  font-size: 21px;
-  font-weight: 600;
-  letter-spacing: 0.4px;
+/* ✅ Si quieres que un gráfico específico ocupe todo el ancho */
+section.full-width {
+  grid-column: span 2; /* ocupa las 2 columnas */
 }
+
+/* ✅ Contenedor de gráficos con altura fija */
+.chart-container {
+  background: var(--color-blanco);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: var(--sombra);
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
 .chart-container:hover {
-  transform: scale(1.02);
+  transform: scale(1.01);
   box-shadow: 0 6px 14px rgba(0,0,0,0.08);
 }
-#chartRegiones {
-  width: 100%;
-  height: 380px;
-}
 
-.chart-panel {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-  transition: transform 0.2s ease-in-out;
-}
-
-.chart-panel:hover {
-  transform: scale(1.01);
-}
-/* ✔️ CANVAS FIJO PARA EVITAR SALTOS */
+/* ✅ Canvas con altura fija para evitar saltos */
 canvas {
   width: 100% !important;
-  height: 320px !important;   /* altura fija */
-  max-height: 380px !important;
+  height: 280px !important;
+  max-height: 320px !important;
 }
 
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1400px) {
+  main {
+    grid-template-columns: 1fr; /* 1 columna en pantallas medianas */
+    padding-right: 40px;
+  }
+  
+  .tabla-card {
+    grid-column: span 1;
+  }
+  
+  section {
+    grid-column: span 1;
+  }
+  
+  .panel-lateral {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: 100%;
+    margin-top: 25px;
+  }
+}
+
+@media (max-width: 768px) {
+  main {
+    padding: 15px 20px;
+  }
+  
+  canvas {
+    height: 240px !important;
+  }
+  
+  .chart-container {
+    min-height: 260px;
+    padding: 15px;
+  }
+}
 
 /* ===== FOOTER ===== */
 footer {
@@ -968,4 +1001,149 @@ footer {
 .tabla-segmentacion tbody tr:hover {
   background: #f8fafc;
   transition: 0.15s;
+}
+
+/* ===== CARD DE SEGMENTACIÓN ===== */
+.card-analitica {
+  background: var(--color-blanco);
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: var(--sombra);
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.card-analitica h2 {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primario);
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 3px solid var(--color-secundario);
+}
+
+/* ✅ LAYOUT DE GRÁFICOS: 2 COLUMNAS CON MÁS ESPACIO */
+.segmentacion-layout {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columnas iguales */
+  gap: 40px; /* más espacio entre gráficos */
+  margin-bottom: 40px;
+  min-height: 400px; /* altura mínima para gráficos */
+}
+
+/* ✅ CADA CAJA DE GRÁFICO */
+.chart-box {
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 350px; /* altura fija para evitar saltos */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chart-box:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ✅ CANVAS CON ALTURA FIJA */
+.chart-box canvas {
+  width: 100% !important;
+  height: 320px !important;
+  max-height: 350px !important;
+}
+
+/* ===== TABLA DE SEGMENTACIÓN ===== */
+.tabla-card-segmentacion {
+  background: var(--color-blanco);
+  border-radius: 14px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+}
+
+.tabla-segmentacion {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.tabla-segmentacion thead {
+  background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-secundario) 100%);
+  color: white;
+}
+
+.tabla-segmentacion th {
+  padding: 14px 16px;
+  text-align: center;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+.tabla-segmentacion td {
+  padding: 12px 16px;
+  text-align: center;
+  border-bottom: 1px solid #e2e8f0;
+  color: var(--color-texto);
+}
+
+.tabla-segmentacion tbody tr:hover {
+  background-color: #f1f5f9;
+  transition: background-color 0.2s ease;
+}
+
+.tabla-segmentacion tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ===== RESPONSIVE PARA SEGMENTACIÓN ===== */
+@media (max-width: 1200px) {
+  .segmentacion-layout {
+    grid-template-columns: 1fr; /* 1 columna en tablets */
+    gap: 30px;
+  }
+  
+  .chart-box {
+    min-height: 300px;
+  }
+  
+  .chart-box canvas {
+    height: 280px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .card-analitica {
+    padding: 20px;
+  }
+  
+  .card-analitica h2 {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+  }
+  
+  .chart-box {
+    padding: 15px;
+    min-height: 250px;
+  }
+  
+  .chart-box canvas {
+    height: 240px !important;
+  }
+  
+  .tabla-segmentacion {
+    font-size: 0.85rem;
+  }
+  
+  .tabla-segmentacion th,
+  .tabla-segmentacion td {
+    padding: 10px 12px;
+  }
 }
