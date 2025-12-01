@@ -244,7 +244,7 @@ Chart.register(ChartDataLabels);
 //  VARIABLES GLOBALES
 // =============================================================
 let charts = {};
-let filtros = {};
+let filtros = {}; // ✅ Variable global para filtros
 
 // Variables para scroll infinito
 let paginaBajas = 1;
@@ -253,6 +253,9 @@ let cargandoBajas = false;
 let cargandoSubidas = false;
 let hayMasBajas = true;
 let hayMasSubidas = true;
+
+// ✅ NUEVA VARIABLE: Guardar filtros de precios para scroll infinito
+let filtrosPrecios = {};
 
 // =============================================================
 //  UTILIDADES
@@ -287,7 +290,7 @@ function registrarClick(producto) {
 }
 
 // =============================================================
-//  SCROLL INFINITO: BAJAS DE PRECIO
+//  SCROLL INFINITO: BAJAS DE PRECIO (CORREGIDO)
 // =============================================================
 async function cargarBajas(filtros = {}, append = false) {
   if (cargandoBajas || !hayMasBajas) return;
@@ -303,6 +306,9 @@ async function cargarBajas(filtros = {}, append = false) {
     `;
     paginaBajas = 1;
     hayMasBajas = true;
+    
+    // ✅ GUARDAR FILTROS PARA SCROLL INFINITO
+    filtrosPrecios = { ...filtros };
   } else {
     const loaderRow = document.createElement('tr');
     loaderRow.className = 'loader-row';
@@ -315,11 +321,14 @@ async function cargarBajas(filtros = {}, append = false) {
   }
 
   try {
+    // ✅ USAR SIEMPRE filtrosPrecios (que ya tiene supermercado, desde, hasta)
     const params = new URLSearchParams({
-      ...filtros,
+      ...filtrosPrecios, // ✅ Mantener filtros anteriores
       page: paginaBajas,
       limit: 20
     });
+    
+    console.log(`🔍 Cargando bajas - Página ${paginaBajas} con filtros:`, Object.fromEntries(params));
     
     const res = await fetch(`/api/estadisticas/bajas?${params}`);
     const data = await res.json();
@@ -374,7 +383,7 @@ async function cargarBajas(filtros = {}, append = false) {
     paginaBajas++;
 
   } catch (error) {
-    console.error("Error cargando bajas:", error);
+    console.error("❌ Error cargando bajas:", error);
     if (!append) {
       tbody.innerHTML = `
         <tr><td colspan="6" style="text-align:center; padding:20px; color:#ef4444;">
@@ -388,7 +397,7 @@ async function cargarBajas(filtros = {}, append = false) {
 }
 
 // =============================================================
-//  SCROLL INFINITO: SUBIDAS DE PRECIO
+//  SCROLL INFINITO: SUBIDAS DE PRECIO (CORREGIDO)
 // =============================================================
 async function cargarSubidas(filtros = {}, append = false) {
   if (cargandoSubidas || !hayMasSubidas) return;
@@ -404,6 +413,9 @@ async function cargarSubidas(filtros = {}, append = false) {
     `;
     paginaSubidas = 1;
     hayMasSubidas = true;
+    
+    // ✅ GUARDAR FILTROS PARA SCROLL INFINITO
+    filtrosPrecios = { ...filtros };
   } else {
     const loaderRow = document.createElement('tr');
     loaderRow.className = 'loader-row';
@@ -416,11 +428,14 @@ async function cargarSubidas(filtros = {}, append = false) {
   }
 
   try {
+    // ✅ USAR SIEMPRE filtrosPrecios
     const params = new URLSearchParams({
-      ...filtros,
+      ...filtrosPrecios, // ✅ Mantener filtros anteriores
       page: paginaSubidas,
       limit: 20
     });
+    
+    console.log(`🔍 Cargando subidas - Página ${paginaSubidas} con filtros:`, Object.fromEntries(params));
     
     const res = await fetch(`/api/estadisticas/subidas?${params}`);
     const data = await res.json();
@@ -465,7 +480,7 @@ async function cargarSubidas(filtros = {}, append = false) {
     paginaSubidas++;
 
   } catch (error) {
-    console.error("Error cargando subidas:", error);
+    console.error("❌ Error cargando subidas:", error);
     if (!append) {
       tbody.innerHTML = `
         <tr><td colspan="6" style="text-align:center; padding:20px; color:#ef4444;">
@@ -479,7 +494,7 @@ async function cargarSubidas(filtros = {}, append = false) {
 }
 
 // =============================================================
-//  DETECTAR SCROLL INFINITO
+//  DETECTAR SCROLL INFINITO (SIN CAMBIOS)
 // =============================================================
 function setupInfiniteScroll() {
   const tablaBajas = document.querySelector('#tablaBajas').closest('.tabla-scroll');
@@ -491,7 +506,7 @@ function setupInfiniteScroll() {
       
       if (scrollTop + clientHeight >= scrollHeight - 50 && hayMasBajas && !cargandoBajas) {
         console.log("🔄 Cargando más bajas...");
-        cargarBajas(filtros, true);
+        cargarBajas({}, true); // ✅ El segundo parámetro indica append=true
       }
     });
   }
@@ -502,7 +517,7 @@ function setupInfiniteScroll() {
       
       if (scrollTop + clientHeight >= scrollHeight - 50 && hayMasSubidas && !cargandoSubidas) {
         console.log("🔄 Cargando más subidas...");
-        cargarSubidas(filtros, true);
+        cargarSubidas({}, true); // ✅ El segundo parámetro indica append=true
       }
     });
   }
@@ -776,7 +791,7 @@ async function renderProductosPorTiempo(filtros = {}) {
         }
       }
     }
-  }); 
+  });
 }
 
 
@@ -1127,7 +1142,6 @@ async function initDashboard() {
   // ✅ ACTIVAR SCROLL INFINITO
   setupInfiniteScroll();
 }
-// ...existing code...
 
 // =============================================================
 //  FILTROS (CORREGIDO)
