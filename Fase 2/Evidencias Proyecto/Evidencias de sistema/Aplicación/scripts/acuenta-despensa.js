@@ -42,8 +42,7 @@ const MARCAS_CONOCIDAS = [
 
   //  Procesados de huerta (ensalada lista, mixes)
   "Ready Pac","Florette","VitaFresh","Mr. Veggie","Agrosuper Vegetales",
-  "Fresh Garden","Salad Box","Natur Fresh","La Huerta Mix",
-
+  "Fresh Garden","Salad Box","Natur Fresh","La Huerta Mix","La Romana","Hellmann'S","Natural",
   //  Importados especiales
   "Tropical Fields","King Coconut","Exótica Fresh","Amazonia Fruit","Premium Tropic",
 
@@ -102,11 +101,11 @@ const MARCAS_CONOCIDAS = [
   "Kellogg's","Zucaritas","Corn Flakes","All-Bran","Froot Loops","Choco Krispis",
   "Nestlé Cereales","Chocapic","Nesquik Cereales","Trix","Fitness","Milo Cereales",
   "Quaker Cereales","Granola Alpen","Nature Valley Cereales","Honey Bunches of Oats",
-  "Post Cereals","Granola Mornflake","Kashi",
+  "Post Cereals","Granola Mornflake","Kashi","golondrina","buka",
 
   //  Barras de cereal (siempre clasificadas en cereales)
   "Nature Valley","Quaker Bar","Kellogg's Bar","Nestlé Cereal Bar","Fitness Bar",
-  "Granuts Bar","Milo Bar",
+  "Granuts Bar","Milo Bar","lucchetti","pirulin","Fermipan","Delia","van camps",
 
   //  Pastas, salsas, fideos
   "Carozzi","Lucchetti","Tres Montes Lucchetti","Malloa","Don Vittorio",
@@ -123,14 +122,14 @@ const MARCAS_CONOCIDAS = [
   //  Aceite, vinagre y aderezos de cocina
   "Cisne Aceite","Chef","Miraflores Aceite","Maravilla","Cocinero",
   "La Española","Capri","Carbonell","Coloso","Sasso","Costa Blanca",
-  "Clemente Jacques Aderezos","Karavansay","Maille","Hellmann’s",
+  "Clemente Jacques Aderezos","Karavansay","Maille","Hellmann's","Hellmanns","lucchetti","Vivo",
   "Doritos","Panela Fonce","Oso",
   //  Conservas: tomate, salsa, choclo, arvejas, etc.
   "Wasil","Dos Caballos Conservas","Malloa Conservas","Tres Montes Conservas",
   "La Huerta","Acuenta Conservas","Cuisine & Co Conservas","Arcor Conservas",
   "Productos de la Huerta","Riviana Tomate","Don Juan Conservas","Rikesa","Mavesa",
   "Marco Polo","Caserita Conservas","Iansa","Ambrosoli","Esmeralda","Aconcagua",
-  "Underwood","Evercrisp","Barcel","Sembrasol","Delicia","La Comadre","",
+  "Underwood","Evercrisp","Barcel","Sembrasol","Delicia","La Comadre",
 
   //  Conservas de pescado (solo abarrotes)
   "San José","Aceituno","Robinson Crusoe","Van Camp’s","Jurel Azul",
@@ -197,8 +196,7 @@ const MARCAS_CONOCIDAS = [
   //  Pisco chileno (licor nacional)
   "Mistral","Control C","Alto del Carmen","Horcón Quemado","Campanario",
   "Tres Erres","Mal Paso","Waqar","Coloso","Legado","Kappa","Coliseo",
-  "Pontevedra","El Gobernador","Capel","Talliani","Trattoria","Lays","Tostitos",
-  "",
+  "Pontevedra","El Gobernador","Capel","Talliani","Trattoria","Lays","Tostitos","Choritos",
 
   //  Cervezas nacionales
   "Cristal","Escudo","Royal Guard","Kunstmann","Austral",
@@ -240,7 +238,7 @@ const MARCAS_CONOCIDAS = [
 
   //  Afeitado y depilación
   "Gillette","Prestobarba","Mach3","Venus","Schick","Bic","Depil Bella",
-  "Veet","Nair","Gillette SkinGuard","Wilkinson Sword",
+  "Veet","Nair","Gillette SkinGuard","Wilkinson Sword",'Hellmann’s',
 
   //  Jabón de tocador / barra de baño
   "Dove Soap","Palmolive Soap","Protex Soap","Nivea Soap","Le Sancy Soap",
@@ -278,7 +276,7 @@ const MARCAS_CONOCIDAS = [
 
   //  Desinfectantes y cloro
   "Clorox","Ariel Cloro","Cloralex","Poett Desinfectante","Lysol Desinfectante",
-  "Virutex Cloro","Sapolio Cloro","Ayudín",
+  "Virutex Cloro","Sapolio Cloro","Ayudín","JB","pan","Maizena","Golondrina","Buka","Talliani","Van Camp's",
 
   //  Baño: limpiadores y pastillas
   "Harpic","Mr. Músculo Baño","Pato Purific","Poett Baño","Cif Baño",
@@ -335,7 +333,7 @@ const MARCAS_CONOCIDAS = [
   "Petmax","Animal Planet Pets","ZooActive","PetLovers","Mascota Club",
   "Puppy Love Accesorios","Pet Friend","PetComfort","PetLine",
   "Petlife","Mundo Mascota","Doggies Accessory","Gatitown Accesorios",
-  "Traverso",
+  "Traverso","Heinz","Molino el Peral","Kazai","Diaguita","Edra",
 
   //  Organización y almacenamiento
   "Rubbermaid","Sterilite","Plastiluz","Duraplast","Plasutil",
