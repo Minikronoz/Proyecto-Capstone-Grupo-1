@@ -7,24 +7,76 @@ import { getDB } from "../config/db.js";
 const router = express.Router();
 
 // -------------------------------------------------------------
-//  Palabras clave principales (ampliadas)
+//  Palabras clave principales (AMPLIADAS, PROFESIONALES)
 // -------------------------------------------------------------
 const CATEGORIAS = {
-  "Despensa": [
-    "azucar","harina","pasta","fideos","arroz","aceite","sal","pan","porotos","lentejas","arvejas",
-    "sopa","galletas","cereal","mayonesa","mermelada","atun","conserva","manteca"
+  "Despensa y Abarrotes": [
+    "azucar","harina","pasta","fideos","arroz","aceite","sal","pan","porotos","lentejas","garbanzos",
+    "arvejas","sopa","galletas","cereal","mayonesa","ketchup","mostaza","mermelada",
+    "atun","conserva","manteca","pure","salsa","tomate","sazonador","caldo","avena",
+    "manjar","miel","cocoa","salsas","condimento","fideo","tallarin","espagueti",
+    "levadura","polvo hornear","cuscus","quinoa","arroz jazmin","arroz basmati",
+    "snack","papas fritas","ramitas","mani","mix frutos","frutos secos","pasas",
+    "almendras","nueces","chips","popcorn","granola","barrita"
   ],
+
   "Lácteos": [
-    "leche","queso","yogurt","crema","mantequilla","margarina","manjar"
+    "leche","queso","yogurt","crema","mantequilla","margarina","manjar","leche condensada",
+    "leche en polvo","quesillo","leche sin lactosa","bebida lactea","postre lacteo",
+    "flan","gelatina","batido","queso crema","ricotta","queso rallado"
   ],
-  "Carnes": [
-    "pollo","carne","pescado","cerdo","hamburguesa","trutro"
+
+  "Carnes y Pescados": [
+    "pollo","carne","pescado","cerdo","hamburguesa","trutro","longaniza","choripan",
+    "chuleta","lomito","mechada","molida","plateada","costillar","vienesas","salchicha",
+    "camarones","atun fresco","reineta","salmon","merluza","jibia","calamar","mariscos"
   ],
-  "Bebidas": [
-    "bebida","agua","jugo","coca","cola","fanta","sprite","te","cafe","cerveza","vino"
+
+  "Frutas y Verduras": [
+    "manzana","pera","platano","banana","uva","naranja","limon","kiwi","piña","sandia",
+    "melon","durazno","ciruela","mango","palta","tomate","cebolla","lechuga","papa",
+    "zanahoria","brocoli","coliflor","espinaca","cilantro","pimenton","zapallo",
+    "pepino","berenjena","repollo","ajo","jengibre","choclo","poroto verde",
+    "betarraga","hongo","champinon","ensalada","fruta","verdura"
   ],
-  "Hogar": [
-    "detergente","jabon","shampoo","papel","higienico","toalla"
+
+  "Bebidas, Jugos y Aguas": [
+    "bebida","agua","jugo","gaseosa","coca","cola","fanta","sprite","seven","te","cafe",
+    "cafe instantaneo","cafe molido","bebida energetica","monster","red bull",
+    "isotonica","gatorade","powerade","kombucha","malta",
+    "cerveza","vino","pisco","ron","whisky","vodka","espumante","sidra"
+  ],
+
+  "Pan, Pastelería y Congelados": [
+    "pan","hallulla","marraqueta","mold","integral","pastel","torta","queque","kuchen",
+    "pan de molde","galleton","donas","croissant","masas","empanada","pizza","lasagna",
+    "helado","mix congelado","verduras congeladas","papas congeladas","churros",
+    "nuggets","barritas pescado","empanizados"
+  ],
+
+  "Limpieza y Hogar": [
+    "detergente","jabon","shampoo","acondicionador","lavaloza","cloro","desinfectante",
+    "toalla","higienico","papel higienico","servilleta","esponja","lavanderia",
+    "suavizante","limpiador","multiuso","trapo","bolsa basura",
+    "insecticida","desodorante ambiente","cera piso"
+  ],
+
+  "Cuidado Personal y Perfumería": [
+    "shampoo","acondicionador","crema corporal","desodorante","perfume","colonia",
+    "gel","cera","maquina afeitar","afeitadora","cuchillas","cepillo","pasta dental",
+    "enjuague bucal","protector solar","bloqueador","maquillaje","labial","mascara",
+    "algodon","toalla femenina","pañuelo","pañal","pañales"
+  ],
+
+  "Mascotas": [
+    "perro","gato","alimento","snack","premio","saco","arena","collar","correa",
+    "juguete perro","juguete gato","rascador","hueso","galletitas perro"
+  ],
+
+  "Electrodomésticos y Varios": [
+    "olla","sarten","licuadora","batidora","tetera","microondas","aspiradora",
+    "plancha","cafetera","tostadora","computador","mouse","teclado",
+    "parlante","audifono"
   ]
 };
 

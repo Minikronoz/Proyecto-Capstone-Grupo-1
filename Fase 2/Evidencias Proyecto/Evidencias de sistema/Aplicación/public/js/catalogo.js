@@ -109,17 +109,47 @@ function limpiarTextoClave(str = "") {
   STOPWORDS.forEach(sw => txt = txt.replace(new RegExp("\\b" + sw + "\\b", "g"), " "));
   return txt.replace(/\s+/g, " ").trim();
 }
+function normalizarMarca(m = "") {
+  return m
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "")   // deja solo letras y números, quita espacios
+    .trim();
+}
+function levenshtein(a, b) {
+  const m = [];
+  for (let i = 0; i <= b.length; i++) m[i] = [i];
+  for (let j = 0; j <= a.length; j++) m[0][j] = j;
+
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      m[i][j] = b.charAt(i - 1) === a.charAt(j - 1)
+        ? m[i - 1][j - 1]
+        : 1 + Math.min(
+            m[i - 1][j],
+            m[i][j - 1],
+            m[i - 1][j - 1]
+          );
+    }
+  }
+
+  return m[b.length][a.length];
+}
 
 // ===============================
 // 📌 SIMILITUDES
 // ===============================
 function similitudMarca(m1 = "", m2 = "") {
-  m1 = normalizarTexto(m1); 
-  m2 = normalizarTexto(m2);
-  if (!m1 || !m2) return 0;
-  if (m1 === m2) return 100;
-  if (m1.includes(m2) || m2.includes(m1)) return 85;
-  return 0;
+  const a = normalizarMarca(m1);
+  const b = normalizarMarca(m2);
+
+  if (!a || !b) return 0;
+  if (a === b) return 100;
+  if (a.includes(b) || b.includes(a)) return 95;
+
+  const dist = levenshtein(a, b);
+  const maxLen = Math.max(a.length, b.length);
+  return (1 - dist / maxLen) * 100;
 }
 
 function similitudPalabras(a, b) {
@@ -136,12 +166,13 @@ function compararPesos(p1, p2) {
 }
 
 // ===============================
-// 🧠 BUSCAR SIMILAR EN TODAS LAS TIENDAS
+// 🧠 BUSCAR SIMILAR EN TODAS LAS TIENDAS (versión estricta)
 // ===============================
 function encontrarSimilaresEnTodasLasTiendas(prod) {
   const res = {};
   const pesoBase = normalizarPesoDesdeTitulo(prod.titulo);
   const claveBase = limpiarTextoClave(prod.titulo);
+  const atributosBase = extraerAtributosCriticos(prod.titulo);
 
   TIENDAS_COMPARACION.forEach(tienda => {
     let mejor = null, mejorScore = 0;
@@ -151,21 +182,32 @@ function encontrarSimilaresEnTodasLasTiendas(prod) {
       .forEach(p => {
         const claveP = limpiarTextoClave(p.title);
         const pesoP = normalizarPesoDesdeTitulo(p.title);
+        const atributosP = extraerAtributosCriticos(p.title);
 
-        const score = (
-          similitudMarca(prod.marca, p.brand) * 0.40 +
-          similitudPalabras(claveBase, claveP) * 0.30 +
-          compararPesos(pesoBase, pesoP) * 0.30
-        );
+        let scoreMarca = similitudMarca(prod.marca, p.brand);    // 0–100
+        let scoreNombre = similitudPalabras(claveBase, claveP);  // 0–100
+        let scorePeso = compararPesos(pesoBase, pesoP);          // 0–100
 
-        if (score > mejorScore) {
-          mejorScore = score;
+
+        // ❌ Penalizar diferencias en atributos críticos
+        let penalizacion = penalizarDiferenciasAtributos(atributosBase, atributosP);
+
+        // 🎯 Score final con ponderaciones mejoradas
+        const scoreFinal =
+          (scoreMarca * 0.45) +
+          (scoreNombre * 0.30) +
+          (scorePeso * 0.25) -
+          penalizacion;
+
+        if (scoreFinal > mejorScore) {
+          mejorScore = scoreFinal;
           mejor = p;
         }
       });
 
-    if (!mejor || mejorScore < 58) {
-      res[tienda] = { porcentaje: mejorScore, precio: null };
+    // ✔ Mínimo 65 para aceptar coincidencia
+    if (!mejor || mejorScore < 65) {
+      res[tienda] = { porcentaje: Math.round(mejorScore), precio: null };
     } else {
       res[tienda] = {
         porcentaje: Math.round(mejorScore),
@@ -180,6 +222,7 @@ function encontrarSimilaresEnTodasLasTiendas(prod) {
 
   return res;
 }
+
 
 // ==========================================
 // Cargar marcas en el sidebar
@@ -204,6 +247,36 @@ function cargarMarcasSidebar() {
   document.querySelectorAll(".chkMarca").forEach(cb => {
     cb.addEventListener("change", aplicarFiltroMarcas);
   });
+}
+
+function extraerAtributosCriticos(texto) {
+  const t = texto.toLowerCase();
+
+  return {
+    conPolvos: /con polvos/.test(t),
+    sinPolvos: /sin polvos/.test(t),
+    vegetal: /vegetal/.test(t),
+    oliva: /oliva/.test(t),
+    maravilla: /maravilla/.test(t),
+    canola: /canola/.test(t),
+    entera: /entera/.test(t),
+    descremada: /descremada|light|baja en grasa/.test(t)
+  };
+}
+function penalizarDiferenciasAtributos(a, b) {
+  let p = 0;
+
+  if (a.conPolvos !== b.conPolvos) p += 25;
+  if (a.sinPolvos !== b.sinPolvos) p += 25;
+
+  if (a.vegetal !== b.vegetal) p += 20;
+  if (a.oliva !== b.oliva) p += 20;
+  if (a.maravilla !== b.maravilla) p += 20;
+
+  if (a.entera !== b.entera) p += 20;
+  if (a.descremada !== b.descremada) p += 20;
+
+  return p;
 }
 
 // ==========================================

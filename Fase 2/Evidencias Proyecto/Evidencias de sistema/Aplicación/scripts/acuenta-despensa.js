@@ -175,7 +175,7 @@ const MARCAS_CONOCIDAS = [
 
   //  Bebidas deportivas e hidratantes (no energéticas)
   "Gatorade","Powerade","Gatorade Zero","Powerade Zero",
-  "IsoSport","Oralight","Vive Hidratante",
+  "IsoSport","Oralight","Vive Hidratante","Mont Blanc",
 
   //  Bebidas funcionales (con vitaminas, bajos en calorías, etc.)
   "VitaminWater","Livean","Benjoy","B-Light","Flow Vitamin",
@@ -186,7 +186,7 @@ const MARCAS_CONOCIDAS = [
   "Gato Negro","Tarapacá","Carmen","San Pedro","120 Santa Rita",
   "Montes","Errázuriz","De Martino","Ostión","Cousiño Macul",
   "Los Boldos","Terranoble","Casa Silva","Morandé","Veramonte",
-  "Koyle","Toro de Piedra","Nidias","Misiones de Rengo","Frontera","Marqués de Casa Concha",
+  "Koyle","Toro de Piedra","Nidias","Misiones de Rengo","Frontera","Marqués de Casa Concha","Belmont",
 
   //  Espumantes y champagne
   "Riccadonna","Chandon","Undurraga Sparkling","Fresita","Norton",
