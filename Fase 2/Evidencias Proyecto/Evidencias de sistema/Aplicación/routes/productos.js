@@ -15,43 +15,40 @@ router.get("/sugerencias", async (req, res) => {
     const db = getDB();
     const { q } = req.query;
 
-    console.log("🔍 Buscando sugerencias para:", q);
-
-    if (!q || q.trim().length < 3) {
-      return res.status(400).json({ 
-        ok: false, 
-        error: "Se requieren al menos 3 caracteres" 
-      });
+    if (!q || q.trim().length < 1) {
+      return res.json([]);
     }
 
-    const termino = q.trim();
+    const termino = q.trim().toLowerCase();
+    let regex;
 
-    // Buscar productos que coincidan
+    // Coincidencia EXACTA si 3 letras o menos
+    if (termino.length <= 3) {
+      regex = new RegExp(`\\b${termino}\\b`, "i");
+    } else {
+      regex = new RegExp(termino, "i");
+    }
+
     const productos = await db.collection("productos")
       .find({
         $or: [
-          { title: { $regex: termino, $options: "i" } },
-          { brand: { $regex: termino, $options: "i" } }
+          { title: regex },
+          { brand: regex }
         ]
       })
-      .limit(10)
+      .limit(15)
       .toArray();
 
-    // Extraer títulos únicos
-    const sugerencias = [...new Set(productos.map(p => p.title))].slice(0, 8);
-
-    console.log(` Sugerencias encontradas: ${sugerencias.length}`);
+    const sugerencias = [...new Set(productos.map(p => p.title))].slice(0, 10);
 
     res.json(sugerencias);
 
   } catch (err) {
-    console.error(" Error en sugerencias:", err);
-    res.status(500).json({ 
-      ok: false, 
-      error: "Error al buscar sugerencias" 
-    });
+    console.error("❌ Error sugerencias:", err);
+    res.status(500).json([]);
   }
 });
+
 
 // =============================================================
 //  Obtener historial de precios de un producto
@@ -152,46 +149,92 @@ router.get("/:id/historico", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const db = getDB();
-    const { q, store, categoria, minPrice, maxPrice } = req.query;
+    const { q, store, categoria, minPrice, maxPrice, marcas } = req.query;
 
     const filtro = {};
 
-    // Filtro por búsqueda de texto
-    if (q) {
-      filtro.$or = [
-        { title: { $regex: q, $options: "i" } },
-        { brand: { $regex: q, $options: "i" } }
-      ];
+// =====================================================
+//  🎯 BÚSQUEDA — inteligente con soporte para "sal"
+// =====================================================
+if (q && q.trim() !== "") {
+
+  let termino = q.trim();
+
+  let regex;
+
+  // Si el frontend envió delimitadores \b → coincidencia EXACTA
+  if (termino.includes("\\b")) {
+
+    // Limpia doble escape: "\\bsal\\b" → "\bsal\b"
+    let limpio = termino.replace(/\\\\b/g, "\\b");
+
+    // Asegurar que la expresión tenga ambos bordes
+    if (!limpio.startsWith("\\b")) limpio = "\\b" + limpio;
+    if (!limpio.endsWith("\\b")) limpio = limpio + "\\b";
+
+    try {
+      regex = new RegExp(limpio, "i");  // 👉 regex real
+    } catch (e) {
+      console.error("⚠ Regex inválida, usando fallback:", limpio);
+      regex = new RegExp(termino.replace(/\\b/g, ""), "i");
     }
-    if (req.query.marcas) {
-  filtro.brand = { $in: req.query.marcas.split(",") };
+  }
+
+  // Palabras cortas → coincidencia exacta
+  else if (termino.length <= 3) {
+    regex = new RegExp(`\\b${termino}\\b`, "i");
+  }
+
+  // Palabras largas → búsqueda normal
+  else {
+    regex = new RegExp(termino, "i");
+  }
+
+  filtro.$or = [
+    { title: regex },
+    { brand: regex }
+  ];
 }
-    // Filtro por tienda
-    if (store) {
-      filtro.store = store;
+
+
+    // =====================================================
+    //  Filtro por marcas (sidebar)
+    // =====================================================
+    if (marcas) {
+      filtro.brand = { $in: marcas.split(",") };
     }
 
-    // Filtro por categoría
+    // =====================================================
+    //  Filtro por tienda
+    // =====================================================
+if (store) {
+  filtro.store = { $in: store.split(",") };
+}
+
+
+    // =====================================================
+    //  Filtro por categoría
+    // =====================================================
     if (categoria) {
       filtro.categoria = categoria;
     }
 
-    // Filtro por rango de precio
+    // =====================================================
+    //  Rango de precios
+    // =====================================================
     if (minPrice || maxPrice) {
       filtro.currentPrice = {};
       if (minPrice) filtro.currentPrice.$gte = parseFloat(minPrice);
       if (maxPrice) filtro.currentPrice.$lte = parseFloat(maxPrice);
     }
 
-    console.log(" Filtros aplicados:", filtro);
+    console.log("📌 Filtros aplicados:", filtro);
 
     const productos = await db.collection("productos")
       .find(filtro)
       .sort({ lastUpdate: -1 })
-      .limit(100)
+      .limit(200)
       .toArray();
-
-    console.log(` Productos encontrados: ${productos.length}`);
 
     res.json({
       ok: true,
@@ -200,10 +243,10 @@ router.get("/", async (req, res) => {
     });
 
   } catch (err) {
-    console.error(" Error buscando productos:", err);
-    res.status(500).json({ 
-      ok: false, 
-      error: "Error al buscar productos" 
+    console.error("❌ Error buscando productos:", err);
+    res.status(500).json({
+      ok: false,
+      error: "Error al buscar productos"
     });
   }
 });
