@@ -1,17 +1,6 @@
-import { firefox } from "playwright";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
 import { getDB, connectDB } from "../config/db.js";
-import { actualizarScrapingArchivo } from "../utils/actualizarScraping.js";
 import crypto from "crypto";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const STORE = "acuenta";
-
-// =============================================================
-//  MARCAS CONOCIDAS
-// =============================================================
 const MARCAS_CONOCIDAS = [
   //  Manzanas, Peras y Kiwis
   "Hass","Zespri","Royal Gala","Granny Smith","Pink Lady","Fuji","Honeycrisp",
@@ -42,8 +31,7 @@ const MARCAS_CONOCIDAS = [
 
   //  Procesados de huerta (ensalada lista, mixes)
   "Ready Pac","Florette","VitaFresh","Mr. Veggie","Agrosuper Vegetales",
-  "Fresh Garden","Salad Box","Natur Fresh","La Huerta Mix",
-
+  "Fresh Garden","Salad Box","Natur Fresh","La Huerta Mix","La Romana","Hellmann'S","Natural",
   //  Importados especiales
   "Tropical Fields","King Coconut","Exótica Fresh","Amazonia Fruit","Premium Tropic",
 
@@ -102,11 +90,11 @@ const MARCAS_CONOCIDAS = [
   "Kellogg's","Zucaritas","Corn Flakes","All-Bran","Froot Loops","Choco Krispis",
   "Nestlé Cereales","Chocapic","Nesquik Cereales","Trix","Fitness","Milo Cereales",
   "Quaker Cereales","Granola Alpen","Nature Valley Cereales","Honey Bunches of Oats",
-  "Post Cereals","Granola Mornflake","Kashi",
+  "Post Cereals","Granola Mornflake","Kashi","golondrina","buka",
 
   //  Barras de cereal (siempre clasificadas en cereales)
   "Nature Valley","Quaker Bar","Kellogg's Bar","Nestlé Cereal Bar","Fitness Bar",
-  "Granuts Bar","Milo Bar",
+  "Granuts Bar","Milo Bar","lucchetti","pirulin","Fermipan","Delia","van camps",
 
   //  Pastas, salsas, fideos
   "Carozzi","Lucchetti","Tres Montes Lucchetti","Malloa","Don Vittorio",
@@ -123,14 +111,14 @@ const MARCAS_CONOCIDAS = [
   //  Aceite, vinagre y aderezos de cocina
   "Cisne Aceite","Chef","Miraflores Aceite","Maravilla","Cocinero",
   "La Española","Capri","Carbonell","Coloso","Sasso","Costa Blanca",
-  "Clemente Jacques Aderezos","Karavansay","Maille","Hellmann’s",
+  "Clemente Jacques Aderezos","Karavansay","Maille","Hellmann's","Hellmanns","lucchetti","Vivo",
   "Doritos","Panela Fonce","Oso",
   //  Conservas: tomate, salsa, choclo, arvejas, etc.
   "Wasil","Dos Caballos Conservas","Malloa Conservas","Tres Montes Conservas",
   "La Huerta","Acuenta Conservas","Cuisine & Co Conservas","Arcor Conservas",
   "Productos de la Huerta","Riviana Tomate","Don Juan Conservas","Rikesa","Mavesa",
   "Marco Polo","Caserita Conservas","Iansa","Ambrosoli","Esmeralda","Aconcagua",
-  "Underwood","Evercrisp","Barcel","Sembrasol","Delicia","La Comadre","",
+  "Underwood","Evercrisp","Barcel","Sembrasol","Delicia","La Comadre",
 
   //  Conservas de pescado (solo abarrotes)
   "San José","Aceituno","Robinson Crusoe","Van Camp’s","Jurel Azul",
@@ -197,8 +185,7 @@ const MARCAS_CONOCIDAS = [
   //  Pisco chileno (licor nacional)
   "Mistral","Control C","Alto del Carmen","Horcón Quemado","Campanario",
   "Tres Erres","Mal Paso","Waqar","Coloso","Legado","Kappa","Coliseo",
-  "Pontevedra","El Gobernador","Capel","Talliani","Trattoria","Lays","Tostitos",
-  "",
+  "Pontevedra","El Gobernador","Capel","Talliani","Trattoria","Lays","Tostitos","Choritos",
 
   //  Cervezas nacionales
   "Cristal","Escudo","Royal Guard","Kunstmann","Austral",
@@ -240,7 +227,7 @@ const MARCAS_CONOCIDAS = [
 
   //  Afeitado y depilación
   "Gillette","Prestobarba","Mach3","Venus","Schick","Bic","Depil Bella",
-  "Veet","Nair","Gillette SkinGuard","Wilkinson Sword",
+  "Veet","Nair","Gillette SkinGuard","Wilkinson Sword",'Hellmann’s',
 
   //  Jabón de tocador / barra de baño
   "Dove Soap","Palmolive Soap","Protex Soap","Nivea Soap","Le Sancy Soap",
@@ -278,7 +265,7 @@ const MARCAS_CONOCIDAS = [
 
   //  Desinfectantes y cloro
   "Clorox","Ariel Cloro","Cloralex","Poett Desinfectante","Lysol Desinfectante",
-  "Virutex Cloro","Sapolio Cloro","Ayudín",
+  "Virutex Cloro","Sapolio Cloro","Ayudín","JB","pan","Maizena","Golondrina","Buka","Talliani","Van Camp's",
 
   //  Baño: limpiadores y pastillas
   "Harpic","Mr. Músculo Baño","Pato Purific","Poett Baño","Cif Baño",
@@ -335,7 +322,7 @@ const MARCAS_CONOCIDAS = [
   "Petmax","Animal Planet Pets","ZooActive","PetLovers","Mascota Club",
   "Puppy Love Accesorios","Pet Friend","PetComfort","PetLine",
   "Petlife","Mundo Mascota","Doggies Accessory","Gatitown Accesorios",
-  "Traverso",
+  "Traverso","Heinz","Molino el Peral","Kazai","Diaguita","Edra",
 
   //  Organización y almacenamiento
   "Rubbermaid","Sterilite","Plastiluz","Duraplast","Plasutil",
@@ -419,6 +406,58 @@ const MARCAS_CONOCIDAS = [
   "Acuenta (pet, alimentos, hogar)"
 ];
 
+// ✅ Función de detección mejorada CON LINK (NORMALIZACIÓN MEJORADA)
+function detectarMarca(title = "", link = "") {
+  if (!title || typeof title !== "string") return "Sin Marca";
+
+  const normalizar = (txt) =>
+    txt
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // Quitar acentos
+      .replace(/[°º]/g, "") // ✅ Quitar símbolos de grado
+      .replace(/\s+/g, " ") // Espacios múltiples → 1 espacio
+      .trim();
+
+  const tituloNorm = normalizar(title);
+  
+  let linkSlug = "";
+  if (link && typeof link === "string") {
+    const match = link.match(/\/p\/([\w-°º]+)/); // ✅ Permitir °º en el match
+    if (match) {
+      linkSlug = normalizar(match[1].replace(/-/g, " ")); // Reemplazar guiones por espacios
+    }
+  }
+
+  console.log(`🔍 Título normalizado: "${tituloNorm}"`);
+  console.log(`🔗 Link slug normalizado: "${linkSlug}"`);
+
+  if (tituloNorm.includes("acuenta") || tituloNorm.includes("a cuenta") || 
+      linkSlug.includes("acuenta") || linkSlug.includes("a cuenta")) {
+    return "Acuenta";
+  }
+
+  const marcasOrdenadas = [...MARCAS_CONOCIDAS].sort((a, b) => b.length - a.length);
+
+  for (const marca of marcasOrdenadas) {
+    const marcaNorm = normalizar(marca);
+    const regex = new RegExp(`\\b${marcaNorm}\\b`, "i");
+    
+    if (regex.test(tituloNorm)) {
+      console.log(`✅ Encontrado en título: "${marca}"`);
+      return marca;
+    }
+    
+    if (linkSlug && regex.test(linkSlug)) {
+      console.log(`✅ Encontrado en link: "${marca}"`);
+      return marca;
+    }
+  }
+
+  return "Sin Marca";
+}
+
+// ✅ Regenerar globalId
 function generarGlobalId(title, brand) {
   const normalizar = (txt) =>
     txt
@@ -441,429 +480,75 @@ function generarGlobalId(title, brand) {
   return crypto.createHash("md5").update(cadena).digest("hex").substring(0, 12);
 }
 
-
-// =============================================================
-//  Conversión de precio Acuenta (evita dobles: "$2990$3790")
-// =============================================================
-const parsePrice = (priceStr = "") => {
-  if (!priceStr) return null;
-  const texto = priceStr.replace(/\s+/g, "").toLowerCase();
-  if (texto.includes("-")) return null;
-
-  //  Combo "2x$3000"
-  const combo = texto.match(/(\d+)\s*x\s*\$?([\d\.]+)/i);
-  if (combo) {
-    const cantidad = parseInt(combo[1], 10);
-    const total = parseInt(combo[2].replace(/\D/g, ""), 10);
-    return cantidad > 0 && total > 0 ? Math.round(total / cantidad) : null;
-  }
-
-  //  SOLO primer precio (evita “...$2990$3790”)
-  const primerPrecio = texto.match(/\$?([\d\.]+)/);
-  if (!primerPrecio) return null;
-
-  const num = parseInt(primerPrecio[1].replace(/\D/g, ""), 10);
-  return num > 0 ? num : null;
-};
-
-
-// =============================================================
-//  Detección automática de marcas (CON LINK DE RESPALDO)
-// =============================================================
-function detectarMarca(title = "", link = "") {
-  if (!title || typeof title !== "string") return "Sin Marca";
-
-  // ✅ Normalizar texto
-  const normalizar = (txt) =>
-    txt
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "") // Quitar acentos
-      .replace(/\s+/g, " ") // Espacios múltiples → 1 espacio
-      .trim();
-
-  const tituloNorm = normalizar(title);
+// ✅ Función principal (CORREGIDA)
+async function actualizarMarcas() {
+  console.log("\n🔄 Iniciando actualización de marcas...\n");
   
-  // ✅ Extraer slug del link
-  // Ejemplo: "https://www.acuenta.cl/p/harina-sin-polvos-de-hornear-bolsa-25-kg-acuenta/p"
-  // → "harina-sin-polvos-de-hornear-bolsa-25-kg-acuenta"
-  let linkSlug = "";
-  if (link && typeof link === "string") {
-    const match = link.match(/\/p\/([\w-]+)/);
-    if (match) {
-      linkSlug = normalizar(match[1].replace(/-/g, " ")); // Reemplazar guiones por espacios
-    }
-  }
-
-  // ✅ 1. Marcas propias Acuenta (prioridad)
-  if (tituloNorm.includes("acuenta") || tituloNorm.includes("a cuenta") || 
-      linkSlug.includes("acuenta") || linkSlug.includes("a cuenta")) {
-    return "Acuenta";
-  }
-
-  // ✅ 2. Buscar marca en título O link (más larga primero)
-  const marcasOrdenadas = [...MARCAS_CONOCIDAS].sort((a, b) => b.length - a.length);
-
-  for (const marca of marcasOrdenadas) {
-    const marcaNorm = normalizar(marca);
-    
-    // ✅ Búsqueda con límites de palabra
-    const regex = new RegExp(`\\b${marcaNorm}\\b`, "i");
-    
-    // Buscar en título
-    if (regex.test(tituloNorm)) {
-      return marca;
-    }
-    
-    // ✅ NUEVO: Buscar en el slug del link
-    if (linkSlug && regex.test(linkSlug)) {
-      return marca;
-    }
-  }
-
-  // ✅ 3. Si no encuentra nada, devolver "Sin Marca"
-  return "Sin Marca";
-}
-
-// =============================================================
-//  Categorías
-// =============================================================
-const CATEGORIAS = [
-  // { nombre: "Promociones", url: "https://www.acuenta.cl/ca/promociones/01" },
-  // { nombre: "Bodegazo", url: "https://www.acuenta.cl/ca/bodegazo/60" },
-  // { nombre: "Marcas Propias", url: "https://www.acuenta.cl/ca/marcas-propias/20" },
-  // { nombre: "Imperdibles", url: "https://www.acuenta.cl/ca/imperdibles/100" },
-  // { nombre: "Mundo bebé", url: "https://www.acuenta.cl/ca/mundo-bebe/09" },
-  { nombre: "Despensa", url: "https://www.acuenta.cl/ca/despensa/05" },
-  // { nombre: "Carnes y Pescados", url: "https://www.acuenta.cl/ca/carnes-y-pescados/03" },
-  // { nombre: "Aseo y limpieza", url: "https://www.acuenta.cl/ca/aseo-y-limpieza/11" },
-  // { nombre: "Frescos y Lácteos", url: "https://www.acuenta.cl/ca/frescos-y-lacteos/07" },
-  // { nombre: "El Bar", url: "https://www.acuenta.cl/ca/el-bar/14" },
-  // { nombre: "Desayuno y Dulces", url: "https://www.acuenta.cl/ca/desayuno-y-dulces/12" },
-  // { nombre: "Mascotas", url: "https://www.acuenta.cl/ca/mascotas/08" },
-  // { nombre: "Bebidas y Snacks", url: "https://www.acuenta.cl/ca/bebidas-y-snacks/02" },
-  // { nombre: "Congelados", url: "https://www.acuenta.cl/ca/congelados/04" },
-  // { nombre: "Frutas y Verduras", url: "https://www.acuenta.cl/ca/frutas-y-verduras/06" },
-  // { nombre: "Panadería y Pastelería", url: "https://www.acuenta.cl/ca/panaderia-y-pasteleria/10" },
-  // { nombre: "Perfumería y Cuidado Personal", url: "https://www.acuenta.cl/ca/perfumeria-y-cuidado-personal/13" },
-  // { nombre: "Hogar, entretención y tecnología", url: "https://www.acuenta.cl/ca/hogar-entretencion-y-tecnologia/47" }
-];
-
-
-// =============================================================
-//  Barra estándar (actualiza solo cada 5%)
-// =============================================================
-function renderProgressBar(current, total, prefix = `[${STORE}]`) {
-  if (!total || total <= 0) return;
-  const width = 28;
-  const avance = current / total;
-  const progress = Math.round(avance * width);
-
-  const pasoMin = Math.ceil(total * 0.05);
-  if (current % pasoMin !== 0 && current !== total) return;
-
-  const bar = "█".repeat(progress) + "░".repeat(width - progress);
-  const percent = (avance * 100).toFixed(0).padStart(3);
-
-  process.stdout.write(`\r${prefix} [${bar}] ${percent}% (${current}/${total})`);
-  if (current === total) process.stdout.write("\n");
-}
-
-
-function procesarUnit(pricePerUnit = "") {
-  if (!pricePerUnit) return { unitValue: null, unitName: null };
-
-  const txt = pricePerUnit.toLowerCase().trim();
-
-  //  Ignorar datos inválidos que Acuenta devuelve
-  if (
-    txt === "" ||
-    txt.includes("pum") ||
-    txt.includes("unidad") ||
-    txt.includes("un") && !txt.match(/\d/) ||
-    txt.includes("oferta") ||
-    txt.includes("price-unit") ||
-    txt.length < 3
-  ) {
-    return { unitValue: null, unitName: null };
-  }
-
-  const match = txt.match(/([\d\.]+).*?(?:x|\/)\s*(\d+)?\s*(g|gr|kg|ml|l|lt)/i);
-  if (!match) return { unitValue: null, unitName: null };
-
-  let valor = parseInt(match[1].replace(/\D/g, ""), 10);
-  let cantidad = parseInt(match[2], 10) || 1;
-  let unidad = match[3].toLowerCase();
-
-  if (unidad === "kg") {
-    cantidad *= 1000;
-    unidad = "g";
-  }
-  if (unidad === "l" || unidad === "lt") {
-    cantidad *= 1000;
-    unidad = "ml";
-  }
-
-  if (unidad === "" || unidad === "un" || unidad === "unidad" || cantidad === 1) {
-    return { unitValue: null, unitName: null };
-  }
-
-  return {
-    unitValue: valor,
-    unitName: `${cantidad}${unidad}`
-  };
-}
-
-async function cargarTodosLosProductos(page) {
-  const selectorCard = ".styles__StyledCard-sc-3jvmda-0";
-
-  let intentos = 0;
-  let sameCount = 0;
-  let ultimoTotal = 0;
-
-  while (intentos < 40 && sameCount < 5) {
-    intentos++;
-
-    //  Scroll hasta el fondo
-    await page.evaluate(() => {
-      window.scrollTo(0, document.body.scrollHeight);
-    });
-
-    await page.waitForTimeout(2000);
-
-    //  Si existe un botón "Ver más productos", lo clickeamos
-    const btnVerMas = await page.$("button:has-text('Ver más productos')");
-    if (btnVerMas) {
-      try {
-        await btnVerMas.click();
-        await page.waitForTimeout(2000);
-      } catch (e) {
-        console.warn(`[${STORE}] ⚠️ No se pudo clickear "Ver más productos":`, e.message);
-      }
-    }
-
-    const totalActual = await page.locator(selectorCard).count();
-
-    if (totalActual === ultimoTotal) {
-      sameCount++;
-    } else {
-      sameCount = 0;
-      ultimoTotal = totalActual;
-    }
-
-    process.stdout.write(
-      `\r[${STORE}]  Scroll infinito -> cards visibles: ${totalActual} (intento ${intentos}, same=${sameCount})`
-    );
-  }
-
-  const finalCount = await page.locator(selectorCard).count();
-  console.log(`\n[${STORE}]  Productos visibles tras scroll: ${finalCount}`);
-  return finalCount;
-}
-
-
-// =============================================================
-//  MAIN
-// =============================================================
-async function main() {
-  console.log(`\n Iniciando SCRAPER ${STORE.toUpperCase()}`);
   await connectDB();
   const db = getDB();
-  console.log(`[${STORE}]  Conectado a MongoDB Atlas`);
-
-  const browser = await firefox.launch({ headless: true });
-  const context = await browser.newContext({
-    viewport: { width: 1920, height: 1080 },
-    userAgent:
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125 Safari/537.36",
-  });
-  const page = await context.newPage();
-
-  let nuevos = 0, actualizados = 0, revisados = 0;
-  const productosMap = new Map();
-
-  for (const cat of CATEGORIAS) {
-    console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-    console.log(`[${STORE}] 🟢 Categoría: ${cat.nombre}`);
-    console.log(`[${STORE}] 🌐 URL: ${cat.url}`);
-    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-
-    let intentos = 0;
-    let productos = [];
-
-    //  Reintentos automáticos
-    while (intentos < 5 && productos.length === 0) {
-      try {
-        intentos++;
-        console.log(`[${STORE}]  Intento ${intentos}/5 en ${cat.nombre}`);
-        const response = await page.goto(cat.url, { waitUntil: "domcontentloaded", timeout: 120000 });
-        if (!response || response.status() >= 400) continue;
-
-        await page.waitForTimeout(3000);
-
-        const notFound = await page.$('text="Lo sentimos"');
-        if (notFound) {
-          console.warn(`[${STORE}] ⚠️ Página vacía (${cat.nombre})`);
-          await page.reload();
-          continue;
-        }
-
-        //  Scroll dinámico
-        let sameCount = 0;
-        while (sameCount < 3) {
-          const before = await page.locator(".styles__StyledCard-sc-3jvmda-0").count();
-          await page.evaluate(() => window.scrollBy(0, window.innerHeight * 2));
-          await page.waitForTimeout(1500);
-          const after = await page.locator(".styles__StyledCard-sc-3jvmda-0").count();
-          if (after === before) sameCount++;
-          else sameCount = 0;
-        }
-
-//  Scroll infinito hasta que no carguen más productos
-await cargarTodosLosProductos(page);
-
-productos = await page.$$eval(".styles__StyledCard-sc-3jvmda-0", (cards) =>
-  cards.map((card) => {
-    try {
-      const title =
-        card.querySelector(".prod__name, .CardName__CardNameStyles-sc-147zxke-0")?.innerText?.trim() || "";
-      const price =
-        card.querySelector(".base__price, .CardBasePrice__CardBasePriceStyles-sc-1dlx87w-0")?.innerText?.trim() || "";
-      const pricePerUnit =
-        card.querySelector(".CardPum__CardPumStyles-sc-1vz27ac-0 span, .styles__PumStyles-sc-omx4ld-0 span")
-          ?.innerText?.trim() || null;
-      const offerDescription =
-        card.querySelector(".styles__PromoTagStyles-sc-q4v3s1-0 div")?.innerText?.trim() || null;
-      const image =
-        card.querySelector("img.ant-image-img, img.prod__figure__img")?.src || "";
-      const href = card.querySelector("a.containerCard")?.getAttribute("href") || "";
-      const link = href.startsWith("http") ? href : `https://www.acuenta.cl${href}`;
-      return { title, price, pricePerUnit, offerDescription, image, link };
-    } catch {
-      return null;
-    }
-  }).filter(Boolean)
-);
-
-
-      } catch (err) {
-        console.error(`[${STORE}] ❌ Error en intento ${intentos}: ${err.message}`);
-        await page.waitForTimeout(3000);
-      }
-    }
-
-    if (!productos.length) {
-      console.warn(`[${STORE}] ⚠️ No se logró extraer ${cat.nombre} tras 5 intentos.`);
-      continue;
-    }
-
-    console.log(`[${STORE}]  ${productos.length} productos extraídos (${cat.nombre})`);
-    for (const prod of productos) {
-      if (!productosMap.has(prod.link)) productosMap.set(prod.link, { ...prod, categoria: cat.nombre });
-    }
-  }
-
-  const productosFinal = Array.from(productosMap.values());
-  console.log(`\n[${STORE}]  Total productos únicos: ${productosFinal.length}`);
-
   const colProductos = db.collection("productos");
-  const colPriceHistory = db.collection("priceHistory");
 
-for (const [i, prod] of productosFinal.entries()) {
-  if (!prod.image || prod.image.includes("default")) continue;
+  const productosSinMarca = await colProductos
+    .find({
+      store: "acuenta",
+      $or: [
+        { brand: "Sin Marca" },
+        { brand: { $exists: false } },
+        { brand: null },
+        { brand: "" }
+      ]
+    })
+    .toArray();
 
-  const precioNum = parsePrice(prod.price);
-  if (isNaN(precioNum)) continue;
+  console.log(`📦 Productos sin marca encontrados: ${productosSinMarca.length}\n`);
 
-  const { unitValue, unitName } = procesarUnit(prod.pricePerUnit);
-  
-  // ✅ PASAR EL LINK TAMBIÉN
-  const marcaDetectada = detectarMarca(prod.title, prod.link);
-  
-  const globalId = generarGlobalId(prod.title, marcaDetectada);
+  let actualizados = 0;
+  let sinCambios = 0;
 
-  const existente = await colProductos.findOne({ globalId, store: STORE });
-
-  if (existente) {
-    if (existente.currentPrice !== precioNum) {
+  for (const prod of productosSinMarca) {
+    // ✅ PASAR TÍTULO Y LINK
+    const marcaDetectada = detectarMarca(prod.title, prod.link);
+    
+    // ✅ VALIDAR QUE NO SEA "Sin Marca" NI VACÍO
+    if (marcaDetectada && 
+        marcaDetectada !== "Sin Marca" && 
+        marcaDetectada.trim() !== "") {
+      
+      const nuevoGlobalId = generarGlobalId(prod.title, marcaDetectada);
+      
       await colProductos.updateOne(
-        { _id: existente._id },
+        { _id: prod._id },
         {
           $set: {
-            globalId,
-            title: prod.title,
-            brand: marcaDetectada, // ✅ Marca desde título O link
-            currentPrice: precioNum,
-            formattedPrice: prod.price,
-            pricePerUnit: prod.pricePerUnit || null,
-            offerDescription: prod.offerDescription || null,
-            lastUpdate: new Date(),
-            categoria: prod.categoria
+            brand: marcaDetectada.trim(), // ✅ Limpiar espacios
+            globalId: nuevoGlobalId,
+            lastUpdate: new Date()
           }
         }
       );
-
-      await colPriceHistory.insertOne({
-        productId: existente._id,
-        store: STORE,
-        price: precioNum,
-        previousPrice: existente.currentPrice || null,
-        variation: existente.currentPrice
-          ? Number((((precioNum - existente.currentPrice) / existente.currentPrice) * 100).toFixed(2))
-          : 0,
-        offerDescription: prod.offerDescription || null,
-        fecha: new Date()
-      });
-
+      
+      console.log(`✅ "${prod.title.substring(0, 60)}..."`);
+      console.log(`   Link: ${prod.link}`);
+      console.log(`   Marca detectada: "${marcaDetectada}"\n`);
+      
       actualizados++;
+    } else {
+      console.log(`⚠️ SIN MARCA: "${prod.title.substring(0, 60)}..."`);
+      console.log(`   Link: ${prod.link}\n`);
+      sinCambios++;
     }
-  } else {
-    await colProductos.insertOne({
-      globalId,
-      title: prod.title,
-      brand: marcaDetectada, // ✅ Marca desde título O link
-      store: STORE,
-      currentPrice: precioNum,
-      formattedPrice: prod.price,
-      pricePerUnit: prod.pricePerUnit || null,
-      unitValue,
-      unitName,
-      offerDescription: prod.offerDescription || null,
-      image: prod.image,
-      link: prod.link,
-      categoria: prod.categoria,
-      lastUpdate: new Date()
-    });
-
-    nuevos++;
   }
 
-  revisados++;
-  renderProgressBar(revisados, productosFinal.length, `[${STORE}]`);
+  console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+  console.log(`✅ Actualizados: ${actualizados}`);
+  console.log(`⚠️ Sin cambios: ${sinCambios}`);
+  console.log(`📊 Total procesados: ${productosSinMarca.length}`);
+  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
+
+  process.exit(0);
 }
 
-
-const totalDB = await colProductos.countDocuments({ store: STORE });
-
-console.log(`\n📊 ${STORE.toUpperCase()} — RESULTADOS`);
-console.log(`🆕 Nuevos: ${nuevos}`);
-console.log(`♻️ Actualizados: ${actualizados}`);
-console.log(`🔎 Revisados: ${revisados}`);
-console.log(`📦 Total en Atlas: ${totalDB}`);
-console.log(`⏱️ Finalizado: ${new Date().toLocaleString("es-CL")}\n`);
-
-//  Guarda resumen global
-await actualizarScrapingArchivo({
-  store: STORE,
-  nuevos,
-  actualizados,
-  totalProductos: totalDB
+actualizarMarcas().catch((err) => {
+  console.error("❌ Error:", err);
+  process.exit(1);
 });
-
-console.log(`[${STORE}] 🧾 Archivo de scraping actualizado`);
-//  No cerramos browser ni DB para que continúe el proceso padre
-
-
-}
-
-main().catch((err) => console.error(`[${STORE}] ERROR GLOBAL`, err));
