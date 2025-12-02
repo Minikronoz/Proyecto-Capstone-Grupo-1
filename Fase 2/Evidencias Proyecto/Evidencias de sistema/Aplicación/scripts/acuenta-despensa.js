@@ -112,7 +112,7 @@ const MARCAS_CONOCIDAS = [
 
   //  Pastas, salsas, fideos
   "Carozzi","Lucchetti","Tres Montes Lucchetti","Malloa","Don Vittorio",
-  "Molitalia","Rana","Barilla","Knorr Pastas","Cuisine & Co Pasta",
+  "Molitalia","Rana","Barilla","Knorr Pastas","Cuisine & Co Pasta","Banquete",
 
   //  Arroz, legumbres, quinoa y granos
   "Tucapel","Miraflores","Dos Caballos","Granja del Sol Arroz","Costeño",
@@ -125,12 +125,14 @@ const MARCAS_CONOCIDAS = [
   //  Aceite, vinagre y aderezos de cocina
   "Cisne Aceite","Chef","Miraflores Aceite","Maravilla","Cocinero",
   "La Española","Capri","Carbonell","Coloso","Sasso","Costa Blanca",
-  "Clemente Jacques Aderezos","Karavansay","Maille","Hellmann’s Cocina",
-
+  "Clemente Jacques Aderezos","Karavansay","Maille","Hellmann’s",
+  "Doritos","Panela Fonce","Oso",
   //  Conservas: tomate, salsa, choclo, arvejas, etc.
   "Wasil","Dos Caballos Conservas","Malloa Conservas","Tres Montes Conservas",
   "La Huerta","Acuenta Conservas","Cuisine & Co Conservas","Arcor Conservas",
-  "Productos de la Huerta","Riviana Tomate","Don Juan Conservas",
+  "Productos de la Huerta","Riviana Tomate","Don Juan Conservas","Rikesa","Mavesa",
+  "Marco Polo","Caserita Conservas","Iansa","Ambrosoli","Esmeralda","Aconcagua",
+  "Underwood","Evercrisp","Barcel","Sembrasol","Delicia","La Comadre","",
 
   //  Conservas de pescado (solo abarrotes)
   "San José","Aceituno","Robinson Crusoe","Van Camp’s","Jurel Azul",
@@ -141,8 +143,9 @@ const MARCAS_CONOCIDAS = [
   "Sugal","Domino Azúcar","Zuccaro","SweetZero","Tagatosa Iansa",
 
   //  Sal, condimentos básicos de despensa
-  "Cisne","Lobos","Miraflores Sal","Astra","Aliño Completo Gourmet",
+  "Cisne","Lobos","Miraflores Sal","Astra","Aliño Completo Gourmet","Gourmet",
   "Gourmet Condimentos","Karavansay Condimentos","Knorr Condimentos","McCormick",
+  "Caricia","Lider","Cock Brand","Kraft",
 
   //  Comidas listas en conserva o envase
   "Maggi","Knorr","Clemente Jacques","Puré Maggi","Acuenta Preparados",
@@ -163,7 +166,8 @@ const MARCAS_CONOCIDAS = [
   //  Jugos naturales y premium (botella, prensado, sin azúcar)
   "Natural One","Ama","Asofrut","Livean Natural","Watt's Natural",
   "Tamaya","Pomar","Cocotazo","Néctar Manare","Jugo NotCo Fruit",
-  "Watt’s 100%","Cosecha Fresca","Jugos Casa Noble",
+  "Watt’s 100%","Cosecha Fresca","Jugos Casa Noble","Pomarola",
+  "Iselita",
 
   //  Aguas minerales y purificadas
   "Benedictino","Vital","Cachantún","Dasani","San Pellegrino",
@@ -179,7 +183,7 @@ const MARCAS_CONOCIDAS = [
 
   //  Bebidas funcionales (con vitaminas, bajos en calorías, etc.)
   "VitaminWater","Livean","Benjoy","B-Light","Flow Vitamin",
-  "Néctar Zero Vivo","Gatorade Fit","Glow Up Drink",
+  "Néctar Zero Vivo","Gatorade Fit","Glow Up Drink","P.A.N",
 
   //  Vinos chilenos (viñas presentes en retail)
   "Concha y Toro","Santa Rita","Undurraga","Casillero del Diablo",
@@ -194,14 +198,16 @@ const MARCAS_CONOCIDAS = [
 
   //  Pisco chileno (licor nacional)
   "Mistral","Control C","Alto del Carmen","Horcón Quemado","Campanario",
-  "Tres Erres","Mal Paso","Waqar","Coloso","Legado","Kappa",
+  "Tres Erres","Mal Paso","Waqar","Coloso","Legado","Kappa","Coliseo",
+  "Pontevedra","El Gobernador","Capel","Talliani","Trattoria","Lays","Tostitos",
+  "",
 
   //  Cervezas nacionales
   "Cristal","Escudo","Royal Guard","Kunstmann","Austral",
   "Torobayo","Quimera","Cuello Negro","Minerva","Szot","Volcanes del Sur",
 
   //  Cervezas importadas
-  "Heineken","Corona","Budweiser","Stella Artois","Kross",
+  "Heineken","Corona","Budweiser","Stella Artois","Kross","Stevia",
   "Becker","Peroni","Pilsner Urquell","Hoegaarden","Leffe","Patagonia",
 
   //  Whisky, ron, tequila, vodka, gin
@@ -213,8 +219,8 @@ const MARCAS_CONOCIDAS = [
   "José Cuervo","Don Julio","Espolón","1800 Tequila",
 
   //  Licores dulces + aperitivos
-  "Baileys","Amaretto Disaronno","Aperol","Campari",
-  "Jägermeister","Sheridan’s","Fernet Branca","Benedictine",
+  "Baileys","Amaretto Disaronno","Aperol","Campari","Selección","Oregon","Imperial",
+  "Jägermeister","Sheridan’s","Fernet Branca","Benedictine","Lefersa","Royal",
   "Piscola Campanario","Artesanos Horcón Quemado","Amargo Andino",
 
   //  Shampoo, acondicionador y tratamiento capilar
@@ -310,12 +316,13 @@ const MARCAS_CONOCIDAS = [
   "Cat Chow","Gati","Whiskas","Master Cat","Champion Cat","Felix",
   "Purina Pro Plan Cat","Royal Canin Cat","Hill’s Science Diet Cat",
   "Instinct Cat","Nutrición Instinct Cat","Lider Cat","Tottus Cat","Acuenta Cat",
-  "Miau Miau","Evolve Cat Food",
+  "Miau Miau","Evolve Cat Food","Alusweet",
 
   //  Snacks y premios
   "Dogui","Deli-Treats","Whiskas Snacks","Pedigree Dentastix","Bakán Snacks",
   "Gati Snack","Master Cat Treats","Felix Party Mix","Pro Plan Biscuits",
   "Mighty Snack","Serrano Snacks","Snackytos Pet",
+  "Maruchan","Nissin","Deyco","Imperatore","Hoffmann","Van Camp´s",
 
   //  Arena para gatos
   "Sanicat","Cat’s Best","Performatrin Litter","Master Cat Arena","Gati Arena",
@@ -330,6 +337,7 @@ const MARCAS_CONOCIDAS = [
   "Petmax","Animal Planet Pets","ZooActive","PetLovers","Mascota Club",
   "Puppy Love Accesorios","Pet Friend","PetComfort","PetLine",
   "Petlife","Mundo Mascota","Doggies Accessory","Gatitown Accesorios",
+  "Traverso",
 
   //  Organización y almacenamiento
   "Rubbermaid","Sterilite","Plastiluz","Duraplast","Plasutil",
