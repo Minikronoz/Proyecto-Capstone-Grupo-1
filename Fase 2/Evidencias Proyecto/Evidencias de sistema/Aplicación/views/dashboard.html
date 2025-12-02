@@ -244,7 +244,7 @@ Chart.register(ChartDataLabels);
 //  VARIABLES GLOBALES
 // =============================================================
 let charts = {};
-let filtros = {}; // ✅ Variable global para filtros
+let filtros = {};
 
 // Variables para scroll infinito
 let paginaBajas = 1;
@@ -254,7 +254,6 @@ let cargandoSubidas = false;
 let hayMasBajas = true;
 let hayMasSubidas = true;
 
-// ✅ NUEVA VARIABLE: Guardar filtros de precios para scroll infinito
 let filtrosPrecios = {};
 
 // =============================================================
@@ -307,7 +306,7 @@ async function cargarBajas(filtros = {}, append = false) {
     paginaBajas = 1;
     hayMasBajas = true;
     
-    // ✅ GUARDAR FILTROS PARA SCROLL INFINITO
+    
     filtrosPrecios = { ...filtros };
   } else {
     const loaderRow = document.createElement('tr');
@@ -321,9 +320,9 @@ async function cargarBajas(filtros = {}, append = false) {
   }
 
   try {
-    // ✅ USAR SIEMPRE filtrosPrecios (que ya tiene supermercado, desde, hasta)
+    
     const params = new URLSearchParams({
-      ...filtrosPrecios, // ✅ Mantener filtros anteriores
+      ...filtrosPrecios, 
       page: paginaBajas,
       limit: 20
     });
@@ -340,7 +339,7 @@ async function cargarBajas(filtros = {}, append = false) {
       if (!append) {
         tbody.innerHTML = `
           <tr><td colspan="6" style="text-align:center; padding:20px; color:#94a3b8;">
-            📊 No hay bajas de precio recientes
+            No hay bajas de precio recientes
           </td></tr>
         `;
       }
@@ -383,11 +382,11 @@ async function cargarBajas(filtros = {}, append = false) {
     paginaBajas++;
 
   } catch (error) {
-    console.error("❌ Error cargando bajas:", error);
+    console.error("Error cargando bajas:", error);
     if (!append) {
       tbody.innerHTML = `
         <tr><td colspan="6" style="text-align:center; padding:20px; color:#ef4444;">
-          ❌ Error al cargar datos
+          Error al cargar datos
         </td></tr>
       `;
     }
@@ -414,7 +413,7 @@ async function cargarSubidas(filtros = {}, append = false) {
     paginaSubidas = 1;
     hayMasSubidas = true;
     
-    // ✅ GUARDAR FILTROS PARA SCROLL INFINITO
+   
     filtrosPrecios = { ...filtros };
   } else {
     const loaderRow = document.createElement('tr');
@@ -428,14 +427,14 @@ async function cargarSubidas(filtros = {}, append = false) {
   }
 
   try {
-    // ✅ USAR SIEMPRE filtrosPrecios
+    
     const params = new URLSearchParams({
-      ...filtrosPrecios, // ✅ Mantener filtros anteriores
+      ...filtrosPrecios, 
       page: paginaSubidas,
       limit: 20
     });
     
-    console.log(`🔍 Cargando subidas - Página ${paginaSubidas} con filtros:`, Object.fromEntries(params));
+    console.log(`Cargando subidas - Página ${paginaSubidas} con filtros:`, Object.fromEntries(params));
     
     const res = await fetch(`/api/estadisticas/subidas?${params}`);
     const data = await res.json();
@@ -480,11 +479,11 @@ async function cargarSubidas(filtros = {}, append = false) {
     paginaSubidas++;
 
   } catch (error) {
-    console.error("❌ Error cargando subidas:", error);
+    console.error("Error cargando subidas:", error);
     if (!append) {
       tbody.innerHTML = `
         <tr><td colspan="6" style="text-align:center; padding:20px; color:#ef4444;">
-          ❌ Error al cargar datos
+           Error al cargar datos
         </td></tr>
       `;
     }
@@ -506,7 +505,7 @@ function setupInfiniteScroll() {
       
       if (scrollTop + clientHeight >= scrollHeight - 50 && hayMasBajas && !cargandoBajas) {
         console.log("🔄 Cargando más bajas...");
-        cargarBajas({}, true); // ✅ El segundo parámetro indica append=true
+        cargarBajas({}, true); 
       }
     });
   }
@@ -517,7 +516,7 @@ function setupInfiniteScroll() {
       
       if (scrollTop + clientHeight >= scrollHeight - 50 && hayMasSubidas && !cargandoSubidas) {
         console.log("🔄 Cargando más subidas...");
-        cargarSubidas({}, true); // ✅ El segundo parámetro indica append=true
+        cargarSubidas({}, true); 
       }
     });
   }
@@ -526,9 +525,12 @@ function setupInfiniteScroll() {
 // =============================================================
 //  RENDERIZAR GRÁFICOS GENERALES (OPTIMIZADO)
 // =============================================================
+
+
+
 async function renderChart(id, url, label, filtros = {}) {
   const canvas = document.getElementById(id);
-  if (!canvas) return console.warn(`⚠️ No existe canvas con id "${id}".`);
+  if (!canvas) return console.warn(` No existe canvas con id "${id}".`);
 
   const ctx = canvas.getContext("2d");
   const data = await fetchData(url, filtros);
@@ -544,15 +546,13 @@ async function renderChart(id, url, label, filtros = {}) {
   }
 
   const valores = data.map(d => d.promedio ?? d.total ?? d.value ?? d.valor ?? 0);
-  const etiquetas = data.map(d => d.tienda ?? d.nombre ?? d._id ?? d.label ?? "—");
+  const etiquetas = data.map(d => {
+    const label = d.tienda ?? d.nombre ?? d._id ?? d.label ?? "—";
+    return typeof label === "string" ? label.toLowerCase() : label;
+  });
 
   const idLineas = ["clicsPorDia", "busquedasPorDia", "comparativaConsultasBusquedas", "actividadPorHora", "usuariosActivosDia"];
   const tipoGrafico = idLineas.includes(id) ? "line" : "bar";
-
-  // 🎨 Gradiente corporativo elegante
-  const gradient = ctx.createLinearGradient(0, 0, 0, 320);
-  gradient.addColorStop(0, "rgba(0,167,181,0.9)");
-  gradient.addColorStop(1, "rgba(0,167,181,0.25)");
 
   charts[id] = new Chart(ctx, {
     type: tipoGrafico,
@@ -561,13 +561,13 @@ async function renderChart(id, url, label, filtros = {}) {
       datasets: [{
         label,
         data: valores,
-        backgroundColor: tipoGrafico === "bar" ? gradient : "rgba(0,167,181,0.18)",
+        backgroundColor: tipoGrafico === "bar" ? "rgba(0,167,181,0.85)" : "rgba(0,167,181,0.2)",
         borderColor: "#007a85",
         borderWidth: 2,
         fill: tipoGrafico === "line",
         tension: 0.35,
-        borderRadius: tipoGrafico === "bar" ? 14 : 0,
-        pointBackgroundColor: "#009FB0"
+        borderRadius: tipoGrafico === "bar" ? 10 : 0,
+        pointBackgroundColor: "#007a85"
       }]
     },
     options: {
@@ -575,6 +575,18 @@ async function renderChart(id, url, label, filtros = {}) {
       maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
+        datalabels: tipoGrafico === "bar" ? {
+          anchor: "end",
+          align: "top",
+          offset: 4,
+          formatter: value => value.toLocaleString("es-CL"),
+          color: "#0f172a",
+          font: { 
+            weight: "400",
+            size: 13,
+            family: "Poppins"
+          }
+        } : { display: false },
         tooltip: {
           backgroundColor: "#1E293B",
           titleColor: "#fff",
@@ -587,22 +599,37 @@ async function renderChart(id, url, label, filtros = {}) {
       },
       scales: {
         x: {
-          ticks: { color: "#334155", font: { size: 12, weight: "600" } },
+          ticks: { 
+            color: "#1E293B",
+            font: { 
+              size: 14,
+              weight: "400",
+              family: "Poppins"
+            }
+          },
           grid: { color: "transparent" }
         },
         y: {
           beginAtZero: true,
           ticks: {
             color: "#475569",
-            font: { size: 12 },
+            font: { 
+              size: 12,
+              weight: "400",
+              family: "Poppins"
+            },
             callback: v => v.toLocaleString("es-CL")
           },
           grid: { color: "rgba(0,0,0,0.06)" }
         }
       }
-    }
+    },
+    plugins: tipoGrafico === "bar" ? [ChartDataLabels] : []
   });
 }
+
+
+
 
 
 async function renderTopProductos(filtros = {}) {
@@ -624,13 +651,11 @@ async function renderTopProductos(filtros = {}) {
   }
 
   data = data.slice(0, 10);
-  const etiquetas = data.map(d => d.nombre || d._id);
+  const etiquetas = data.map(d => {
+    const nombre = d.nombre || d._id;
+    return typeof nombre === "string" ? nombre.toLowerCase() : nombre; 
+  });
   const valores = data.map(d => d.total);
-  const max = Math.max(...valores);
-
-  const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-  gradient.addColorStop(0, "rgba(0, 167, 181, 0.25)");
-  gradient.addColorStop(1, "rgba(0, 167, 181, 0.85)");
 
   if (charts[id]) charts[id].destroy();
 
@@ -641,23 +666,33 @@ async function renderTopProductos(filtros = {}) {
       datasets: [{
         label: "Clics",
         data: valores,
-        backgroundColor: valores.map(v => v === max ? "rgba(67,160,71,0.85)" : gradient),
-        borderColor: valores.map(v => v === max ? "#2e7d32" : "#009FB0"),
+        backgroundColor: "rgba(0,167,181,0.85)",
+        borderColor: "#007a85",
         borderWidth: 2,
-        borderRadius: 12
+        borderRadius: 10
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      layout: {
+        padding: {
+          top: 30
+        }
+      },
       plugins: {
         legend: { display: false },
         datalabels: {
           anchor: "end",
           align: "top",
+          offset: 4,
           formatter: (val) => val.toLocaleString("es-CL"),
           color: "#0f172a",
-          font: { weight: "bold", size: 12 }
+          font: { 
+            weight: "400",
+            size: 13, 
+            family: "Poppins" 
+          }
         },
         tooltip: {
           backgroundColor: "#1E293B",
@@ -669,7 +704,7 @@ async function renderTopProductos(filtros = {}) {
               const i = ctx.dataIndex;
               const clicks = valores[i];
               const tienda = data[i]?.store || "Sin información";
-              return `${clicks} Busquedas— 🏬 ${tienda.toUpperCase()}`;
+              return `${clicks} Búsquedas — 🏬 ${tienda.toUpperCase()}`;
             }
           }
         }
@@ -677,31 +712,40 @@ async function renderTopProductos(filtros = {}) {
       scales: {
         x: {
           ticks: {
-            color: "#334155",
-            font: { size: 11, weight: "600" },
+            color: "#1E293B",
+            font: { 
+              size: 14, 
+              weight: "400",
+              family: "Poppins" 
+            },
             maxRotation: 45,
             minRotation: 45,
             callback: (value, index) => {
               const label = etiquetas[index] || "";
-              return label.length > 14 ? label.slice(0, 14) + "…" : label;
+              return label.length > 14 ? label.slice(0, 14) + "…" : label; 
             }
           },
           grid: { color: "transparent" }
         },
         y: {
           beginAtZero: true,
+          max: Math.max(...valores) + 1,
           ticks: {
             color: "#475569",
-            font: { size: 12 },
+            font: { 
+              size: 12, 
+              weight: "400",
+              family: "Poppins" 
+            },
             callback: v => v.toLocaleString("es-CL")
           },
           grid: { color: "rgba(0,0,0,0.06)" }
         }
       }
-    }
+    },
+    plugins: [ChartDataLabels]
   });
 }
-
 
 
 async function renderProductosPorTiempo(filtros = {}) {
@@ -743,21 +787,45 @@ async function renderProductosPorTiempo(filtros = {}) {
         borderColor: "#009FB0",
         borderWidth: 2,
         tension: 0.4,
-        pointRadius: 5,
+        pointRadius: 7,                   
         pointBackgroundColor: "#007a85",
-        pointHoverRadius: 7
+        pointBorderColor: "#ffffff",      
+        pointBorderWidth: 2,             
+        pointHoverRadius: 10,              
+        pointHoverBackgroundColor: "#00a7b5", 
+        pointHoverBorderWidth: 3,         
+        hitRadius: 15                     
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      layout: {
+        padding: {
+          top: 30
+        }
+      },
       plugins: {
         legend: { display: false },
+        datalabels: {
+          anchor: "end",
+          align: "top",
+          offset: 8,
+          formatter: value => value.toLocaleString("es-CL"),
+          color: "#0f172a",
+          font: { 
+            weight: "600",
+            size: 12,
+            family: "Poppins" 
+          }
+        },
         tooltip: {
           backgroundColor: "#1E293B",
           titleColor: "#fff",
           bodyColor: "#fff",
           displayColors: false,
+          padding: 12,                     // ✅ Tooltip más grande
+          cornerRadius: 8,                 // ✅ Bordes redondeados
           callbacks: {
             label: (ctx) => {
               const i = ctx.dataIndex;
@@ -772,7 +840,11 @@ async function renderProductosPorTiempo(filtros = {}) {
         x: {
           ticks: {
             color: "#334155",
-            font: { size: 11, weight: "600" },
+            font: { 
+              size: 11, 
+              weight: "400",
+              family: "Poppins" 
+            },
             callback: (value) => {
               const label = etiquetas[value] || "";
               return label.length > 10 ? label.slice(0, 10) : label;
@@ -782,22 +854,31 @@ async function renderProductosPorTiempo(filtros = {}) {
         },
         y: {
           beginAtZero: true,
+          max: Math.max(...valores) + 1,
           ticks: {
             color: "#475569",
-            font: { size: 12 },
+            font: { 
+              size: 12, 
+              weight: "400",
+              family: "Poppins" 
+            },
             callback: v => v.toLocaleString("es-CL")
           },
           grid: { color: "rgba(0,0,0,0.06)" }
         }
       }
-    }
+    },
+    plugins: [ChartDataLabels]
   });
 }
 
 
 
+
+
+
 async function renderCompetitividadChart(id, url, label, filtros = {}) {
-  const data = await fetchData(url, filtros); // ✅ CORREGIDO: pasar filtros
+  const data = await fetchData(url, filtros);
   const canvas = document.getElementById(id);
   if (!canvas) return;
 
@@ -811,9 +892,12 @@ async function renderCompetitividadChart(id, url, label, filtros = {}) {
     return;
   }
 
-  const etiquetas = data.map(d => d.tienda);
+  const etiquetas = data.map(d => d.tienda.toLowerCase()); // ✅ Minúsculas
   const valores = data.map(d => d.promedio);
-  const mejorPrecio = Math.min(...valores);
+  
+  // ✅ Calcular rango para el eje Y (de 500 en 500)
+  const minValor = Math.floor(Math.min(...valores) / 500) * 500;
+  const maxValor = Math.ceil(Math.max(...valores) / 500) * 500;
 
   charts[id] = new Chart(ctx, {
     type: "bar",
@@ -822,8 +906,8 @@ async function renderCompetitividadChart(id, url, label, filtros = {}) {
       datasets: [{
         label,
         data: valores,
-        backgroundColor: valores.map(v => v === mejorPrecio ? "rgba(67,160,71,0.9)" : "rgba(0,167,181,0.85)"),
-        borderColor: valores.map(v => v === mejorPrecio ? "#2e7d32" : "#007a85"),
+        backgroundColor: "rgba(0,167,181,0.85)",
+        borderColor: "#007a85",
         borderWidth: 2,
         borderRadius: 10
       }]
@@ -835,11 +919,15 @@ async function renderCompetitividadChart(id, url, label, filtros = {}) {
         legend: { display: false },
         datalabels: {
           anchor: "end",
-          align: "start",
-          offset: -6,
+          align: "top",
+          offset: 4,
           formatter: value => `$${value.toLocaleString("es-CL")}`,
           color: "#0f172a",
-          font: { weight: "bold", size: 12 }
+          font: { 
+            weight: "400",      // ✅ Peso normal (sin negrita)
+            size: 13,
+            family: "Poppins"
+          }
         },
         tooltip: {
           backgroundColor: "#1E293B",
@@ -854,15 +942,29 @@ async function renderCompetitividadChart(id, url, label, filtros = {}) {
       scales: {
         y: {
           beginAtZero: false,
+          min: minValor,
+          max: maxValor,
           ticks: {
+            stepSize: 500,
             callback: v => "$" + v.toLocaleString("es-CL"),
-            color: "#334155",
-            font: { size: 13 }
+            color: "#475569",
+            font: { 
+              size: 12,
+              weight: "400",    // ✅ Peso normal (sin negrita)
+              family: "Poppins"
+            }
           },
-          grid: { color: "rgba(0,0,0,0.05)" }
+          grid: { color: "rgba(0,0,0,0.06)" }
         },
         x: {
-          ticks: { color: "#1E293B", font: { size: 14, weight: "bold" } },
+          ticks: { 
+            color: "#1E293B", 
+            font: { 
+              size: 14, 
+              weight: "400",    // ✅ Peso normal (sin negrita)
+              family: "Poppins"
+            }
+          },
           grid: { color: "transparent" }
         }
       }
@@ -870,6 +972,8 @@ async function renderCompetitividadChart(id, url, label, filtros = {}) {
     plugins: [ChartDataLabels]
   });
 }
+
+
 
 async function renderTendencia(filtros = {}) {
   const id = "chartTendencia";

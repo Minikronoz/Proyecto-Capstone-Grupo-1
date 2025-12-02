@@ -417,7 +417,7 @@ const MARCAS_CONOCIDAS = [
   "Acuenta (pet, alimentos, hogar)"
 ];
 
-function generarGlobalId(title, brand) {
+function generarGlobalId(title, brand, codigoProducto = null) {
   const normalizar = (txt) =>
     txt
       ?.toLowerCase()
@@ -434,8 +434,15 @@ function generarGlobalId(title, brand) {
   const tituloNorm = normalizar(title);
   const unidad = extraerUnidad(title);
   const brandNorm = normalizar(brand);
+  
+  // ✅ SI EXISTE CÓDIGO DEL PRODUCTO, LO USAMOS (MÁS CONFIABLE)
+  if (codigoProducto) {
+    const cadena = `${STORE}_${codigoProducto}`; // Ejemplo: "acuenta_937918"
+    return crypto.createHash("md5").update(cadena).digest("hex").substring(0, 12);
+  }
+  
+  // ✅ SI NO, USAMOS EL MÉTODO ANTIGUO (para otros supermercados)
   const cadena = `${brandNorm}_${tituloNorm}_${unidad}`;
-
   return crypto.createHash("md5").update(cadena).digest("hex").substring(0, 12);
 }
 
@@ -521,6 +528,21 @@ function detectarMarca(title = "", link = "") {
 
   // ✅ 3. Si no encuentra nada, devolver "Sin Marca"
   return "Sin Marca";
+}
+
+// =============================================================
+//  EXTRAER CÓDIGO DEL PRODUCTO DESDE EL LINK
+// =============================================================
+function extraerCodigoProducto(link = "") {
+  if (!link || typeof link !== "string") return null;
+  
+  // ✅ Acuenta usa URLs como:
+  // https://www.acuenta.cl/p/bicarbonato-de-sodio-30-g-lider-937918
+  // https://www.acuenta.cl/p/bicarbonato-de-sodio-30grs-lider-937918
+  // El CÓDIGO SIEMPRE está al final: 937918
+  
+  const match = link.match(/\/p\/[\w-]+-(\d{6,})/); // Buscar 6+ dígitos al final
+  return match ? match[1] : null;
 }
 
 // =============================================================
@@ -775,10 +797,13 @@ for (const [i, prod] of productosFinal.entries()) {
 
   const { unitValue, unitName } = procesarUnit(prod.pricePerUnit);
   
-  // ✅ PASAR EL LINK TAMBIÉN
   const marcaDetectada = detectarMarca(prod.title, prod.link);
   
-  const globalId = generarGlobalId(prod.title, marcaDetectada);
+  // ✅ EXTRAER CÓDIGO DEL PRODUCTO DESDE EL LINK
+  const codigoProducto = extraerCodigoProducto(prod.link);
+  
+  // ✅ GENERAR globalId CON EL CÓDIGO
+  const globalId = generarGlobalId(prod.title, marcaDetectada, codigoProducto);
 
   const existente = await colProductos.findOne({ globalId, store: STORE });
 
@@ -790,13 +815,14 @@ for (const [i, prod] of productosFinal.entries()) {
           $set: {
             globalId,
             title: prod.title,
-            brand: marcaDetectada, // ✅ Marca desde título O link
+            brand: marcaDetectada,
             currentPrice: precioNum,
             formattedPrice: prod.price,
             pricePerUnit: prod.pricePerUnit || null,
             offerDescription: prod.offerDescription || null,
             lastUpdate: new Date(),
-            categoria: prod.categoria
+            categoria: prod.categoria,
+            codigoProducto // ✅ Guardar código también
           }
         }
       );
@@ -819,7 +845,7 @@ for (const [i, prod] of productosFinal.entries()) {
     await colProductos.insertOne({
       globalId,
       title: prod.title,
-      brand: marcaDetectada, // ✅ Marca desde título O link
+      brand: marcaDetectada,
       store: STORE,
       currentPrice: precioNum,
       formattedPrice: prod.price,
@@ -830,6 +856,7 @@ for (const [i, prod] of productosFinal.entries()) {
       image: prod.image,
       link: prod.link,
       categoria: prod.categoria,
+      codigoProducto, // ✅ Guardar código también
       lastUpdate: new Date()
     });
 
