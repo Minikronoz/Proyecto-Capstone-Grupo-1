@@ -43,7 +43,6 @@ var import_helper = require("../helper");
 var network = __toESM(require("../network"));
 var import_page = require("../page");
 var import_registry = require("../registry");
-var import_crAccessibility = require("./crAccessibility");
 var import_crCoverage = require("./crCoverage");
 var import_crDragDrop = require("./crDragDrop");
 var import_crExecutionContext = require("./crExecutionContext");
@@ -267,9 +266,6 @@ class CRPage {
   }
   async adoptElementHandle(handle, to) {
     return this._sessionForHandle(handle)._adoptElementHandle(handle, to);
-  }
-  async getAccessibilityTree(needle) {
-    return (0, import_crAccessibility.getAccessibilityTree)(this._mainFrameSession._client, needle);
   }
   async inputActionEpilogue() {
     await this._mainFrameSession._client.send("Page.enable").catch((e) => {
@@ -620,6 +616,10 @@ class FrameSession {
     session.once("Runtime.executionContextCreated", async (event2) => {
       worker.createExecutionContext(new import_crExecutionContext.CRExecutionContext(session, event2.context));
     });
+    if (this._crPage._browserContext._browser.majorVersion() >= 143)
+      session.on("Inspector.workerScriptLoaded", () => worker.workerScriptLoaded());
+    else
+      worker.workerScriptLoaded();
     session._sendMayFail("Runtime.enable");
     this._crPage._networkManager.addSession(session, this._page.frameManager.frame(this._targetId) ?? void 0).catch(() => {
     });
@@ -629,7 +629,7 @@ class FrameSession {
     session.on("Target.detachedFromTarget", (event2) => this._onDetachedFromTarget(event2));
     session.on("Runtime.consoleAPICalled", (event2) => {
       const args = event2.args.map((o) => (0, import_crExecutionContext.createHandle)(worker.existingExecutionContext, o));
-      this._page.addConsoleMessage(event2.type, args, (0, import_crProtocolHelper.toConsoleMessageLocation)(event2.stackTrace));
+      this._page.addConsoleMessage(worker, event2.type, args, (0, import_crProtocolHelper.toConsoleMessageLocation)(event2.stackTrace));
     });
     session.on("Runtime.exceptionThrown", (exception) => this._page.addPageError((0, import_crProtocolHelper.exceptionToError)(exception.exceptionDetails)));
   }
@@ -664,7 +664,7 @@ class FrameSession {
     if (!context)
       return;
     const values = event.args.map((arg) => (0, import_crExecutionContext.createHandle)(context, arg));
-    this._page.addConsoleMessage(event.type, values, (0, import_crProtocolHelper.toConsoleMessageLocation)(event.stackTrace));
+    this._page.addConsoleMessage(null, event.type, values, (0, import_crProtocolHelper.toConsoleMessageLocation)(event.stackTrace));
   }
   async _onBindingCalled(event) {
     const pageOrError = await this._crPage._page.waitForInitializedOrError();
@@ -706,7 +706,7 @@ class FrameSession {
         lineNumber: lineNumber || 0,
         columnNumber: 0
       };
-      this._page.addConsoleMessage(level, [], location, text);
+      this._page.addConsoleMessage(null, level, [], location, text);
     }
   }
   async _onFileChooserOpened(event) {

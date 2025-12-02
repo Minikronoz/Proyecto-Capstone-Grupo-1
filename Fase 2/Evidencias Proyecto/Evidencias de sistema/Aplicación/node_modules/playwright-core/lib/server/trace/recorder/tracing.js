@@ -40,6 +40,7 @@ var import_assert = require("../../../utils/isomorphic/assert");
 var import_time = require("../../../utils/isomorphic/time");
 var import_eventsHelper = require("../../utils/eventsHelper");
 var import_crypto = require("../../utils/crypto");
+var import_userAgent = require("../../utils/userAgent");
 var import_artifact = require("../../artifact");
 var import_browserContext = require("../../browserContext");
 var import_dispatcher = require("../../dispatchers/dispatcher");
@@ -74,6 +75,7 @@ class Tracing extends import_instrumentation.SdkObject {
       type: "context-options",
       origin: "library",
       browserName: "",
+      playwrightVersion: (0, import_userAgent.getPlaywrightVersion)(),
       options: {},
       platform: process.platform,
       wallTime: 0,

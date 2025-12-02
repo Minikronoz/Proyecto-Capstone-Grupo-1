@@ -22,7 +22,6 @@ __export(page_exports, {
   Page: () => Page
 });
 module.exports = __toCommonJS(page_exports);
-var import_accessibility = require("./accessibility");
 var import_artifact = require("./artifact");
 var import_channelOwner = require("./channelOwner");
 var import_clientHelper = require("./clientHelper");
@@ -65,7 +64,6 @@ class Page extends import_channelOwner.ChannelOwner {
     this._locatorHandlers = /* @__PURE__ */ new Map();
     this._browserContext = parent;
     this._timeoutSettings = new import_timeoutSettings.TimeoutSettings(this._platform, this._browserContext._timeoutSettings);
-    this.accessibility = new import_accessibility.Accessibility(this._channel);
     this.keyboard = new import_input.Keyboard(this);
     this.mouse = new import_input.Mouse(this);
     this.request = this._browserContext.request;
@@ -536,7 +534,7 @@ class Page extends import_channelOwner.ChannelOwner {
   }
   async consoleMessages() {
     const { messages } = await this._channel.consoleMessages();
-    return messages.map((message) => new import_consoleMessage.ConsoleMessage(this._platform, message, this));
+    return messages.map((message) => new import_consoleMessage.ConsoleMessage(this._platform, message, this, null));
   }
   async pageErrors() {
     const { errors } = await this._channel.pageErrors();
@@ -676,8 +674,7 @@ class Page extends import_channelOwner.ChannelOwner {
     return result.pdf;
   }
   async _snapshotForAI(options = {}) {
-    const result = await this._channel.snapshotForAI({ timeout: this._timeoutSettings.timeout(options) });
-    return result.snapshot;
+    return await this._channel.snapshotForAI({ timeout: this._timeoutSettings.timeout(options), track: options.track });
   }
 }
 class BindingCall extends import_channelOwner.ChannelOwner {

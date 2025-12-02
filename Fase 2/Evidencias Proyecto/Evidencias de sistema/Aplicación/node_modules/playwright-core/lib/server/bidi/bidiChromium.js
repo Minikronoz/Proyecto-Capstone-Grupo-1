@@ -40,7 +40,7 @@ var import_chromiumSwitches = require("../chromium/chromiumSwitches");
 var import_chromium = require("../chromium/chromium");
 class BidiChromium extends import_browserType.BrowserType {
   constructor(parent) {
-    super(parent, "_bidiChromium");
+    super(parent, "chromium");
   }
   async connectToTransport(transport, options, browserLogsCollector) {
     const bidiTransport = await require("./bidiOverCdp").connectBidiOverCdp(transport);

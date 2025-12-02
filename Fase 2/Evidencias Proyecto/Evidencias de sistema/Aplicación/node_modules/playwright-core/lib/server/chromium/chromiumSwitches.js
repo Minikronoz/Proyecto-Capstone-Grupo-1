@@ -46,9 +46,11 @@ const disabledFeatures = (assistantMode) => [
   "AutoDeElevate",
   // See https://github.com/microsoft/playwright/issues/37714
   "RenderDocument",
+  // Prevents downloading optimization hints on startup.
+  "OptimizationHints",
   assistantMode ? "AutomationControlled" : ""
 ].filter(Boolean);
-const chromiumSwitches = (assistantMode, channel) => [
+const chromiumSwitches = (assistantMode, channel, android) => [
   "--disable-field-trial-config",
   // https://source.chromium.org/chromium/chromium/src/+/main:testing/variations/README.md
   "--disable-background-networking",
@@ -87,7 +89,14 @@ const chromiumSwitches = (assistantMode, channel) => [
   "--unsafely-disable-devtools-self-xss-warnings",
   // Edge can potentially restart on Windows (msRelaunchNoCompatLayer) which looses its file descriptors (stdout/stderr) and CDP (3/4). Disable until fixed upstream.
   "--edge-skip-compat-layer-relaunch",
-  assistantMode ? "" : "--enable-automation"
+  assistantMode ? "" : "--enable-automation",
+  // This disables Chrome for Testing infobar that is visible in the persistent context.
+  // The switch is ignored everywhere else, including Chromium/Chrome/Edge.
+  "--disable-infobars",
+  // Less annoying popups.
+  "--disable-search-engine-choice-screen",
+  // Prevents the "three dots" menu crash in IdentityManager::HasPrimaryAccount for ephemeral contexts.
+  android ? "" : "--disable-sync"
 ].filter(Boolean);
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

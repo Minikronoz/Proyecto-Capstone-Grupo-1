@@ -41,7 +41,7 @@ var import_firefoxPrefs = require("./third_party/firefoxPrefs");
 var import_manualPromise = require("../../utils/isomorphic/manualPromise");
 class BidiFirefox extends import_browserType.BrowserType {
   constructor(parent) {
-    super(parent, "_bidiFirefox");
+    super(parent, "firefox");
   }
   executablePath() {
     return "";

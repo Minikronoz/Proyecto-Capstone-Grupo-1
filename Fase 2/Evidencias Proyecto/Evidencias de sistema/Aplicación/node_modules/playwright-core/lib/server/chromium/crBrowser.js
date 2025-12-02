@@ -53,6 +53,7 @@ class CRBrowser extends import_browser.Browser {
     this._crPages = /* @__PURE__ */ new Map();
     this._serviceWorkers = /* @__PURE__ */ new Map();
     this._version = "";
+    this._majorVersion = 0;
     this._tracingRecording = false;
     this._userAgent = "";
     this._connection = connection;
@@ -75,6 +76,10 @@ class CRBrowser extends import_browser.Browser {
       await options.__testHookOnConnectToBrowser();
     const version = await session.send("Browser.getVersion");
     browser._version = version.product.substring(version.product.indexOf("/") + 1);
+    try {
+      browser._majorVersion = +browser._version.split(".")[0];
+    } catch {
+    }
     browser._userAgent = version.userAgent;
     browser.options.headful = !version.userAgent.includes("Headless");
     if (!options.persistent) {
@@ -115,6 +120,9 @@ class CRBrowser extends import_browser.Browser {
   }
   version() {
     return this._version;
+  }
+  majorVersion() {
+    return this._majorVersion;
   }
   userAgent() {
     return this._userAgent;

@@ -23,11 +23,15 @@ __export(consoleMessage_exports, {
 module.exports = __toCommonJS(consoleMessage_exports);
 var import_jsHandle = require("./jsHandle");
 class ConsoleMessage {
-  constructor(platform, event, page) {
+  constructor(platform, event, page, worker) {
     this._page = page;
+    this._worker = worker;
     this._event = event;
     if (platform.inspectCustom)
       this[platform.inspectCustom] = () => this._inspect();
+  }
+  worker() {
+    return this._worker;
   }
   page() {
     return this._page;

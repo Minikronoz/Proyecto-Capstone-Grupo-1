@@ -85,7 +85,8 @@ const Events = {
     FrameSent: "framesent"
   },
   Worker: {
-    Close: "close"
+    Close: "close",
+    Console: "console"
   },
   ElectronApplication: {
     Close: "close",

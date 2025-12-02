@@ -20,11 +20,15 @@ var ariaSnapshot_exports = {};
 __export(ariaSnapshot_exports, {
   KeyParser: () => KeyParser,
   ParserError: () => ParserError,
+  ariaPropsEqual: () => ariaPropsEqual,
   parseAriaSnapshot: () => parseAriaSnapshot,
   parseAriaSnapshotUnsafe: () => parseAriaSnapshotUnsafe,
   textValue: () => textValue
 });
 module.exports = __toCommonJS(ariaSnapshot_exports);
+function ariaPropsEqual(a, b) {
+  return a.active === b.active && a.checked === b.checked && a.disabled === b.disabled && a.expanded === b.expanded && a.selected === b.selected && a.level === b.level && a.pressed === b.pressed;
+}
 function parseAriaSnapshotUnsafe(yaml, text, options = {}) {
   const result = parseAriaSnapshot(yaml, text, options);
   if (result.errors.length)
@@ -386,6 +390,7 @@ class ParserError extends Error {
 0 && (module.exports = {
   KeyParser,
   ParserError,
+  ariaPropsEqual,
   parseAriaSnapshot,
   parseAriaSnapshotUnsafe,
   textValue

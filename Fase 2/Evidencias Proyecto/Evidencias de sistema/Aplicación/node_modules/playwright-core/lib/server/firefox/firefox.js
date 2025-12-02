@@ -39,8 +39,19 @@ var import_ascii = require("../utils/ascii");
 var import_browserType = require("../browserType");
 var import_manualPromise = require("../../utils/isomorphic/manualPromise");
 class Firefox extends import_browserType.BrowserType {
-  constructor(parent) {
+  constructor(parent, bidiFirefox) {
     super(parent, "firefox");
+    this._bidiFirefox = bidiFirefox;
+  }
+  launch(progress, options, protocolLogger) {
+    if (options.channel?.startsWith("moz-"))
+      return this._bidiFirefox.launch(progress, options, protocolLogger);
+    return super.launch(progress, options, protocolLogger);
+  }
+  async launchPersistentContext(progress, userDataDir, options) {
+    if (options.channel?.startsWith("moz-"))
+      return this._bidiFirefox.launchPersistentContext(progress, userDataDir, options);
+    return super.launchPersistentContext(progress, userDataDir, options);
   }
   connectToTransport(transport, options) {
     return import_ffBrowser.FFBrowser.connect(this.attribution.playwright, transport, options);
