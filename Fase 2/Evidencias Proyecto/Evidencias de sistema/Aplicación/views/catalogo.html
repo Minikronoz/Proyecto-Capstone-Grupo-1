@@ -175,7 +175,26 @@ async function cerrarSesion(event) {
 </section>
 
 <!--  Filtro de PESO debajo del buscador -->
-<section id="filtros-peso"></section>
+<!--  Filtro de PESO debajo del buscador -->
+<section id="filtros-peso">
+  
+  <div class="grupo-filtro" id="grupo-volumen">
+    <h4 class="filtro-titulo">Filtrar por volumen</h4>
+    <div class="chips-container" id="chips-volumen">
+      <!-- Chips de volumen serán insertados dinámicamente -->
+    </div>
+  </div>
+
+  <div class="grupo-filtro" id="grupo-peso">
+    <h4 class="filtro-titulo">Filtrar por peso</h4>
+    <div class="chips-container" id="chips-peso">
+      <!-- Chips de peso serán insertados dinámicamente -->
+    </div>
+  </div>
+
+  <button class="btn-limpiar-filtro" id="btn-limpiar-filtros">Limpiar todos los filtros</button>
+
+</section>
 
 
 <div class="catalogo-layout">

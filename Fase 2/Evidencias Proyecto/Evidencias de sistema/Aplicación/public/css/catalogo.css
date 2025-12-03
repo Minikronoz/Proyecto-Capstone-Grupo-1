@@ -1407,6 +1407,33 @@ button:active, .btn-ver:active {
     opacity: 1;
   }
 }
+/* 🔄 Botón ACTUALIZAR – estilo profesional */
+.btn-recargar {
+  background: linear-gradient(135deg, #00a7b5, #008e9a);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  letter-spacing: .3px;
+  box-shadow: 0 3px 10px rgba(0, 167, 181, 0.25);
+  transition: all 0.25s ease;
+}
+
+/* Hover */
+.btn-recargar:hover {
+  background: linear-gradient(135deg, #0099a8, #007b89);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 14px rgba(0, 167, 181, 0.35);
+}
+
+/* Active */
+.btn-recargar:active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
 
 /* ================================
    SUPERMERCADOS NO DISPONIBLES (actualizados)
@@ -1702,83 +1729,96 @@ button:active, .btn-ver:active {
   justify-items: center;
   align-items: stretch;
 }
+/* ================================
+   CONTENEDOR FULL-WIDTH 📌
+================================ */
 #filtros-peso {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
+  width: 100%;                  /* 💯 ocupa el ancho completo */
+  max-width: none;              /* ❗ elimina límites */
+  display: block;               /* expande correctamente */
+  background: #e6f7fa;
+  border: 2px solid #00a7b5;
+  border-radius: 14px;
+
+  padding: 15px 20px;
+  margin-top: 15px;
+
+  overflow-x: auto;             /* 👉 scroll infinito a la derecha */
   overflow-y: hidden;
   white-space: nowrap;
-  padding: 10px 5px;
-  scrollbar-width: thin;
+
+  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
 }
 
+/* Títulos */
+#filtros-peso .filtro-titulo {
+  display: inline-block;
+  font-size: 15px;
+  font-weight: 700;
+  color: #006b7e;
+  margin: 10px 10px 8px 4px;
+}
+
+/* Chips */
+.chip-filtro {
+  display: inline-block;
+  padding: 7px 14px;
+  margin: 4px 6px;
+  font-size: 14px;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 2px solid #00a7b5;
+  color: #006b7e;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.chip-filtro:hover {
+  background: #00a7b5;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.chip-filtro.seleccionado {
+  background: #00a7b5;
+  color: white;
+  border-color: #007a86;
+  box-shadow: 0 2px 8px rgba(0,167,181,0.35);
+}
+
+/* Botón limpiar */
+.btn-limpiar-filtro {
+  display: inline-block;
+  padding: 6px 14px;
+  background: #ff5757;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-limpiar-filtro:hover {
+  background: #d13636;
+}
+
+/* Scrollbar */
 #filtros-peso::-webkit-scrollbar {
   height: 6px;
 }
 
 #filtros-peso::-webkit-scrollbar-thumb {
-  background: #ccc;
+  background: #00a7b5;
   border-radius: 4px;
 }
 
-#filtros-peso::-webkit-scrollbar-track {
-  background: transparent;
-}
 
-.chip-filtro {
-  display: inline-block;
-  padding: 8px 14px;
-  border-radius: 16px;
-  border: 1px solid #00a7b5;
-  background: #fff;
-  font-size: 14px;
-  cursor: pointer;
-  user-select: none;
-  white-space: nowrap;
-}
 
-.chip-filtro.seleccionado {
-  background: #00a7b5;
-  color: #fff;
-  border-color: #007a86;
-}
-
-.filtro-titulo {
-  font-size: 13px;
-  font-weight: bold;
-  margin-right: 10px;
-  white-space: nowrap;
-  position: relative;
-  top: 6px;
-}
-
-.btn-limpiar-filtro {
-  padding: 6px 14px;
-  border: none;
-  background: #ff5757;
-  color: #fff;
-  border-radius: 20px;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.btn-recargar {
-  background: #007a9c;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: 0.15s;
-}
-
-.btn-recargar:hover {
-  background: #005f77;
-}
-
-.btn-recargar:active {
-  transform: scale(0.96);
-}
 /* 🌌 Modal Fondo Oscuro */
 .modal-confirm {
   position: fixed;
