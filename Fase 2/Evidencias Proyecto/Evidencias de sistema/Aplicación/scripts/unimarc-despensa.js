@@ -568,7 +568,7 @@ async function main() {
 
   const colProductos = db.collection("productos");
 
-  const browser = await chromium.launch({ headless: false });
+  const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
     viewport: { width: 1920, height: 1080 },
   });
