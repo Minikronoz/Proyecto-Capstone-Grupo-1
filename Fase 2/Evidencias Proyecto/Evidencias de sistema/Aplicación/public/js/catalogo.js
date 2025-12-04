@@ -1389,6 +1389,12 @@ if (supermercadosAfectados.length > 0) {
 cont.innerHTML = html + mensajeAdvertencia;
 
 }
+function resetFiltroMarcas() {
+  selectedBrands.clear();                 // 🧹 Vaciar marcas seleccionadas
+  const checkboxes = document.querySelectorAll(".chkMarca");
+  checkboxes.forEach(chk => chk.checked = false); // 🔄 Desmarcar visualmente
+  filtrarProductos();                     // 🔃 Refrescar catálogo
+}
 
 async function cargarProductos(q = "", tiendas = []) {
   try {
@@ -1442,6 +1448,8 @@ async function cargarProductos(q = "", tiendas = []) {
 
     // Renderizar catálogo
     renderizarProductos(lista);
+      actualizarListaMarcas(data);  // 🔄 Reconstruir lista de marcas
+  resetFiltroMarcas();
 
   } catch (err) {
     console.error("❌ Error cargando catálogo:", err);
