@@ -67,7 +67,7 @@ async function scrapeSantaIsabel() {
   const historialDB = db.collection("priceHistory");
 
   const browser = await chromium.launch({
-    headless: false, // lo dejamos false como tenías para depurar visualmente
+    headless: true, // lo dejamos false como tenías para depurar visualmente
     args: ["--disable-blink-features=AutomationControlled"],
     ignoreDefaultArgs: ["--enable-automation"]
   });
