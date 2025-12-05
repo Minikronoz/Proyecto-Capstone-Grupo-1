@@ -16,6 +16,7 @@ import {
   distribucionUsuariosRegion,
   obtenerBajasDePrecio,
   obtenerSubidasDePrecio,
+  obtenerProductosVolatiles,
 } from "../controllers/estadisticas.controller.js";
 
 const router = express.Router();
@@ -65,8 +66,34 @@ router.get("/clics-por-supermercado", async (req, res) => {
 
     const data = await aggregateClicks([
       { $match: match },
-      { $group: { _id: "$supermercado", total: { $sum: 1 } } },
-      { $sort: { total: -1 } },
+
+      // 🔥 Normalización de supermercados (para evitar duplicados)
+      {
+        $addFields: {
+          supermercadoNormalizado: {
+            $switch: {
+              branches: [
+                { case: { $regexMatch: { input: "$supermercado", regex: /jumbo/i } }, then: "jumbo" },
+                { case: { $regexMatch: { input: "$supermercado", regex: /unimarc/i } }, then: "unimarc" },
+                { case: { $regexMatch: { input: "$supermercado", regex: /tottus/i } }, then: "tottus" },
+                { case: { $regexMatch: { input: "$supermercado", regex: /a[\s]*cuenta|acuenta/i } }, then: "acuenta" },
+                { case: { $regexMatch: { input: "$supermercado", regex: /santa[\s]*isabel|santaisabel/i } }, then: "santaisabel" }
+              ],
+              default: "otros"
+            }
+          }
+        }
+      },
+
+      // 🔥 Agrupar por supermercado normalizado
+      {
+        $group: {
+          _id: "$supermercadoNormalizado",
+          total: { $sum: 1 }
+        }
+      },
+
+      { $sort: { total: -1 } }
     ]);
 
     res.json(data);
@@ -75,6 +102,7 @@ router.get("/clics-por-supermercado", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 
 // ======================================
@@ -249,6 +277,8 @@ router.get("/productos-por-tiempo", async (req, res) => {
   }
 });
 
+router.get("/volatiles", obtenerProductosVolatiles);
+
 
 // ======================================
 //  TENDENCIA SEMANAL (clics por semana ISO)
@@ -373,84 +403,6 @@ router.get("/busquedas-por-region", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-
-// ======================================
-//  COMPARATIVA ENTRE CLICS & BÚSQUEDAS
-// ======================================
-router.get("/comparativa", async (req, res) => {
-  try {
-    const db = getDB();
-    const match = buildMatchFilters(req.query);
-
-    // CLICS POR DÍA
-    const clics = await db.collection("clicks").aggregate([
-      { $match: { ...match, createdAt: { $exists: true } } },
-      {
-        $addFields: {
-          createdAtDate: {
-            $cond: [
-              { $isNumber: "$createdAt" },
-              { $toDate: "$createdAt" },
-              "$createdAt"
-            ]
-          }
-        }
-      },
-      {
-        $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAtDate" } },
-          total: { $sum: 1 }
-        }
-      }
-    ]).toArray();
-
-    // BÚSQUEDAS POR DÍA
-    const busquedas = await db.collection("busquedas").aggregate([
-      { $match: { ...match, fecha: { $exists: true } } },
-      {
-        $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$fecha" } },
-          total: { $sum: 1 }
-        }
-      }
-    ]).toArray();
-
-    // FUSIÓN DE RESULTADOS
-    const mapa = {};
-
-    clics.forEach((c) => {
-      mapa[c._id] = {
-        fecha: c._id,
-        clics: c.total,
-        busquedas: 0
-      };
-    });
-
-    busquedas.forEach((b) => {
-      if (!mapa[b._id]) {
-        mapa[b._id] = { fecha: b._id, clics: 0, busquedas: 0 };
-      }
-      mapa[b._id].busquedas = b.total;
-    });
-
-    const data = Object.values(mapa)
-      .sort((a, b) => a.fecha.localeCompare(b.fecha))
-      .map((d) => ({
-        _id: d.fecha,
-        total: d.clics + d.busquedas,
-        clics: d.clics,
-        busquedas: d.busquedas
-      }));
-
-    res.json(data);
-
-  } catch (err) {
-    console.error("❌ Error en /comparativa:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
 
 // ======================================
 //  USUARIOS ACTIVOS POR DÍA
@@ -769,5 +721,6 @@ router.get("/distribucion-usuarios-region", distribucionUsuariosRegion);
 router.get("/bajas", obtenerBajasDePrecio);
 
 router.get("/subidas", obtenerSubidasDePrecio);
+
 
 export default router;

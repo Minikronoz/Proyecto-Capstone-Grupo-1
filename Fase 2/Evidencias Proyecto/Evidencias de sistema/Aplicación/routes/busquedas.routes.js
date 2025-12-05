@@ -156,5 +156,5 @@ router.get("/", async (req, res) => {
     res.status(500).json({ msg: "Error al obtener búsquedas." });
   }
 });
-
+ 
 export default router;

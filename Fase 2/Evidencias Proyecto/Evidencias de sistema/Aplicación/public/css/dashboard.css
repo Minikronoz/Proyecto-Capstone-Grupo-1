@@ -113,42 +113,51 @@ h1 {
   transform: scale(1.05);
 }
 
-/* ===== MAIN ===== */
-main {
-  padding: 20px 40px;
-  padding-right: 380px; /* espacio para panel lateral */
-  box-sizing: border-box;
-}
-
 /* ✅ GRID DE SECCIONES: 2 COLUMNAS */
+/* ✅ GRID AJUSTADO — 2 columnas, pero con control total */
 main {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 columnas iguales */
-  gap: 30px; /* espacio entre gráficos */
+  grid-template-columns: 1fr 1fr; /* siempre 2 columnas iguales */
+  grid-auto-rows: auto;
+  gap: 30px;
   padding: 20px 40px;
   padding-right: 380px;
+  align-items: start; /* evita estiramientos feos */
 }
 
-/* ✅ Las tablas de bajas/subidas ocupan el ancho completo (2 columnas) */
-.tabla-card {
-  grid-column: span 2; /* ocupa las 2 columnas */
-  max-width: 100%;
-  margin: 0;
+/* 🔹 Un elemento que debe ocupar toda la fila */
+.full-width,
+section.full-width,
+.tabla-card.full-width {
+  grid-column: span 2;
 }
 
-/* ✅ Cada section (gráfico) ocupa 1 columna */
-section {
-  grid-column: span 1; /* 1 columna por defecto */
+/* 🔹 Forzar que tablas dobles también ocupen solo 2 columnas arriba */
+.fila-tablas {
+  grid-column: span 2;   /* perfecto para tus 2 tablas iniciales */
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  margin-bottom: 0; /* ya no necesitamos margin porque usamos gap */
+  gap: 20px;
 }
 
-/* ✅ Si quieres que un gráfico específico ocupe todo el ancho */
-section.full-width {
-  grid-column: span 2; /* ocupa las 2 columnas */
+
+/* Cada sección se convierte en un contenedor con 2 columnas */
+main > section {
+  width: 100%;
 }
+
+/* Contenedor para secciones de charts, tablas, alertas */
+.seccion-doble {
+  display: flex;
+  gap: 25px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.seccion-doble > * {
+  flex: 1 1 calc(50% - 20px);
+  max-width: calc(50% - 20px);
+}
+
 
 /* ✅ Contenedor de gráficos con altura fija */
 .chart-container {
@@ -186,9 +195,7 @@ canvas {
     grid-column: span 1;
   }
   
-  section {
-    grid-column: span 1;
-  }
+
   
   .panel-lateral {
     position: relative;
@@ -682,18 +689,6 @@ footer {
   color: #ef4444;
   font-weight: 700;
 }
-/* ============================
-   CARD PARA TABLAS — CENTRADA
-============================ */
-.tabla-card {
-  max-width: 850px;
-  margin: 0 auto 40px auto; /* centrado horizontal + separación */
-  padding: 20px 24px;
-  background: #ffffff;
-  border-radius: 14px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-  border: 1px solid #e2e8f0;
-}
 
 /* Título centrado como los charts */
 .tabla-card h3 {
@@ -1160,4 +1155,252 @@ footer {
   .tabla-segmentacion td {
     padding: 10px 12px;
   }
+}
+
+/* CONTENEDOR GENERAL */
+.alertas-inteligentes {
+  background: #fff;
+  padding: 18px;
+  border-radius: 14px;
+  margin-top: 35px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  border-left: 5px solid #00a7b5;
+}
+
+/* CAJAS */
+.alerta-box {
+  padding: 14px 14px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  max-height: 430px;
+  overflow-y: auto;
+}
+
+.alerta-box.verde {
+  background: linear-gradient(to bottom, #ecfdf5, #d1fae5);
+  border-left: 4px solid #16a34a;
+}
+
+.alerta-box.rojo {
+  background: linear-gradient(to bottom, #fef2f2, #fde8e8);
+  border-left: 4px solid #dc2626;
+}
+
+/* ITEM */
+.alerta-item {
+  display: flex;
+  gap: 10px;
+  padding: 10px 6px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #0f172a;
+  margin-bottom: 8px;
+  transition: .2s;
+}
+
+.alerta-item:hover {
+  background: rgba(0,0,0,0.06);
+  transform: translateX(3px);
+}
+
+/* ICONO */
+.alerta-icono {
+  font-size: 10px;
+  margin-top: 6px;
+}
+
+.alerta-icono.verde { color: #16a34a; }
+.alerta-icono.rojo { color: #dc2626; }
+
+/* TEXTO */
+.alerta-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.alerta-titulo {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.alerta-info {
+  font-size: 13px;
+  color: #475569;
+}
+
+.alerta-fecha {
+  font-size: 12px;
+  color: #64748b;
+}
+/* 🔷 Contenedor de doble tabla */
+.tablas-doble {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 20px;
+  width: 100%;
+  margin-top: 20px;
+  flex-wrap: nowrap;
+}
+
+.fila-tablas {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+}
+.fila-tablas .tabla-card {
+  flex: 1;
+  max-width: 50%;
+}
+
+
+/* FILA INDIVIDUAL */
+.fila-individual {
+  width: 100%;
+}
+
+.tabla-ancha {
+  width: 100%;
+}
+
+/* Tarjeta base */
+.tabla-card {
+  background: white;
+  padding: 18px 20px;
+  border-radius: 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  min-height: 300px;
+}
+
+.tabla-scroll {
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .fila-tablas {
+    flex-wrap: wrap;
+  }
+
+  .fila-tablas .tabla-card {
+    max-width: 100%;
+  }
+}
+/* === Contenedor para las dos alertas === */
+.fila-alertas {
+  grid-column: span 2; /* las posiciona juntas en 1 fila */
+  display: flex;
+  gap: 20px;
+}
+
+.fila-alertas .alertas-inteligentes {
+  flex: 1;
+  max-width: 50%;
+}
+
+/* Mobile: se apilan */
+@media (max-width: 1200px) {
+  .fila-alertas {
+    flex-wrap: wrap;
+  }
+  .fila-alertas .alertas-inteligentes {
+    max-width: 100%;
+  }
+}
+/* ==========================================
+   TARJETA DE PRODUCTOS VOLÁTILES (PRO)
+   ========================================== */
+
+.volatiles-container {
+  max-height: 360px;        /* Ajusta según quieras */
+  overflow-y: auto;
+  padding-right: 8px;
+  margin-top: 12px;
+}
+
+.volatil-card {
+  background: #ffffff;
+  border: 1px solid #e3e8ef;
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.volatil-card:hover {
+  background: #f7fbff;
+  border-color: #c8def8;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.07);
+}
+
+.volatil-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.volatil-info {
+  flex: 1;
+}
+
+.volatil-info a {
+  font-weight: 600;
+  color: #005bbb;
+  text-decoration: none;
+}
+
+.volatil-info a:hover {
+  text-decoration: underline;
+}
+
+.volatil-detalles {
+  font-size: 13px;
+  color: #475569;
+}
+
+.volatil-tendencia {
+  border-radius: 10px;
+  padding: 4px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.volatil-tendencia.bajando {
+  background: #e4fbea;
+  color: #1c7c36;
+  border: 1px solid #bceecf;
+}
+
+.volatil-tendencia.subiendo {
+  background: #ffe5e5;
+  color: #c92525;
+  border: 1px solid #ffbcbc;
+}
+
+/* Espacio entre tarjetas */
+.lista-volatiles {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.volatil-precios {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.volatil-precios strong {
+  color: #0f172a;
 }

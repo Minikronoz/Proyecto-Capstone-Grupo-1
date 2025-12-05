@@ -282,42 +282,63 @@ export const productosCrecimiento = async (req, res) => {
 
 
 
-/** ✅ Productos con baja de precio CON FILTROS */
 export async function obtenerBajasDePrecio(req, res) {
   try {
     const db = getDB();
-    const { page = 1, limit = 20, supermercado, desde, hasta } = req.query;
-    
-    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const { page = 1, limit = 20, supermercado } = req.query;
 
-    // ✅ Filtro de fecha (por defecto últimos 7 días)
-    let fechaDesde = desde ? new Date(desde) : new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    let fechaHasta = hasta ? new Date(hasta) : new Date();
+    const skip = (page - 1) * limit;
+
+    const hoy = new Date();
+    hoy.setHours(23, 59, 59, 999);
+
+    const hace7 = new Date();
+    hace7.setDate(hoy.getDate() - 7);
+    hace7.setHours(0, 0, 0, 0);
 
     const filtro = {
-      fecha: { $gte: fechaDesde, $lte: fechaHasta },
-      $expr: { $lt: ["$price", "$previousPrice"] },
-      price: { $gte: 100, $lte: 200000 },
-      previousPrice: { $gte: 100, $lte: 200000 }
+      fecha: { $gte: hace7, $lte: hoy },
+      price: { $gt: 0 },
+      previousPrice: { $gt: 0 }
     };
 
-    // ✅ Filtro de supermercado (si existe)
-    if (supermercado) {
-      filtro.store = supermercado;
-    }
+    const filtroBase = {
+  fecha: { $gte: hace7, $lte: hoy },
+  price: { $gt: 0 },
+  previousPrice: { $gt: 0 }
+};
 
-    const pipeline = [
+if (supermercado && supermercado !== "Todos") {
+  filtroBase.store = supermercado;
+}
+
+
+    const data = await db.collection("priceHistory").aggregate([
+
       { $match: filtro },
+
+      // Ordenar primero por fecha DESC
+      { $sort: { fecha: -1 } },
+
+      // Tomar solo la última actualización de cada producto
       {
-        $addFields: {
-          diferencia: { $subtract: ["$previousPrice", "$price"] }
+        $group: {
+          _id: "$productId",
+          ultimo: { $first: "$$ROOT" }
         }
       },
+
+      // FILTRAR CORRECTAMENTE BAJAS (usando $expr)
       {
         $match: {
-          diferencia: { $lte: 50000 }
+          $expr: { $lt: ["$ultimo.price", "$ultimo.previousPrice"] }
         }
       },
+
+      // Reemplazar root para seguir trabajando
+      { $replaceRoot: { newRoot: "$ultimo" } },
+
+      // Traer producto original
       {
         $lookup: {
           from: "productos",
@@ -327,168 +348,287 @@ export async function obtenerBajasDePrecio(req, res) {
         }
       },
       { $unwind: "$producto" },
+
+      // Campos finales
       {
         $project: {
-          _id: 0,
           productId: 1,
+          titulo: "$producto.title",
+          link: "$producto.link",
+          image: "$producto.image",
           store: 1,
           precioAnterior: "$previousPrice",
           precioActual: "$price",
-          diferencia: 1,
-          fecha: 1,
-          titulo: "$producto.title",
-          image: "$producto.image",
-          categoria: "$producto.categoria",
-          link: "$producto.link",
+          diferencia: { $subtract: ["$previousPrice", "$price"] },
+          porcentaje: {
+            $multiply: [
+              { $divide: [{ $subtract: ["$previousPrice", "$price"] }, "$previousPrice"] },
+              100
+            ]
+          },
+          fecha: 1
         }
       },
-      { $sort: { diferencia: -1 } }
-    ];
 
-    const totalPipeline = [...pipeline, { $count: "total" }];
-    const totalResult = await db.collection("priceHistory").aggregate(totalPipeline).toArray();
-    const total = totalResult.length > 0 ? totalResult[0].total : 0;
+      { $sort: { fecha: -1 } },
+      { $skip: skip },
+      { $limit: parseInt(limit) }
 
-    const data = await db.collection("priceHistory")
-      .aggregate([
-        ...pipeline,
-        { $skip: skip },
-        { $limit: parseInt(limit) }
-      ])
-      .toArray();
+    ]).toArray();
 
-    res.json({ 
-      ok: true, 
+    return res.json({
+      ok: true,
       data,
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total,
-        hasMore: skip + data.length < total
+        hasMore: data.length === parseInt(limit)
       }
     });
 
   } catch (err) {
-    console.error("❌ Error en obtenerBajasDePrecio:", err);
+    console.error("❌ Error obtenerBajasDePrecio:", err);
     res.status(500).json({ ok: false, error: err.message });
   }
 }
 
-/** ✅ Productos con subida de precio CON FILTROS */
+
+
 export async function obtenerSubidasDePrecio(req, res) {
   try {
     const db = getDB();
-    const { page = 1, limit = 20, supermercado, desde, hasta } = req.query;
-    
-    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const { page = 1, limit = 20, supermercado } = req.query;
 
-    // ✅ Filtro de fecha (por defecto últimos 7 días)
-    let fechaDesde = desde ? new Date(desde) : new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    let fechaHasta = hasta ? new Date(hasta) : new Date();
+    const skip = (page - 1) * limit;
 
-    const filtro = {
-      fecha: { $gte: fechaDesde, $lte: fechaHasta },
-      $expr: { $gt: ["$price", "$previousPrice"] },
-      price: { $gte: 50, $lte: 500000 },
-      previousPrice: { $gte: 50, $lte: 500000 }
+    const hoy = new Date();
+    hoy.setHours(23, 59, 59, 999);
+
+    const hace7 = new Date();
+    hace7.setDate(hoy.getDate() - 7);
+    hace7.setHours(0, 0, 0, 0);
+
+    // Filtro base del rango
+    const filtroBase = {
+      fecha: { $gte: hace7, $lte: hoy },
+      price: { $gt: 0 },
+      previousPrice: { $gt: 0 }
     };
 
-    // ✅ Filtro de supermercado (si existe)
-    if (supermercado) {
-      filtro.store = supermercado;
+    // Filtro inicial por supermercado
+    if (supermercado && supermercado !== "Todos") {
+      filtroBase.store = supermercado;
     }
 
-    const pipeline = [
-      { $match: filtro },
+    const data = await db.collection("priceHistory").aggregate([
+
+      { $match: filtroBase },
+
+      { $sort: { fecha: -1 } },
+
+      // Último cambio por producto
       {
-        $addFields: {
-          priceNum: {
-            $cond: [
-              { $eq: [{ $type: "$price" }, "string"] },
-              { $toDouble: "$price" },
-              "$price"
+        $group: {
+          _id: "$productId",
+          ultimo: { $first: "$$ROOT" }
+        }
+      },
+
+      // Subidas reales
+      {
+        $match: {
+          $expr: { $gt: ["$ultimo.price", "$ultimo.previousPrice"] }
+        }
+      },
+
+      // Reemplazar root
+      { $replaceRoot: { newRoot: "$ultimo" } },
+
+      // 📌 **FILTRAR AQUÍ TAMBIÉN POR SUPERMERCADO**
+      ...(supermercado && supermercado !== "Todos"
+        ? [{ $match: { store: supermercado } }]
+        : []),
+
+      // Traer datos del producto
+      {
+        $lookup: {
+          from: "productos",
+          localField: "productId",
+          foreignField: "_id",
+          as: "producto"
+        }
+      },
+      { $unwind: "$producto" },
+
+      // Formato final
+      {
+        $project: {
+          productId: 1,
+          titulo: "$producto.title",
+          link: "$producto.link",
+          image: "$producto.image",
+          store: 1,
+          precioAnterior: "$previousPrice",
+          precioActual: "$price",
+          diferencia: { $subtract: ["$price", "$previousPrice"] },
+          porcentaje: {
+            $multiply: [
+              { $divide: [{ $subtract: ["$price", "$previousPrice"] }, "$previousPrice"] },
+              100
             ]
           },
-          prevNum: {
+          fecha: 1
+        }
+      },
+
+      { $sort: { fecha: -1 } },
+      { $skip: skip },
+      { $limit: parseInt(limit) }
+
+    ]).toArray();
+
+    res.json({
+      ok: true,
+      data,
+      pagination: {
+        hasMore: data.length === parseInt(limit)
+      }
+    });
+
+  } catch (err) {
+    console.error("❌ Error obtenerSubidasDePrecio:", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+}
+
+// ================================================================
+// 📌 Productos Más Volátiles (últimos 30 días) — CORREGIDA DEFINITIVA
+// ================================================================
+export async function obtenerProductosVolatiles(req, res) {
+  try {
+    const db = getDB();
+    const { limit = 20, supermercado } = req.query;
+
+    // AUTO-DETECCIÓN DEL NOMBRE DE LA COLECCIÓN
+    const collections = await db.listCollections().toArray();
+    const nombre = collections.some(c => c.name === "pricehistory")
+      ? "pricehistory"
+      : collections.some(c => c.name === "priceHistory")
+        ? "priceHistory"
+        : "pricehistory";
+
+    const hoy = new Date();
+    hoy.setHours(23, 59, 59, 999);
+
+    const hace30 = new Date();
+    hace30.setDate(hoy.getDate() - 30);
+    hace30.setHours(0, 0, 0, 0);
+
+    const filtro = {
+      fecha: { $gte: hace30, $lte: hoy },
+      price: { $gt: 0 }
+    };
+
+    if (supermercado && supermercado !== "Todos") {
+      filtro.store = supermercado.toLowerCase();
+    }
+
+    const data = await db.collection(nombre).aggregate([
+
+      { $match: filtro },
+
+      // Variación calculable solo si existe precio anterior
+      {
+        $addFields: {
+          variacionPorc: {
             $cond: [
-              { $eq: [{ $type: "$previousPrice" }, "string"] },
-              { $toDouble: "$previousPrice" },
-              "$previousPrice"
+              { $and: [{ $ne: ["$previousPrice", null] }, { $gt: ["$previousPrice", 0] }] },
+              {
+                $abs: {
+                  $multiply: [
+                    {
+                      $divide: [
+                        { $subtract: ["$price", "$previousPrice"] },
+                        "$previousPrice"
+                      ]
+                    },
+                    100
+                  ]
+                }
+              },
+              0
             ]
           }
         }
       },
+
+      { $sort: { fecha: -1 } },
+
       {
-        $match: {
-          priceNum: { $gte: 50, $lte: 500000 },
-          prevNum: { $gte: 50, $lte: 500000 }
+        $group: {
+          _id: "$productId",
+          precioActual: { $first: "$price" },
+          precioAnterior: { $first: "$previousPrice" },
+          fechaUltimoCambio: { $first: "$fecha" },
+          supermercado: { $first: "$store" },
+          volatilidadPromedio: { $avg: "$variacionPorc" },
+          cambios: { $sum: 1 }
         }
       },
-      {
-        $addFields: {
-          diferencia: { $subtract: ["$priceNum", "$prevNum"] }
-        }
-      },
-      {
-        $match: {
-          diferencia: { $lte: 50000 }
-        }
-      },
+
       {
         $lookup: {
           from: "productos",
-          localField: "productId",
+          localField: "_id",
           foreignField: "_id",
           as: "producto"
         }
       },
       { $unwind: "$producto" },
+
+      {
+        $addFields: {
+          tendencia: {
+            $cond: [
+              { $gt: ["$precioActual", "$precioAnterior"] },
+              "subiendo",
+              "bajando"
+            ]
+          }
+        }
+      },
+
+      { $sort: { volatilidadPromedio: -1 } },
+      { $limit: parseInt(limit) },
+
       {
         $project: {
           _id: 0,
-          productId: 1,
-          store: 1,
-          precioAnterior: "$prevNum",
-          precioActual: "$priceNum",
-          diferencia: 1,
-          fecha: 1,
+          productoId: "$_id",
           titulo: "$producto.title",
           image: "$producto.image",
-          categoria: "$producto.categoria",
           link: "$producto.link",
+          supermercado: 1,
+          volatilidadPromedio: { $round: ["$volatilidadPromedio", 2] },
+          cambios: 1,
+          tendencia: 1,
+          precioActual: 1,
+          precioAnterior: 1,
+          fechaUltimoCambio: 1
         }
-      },
-      { $sort: { diferencia: -1 } }
-    ];
-
-    const totalPipeline = [...pipeline, { $count: "total" }];
-    const totalResult = await db.collection("priceHistory").aggregate(totalPipeline).toArray();
-    const total = totalResult.length > 0 ? totalResult[0].total : 0;
-
-    const data = await db.collection("priceHistory")
-      .aggregate([
-        ...pipeline,
-        { $skip: skip },
-        { $limit: parseInt(limit) }
-      ])
-      .toArray();
-
-    res.json({ 
-      ok: true, 
-      data,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total,
-        hasMore: skip + data.length < total
       }
-    });
+
+    ]).toArray();
+
+    res.json({ ok: true, data });
 
   } catch (err) {
-    console.error("❌ Error en obtenerSubidasDePrecio:", err);
+    console.error("❌ Error obtenerProductosVolatiles:", err);
     res.status(500).json({ ok: false, error: err.message });
   }
 }
+
+
+
+
 
 
 
