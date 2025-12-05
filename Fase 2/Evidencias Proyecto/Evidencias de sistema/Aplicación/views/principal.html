@@ -333,7 +333,27 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       <!-- NEGOCIOS -->
       <section id="negocios" class="seccion">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-shop"></i> Gestión de Negocios</h2>
+          <p class="descripcion">Administra los negocios registrados en el sistema.</p>
+        </div>
+        
         <div class="card">
+          <!-- Buscador -->
+          <div class="tabla-header">
+            <input 
+              type="text" 
+              id="buscarNegocio" 
+              class="input-busqueda" 
+              placeholder="Buscar por nombre, giro, dueño o comuna..."
+              onkeyup="if(event.key === 'Enter') buscarNegocios()"
+            >
+            <button class="btn btn-outline" onclick="buscarNegocios()">
+              <i class="fa-solid fa-magnifying-glass"></i> Buscar
+            </button>
+          </div>
+          
+          <!-- Tabla -->
           <table>
             <thead>
               <tr>
@@ -346,56 +366,48 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <th>Acciones</th>
               </tr>
             </thead>
-
             <tbody id="negociosBody">
               <tr><td colspan="7">Cargando negocios...</td></tr>
             </tbody>
           </table>
+          
+          <!-- Paginación -->
+          <div id="paginacionNegocios"></div>
         </div>
       </section>
 
-<!-- MODAL NEGOCIO -->
-<div id="modalEditarNegocio" class="modal oculto">
-  <div class="modal-contenido">
-    <h3>Editar Negocio</h3>
+<!-- MODAL NEGOCIO MEJORADO -->
+<div class="modal oculto" id="modalEditarNegocio">
+  <div class="modal__backdrop" onclick="cerrarModalNegocio()"></div>
 
-    <input type="hidden" id="negocioId">
+  <div class="modal__dialog">
+    <form id="formEditarNegocio" onsubmit="guardarNegocio(event)">
+      <div class="modal__header">
+        <h3>Editar Negocio</h3>
+      </div>
 
-    <!-- Nombre + Rol tributario -->
-    <label for="negocioNombre">Nombre del negocio</label>
-    <input type="text" id="negocioNombre" />
+      <div class="modal__body">
+        <input type="hidden" id="negocioId">
+        <input type="hidden" id="negocioDuenioId">
 
-    <label for="negocioRolTributario">RUT / Rol tributario</label>
-    <input type="text" id="negocioRolTributario" />
+        <label>Nombre del negocio</label>
+        <input type="text" id="negocioNombre" required>
 
-    <!-- Giro -->
-    <label for="negocioGiro">Giro</label>
-    <input type="text" id="negocioGiro" />
+        <label>Giro</label>
+        <input type="text" id="negocioGiro" required>
 
-    <!-- Contacto -->
-    <label for="negocioTelefono">Teléfono</label>
-    <input type="text" id="negocioTelefono" />
+        <label>Comuna</label>
+        <input type="text" id="negocioComuna">
 
-    <label for="negocioCorreo">Correo</label>
-    <input type="email" id="negocioCorreo" />
+        <label>Sector</label>
+        <input type="text" id="negocioSector">
+      </div>
 
-    <label for="negocioWeb">Sitio web</label>
-    <input type="text" id="negocioWeb" />
-
-    <!-- Ubicación -->
-    <label for="negocioRegion">Región</label>
-    <input type="text" id="negocioRegion" />
-
-    <label for="negocioComuna">Comuna</label>
-    <input type="text" id="negocioComuna" />
-
-    <label for="negocioSector">Sector</label>
-    <input type="text" id="negocioSector" />
-
-    <div class="modal-botones">
-      <button class="btn-guardar" onclick="guardarNegocio()">Guardar</button>
-      <button class="btn-cerrar" onclick="cerrarModalNegocio()">Cerrar</button>
-    </div>
+      <div class="modal__footer">
+        <button type="button" onclick="cerrarModalNegocio()">Cancelar</button>
+        <button type="submit">Guardar</button>
+      </div>
+    </form>
   </div>
 </div>
 

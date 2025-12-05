@@ -472,45 +472,44 @@ async function eliminarUsuarioDef(id) {
 async function editarNegocio(negocioId, duenioId) {
   console.log("✏️ Editando negocio:", { negocioId, duenioId });
 
+  if (!negocioId || !duenioId) {
+    alert("❌ Error: ID inválido");
+    return;
+  }
+
   try {
-    const res = await fetch(`${API}/usuarios/negocios`);
+    const res = await fetch(`${API}/usuarios/${duenioId}`);
     
     if (!res.ok) {
       throw new Error(`HTTP error! status: ${res.status}`);
     }
     
-    const negocios = await res.json();
-    console.log(" Negocios recibidos:", negocios);
+    const usuario = await res.json();
+    console.log("📦 Usuario recibido:", usuario);
 
-    // Buscar el negocio por rolTributario (que ahora es el _id)
-    const negocio = negocios.find((n) => n._id === negocioId);
+    // ✅ BUSCAR DIRECTAMENTE POR _id
+    const negocio = usuario.negocios?.find((n) => n._id === negocioId);
     
-    console.log(" Negocio encontrado:", negocio);
+    console.log("🔍 Negocio encontrado:", negocio);
 
     if (!negocio) {
-      alert("No se encontró el negocio.");
+      alert("❌ No se encontró el negocio.");
       return;
     }
 
-    // Rellenar el formulario
-    document.getElementById("negocioId").value = negocio._id; // rolTributario
-    document.getElementById("negocioId").setAttribute("data-duenio-id", negocio.duenioId);
+    // ✅ GUARDAR EL _id REAL
+    document.getElementById("negocioId").value = negocio._id;
+    document.getElementById("negocioDuenioId").value = duenioId;
     document.getElementById("negocioNombre").value = negocio.nombre || "";
     document.getElementById("negocioGiro").value = negocio.giro || "";
     document.getElementById("negocioComuna").value = negocio.comuna || "";
     document.getElementById("negocioSector").value = negocio.sector || "";
 
-    console.log(" Formulario rellenado");
-
-    // Mostrar el modal
-    const modal = document.getElementById("modalEditarNegocio");
-    modal.classList.remove("oculto");
-    
-    console.log(" Modal abierto");
+    document.getElementById("modalEditarNegocio").classList.remove("oculto");
 
   } catch (err) {
-    console.error(" Error al cargar negocio:", err);
-    alert("Error al cargar negocio: " + err.message);
+    console.error("❌ Error al cargar negocio:", err);
+    alert("❌ Error: " + err.message);
   }
 }
 
@@ -984,3 +983,302 @@ document.addEventListener("DOMContentLoaded", renderSegmentacion);
 
 // Exponer ejecutarScraping globalmente
 window.ejecutarScraping = ejecutarScraping;
+// =============================================================
+//  NEGOCIOS CON PAGINACIÓN Y BÚSQUEDA
+// =============================================================
+let paginaActualNegocios = 1;
+let busquedaActualNegocios = "";
+
+async function cargarNegocios(page = 1, search = "") {
+  const tbody = document.getElementById("negociosBody");
+  tbody.innerHTML = "<tr><td colspan='7'>Cargando negocios...</td></tr>";
+  
+  paginaActualNegocios = page;
+  busquedaActualNegocios = search;
+
+  try {
+    const params = new URLSearchParams({
+      page: page,
+      limit: 50,
+      search: search
+    });
+    
+    const res = await fetch(`${API}/usuarios/negocios?${params}`);
+    
+    // ✅ VERIFICAR SI LA RESPUESTA ES EXITOSA
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+    
+    const data = await res.json();
+    
+    console.log("📦 Datos recibidos del servidor:", data);
+    
+    // ✅ DETECTAR SI ES ARRAY DIRECTO O OBJETO CON PAGINACIÓN
+    let negocios = [];
+    let paginacion = null;
+    
+    if (Array.isArray(data)) {
+      // Si es un array directo (sin paginación)
+      negocios = data;
+      console.log("⚠️ Respuesta en formato array, creando paginación manual");
+      
+      // Crear paginación manual
+      const total = negocios.length;
+      const limit = 50;
+      const inicio = (page - 1) * limit;
+      const fin = inicio + limit;
+      
+      negocios = negocios.slice(inicio, fin);
+      
+      paginacion = {
+        page: page,
+        totalPaginas: Math.ceil(total / limit),
+        desde: inicio + 1,
+        hasta: Math.min(fin, total),
+        total: total
+      };
+    } else {
+      // Si tiene estructura { negocios: [], paginacion: {} }
+      negocios = data.negocios || [];
+      paginacion = data.paginacion;
+    }
+    
+    console.log("✅ Negocios procesados:", negocios);
+    console.log("✅ Paginación:", paginacion);
+    
+    renderNegocios(negocios);
+    
+    if (paginacion) {
+      renderPaginacionNegocios(paginacion);
+    }
+
+  } catch (err) {
+    console.error("❌ Error cargando negocios:", err);
+    tbody.innerHTML = `<tr><td colspan='7'>❌ Error: ${err.message}</td></tr>`;
+  }
+}
+function renderNegocios(lista) {
+  const tbody = document.getElementById("negociosBody");
+  
+  if (!lista || !lista.length) {
+    tbody.innerHTML = "<tr><td colspan='7'>No se encontraron negocios</td></tr>";
+    return;
+  }
+  
+  console.log("🎨 Renderizando", lista.length, "negocios");
+  
+  tbody.innerHTML = lista.map((n) => {
+    // ✅ USAR DIRECTAMENTE EL _id (ya viene en formato string del backend)
+    console.log("Negocio:", n.nombre, "| _id:", n._id);
+    
+    return `
+      <tr>
+        <td>${n.nombre || "—"}</td>
+        <td>${n.giro || "—"}</td>
+        <td>${n.comuna || "—"}</td>
+        <td>${n.sector || "—"}</td>
+        <td>${n.duenioNombre || "—"}</td>
+        <td>${n.duenioCorreo || "—"}</td>
+        <td class="acciones-columna">
+          <button class="btn-mini btn-editar" onclick="editarNegocio('${n._id}', '${n.duenioId}')">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </button>
+          <button class="btn-mini btn-eliminar" onclick="eliminarNegocio('${n._id}', '${n.duenioId}')">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function renderPaginacionNegocios(paginacion) {
+  const contenedor = document.getElementById("paginacionNegocios");
+  
+  if (!contenedor) {
+    console.warn("⚠️ No existe el contenedor de paginación");
+    return;
+  }
+  
+  const { page, totalPaginas, desde, hasta, total } = paginacion;
+  
+  contenedor.innerHTML = `
+    <div class="paginacion">
+      <div class="paginacion-info">
+        Mostrando ${desde} - ${hasta} de ${total} negocios
+      </div>
+      <div class="paginacion-botones">
+        <button 
+          class="btn-paginacion" 
+          onclick="cargarNegocios(${page - 1}, '${busquedaActualNegocios}')"
+          ${page === 1 ? 'disabled' : ''}
+        >
+          <i class="fa-solid fa-chevron-left"></i> Anterior
+        </button>
+        
+        <span class="paginacion-pagina">
+          Página ${page} de ${totalPaginas}
+        </span>
+        
+        <button 
+          class="btn-paginacion" 
+          onclick="cargarNegocios(${page + 1}, '${busquedaActualNegocios}')"
+          ${page === totalPaginas ? 'disabled' : ''}
+        >
+          Siguiente <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function buscarNegocios() {
+  const input = document.getElementById("buscarNegocio");
+  const search = input.value.trim();
+  cargarNegocios(1, search);
+}
+
+// =============================================================
+//  EDITAR NEGOCIO
+// =============================================================
+async function editarNegocio(negocioId, duenioId) {
+  console.log("✏️ Editando negocio:", { negocioId, duenioId });
+
+  if (!negocioId || !duenioId) {
+    alert("❌ Error: ID inválido");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API}/usuarios/${duenioId}`);
+    
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    
+    const usuario = await res.json();
+    console.log("📦 Usuario recibido:", usuario);
+
+    // ✅ BUSCAR DIRECTAMENTE POR _id
+    const negocio = usuario.negocios?.find((n) => n._id === negocioId);
+    
+    console.log("🔍 Negocio encontrado:", negocio);
+
+    if (!negocio) {
+      alert("❌ No se encontró el negocio.");
+      return;
+    }
+
+    // ✅ GUARDAR EL _id REAL
+    document.getElementById("negocioId").value = negocio._id;
+    document.getElementById("negocioDuenioId").value = duenioId;
+    document.getElementById("negocioNombre").value = negocio.nombre || "";
+    document.getElementById("negocioGiro").value = negocio.giro || "";
+    document.getElementById("negocioComuna").value = negocio.comuna || "";
+    document.getElementById("negocioSector").value = negocio.sector || "";
+
+    document.getElementById("modalEditarNegocio").classList.remove("oculto");
+
+  } catch (err) {
+    console.error("❌ Error al cargar negocio:", err);
+    alert("❌ Error: " + err.message);
+  }
+}
+
+// =============================================================
+//  GUARDAR NEGOCIO
+// =============================================================
+async function guardarNegocio(e) {
+  e.preventDefault();
+
+  const negocioId = document.getElementById("negocioId").value;
+  const duenioId = document.getElementById("negocioDuenioId").value;
+
+  console.log("💾 Guardando negocio:", { negocioId, duenioId });
+
+  if (!negocioId || !duenioId) {
+    alert("❌ Error: Faltan datos del negocio");
+    return;
+  }
+
+  const data = {
+    nombre: document.getElementById("negocioNombre").value.trim(),
+    giro: document.getElementById("negocioGiro").value.trim(),
+    comuna: document.getElementById("negocioComuna").value.trim(),
+    sector: document.getElementById("negocioSector").value.trim()
+  };
+
+  if (!data.nombre || !data.giro) {
+    alert("❌ El nombre y giro son obligatorios");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API}/usuarios/${duenioId}/negocios/${negocioId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.error || "Error al actualizar");
+    }
+
+    alert("✅ Negocio actualizado correctamente");
+    cerrarModalNegocio();
+    cargarNegocios(paginaActualNegocios, busquedaActualNegocios);
+
+  } catch (err) {
+    console.error("❌ Error guardando negocio:", err);
+    alert("❌ Error: " + err.message);
+  }
+}
+
+// =============================================================
+//  ELIMINAR NEGOCIO
+// =============================================================
+async function eliminarNegocio(negocioId, duenioId) {
+  console.log("🗑️ Intentando eliminar:", { negocioId, duenioId });
+
+  if (!negocioId || !duenioId || negocioId === "null" || negocioId === "undefined") {
+    alert("❌ Error: ID de negocio o dueño inválido");
+    return;
+  }
+
+  if (!confirm("⚠️ ¿Estás seguro de eliminar este negocio?")) return;
+
+  try {
+    const res = await fetch(`${API}/usuarios/${duenioId}/negocios/${negocioId}`, {
+      method: "DELETE"
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.error || "Error al eliminar negocio");
+    }
+
+    alert("✅ Negocio eliminado correctamente");
+    cargarNegocios(paginaActualNegocios, busquedaActualNegocios);
+
+  } catch (err) {
+    console.error("❌ Error eliminando negocio:", err);
+    alert("❌ Error: " + err.message);
+  }
+}
+
+// =============================================================
+//  CERRAR MODAL NEGOCIO
+// =============================================================
+function cerrarModalNegocio() {
+  document.getElementById("modalEditarNegocio").classList.add("oculto");
+}
+
+// Exponer funciones globalmente
+window.cargarNegocios = cargarNegocios;
+window.buscarNegocios = buscarNegocios;
+window.editarNegocio = editarNegocio;
+window.guardarNegocio = guardarNegocio;
+window.eliminarNegocio = eliminarNegocio;
+window.cerrarModalNegocio = cerrarModalNegocio;

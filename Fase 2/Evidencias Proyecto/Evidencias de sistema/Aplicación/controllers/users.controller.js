@@ -87,7 +87,7 @@ export async function obtenerNegociosConDuenio(req, res) {
       if (!Array.isArray(u.negocios) || u.negocios.length === 0) return [];
 
       return u.negocios.map((n) => ({
-        _id: n.rolTributario || null,
+        _id: n._id?.toString() || null,  // ✅ USAR EL _id REAL
         nombre: n.nombre || "(sin nombre)",
         giro: n.giro || "—",
         comuna: n.comuna || "—",
@@ -112,18 +112,18 @@ export async function obtenerNegociosConDuenio(req, res) {
 export async function actualizarNegocio(req, res) {
   try {
     const db = getDB();
-    const { userId, negocioId } = req.params; // negocioId ahora es rolTributario
+    const { userId, negocioId } = req.params;
     const datos = req.body;
 
     if (!ObjectId.isValid(userId)) {
       return res.status(400).json({ error: "ID de usuario inválido" });
     }
 
-    // ✅ Buscar por rolTributario en lugar de _id
+    // ✅ Buscar por _id del negocio (ObjectId)
     const result = await db.collection("users").updateOne(
       { 
         _id: new ObjectId(userId),
-        "negocios.rolTributario": negocioId // ✅ CAMBIO AQUÍ
+        "negocios._id": new ObjectId(negocioId) // ✅ BUSCAR POR _id
       },
       { 
         $set: {
@@ -173,18 +173,18 @@ export async function eliminarUsuario(req, res) {
 export async function eliminarNegocio(req, res) {
   try {
     const db = getDB();
-    const { userId, negocioId } = req.params; // negocioId ahora es rolTributario
+    const { userId, negocioId } = req.params;
 
     if (!ObjectId.isValid(userId)) {
       return res.status(400).json({ error: "ID de usuario inválido" });
     }
 
-    // ✅ Eliminar por rolTributario en lugar de _id
+    // ✅ Eliminar por _id del negocio
     const result = await db.collection("users").updateOne(
       { _id: new ObjectId(userId) },
       { 
         $pull: { 
-          negocios: { rolTributario: negocioId } // ✅ CAMBIO AQUÍ
+          negocios: { _id: new ObjectId(negocioId) } // ✅ ELIMINAR POR _id
         } 
       }
     );
@@ -195,7 +195,7 @@ export async function eliminarNegocio(req, res) {
 
     res.json({ ok: true, mensaje: "Negocio eliminado" });
   } catch (err) {
-    console.error(" Error al eliminar negocio:", err);
+    console.error("❌ Error al eliminar negocio:", err);
     res.status(500).json({ error: "Error al eliminar negocio" });
   }
 }
