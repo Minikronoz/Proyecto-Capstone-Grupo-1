@@ -417,45 +417,116 @@ const MARCAS_CONOCIDAS = [
   "Acuenta (pet, alimentos, hogar)"
 ];
 
-function generarGlobalId(title, brand, codigoProducto = null) {
-  const normalizar = (txt) =>
-    txt
-      ?.toLowerCase()
-      ?.normalize("NFD")
-      ?.replace(/[\u0300-\u036f]/g, "")
-      ?.replace(/[^a-z0-9]/g, "")
-      ?.trim() || "";
+// =============================================================
+//  EXTRAER CÓDIGO DEL PRODUCTO DESDE EL LINK
+// =============================================================
+function extraerCodigoProducto(link = "") {
+  if (!link || typeof link !== "string") return null;
+  const match = link.match(/\/p\/[\w-]+-(\d{6,})/);
+  return match ? match[1] : null;
+}
 
-  const extraerUnidad = (txt) => {
-    const match = txt?.match(/(\d+)(\s)?(g|gr|kg|ml|lt|l)/i);
-    return match ? match[0].toLowerCase() : "";
-  };
-
-  const tituloNorm = normalizar(title);
-  const unidad = extraerUnidad(title);
-  const brandNorm = normalizar(brand);
-  
-  // ✅ SI EXISTE CÓDIGO DEL PRODUCTO, LO USAMOS (MÁS CONFIABLE)
-  if (codigoProducto) {
-    const cadena = `${STORE}_${codigoProducto}`; // Ejemplo: "acuenta_937918"
-    return crypto.createHash("md5").update(cadena).digest("hex").substring(0, 12);
-  }
-  
-  // ✅ SI NO, USAMOS EL MÉTODO ANTIGUO (para otros supermercados)
-  const cadena = `${brandNorm}_${tituloNorm}_${unidad}`;
+// =============================================================
+//  GENERAR GLOBAL ID
+// =============================================================
+function generarGlobalId(codigoProducto) {
+  if (!codigoProducto) return null;
+  const cadena = `${STORE}_${codigoProducto}`;
   return crypto.createHash("md5").update(cadena).digest("hex").substring(0, 12);
 }
 
+// =============================================================
+//  LIMPIAR DUPLICADOS (integrado al final del scraping)
+// =============================================================
+async function limpiarDuplicados(db) {
+  console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+  console.log(`[${STORE}] 🧹 Limpiando duplicados...`);
+  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+  
+  const colProductos = db.collection("productos");
+  const productos = await colProductos.find({ store: STORE }).toArray();
+  
+  console.log(`[${STORE}] 📦 Productos encontrados: ${productos.length}`);
+
+  const duplicadosMap = new Map(); // codigoProducto → array de productos
+  let eliminados = 0;
+
+  // Agrupar por código de producto
+  for (const prod of productos) {
+    const codigo = extraerCodigoProducto(prod.link);
+    
+    if (codigo) {
+      if (!duplicadosMap.has(codigo)) {
+        duplicadosMap.set(codigo, []);
+      }
+      duplicadosMap.get(codigo).push(prod);
+    }
+  }
+
+  console.log(`[${STORE}] 🔍 Códigos únicos encontrados: ${duplicadosMap.size}`);
+  console.log(`[${STORE}] 🔄 Procesando duplicados...\n`);
+
+  // Procesar duplicados
+  for (const [codigo, prods] of duplicadosMap.entries()) {
+    if (prods.length > 1) {
+      console.log(`[${STORE}] 📦 Código ${codigo} tiene ${prods.length} versiones:`);
+      
+      // Ordenar por fecha de actualización (más reciente primero)
+      prods.sort((a, b) => new Date(b.lastUpdate) - new Date(a.lastUpdate));
+      
+      const mantener = prods[0]; // El más reciente
+      const eliminar = prods.slice(1); // Los demás
+      
+      console.log(`   ✅ MANTENER: "${mantener.title.substring(0, 50)}..."`);
+      console.log(`      Precio: $${mantener.currentPrice}`);
+      console.log(`      Última actualización: ${mantener.lastUpdate}`);
+      
+      // Actualizar el que mantenemos con el nuevo globalId
+      const nuevoGlobalId = generarGlobalId(codigo);
+      
+      if (nuevoGlobalId) {
+        await colProductos.updateOne(
+          { _id: mantener._id },
+          {
+            $set: {
+              globalId: nuevoGlobalId,
+              codigoProducto: codigo,
+              lastUpdate: new Date()
+            }
+          }
+        );
+      }
+      
+      // Eliminar duplicados
+      for (const dup of eliminar) {
+        console.log(`   ❌ ELIMINAR: "${dup.title.substring(0, 50)}..."`);
+        
+        await colProductos.deleteOne({ _id: dup._id });
+        eliminados++;
+      }
+    }
+  }
+
+  const totalFinal = await colProductos.countDocuments({ store: STORE });
+
+  console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+  console.log(`[${STORE}] Limpieza completada`);
+  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+  console.log(`[${STORE}] Duplicados eliminados: ${eliminados}`);
+  console.log(`[${STORE}] Productos únicos restantes: ${totalFinal}`);
+  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
+
+  return { eliminados, totalFinal };
+}
 
 // =============================================================
-//  Conversión de precio Acuenta (evita dobles: "$2990$3790")
+//  Conversión de precio
 // =============================================================
 const parsePrice = (priceStr = "") => {
   if (!priceStr) return null;
   const texto = priceStr.replace(/\s+/g, "").toLowerCase();
   if (texto.includes("-")) return null;
 
-  //  Combo "2x$3000"
   const combo = texto.match(/(\d+)\s*x\s*\$?([\d\.]+)/i);
   if (combo) {
     const cantidad = parseInt(combo[1], 10);
@@ -463,7 +534,6 @@ const parsePrice = (priceStr = "") => {
     return cantidad > 0 && total > 0 ? Math.round(total / cantidad) : null;
   }
 
-  //  SOLO primer precio (evita “...$2990$3790”)
   const primerPrecio = texto.match(/\$?([\d\.]+)/);
   if (!primerPrecio) return null;
 
@@ -471,131 +541,54 @@ const parsePrice = (priceStr = "") => {
   return num > 0 ? num : null;
 };
 
-
 // =============================================================
-//  Detección automática de marcas (CON LINK DE RESPALDO)
+//  Detección de marca
 // =============================================================
 function detectarMarca(title = "", link = "") {
   if (!title || typeof title !== "string") return "Sin Marca";
 
-  // ✅ Normalizar texto
   const normalizar = (txt) =>
     txt
       .toLowerCase()
       .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "") // Quitar acentos
-      .replace(/\s+/g, " ") // Espacios múltiples → 1 espacio
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, " ")
       .trim();
 
   const tituloNorm = normalizar(title);
   
-  // ✅ Extraer slug del link
-  // Ejemplo: "https://www.acuenta.cl/p/harina-sin-polvos-de-hornear-bolsa-25-kg-acuenta/p"
-  // → "harina-sin-polvos-de-hornear-bolsa-25-kg-acuenta"
   let linkSlug = "";
   if (link && typeof link === "string") {
     const match = link.match(/\/p\/([\w-]+)/);
     if (match) {
-      linkSlug = normalizar(match[1].replace(/-/g, " ")); // Reemplazar guiones por espacios
+      linkSlug = normalizar(match[1].replace(/-/g, " "));
     }
   }
 
-  // ✅ 1. Marcas propias Acuenta (prioridad)
   if (tituloNorm.includes("acuenta") || tituloNorm.includes("a cuenta") || 
       linkSlug.includes("acuenta") || linkSlug.includes("a cuenta")) {
     return "Acuenta";
   }
 
-  // ✅ 2. Buscar marca en título O link (más larga primero)
   const marcasOrdenadas = [...MARCAS_CONOCIDAS].sort((a, b) => b.length - a.length);
 
   for (const marca of marcasOrdenadas) {
     const marcaNorm = normalizar(marca);
-    
-    // ✅ Búsqueda con límites de palabra
     const regex = new RegExp(`\\b${marcaNorm}\\b`, "i");
     
-    // Buscar en título
-    if (regex.test(tituloNorm)) {
-      return marca;
-    }
-    
-    // ✅ NUEVO: Buscar en el slug del link
-    if (linkSlug && regex.test(linkSlug)) {
+    if (regex.test(tituloNorm) || (linkSlug && regex.test(linkSlug))) {
       return marca;
     }
   }
 
-  // ✅ 3. Si no encuentra nada, devolver "Sin Marca"
   return "Sin Marca";
 }
-
-// =============================================================
-//  EXTRAER CÓDIGO DEL PRODUCTO DESDE EL LINK
-// =============================================================
-function extraerCodigoProducto(link = "") {
-  if (!link || typeof link !== "string") return null;
-  
-  // ✅ Acuenta usa URLs como:
-  // https://www.acuenta.cl/p/bicarbonato-de-sodio-30-g-lider-937918
-  // https://www.acuenta.cl/p/bicarbonato-de-sodio-30grs-lider-937918
-  // El CÓDIGO SIEMPRE está al final: 937918
-  
-  const match = link.match(/\/p\/[\w-]+-(\d{6,})/); // Buscar 6+ dígitos al final
-  return match ? match[1] : null;
-}
-
-// =============================================================
-//  Categorías
-// =============================================================
-const CATEGORIAS = [
-  // { nombre: "Promociones", url: "https://www.acuenta.cl/ca/promociones/01" },
-  // { nombre: "Bodegazo", url: "https://www.acuenta.cl/ca/bodegazo/60" },
-  // { nombre: "Marcas Propias", url: "https://www.acuenta.cl/ca/marcas-propias/20" },
-  // { nombre: "Imperdibles", url: "https://www.acuenta.cl/ca/imperdibles/100" },
-  // { nombre: "Mundo bebé", url: "https://www.acuenta.cl/ca/mundo-bebe/09" },
-  { nombre: "Despensa", url: "https://www.acuenta.cl/ca/despensa/05" },
-  // { nombre: "Carnes y Pescados", url: "https://www.acuenta.cl/ca/carnes-y-pescados/03" },
-  // { nombre: "Aseo y limpieza", url: "https://www.acuenta.cl/ca/aseo-y-limpieza/11" },
-  // { nombre: "Frescos y Lácteos", url: "https://www.acuenta.cl/ca/frescos-y-lacteos/07" },
-  // { nombre: "El Bar", url: "https://www.acuenta.cl/ca/el-bar/14" },
-  // { nombre: "Desayuno y Dulces", url: "https://www.acuenta.cl/ca/desayuno-y-dulces/12" },
-  // { nombre: "Mascotas", url: "https://www.acuenta.cl/ca/mascotas/08" },
-  // { nombre: "Bebidas y Snacks", url: "https://www.acuenta.cl/ca/bebidas-y-snacks/02" },
-  // { nombre: "Congelados", url: "https://www.acuenta.cl/ca/congelados/04" },
-  // { nombre: "Frutas y Verduras", url: "https://www.acuenta.cl/ca/frutas-y-verduras/06" },
-  // { nombre: "Panadería y Pastelería", url: "https://www.acuenta.cl/ca/panaderia-y-pasteleria/10" },
-  // { nombre: "Perfumería y Cuidado Personal", url: "https://www.acuenta.cl/ca/perfumeria-y-cuidado-personal/13" },
-  // { nombre: "Hogar, entretención y tecnología", url: "https://www.acuenta.cl/ca/hogar-entretencion-y-tecnologia/47" }
-];
-
-
-// =============================================================
-//  Barra estándar (actualiza solo cada 5%)
-// =============================================================
-function renderProgressBar(current, total, prefix = `[${STORE}]`) {
-  if (!total || total <= 0) return;
-  const width = 28;
-  const avance = current / total;
-  const progress = Math.round(avance * width);
-
-  const pasoMin = Math.ceil(total * 0.05);
-  if (current % pasoMin !== 0 && current !== total) return;
-
-  const bar = "█".repeat(progress) + "░".repeat(width - progress);
-  const percent = (avance * 100).toFixed(0).padStart(3);
-
-  process.stdout.write(`\r${prefix} [${bar}] ${percent}% (${current}/${total})`);
-  if (current === total) process.stdout.write("\n");
-}
-
 
 function procesarUnit(pricePerUnit = "") {
   if (!pricePerUnit) return { unitValue: null, unitName: null };
 
   const txt = pricePerUnit.toLowerCase().trim();
 
-  //  Ignorar datos inválidos que Acuenta devuelve
   if (
     txt === "" ||
     txt.includes("pum") ||
@@ -634,6 +627,22 @@ function procesarUnit(pricePerUnit = "") {
   };
 }
 
+function renderProgressBar(current, total, prefix = `[${STORE}]`) {
+  if (!total || total <= 0) return;
+  const width = 28;
+  const avance = current / total;
+  const progress = Math.round(avance * width);
+
+  const pasoMin = Math.ceil(total * 0.05);
+  if (current % pasoMin !== 0 && current !== total) return;
+
+  const bar = "█".repeat(progress) + "░".repeat(width - progress);
+  const percent = (avance * 100).toFixed(0).padStart(3);
+
+  process.stdout.write(`\r${prefix} [${bar}] ${percent}% (${current}/${total})`);
+  if (current === total) process.stdout.write("\n");
+}
+
 async function cargarTodosLosProductos(page) {
   const selectorCard = ".styles__StyledCard-sc-3jvmda-0";
 
@@ -644,21 +653,19 @@ async function cargarTodosLosProductos(page) {
   while (intentos < 40 && sameCount < 5) {
     intentos++;
 
-    //  Scroll hasta el fondo
     await page.evaluate(() => {
       window.scrollTo(0, document.body.scrollHeight);
     });
 
     await page.waitForTimeout(2000);
 
-    //  Si existe un botón "Ver más productos", lo clickeamos
     const btnVerMas = await page.$("button:has-text('Ver más productos')");
     if (btnVerMas) {
       try {
         await btnVerMas.click();
         await page.waitForTimeout(2000);
       } catch (e) {
-        console.warn(`[${STORE}] ⚠️ No se pudo clickear "Ver más productos":`, e.message);
+        console.warn(`[${STORE}] No se pudo clickear "Ver más productos":`, e.message);
       }
     }
 
@@ -681,6 +688,9 @@ async function cargarTodosLosProductos(page) {
   return finalCount;
 }
 
+const CATEGORIAS = [
+  { nombre: "Despensa", url: "https://www.acuenta.cl/ca/despensa/05" }
+];
 
 // =============================================================
 //  MAIN
@@ -689,7 +699,7 @@ async function main() {
   console.log(`\n Iniciando SCRAPER ${STORE.toUpperCase()}`);
   await connectDB();
   const db = getDB();
-  console.log(`[${STORE}]  Conectado a MongoDB Atlas`);
+  console.log(`[${STORE}] Conectado a MongoDB Atlas`);
 
   const browser = await firefox.launch({ headless: true });
   const context = await browser.newContext({
@@ -704,14 +714,13 @@ async function main() {
 
   for (const cat of CATEGORIAS) {
     console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-    console.log(`[${STORE}] 🟢 Categoría: ${cat.nombre}`);
-    console.log(`[${STORE}] 🌐 URL: ${cat.url}`);
+    console.log(`[${STORE}] Categoría: ${cat.nombre}`);
+    console.log(`[${STORE}] URL: ${cat.url}`);
     console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
 
     let intentos = 0;
     let productos = [];
 
-    //  Reintentos automáticos
     while (intentos < 5 && productos.length === 0) {
       try {
         intentos++;
@@ -723,12 +732,11 @@ async function main() {
 
         const notFound = await page.$('text="Lo sentimos"');
         if (notFound) {
-          console.warn(`[${STORE}] ⚠️ Página vacía (${cat.nombre})`);
+          console.warn(`[${STORE}] Página vacía (${cat.nombre})`);
           await page.reload();
           continue;
         }
 
-        //  Scroll dinámico
         let sameCount = 0;
         while (sameCount < 3) {
           const before = await page.locator(".styles__StyledCard-sc-3jvmda-0").count();
@@ -739,41 +747,39 @@ async function main() {
           else sameCount = 0;
         }
 
-//  Scroll infinito hasta que no carguen más productos
-await cargarTodosLosProductos(page);
+        await cargarTodosLosProductos(page);
 
-productos = await page.$$eval(".styles__StyledCard-sc-3jvmda-0", (cards) =>
-  cards.map((card) => {
-    try {
-      const title =
-        card.querySelector(".prod__name, .CardName__CardNameStyles-sc-147zxke-0")?.innerText?.trim() || "";
-      const price =
-        card.querySelector(".base__price, .CardBasePrice__CardBasePriceStyles-sc-1dlx87w-0")?.innerText?.trim() || "";
-      const pricePerUnit =
-        card.querySelector(".CardPum__CardPumStyles-sc-1vz27ac-0 span, .styles__PumStyles-sc-omx4ld-0 span")
-          ?.innerText?.trim() || null;
-      const offerDescription =
-        card.querySelector(".styles__PromoTagStyles-sc-q4v3s1-0 div")?.innerText?.trim() || null;
-      const image =
-        card.querySelector("img.ant-image-img, img.prod__figure__img")?.src || "";
-      const href = card.querySelector("a.containerCard")?.getAttribute("href") || "";
-      const link = href.startsWith("http") ? href : `https://www.acuenta.cl${href}`;
-      return { title, price, pricePerUnit, offerDescription, image, link };
-    } catch {
-      return null;
-    }
-  }).filter(Boolean)
-);
-
+        productos = await page.$$eval(".styles__StyledCard-sc-3jvmda-0", (cards) =>
+          cards.map((card) => {
+            try {
+              const title =
+                card.querySelector(".prod__name, .CardName__CardNameStyles-sc-147zxke-0")?.innerText?.trim() || "";
+              const price =
+                card.querySelector(".base__price, .CardBasePrice__CardBasePriceStyles-sc-1dlx87w-0")?.innerText?.trim() || "";
+              const pricePerUnit =
+                card.querySelector(".CardPum__CardPumStyles-sc-1vz27ac-0 span, .styles__PumStyles-sc-omx4ld-0 span")
+                  ?.innerText?.trim() || null;
+              const offerDescription =
+                card.querySelector(".styles__PromoTagStyles-sc-q4v3s1-0 div")?.innerText?.trim() || null;
+              const image =
+                card.querySelector("img.ant-image-img, img.prod__figure__img")?.src || "";
+              const href = card.querySelector("a.containerCard")?.getAttribute("href") || "";
+              const link = href.startsWith("http") ? href : `https://www.acuenta.cl${href}`;
+              return { title, price, pricePerUnit, offerDescription, image, link };
+            } catch {
+              return null;
+            }
+          }).filter(Boolean)
+        );
 
       } catch (err) {
-        console.error(`[${STORE}] ❌ Error en intento ${intentos}: ${err.message}`);
+        console.error(`[${STORE}] Error en intento ${intentos}: ${err.message}`);
         await page.waitForTimeout(3000);
       }
     }
 
     if (!productos.length) {
-      console.warn(`[${STORE}] ⚠️ No se logró extraer ${cat.nombre} tras 5 intentos.`);
+      console.warn(`[${STORE}] No se logró extraer ${cat.nombre} tras 5 intentos.`);
       continue;
     }
 
@@ -789,106 +795,121 @@ productos = await page.$$eval(".styles__StyledCard-sc-3jvmda-0", (cards) =>
   const colProductos = db.collection("productos");
   const colPriceHistory = db.collection("priceHistory");
 
-for (const [i, prod] of productosFinal.entries()) {
-  if (!prod.image || prod.image.includes("default")) continue;
+  for (const [i, prod] of productosFinal.entries()) {
+    if (!prod.image || prod.image.includes("default")) continue;
 
-  const precioNum = parsePrice(prod.price);
-  if (isNaN(precioNum)) continue;
+    const precioNum = parsePrice(prod.price);
+    if (isNaN(precioNum)) continue;
 
-  const { unitValue, unitName } = procesarUnit(prod.pricePerUnit);
-  
-  const marcaDetectada = detectarMarca(prod.title, prod.link);
-  
-  // ✅ EXTRAER CÓDIGO DEL PRODUCTO DESDE EL LINK
-  const codigoProducto = extraerCodigoProducto(prod.link);
-  
-  // ✅ GENERAR globalId CON EL CÓDIGO
-  const globalId = generarGlobalId(prod.title, marcaDetectada, codigoProducto);
+    const { unitValue, unitName } = procesarUnit(prod.pricePerUnit);
+    const marcaDetectada = detectarMarca(prod.title, prod.link);
+    const codigoProducto = extraerCodigoProducto(prod.link);
+    const globalId = generarGlobalId(codigoProducto);
 
-  const existente = await colProductos.findOne({ globalId, store: STORE });
+    if (!globalId) continue;
 
-  if (existente) {
-    if (existente.currentPrice !== precioNum) {
-      await colProductos.updateOne(
-        { _id: existente._id },
-        {
-          $set: {
-            globalId,
-            title: prod.title,
-            brand: marcaDetectada,
-            currentPrice: precioNum,
-            formattedPrice: prod.price,
-            pricePerUnit: prod.pricePerUnit || null,
-            offerDescription: prod.offerDescription || null,
-            lastUpdate: new Date(),
-            categoria: prod.categoria,
-            codigoProducto // ✅ Guardar código también
+    const existente = await colProductos.findOne({ globalId, store: STORE });
+
+    if (existente) {
+      if (existente.currentPrice !== precioNum) {
+        await colProductos.updateOne(
+          { _id: existente._id },
+          {
+            $set: {
+              globalId,
+              title: prod.title,
+              brand: marcaDetectada,
+              currentPrice: precioNum,
+              formattedPrice: prod.price,
+              pricePerUnit: prod.pricePerUnit || null,
+              offerDescription: prod.offerDescription || null,
+              lastUpdate: new Date(),
+              categoria: prod.categoria,
+              codigoProducto
+            }
           }
-        }
-      );
+        );
 
-      await colPriceHistory.insertOne({
-        productId: existente._id,
+        await colPriceHistory.insertOne({
+          productId: existente._id,
+          store: STORE,
+          price: precioNum,
+          previousPrice: existente.currentPrice || null,
+          variation: existente.currentPrice
+            ? Number((((precioNum - existente.currentPrice) / existente.currentPrice) * 100).toFixed(2))
+            : 0,
+          offerDescription: prod.offerDescription || null,
+          fecha: new Date()
+        });
+
+        actualizados++;
+      }
+    } else {
+      await colProductos.insertOne({
+        globalId,
+        title: prod.title,
+        brand: marcaDetectada,
         store: STORE,
-        price: precioNum,
-        previousPrice: existente.currentPrice || null,
-        variation: existente.currentPrice
-          ? Number((((precioNum - existente.currentPrice) / existente.currentPrice) * 100).toFixed(2))
-          : 0,
+        currentPrice: precioNum,
+        formattedPrice: prod.price,
+        pricePerUnit: prod.pricePerUnit || null,
+        unitValue,
+        unitName,
         offerDescription: prod.offerDescription || null,
-        fecha: new Date()
+        image: prod.image,
+        link: prod.link,
+        categoria: prod.categoria,
+        codigoProducto,
+        lastUpdate: new Date()
       });
 
-      actualizados++;
+      nuevos++;
     }
-  } else {
-    await colProductos.insertOne({
-      globalId,
-      title: prod.title,
-      brand: marcaDetectada,
-      store: STORE,
-      currentPrice: precioNum,
-      formattedPrice: prod.price,
-      pricePerUnit: prod.pricePerUnit || null,
-      unitValue,
-      unitName,
-      offerDescription: prod.offerDescription || null,
-      image: prod.image,
-      link: prod.link,
-      categoria: prod.categoria,
-      codigoProducto, // ✅ Guardar código también
-      lastUpdate: new Date()
-    });
 
-    nuevos++;
+    revisados++;
+    renderProgressBar(revisados, productosFinal.length, `[${STORE}]`);
   }
 
-  revisados++;
-  renderProgressBar(revisados, productosFinal.length, `[${STORE}]`);
+  const totalAntesLimpieza = await colProductos.countDocuments({ store: STORE });
+
+  console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+  console.log(`[${STORE}] RESULTADOS DEL SCRAPING`);
+  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+  console.log(`[${STORE}] Nuevos: ${nuevos}`);
+  console.log(`[${STORE}] Actualizados: ${actualizados}`);
+  console.log(`[${STORE}] Revisados: ${revisados}`);
+  console.log(`[${STORE}] Total en Atlas (antes limpieza): ${totalAntesLimpieza}`);
+  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
+
+  // LIMPIAR DUPLICADOS AUTOMÁTICAMENTE
+  const { eliminados, totalFinal } = await limpiarDuplicados(db);
+
+  console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+  console.log(`[${STORE}] RESUMEN FINAL`);
+  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+  console.log(`[${STORE}] Nuevos: ${nuevos}`);
+  console.log(`[${STORE}] Actualizados: ${actualizados}`);
+  console.log(`[${STORE}] Duplicados eliminados: ${eliminados}`);
+  console.log(`[${STORE}] Total final en Atlas: ${totalFinal}`);
+  console.log(`[${STORE}] Finalizado: ${new Date().toLocaleString("es-CL")}`);
+  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
+
+  await actualizarScrapingArchivo({
+    store: STORE,
+    nuevos,
+    actualizados,
+    totalProductos: totalFinal
+  });
+
+  console.log(`[${STORE}]  Archivo de scraping actualizado`);
+
+  await browser.close();
+  process.exit(0);
 }
 
-
-const totalDB = await colProductos.countDocuments({ store: STORE });
-
-console.log(`\n📊 ${STORE.toUpperCase()} — RESULTADOS`);
-console.log(`🆕 Nuevos: ${nuevos}`);
-console.log(`♻️ Actualizados: ${actualizados}`);
-console.log(`🔎 Revisados: ${revisados}`);
-console.log(`📦 Total en Atlas: ${totalDB}`);
-console.log(`⏱️ Finalizado: ${new Date().toLocaleString("es-CL")}\n`);
-
-//  Guarda resumen global
-await actualizarScrapingArchivo({
-  store: STORE,
-  nuevos,
-  actualizados,
-  totalProductos: totalDB
+main().catch((err) => {
+  console.error(`[${STORE}]  ERROR GLOBAL:`, err);
+  process.exit(1);
 });
 
-console.log(`[${STORE}] 🧾 Archivo de scraping actualizado`);
-//  No cerramos browser ni DB para que continúe el proceso padre
 
-
-}
-
-main().catch((err) => console.error(`[${STORE}] ERROR GLOBAL`, err));
