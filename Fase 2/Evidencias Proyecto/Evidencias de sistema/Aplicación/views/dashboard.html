@@ -246,6 +246,7 @@
 let charts = {};
 let filtros = {};
 let filtrosAlertasGlobal = {};
+let filtrosPrecios = {};
 
 // Variables para scroll infinito (tablas)
 let paginaBajas = 1;
@@ -255,21 +256,13 @@ let cargandoSubidas = false;
 let hayMasBajas = true;
 let hayMasSubidas = true;
 
-let filtrosPrecios = {};
-
-
-// ===============================
-// ALERTAS - VARIABLES GLOBALES
-// ===============================
+// Variables para scroll infinito (alertas)
 let paginaOportunidades = 1;
 let paginaRiesgos = 1;
-
 let cargandoOpo = false;
 let cargandoRiesgos = false;
-
 let hayMasOpo = true;
 let hayMasRiesgos = true;
-
 
 // =============================================================
 //  UTILIDADES
@@ -295,14 +288,9 @@ async function fetchData(url, filtros = {}) {
   return await res.json();
 }
 
-function registrarClick(producto) {
-  fetch("http://localhost:4000/api/clicks/registrar", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ producto })
-  }).catch(err => console.error("Error registrando click:", err));
-}
-
+// =============================================================
+//  CARGAR VOLÁTILES
+// =============================================================
 async function cargarVolatiles(filtros = {}) {
   const cont = document.getElementById("listaVolatiles");
   cont.innerHTML = "<p>Cargando...</p>";
@@ -325,20 +313,16 @@ async function cargarVolatiles(filtros = {}) {
 
     cont.innerHTML += `
       <div class="volatil-card">
-
         <img src="${p.image}" class="volatil-img">
-
         <div class="volatil-info">
           <a href="${p.link}" target="_blank" class="volatil-titulo">
             ${p.titulo}
           </a>
-
           <div class="volatil-detalles">
             Variación promedio: <strong>${p.volatilidadPromedio}%</strong> • 
             Cambios: ${p.cambios} • 
             Supermercado: ${p.supermercado}
           </div>
-
           <div class="volatil-precios">
             <span>Precio actual: <strong>$${p.precioActual?.toLocaleString()}</strong></span><br>
             <span>Último cambio:
@@ -348,104 +332,26 @@ async function cargarVolatiles(filtros = {}) {
             <span>Fecha último cambio: ${fecha}</span>
           </div>
         </div>
-
         <div class="volatil-tendencia ${p.tendencia}">
           ${p.tendencia === "bajando" ? "📉 Bajando" : "📈 Subiendo"}
         </div>
-
       </div>
     `;
   });
 }
 
-
-
-
-async function cargarAlertas(filtros = {}, append = false) {
-  try {
-    const boxOpo = document.getElementById("bajasHoy");     // CORREGIDO
-    const boxRiesgo = document.getElementById("subidasHoy"); // CORREGIDO
-
-    const hoy = new Date().toISOString().split("T")[0];
-
-    const filtrosHoy = {
-      supermercado: filtros.supermercado || "",
-      desde: hoy,
-      hasta: hoy
-    };
-
-    if (!append) {
-      boxOpo.innerHTML = "";
-      boxRiesgo.innerHTML = "";
-      paginaOportunidades = 1;
-      paginaRiesgos = 1;
-      hayMasOpo = true;
-      hayMasRiesgos = true;
-    }
-
-    const query = new URLSearchParams(filtrosHoy).toString();
-
-    const [resBajas, resSubidas] = await Promise.all([
-      fetch(`/api/estadisticas/bajas?page=${paginaOportunidades}&limit=10&${query}`),
-      fetch(`/api/estadisticas/subidas?page=${paginaRiesgos}&limit=10&${query}`)
-    ]);
-
-    const bajas = await resBajas.json();
-    const subidas = await resSubidas.json();
-
-    // BAJAS
-    (bajas.data || []).forEach(p => {
-      const fecha = new Date(p.fecha).toLocaleDateString("es-CL");
-      boxOpo.innerHTML += `
-        <div class="alerta-item">
-          <span class="alerta-icono verde">●</span>
-          <div class="alerta-texto">
-            <a href="${p.link}" target="_blank" class="alerta-titulo">${p.titulo}</a>
-            <span class="alerta-info">bajó ${p.porcentaje}% • $${p.precioAnterior.toLocaleString()} → $${p.precioActual.toLocaleString()} • ${p.store}</span>
-            <span class="alerta-fecha">${fecha}</span>
-          </div>
-        </div>`;
-    });
-
-    if (bajas.pagination?.hasMore) paginaOportunidades++;
-    else hayMasOpo = false;
-
-    // SUBIDAS
-    (subidas.data || []).forEach(p => {
-      const fecha = new Date(p.fecha).toLocaleDateString("es-CL");
-      boxRiesgo.innerHTML += `
-        <div class="alerta-item">
-          <span class="alerta-icono rojo">●</span>
-          <div class="alerta-texto">
-            <a href="${p.link}" target="_blank" class="alerta-titulo">${p.titulo}</a>
-            <span class="alerta-info">subió ${p.porcentaje}% • $${p.precioAnterior.toLocaleString()} → $${p.precioActual.toLocaleString()} • ${p.store}</span>
-            <span class="alerta-fecha">${fecha}</span>
-          </div>
-        </div>`;
-    });
-
-    if (subidas.pagination?.hasMore) paginaRiesgos++;
-    else hayMasRiesgos = false;
-
-  } catch (e) {
-    console.error("❌ Error en cargarAlertas:", e);
-  }
-}
-
-
+// =============================================================
+//  CARGAR ALERTAS HOY
+// =============================================================
 async function cargarAlertasHoy(filtros = {}, append = false) {
   try {
     const boxBajas = document.getElementById("bajasHoy");
     const boxSubidas = document.getElementById("subidasHoy");
 
-    // FECHA HOY FORZADA
     const hoy = new Date().toISOString().split("T")[0];
 
-    // Mezcla de filtros: supermercado + fecha fija
     const filtrosHoy = {
       supermercado: filtros.supermercado || "",
-      genero: filtros.genero || "",
-      region: filtros.region || "",
       desde: hoy,
       hasta: hoy
     };
@@ -457,9 +363,10 @@ async function cargarAlertasHoy(filtros = {}, append = false) {
       paginaRiesgos = 1;
       hayMasOpo = true;
       hayMasRiesgos = true;
+      filtrosAlertasGlobal = { ...filtrosHoy };
     }
 
-    const qs = new URLSearchParams(filtrosHoy).toString();
+    const qs = new URLSearchParams(filtrosAlertasGlobal).toString();
 
     const [resBajas, resSubidas] = await Promise.all([
       fetch(`/api/estadisticas/bajas?page=${paginaOportunidades}&limit=15&${qs}`),
@@ -469,12 +376,9 @@ async function cargarAlertasHoy(filtros = {}, append = false) {
     const bajas = await resBajas.json();
     const subidas = await resSubidas.json();
 
-    // ============================
-    // 📉 RENDER BAJAS
-    // ============================
+    // BAJAS
     (bajas.data || []).forEach(p => {
       const fecha = new Date(p.fecha).toLocaleDateString("es-CL");
-
       boxBajas.innerHTML += `
         <div class="alerta-item">
           <span class="alerta-icono verde">●</span>
@@ -496,12 +400,9 @@ async function cargarAlertasHoy(filtros = {}, append = false) {
     if (bajas.pagination?.hasMore) paginaOportunidades++;
     else hayMasOpo = false;
 
-    // ============================
-    // 📈 RENDER SUBIDAS
-    // ============================
+    // SUBIDAS
     (subidas.data || []).forEach(p => {
       const fecha = new Date(p.fecha).toLocaleDateString("es-CL");
-
       boxSubidas.innerHTML += `
         <div class="alerta-item">
           <span class="alerta-icono rojo">●</span>
@@ -524,11 +425,13 @@ async function cargarAlertasHoy(filtros = {}, append = false) {
     else hayMasRiesgos = false;
 
   } catch (err) {
-    console.error("Error cargarAlertasHoy:", err);
+    console.error("❌ Error cargarAlertasHoy:", err);
   }
 }
 
-
+// =============================================================
+//  CARGAR BAJAS
+// =============================================================
 async function cargarBajas(filtros = {}, append = false) {
   if (cargandoBajas || !hayMasBajas) return;
 
@@ -561,8 +464,6 @@ async function cargarBajas(filtros = {}, append = false) {
       page: paginaBajas,
       limit: 20
     });
-
-    console.log(`Cargando bajas - Página ${paginaBajas} con filtros:`, Object.fromEntries(params));
 
     const res = await fetch(`/api/estadisticas/bajas?${params}`);
     const data = await res.json();
@@ -607,11 +508,11 @@ async function cargarBajas(filtros = {}, append = false) {
     paginaBajas++;
 
   } catch (error) {
-    console.error("Error cargando bajas:", error);
+    console.error("❌ Error cargando bajas:", error);
     if (!append) {
       tbody.innerHTML = `
         <tr><td colspan="6" style="text-align:center; padding:20px; color:#ef4444;">
-           Error al cargar datos
+          ⚠️ Error al cargar datos
         </td></tr>
       `;
     }
@@ -620,7 +521,9 @@ async function cargarBajas(filtros = {}, append = false) {
   }
 }
 
-
+// =============================================================
+//  CARGAR SUBIDAS
+// =============================================================
 async function cargarSubidas(filtros = {}, append = false) {
   if (cargandoSubidas || !hayMasSubidas) return;
   
@@ -635,8 +538,6 @@ async function cargarSubidas(filtros = {}, append = false) {
     `;
     paginaSubidas = 1;
     hayMasSubidas = true;
-    
-   
     filtrosPrecios = { ...filtros };
   } else {
     const loaderRow = document.createElement('tr');
@@ -650,14 +551,11 @@ async function cargarSubidas(filtros = {}, append = false) {
   }
 
   try {
-    
     const params = new URLSearchParams({
       ...filtrosPrecios, 
       page: paginaSubidas,
       limit: 20
     });
-    
-    console.log(`Cargando subidas - Página ${paginaSubidas} con filtros:`, Object.fromEntries(params));
     
     const res = await fetch(`/api/estadisticas/subidas?${params}`);
     const data = await res.json();
@@ -702,11 +600,11 @@ async function cargarSubidas(filtros = {}, append = false) {
     paginaSubidas++;
 
   } catch (error) {
-    console.error("Error cargando subidas:", error);
+    console.error("❌ Error cargando subidas:", error);
     if (!append) {
       tbody.innerHTML = `
         <tr><td colspan="6" style="text-align:center; padding:20px; color:#ef4444;">
-           Error al cargar datos
+          ⚠️ Error al cargar datos
         </td></tr>
       `;
     }
@@ -715,7 +613,9 @@ async function cargarSubidas(filtros = {}, append = false) {
   }
 }
 
-
+// =============================================================
+//  SCROLL INFINITO
+// =============================================================
 function setupInfiniteScroll() {
   const tablaBajas = document.querySelector('#tablaBajas').closest('.tabla-scroll');
   const tablaSubidas = document.querySelector('#tablaSubidas').closest('.tabla-scroll');
@@ -725,8 +625,7 @@ function setupInfiniteScroll() {
       const { scrollTop, scrollHeight, clientHeight } = tablaBajas;
       
       if (scrollTop + clientHeight >= scrollHeight - 50 && hayMasBajas && !cargandoBajas) {
-        console.log("🔄 Cargando más bajas...");
-        cargarBajas({}, true); 
+        cargarBajas({}, true);
       }
     });
   }
@@ -736,46 +635,26 @@ function setupInfiniteScroll() {
       const { scrollTop, scrollHeight, clientHeight } = tablaSubidas;
       
       if (scrollTop + clientHeight >= scrollHeight - 50 && hayMasSubidas && !cargandoSubidas) {
-        console.log("🔄 Cargando más subidas...");
-        cargarSubidas({}, true); 
+        cargarSubidas({}, true);
       }
     });
   }
 }
 
-
+// =============================================================
+//  RENDER CHART GENÉRICO
+// =============================================================
 async function renderChart(id, url, label, filtros = {}) {
   const canvas = document.getElementById(id);
-  if (!canvas) {
-    console.warn(`⚠ No existe canvas con ID: ${id}`);
-    return;
-  }
+  if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
-
-  console.log("==============================================");
-  console.log(`📊 DEBUG GRÁFICO: ${id}`);
-  console.log("➡ URL:", url);
-  console.log("➡ Filtros enviados:", filtros);
-
-  // ----- Llamada API -----
   let res = await fetchData(url, filtros);
-  console.log("📩 Respuesta cruda del backend:", res);
-
-  // Normalizar array
   let data = Array.isArray(res) ? res : res?.data ?? [];
 
-  if (!Array.isArray(data)) {
-    console.error("❌ ERROR: La respuesta NO es un array.", data);
-    return;
-  }
+  if (!Array.isArray(data)) return;
 
-  console.log("📦 Datos normalizados:", data);
-
-  // Si no hay datos → mensaje directo en canvas
   if (data.length === 0) {
-    console.warn("⚠ El endpoint devolvió un array vacío para:", id);
-
     if (charts[id]) charts[id].destroy();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.font = "15px Poppins";
@@ -784,43 +663,20 @@ async function renderChart(id, url, label, filtros = {}) {
     return;
   }
 
-  // ----- Detectar campos -----
   const etiquetas = data.map(d =>
-    d.tienda ??
-    d.store ??
-    d.supermercado ??
-    d._id ??
-    "desconocido"
+    d.tienda ?? d.store ?? d.supermercado ?? d._id ?? "desconocido"
   );
 
   const valores = data.map(d =>
-    d.total ??
-    d.promedio ??
-    d.value ??
-    d.valor ??
-    0
+    d.total ?? d.promedio ?? d.value ?? d.valor ?? 0
   );
 
-  console.log("🏷 Etiquetas detectadas:", etiquetas);
-  console.log("📈 Valores detectados:", valores);
-
-  // Validación
-  if (etiquetas.includes("desconocido")) {
-    console.warn("⚠ ADVERTENCIA: Una o más etiquetas no vienen del backend.");
-  }
-
-  if (valores.every(v => v === 0)) {
-    console.warn("⚠ ADVERTENCIA: Todos los valores son 0 — posible error en campo del backend.");
-  }
-
-  // ----- Tipo de gráfico -----
   const tipoGrafico = ["porDia", "porTiempo", "chartTendencia"].includes(id)
     ? "line"
     : "bar";
 
   if (charts[id]) charts[id].destroy();
 
-  // ----- Render chart -----
   try {
     charts[id] = new Chart(ctx, {
       type: tipoGrafico,
@@ -851,12 +707,11 @@ async function renderChart(id, url, label, filtros = {}) {
   } catch (err) {
     console.error("❌ ERROR AL RENDERIZAR EL GRÁFICO:", err);
   }
-
-  console.log(`✅ FIN DEBUG GRÁFICO: ${id}`);
-  console.log("==============================================\n\n");
 }
 
-
+// =============================================================
+//  RENDER TOP PRODUCTOS
+// =============================================================
 async function renderTopProductos(filtros = {}) {
   const id = "topProductos";
   const canvas = document.getElementById(id);
@@ -1489,7 +1344,7 @@ document.getElementById("btnFiltrar").addEventListener("click", () => {
   };
 
   // 🛒 FILTROS SOLO PARA PRECIOS (7 días)
-  const filtrosPrecios = {
+  const filtrosPreciosNuevos = {
     supermercado: document.getElementById("filtroSuper").value || "",
     desde: document.getElementById("filtroFecha").value || "",
     hasta: document.getElementById("filtroHasta").value || ""
@@ -1521,6 +1376,10 @@ document.getElementById("btnFiltrar").addEventListener("click", () => {
   hayMasOpo = true;
   hayMasRiesgos = true;
 
+  // ✅ ACTUALIZAR VARIABLE GLOBAL DE FILTROS
+  filtrosPrecios = { ...filtrosPreciosNuevos };
+  console.log("✅ filtrosPrecios ACTUALIZADO:", filtrosPrecios);
+
   // ============================
   // 📊 ACTUALIZAR GRÁFICOS
   // ============================
@@ -1530,22 +1389,18 @@ document.getElementById("btnFiltrar").addEventListener("click", () => {
   renderMapaChile(filtrosGraficos);
   renderSegmentacion(filtrosGraficos);
 
-
   // ============================
   // 📉📈 ACTUALIZAR TABLAS 7 DÍAS
   // ============================
-  cargarBajas(filtrosPrecios);
-  cargarSubidas(filtrosPrecios);
+  cargarBajas(filtrosPreciosNuevos, false);
+  cargarSubidas(filtrosPreciosNuevos, false);
 
   // ============================
   // 🔔 ACTUALIZAR ALERTAS DE HOY
   // ============================
   cargarAlertasHoy(filtrosAlertas, false);
-  cargarAlertas(filtrosAlertas, false);
   cargarVolatiles(filtrosAlertas, false);
 });
-
-
 
 
 

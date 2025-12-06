@@ -285,111 +285,87 @@ export const productosCrecimiento = async (req, res) => {
 export async function obtenerBajasDePrecio(req, res) {
   try {
     const db = getDB();
-    const { page = 1, limit = 20, supermercado } = req.query;
+    const { supermercado, desde, hasta, page = 1, limit = 20 } = req.query;
 
-    const skip = (page - 1) * limit;
+    const match = { variation: { $lt: 0 } };
 
-    const hoy = new Date();
-    hoy.setHours(23, 59, 59, 999);
+    if (supermercado && supermercado.trim() !== "") {
+      match.store = supermercado.toLowerCase().trim();
+    }
 
-    const hace7 = new Date();
-    hace7.setDate(hoy.getDate() - 7);
-    hace7.setHours(0, 0, 0, 0);
+    if (desde || hasta) {
+      match.fecha = {};
+      if (desde) {
+        const desdeDate = new Date(desde);
+        desdeDate.setHours(0, 0, 0, 0);
+        match.fecha.$gte = desdeDate;
+      }
+      if (hasta) {
+        const hastaDate = new Date(hasta);
+        hastaDate.setHours(23, 59, 59, 999);
+        match.fecha.$lte = hastaDate;
+      }
+    }
 
-    const filtro = {
-      fecha: { $gte: hace7, $lte: hoy },
-      price: { $gt: 0 },
-      previousPrice: { $gt: 0 }
-    };
+    const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    const filtroBase = {
-  fecha: { $gte: hace7, $lte: hoy },
-  price: { $gt: 0 },
-  previousPrice: { $gt: 0 }
-};
-
-if (supermercado && supermercado !== "Todos") {
-  filtroBase.store = supermercado;
-}
-
-
-    const data = await db.collection("priceHistory").aggregate([
-
-      { $match: filtro },
-
-      // Ordenar primero por fecha DESC
-      { $sort: { fecha: -1 } },
-
-      // Tomar solo la última actualización de cada producto
-      {
-        $group: {
-          _id: "$productId",
-          ultimo: { $first: "$$ROOT" }
+    const data = await db
+      .collection("priceHistory")
+      .aggregate([
+        { $match: match },
+        { $sort: { fecha: -1 } },
+        { $skip: skip },
+        { $limit: parseInt(limit) },
+        {
+          $lookup: {
+            from: "productos",
+            localField: "productId",
+            foreignField: "_id",
+            as: "producto"
+          }
+        },
+        { $unwind: "$producto" },
+        {
+          $project: {
+            _id: 1,
+            productId: 1,
+            store: 1,
+            fecha: 1,
+            titulo: "$producto.title",
+            link: "$producto.link",
+            image: "$producto.image",
+            precioAnterior: "$previousPrice",
+            precioActual: "$price",
+            diferencia: { $subtract: ["$previousPrice", "$price"] },
+            porcentaje: {
+              $abs: {
+                $multiply: [
+                  { $divide: [{ $subtract: ["$price", "$previousPrice"] }, "$previousPrice"] },
+                  100
+                ]
+              }
+            }
+          }
         }
-      },
+      ])
+      .toArray();
 
-      // FILTRAR CORRECTAMENTE BAJAS (usando $expr)
-      {
-        $match: {
-          $expr: { $lt: ["$ultimo.price", "$ultimo.previousPrice"] }
-        }
-      },
+    const totalCount = await db.collection("priceHistory").countDocuments(match);
 
-      // Reemplazar root para seguir trabajando
-      { $replaceRoot: { newRoot: "$ultimo" } },
-
-      // Traer producto original
-      {
-        $lookup: {
-          from: "productos",
-          localField: "productId",
-          foreignField: "_id",
-          as: "producto"
-        }
-      },
-      { $unwind: "$producto" },
-
-      // Campos finales
-      {
-        $project: {
-          productId: 1,
-          titulo: "$producto.title",
-          link: "$producto.link",
-          image: "$producto.image",
-          store: 1,
-          precioAnterior: "$previousPrice",
-          precioActual: "$price",
-          diferencia: { $subtract: ["$previousPrice", "$price"] },
-          porcentaje: {
-            $multiply: [
-              { $divide: [{ $subtract: ["$previousPrice", "$price"] }, "$previousPrice"] },
-              100
-            ]
-          },
-          fecha: 1
-        }
-      },
-
-      { $sort: { fecha: -1 } },
-      { $skip: skip },
-      { $limit: parseInt(limit) }
-
-    ]).toArray();
-
-    return res.json({
+    res.json({
       ok: true,
       data,
       pagination: {
-        hasMore: data.length === parseInt(limit)
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(totalCount / parseInt(limit)),
+        hasMore: skip + data.length < totalCount
       }
     });
-
-  } catch (err) {
-    console.error("❌ Error obtenerBajasDePrecio:", err);
-    res.status(500).json({ ok: false, error: err.message });
+  } catch (error) {
+    console.error("❌ Error en obtenerBajas:", error);
+    res.status(500).json({ ok: false, error: error.message });
   }
 }
-
 
 
 export async function obtenerSubidasDePrecio(req, res) {
