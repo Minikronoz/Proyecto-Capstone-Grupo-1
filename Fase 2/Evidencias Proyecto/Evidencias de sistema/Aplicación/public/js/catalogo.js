@@ -77,13 +77,34 @@ function normalizarPeso(texto) {
 
   return null;
 }
+function tipoHarina(texto = "") {
+  const t = normalizarTexto(texto);
 
-function detectarPolvos(texto) {
-  const t = texto.toLowerCase();
-  if (t.includes("sin polvo") || t.includes("sin polvos")) return "sin";
-  if (t.includes("con polvo") || t.includes("con polvos")) return "con";
+  // Tipos reales distintos
+  if (t.includes("integral")) return "integral";
+  if (t.includes("multicereal")) return "multicereal";
+  if (t.includes("avena")) return "avena";
+  if (t.includes("centeno")) return "centeno";
+
+  // Lo demás NO diferencia productos
   return "regular";
 }
+
+function detectarPolvos(texto = "") {
+  const t = normalizarTexto(texto);
+
+  if (t.includes("sin polvo")) return "sin";
+  if (t.includes("sin polvos")) return "sin";
+
+  if (t.includes("con polvo")) return "con";
+  if (t.includes("con polvos")) return "con";
+
+  return "regular";
+}
+
+
+
+
 
 function similitudNombreFlexible(a, b) {
   const A = new Set(limpiarTextoClave(a).split(" "));
@@ -98,29 +119,18 @@ function similitudNombreFlexible(a, b) {
 
 
 
-function tipoHarina(texto) {
-  const t = texto.toLowerCase();
 
-  if (t.includes("centeno")) return "centeno";
-  if (t.includes("avena")) return "avena";
-  if (t.includes("multicereal")) return "multicereal";
-  if (t.includes("integral")) return "integral";
-  if (t.includes("panader")) return "panaderia";
-  if (t.includes("repost") || t.includes("cake")) return "reposteria";
-  if (t.includes("especial") || t.includes("premium")) return "especial";
 
-  if (t.includes("con polvo") || t.includes("con polvos")) return "con-polvos";
-  if (t.includes("sin polvo") || t.includes("sin polvos")) return "sin-polvos";
-
-  return "regular";
-}
 // ===============================
 // ⚖️ NORMALIZAR PESO / VOLUMEN
 // ===============================
 function normalizarPesoDesdeTitulo(title) {
   if (!title) return null;
 
-  const matchVol = title.match(/(\d+(?:[\.,]\d+)?)\s*(l|ml|cc)\b/i);
+  const t = title.toLowerCase();
+
+  // ✅ VOLUMEN
+  const matchVol = t.match(/(\d+(?:[\.,]\d+)?)\s*(l|ml|cc)\b/i);
   if (matchVol) {
     let valor = parseFloat(matchVol[1].replace(",", "."));
     const unidad = matchVol[2].toLowerCase();
@@ -128,41 +138,32 @@ function normalizarPesoDesdeTitulo(title) {
     return { valor: Math.round(valor), tipo: "volumen" };
   }
 
-  const matchPeso = title.match(/(\d+(?:[\.,]\d+)?)\s*(g|kg)\b/i);
+  // ✅ PESO — SOPORTA: g, kg, kilo, kilos, k
+  const matchPeso = t.match(/(\d+(?:[\.,]\d+)?)\s*(g|kg|kilo|kilos|\bk\b)\b/i);
   if (matchPeso) {
     let valor = parseFloat(matchPeso[1].replace(",", "."));
     const unidad = matchPeso[2].toLowerCase();
-    if (unidad === "kg") valor *= 1000;
-    if (valor < 50 || valor > 50000) return null;
+
+    if (unidad === "kg" || unidad === "kilo" || unidad === "kilos" || unidad === "k") {
+      valor *= 1000;
+    }
+
+    if (valor < 1 || valor > 50000) return null;
+
     return { valor: Math.round(valor), tipo: "peso" };
   }
 
   return null;
 }
 
+
+
 // Convertir peso en texto
 function pesoToText(m) {
   if (!m || !m.valor) return "";
   return `${m.valor}${m.tipo === "peso" ? "g" : "ml"}`;
 }
-function tipoHarina(texto) {
-  const t = texto.toLowerCase();
 
-  if (/\bcenteno\b/.test(t)) return "centeno";
-  if (/\bavena\b/.test(t)) return "avena";
-  if (/\bmulticereal\b/.test(t)) return "multicereal";
-  if (/\bintegral\b/.test(t)) return "integral";
-
-  if (/\bpanader(ia|ía)\b/.test(t)) return "panaderia";
-  if (/\breposter(ia|ía)|cake\b/.test(t)) return "reposteria";
-
-  if (/\bespecial\b|premium/.test(t)) return "especial";
-
-  if (/\bcon\s*polvo/.test(t)) return "con-polvos";
-  if (/\bsin\s*polvo/.test(t)) return "sin-polvos";
-
-  return "regular"; // harina normal
-}
 
 // ===============================
 // 🔍 STOPWORDS Y LIMPIEZA DE TÍTULO
@@ -375,17 +376,131 @@ function compararPesos(p1, p2) {
 
   return dif <= tolerancia ? 100 : 0;
 }
+function detectarProductoBase(texto = "") {
+  const t = normalizarTexto(texto);
 
-// ===============================================
-// 🧠 BUSCAR SIMILAR EN TODAS LAS TIENDAS (VERSIÓN FINAL DEFINITIVA)
-// ===============================================
+  // ✅ HARINAS (SIEMPRE ANULA "polvos", "hornear", etc.)
+  if (t.includes("harina")) return "harina";
+
+  // ✅ POLVOS DE HORNEAR (producto distinto)
+  if (
+    t.includes("polvo de hornear") ||
+    t.includes("polvos de hornear") ||
+    t === "polvos de hornear"
+  ) return "polvos-hornear";
+
+  // ✅ BICARBONATO
+  if (t.includes("bicarbonato")) return "bicarbonato";
+
+  // ✅ AZÚCAR
+  if (t.includes("azucar")) return "azucar";
+
+  // ✅ SAL
+  if (t.includes("sal")) return "sal";
+
+  return "otro";
+}
+
+
+
+
+
+function generarClaveProducto(prod) {
+  const titulo = prod.title || prod.titulo || "";
+  const marca  = normalizarMarca(prod.brand || prod.marca || "");
+  const peso   = normalizarPesoDesdeTitulo(titulo);
+
+  const categoria = detectarCategoriaBase(titulo);
+
+  let atributoClave = "regular";
+
+  if (categoria === "harina") {
+    const h = normalizarHarina(titulo);
+    atributoClave = `${h.tipo}-${h.polvos}`;
+  }
+
+  if (!peso) {
+    return `${categoria}|${atributoClave}|${marca}|sin-peso`;
+  }
+
+  return `${categoria}|${atributoClave}|${marca}|${peso.valor}${peso.tipo}`;
+}
+
+
+
+function detectarCategoriaBase(texto = "") {
+  const t = normalizarTexto(texto);
+
+  if (t.includes("harina")) return "harina";
+  if (t.includes("azucar")) return "azucar";
+  if (t.includes("sal")) return "sal";
+  if (t.includes("aceite")) return "aceite";
+  if (t.includes("arroz")) return "arroz";
+  if (t.includes("leche")) return "leche";
+  if (t.includes("fideos") || t.includes("pasta")) return "pastas";
+  if (t.includes("atún") || t.includes("atun")) return "conservas";
+
+  return "otro";
+}
+
+function normalizarHarina(t) {
+  return {
+    tipo: tipoHarina(t),
+    polvos: detectarPolvos(t)
+  };
+}
+
+
+function normalizarAzucar(t) {
+  const txt = normalizarTexto(t);
+
+  if (txt.includes("rubia")) return "rubia";
+  if (txt.includes("morena")) return "morena";
+  if (txt.includes("flor")) return "flor";
+  if (txt.includes("impalpable")) return "flor";
+
+  return "blanca";
+}
+
+function normalizarSal(t) {
+  const txt = normalizarTexto(t);
+
+  if (txt.includes("fina")) return "fina";
+  if (txt.includes("gruesa")) return "gruesa";
+
+  return "regular";
+}
+function normalizarAceite(t) {
+  const txt = normalizarTexto(t);
+
+  if (txt.includes("oliva")) return "oliva";
+  if (txt.includes("maravilla")) return "maravilla";
+  if (txt.includes("canola")) return "canola";
+  if (txt.includes("girasol")) return "girasol";
+  if (txt.includes("coco")) return "coco";
+
+  return "vegetal";
+}
+
+function normalizarLeche(t) {
+  const txt = normalizarTexto(t);
+
+  if (txt.includes("entera")) return "entera";
+  if (txt.includes("descremada")) return "descremada";
+  if (txt.includes("semi")) return "semidescremada";
+  if (txt.includes("sin lactosa")) return "sinlactosa";
+
+  return "regular";
+}
+
+
 function encontrarSimilaresEnTodasLasTiendas(prod) {
   const res = {};
 
-  const marcaBase = normalizarMarca(prod.marca);
-  const pesoBase = normalizarPesoDesdeTitulo(prod.titulo);
-  const polvosBase = detectarPolvos(prod.titulo);
-  const tipoBase = tipoHarina(prod.titulo);
+  const marcaBase     = normalizarMarca(prod.marca);
+  const pesoBase      = normalizarPesoDesdeTitulo(prod.titulo);
+  const productoBase  = detectarProductoBase(prod.titulo);
+  const polvosBase    = detectarPolvos(prod.titulo);
 
   for (const tienda of TIENDAS_COMPARACION) {
     let mejor = null;
@@ -396,52 +511,39 @@ function encontrarSimilaresEnTodasLasTiendas(prod) {
     );
 
     for (const p of productosTienda) {
+      const marcaP     = normalizarMarca(p.brand || "");
+      const pesoP      = normalizarPesoDesdeTitulo(p.title);
+      const productoP = detectarProductoBase(p.title);
+      const polvosP   = detectarPolvos(p.title);
 
-      const marcaP = normalizarMarca(p.brand || "");
-      const pesoP = normalizarPesoDesdeTitulo(p.title);
-      const polvosP = detectarPolvos(p.title);
-      const tipoP = tipoHarina(p.title);
+      // ✅ 1. MISMO PRODUCTO BASE (harina)
+      if (productoBase !== productoP) continue;
 
-      // =================================================
-      // 1️⃣ TIPO DE HARINA (NO COMPARAR DISTINTOS TIPOS)
-      // =================================================
-      if (tipoBase !== tipoP) continue;
+      // ✅ 2. MISMA MARCA
+      if (marcaBase !== marcaP) continue;
 
-      // =================================================
-      // 2️⃣ POLVOS (con / sin) → NO MEZCLAR JAMÁS
-      // =================================================
-      if (polvosBase !== polvosP) continue;
+      // ✅ 3. BLOQUEO DURO SOLO POR POLVOS
+      if (
+        polvosBase !== "regular" &&
+        polvosP   !== "regular" &&
+        polvosBase !== polvosP
+      ) continue;
 
-      // =================================================
-      // 3️⃣ MARCA (obligatorio 85+)
-      // =================================================
-      const scoreMarca = similitudMarca(prod.marca, p.brand);
-      if (scoreMarca < 85) continue;
+      // ✅ 4. PESO CON TOLERANCIA REAL
+      if (pesoBase && pesoP && pesoBase.tipo === pesoP.tipo) {
+        const diff = Math.abs(pesoBase.valor - pesoP.valor);
+        if (diff > pesoBase.valor * 0.12) continue; // 12%
+      }
 
-      // =================================================
-      // 4️⃣ PESO (±7%)
-      // =================================================
-      if (!pesoBase || !pesoP || pesoBase.tipo !== pesoP.tipo) continue;
+      // ✅ SCORE
+      const scorePeso =
+        pesoBase && pesoP
+          ? 100 - (Math.abs(pesoBase.valor - pesoP.valor) / pesoBase.valor * 100)
+          : 60;
 
-      const diff = Math.abs(pesoBase.valor - pesoP.valor);
-      const tolerancia = pesoBase.valor * 0.07;
-
-      if (diff > tolerancia) continue;
-
-      const scorePeso = 100 - (diff / pesoBase.valor * 100);
-
-      // =================================================
-      // 5️⃣ NOMBRE (NO bloquea — SOLO suma)
-      // =================================================
       const scoreNombre = similitudNombreFlexible(prod.titulo, p.title);
 
-      // =================================================
-      // 6️⃣ SCORE FINAL — Prioridades reales
-      // =================================================
-      const scoreFinal =
-        (scoreMarca  * 0.55) +
-        (scorePeso   * 0.30) +
-        (scoreNombre * 0.15);
+      const scoreFinal = (scorePeso * 0.6) + (scoreNombre * 0.4);
 
       if (scoreFinal > mejorScore) {
         mejorScore = scoreFinal;
@@ -449,7 +551,6 @@ function encontrarSimilaresEnTodasLasTiendas(prod) {
       }
     }
 
-    // Guardar resultado por tienda
     if (mejor) {
       res[tienda] = {
         porcentaje: Math.round(mejorScore),
@@ -466,7 +567,6 @@ function encontrarSimilaresEnTodasLasTiendas(prod) {
 
   return res;
 }
-
 
 
 
@@ -604,38 +704,51 @@ function extraerAtributosCriticos(texto) {
 function penalizarDiferenciasAtributos(a, b) {
   let p = 0;
 
-  // 💥 HARINA: estas diferencias invalidan
-  if (a.sinPolvos !== b.sinPolvos) p += 80;
-  if (a.conPolvos !== b.conPolvos) p += 80;
+  // ============================
+  // 🔴 HARINA: con / sin polvos
+  // ============================
+  // Solo penaliza si uno es SIN y el otro CON
+  if (a.sinPolvos !== b.sinPolvos) p += 60;
+  if (a.conPolvos !== b.conPolvos) p += 60;
 
-  // 💥 ACEITES: deben coincidir exacto
+  // ============================
+  // 🟠 ACEITES (importante)
+  // ============================
   const aceites = ["oliva", "extraVirgen", "vegetal", "maravilla", "canola", "coco", "girasol"];
   aceites.forEach(attr => {
-    if (a[attr] !== b[attr]) p += 40;
+    if (a[attr] !== b[attr]) p += 25;
   });
 
-  // 💥 LECHES
+  // ============================
+  // 🟡 LECHES
+  // ============================
   const leches = ["entera", "descremada", "semidescremada", "sinLactosa", "deslactosada"];
   leches.forEach(attr => {
-    if (a[attr] !== b[attr]) p += 35;
-  });
-
-  // 😐 Azúcares
-  const azucar = ["azucarRubia", "azucarMorena", "azucarFlor", "azucarLight"];
-  azucar.forEach(attr => {
-    if (a[attr] !== b[attr]) p += 30;
-  });
-
-  // 😐 Saludable
-  const saludables = ["sinGluten", "sinAzucar", "vegano", "natural", "organico"];
-  saludables.forEach(attr => {
     if (a[attr] !== b[attr]) p += 20;
   });
 
-  // 😐 Formato / pack
+  // ============================
+  // ⚪ AZÚCAR
+  // ============================
+  const azucar = ["azucarRubia", "azucarMorena", "azucarFlor", "azucarLight"];
+  azucar.forEach(attr => {
+    if (a[attr] !== b[attr]) p += 15;
+  });
+
+  // ============================
+  // 🟢 SALUDABLE
+  // ============================
+  const saludables = ["sinGluten", "sinAzucar", "vegano", "natural", "organico"];
+  saludables.forEach(attr => {
+    if (a[attr] !== b[attr]) p += 10;
+  });
+
+  // ============================
+  // 🔵 FORMATO / PACK
+  // ============================
   const formato = ["sachet", "botella", "doyPack", "bolsa", "caja", "pack", "duo", "familiar"];
   formato.forEach(attr => {
-    if (a[attr] !== b[attr]) p += 10;
+    if (a[attr] !== b[attr]) p += 6;
   });
 
   return p;
@@ -1042,18 +1155,7 @@ function guardarCarritoEnStorage() {
     console.warn("No se pudo guardar el carrito en localStorage", e);
   }
 }
-// ❌ Cerrar Modal sin vaciar
-function cerrarModalVaciar() {
-  document.getElementById("modalVaciarCarrito").style.display = "none";
-}
 
-function confirmarVaciarCarrito() {
-  carritoCotizador = [];
-  guardarCarritoEnStorage();
-  renderCarritoCotizador();
-  cerrarModalVaciar();
-  mostrarToast("Carrito limpiado (cotizaciones guardadas)");
-}
 
 // Carga desde localStorage
 function cargarCarritoDesdeStorage() {
@@ -1069,25 +1171,12 @@ function cargarCarritoDesdeStorage() {
     console.warn("No se pudo leer el carrito desde localStorage", e);
   }
 }
-function generarIDGlobalProducto(titulo, marca) {
-  const marcaNorm = normalizarMarca(marca);
-  const peso = normalizarPesoDesdeTitulo(titulo);
-  const tipo = tipoHarina(titulo); // funciona para arroz también (“regular”)
-  const polvos = detectarPolvos(titulo); // “sin”, “con”, “regular”
 
-  const clave = limpiarTextoClave(titulo)
-    .split(" ")
-    .slice(0, 4)  // primeras 4 palabras relevantes
-    .join("-");
-
-  return `${marcaNorm}_${peso ? peso.valor : "0"}_${tipo}_${polvos}_${clave}`;
-}
 // Llamamos al cargar la página
 document.addEventListener("DOMContentLoaded", () => {
   cargarCarritoDesdeStorage();
 });
 
-// Agregar producto al carrito (desde el botón en la tarjeta)
 async function agregarAlCarrito(btn) {
   const producto = {
     idProducto: btn.getAttribute("data-id"),
@@ -1099,65 +1188,66 @@ async function agregarAlCarrito(btn) {
     link: btn.getAttribute("data-link")
   };
 
-  // 1️⃣ Buscar si YA existe en el carrito (mismo nombre y marca)
-const idGlobal = generarIDGlobalProducto(producto.titulo, producto.marca);
+  // ✅ 1. GENERAR ID GLOBAL REAL (AQUÍ ESTABA EL BUG)
+  const idGlobal = generarClaveProducto({
+    titulo: producto.titulo,
+    marca: producto.marca
+  });
 
-const existente = carritoCotizador.find(i => i.idGlobal === idGlobal);
+  // ✅ 2. BUSCAR SI YA EXISTE
+  const existente = carritoCotizador.find(i => i.idGlobal === idGlobal);
 
   if (existente) {
     existente.cantidad += 1;
     guardarCarritoEnStorage();
     renderCarritoCotizador();
 
-    // Guardar cotización actualizada en el servidor
-    guardarCotizacionEnServidor().catch(err =>
-      console.warn("No se pudo guardar cotización:", err)
-    );
-
+    guardarCotizacionEnServidor().catch(() => {});
     return;
   }
 
-// 2️⃣ Si es nuevo, buscar similares
-let similares = encontrarSimilaresEnTodasLasTiendas(producto);
+  // ✅ 3. BUSCAR SIMILARES
+  let similares = encontrarSimilaresEnTodasLasTiendas(producto);
 
-// 🛑 Asegurar que SIEMPRE incluimos el producto base aunque no existan similitudes
-if (!similares || typeof similares !== "object") similares = {};
+  if (!similares || typeof similares !== "object") similares = {};
 
-similares[producto.supermercado] = {
-  porcentaje: 100,
-  precio: producto.precio,
-  imagen: producto.imagen,
-  link: producto.link,
-  titulo: producto.titulo,
-  marca: producto.marca
-};
+  // ✅ Añadir SIEMPRE el producto base
+  similares[producto.supermercado] = {
+    porcentaje: 100,
+    precio: producto.precio,
+    imagen: producto.imagen,
+    link: producto.link,
+    titulo: producto.titulo,
+    marca: producto.marca
+  };
 
-  // 3️⃣ Crear registro nuevo en el carrito
-const item = {
-  idGlobal,
-  uid: `${producto.idProducto || idGlobal}`,
-  titulo: producto.titulo,
-  marca: producto.marca,
-  cantidad: 1,
-  pesoTexto: (() => {
+  // ✅ 4. CREAR ITEM NUEVO
+  const item = {
+    idGlobal,
+    uid: idGlobal,
+    titulo: producto.titulo,
+    marca: producto.marca,
+    cantidad: 1,
+    pesoTexto: (() => {
       const p = normalizarPesoDesdeTitulo(producto.titulo);
       return p ? pesoToText(p) : "";
-  })(),
-  imagen: producto.imagen,
-  link: producto.link,
-  similares
-};
-
+    })(),
+    imagen: producto.imagen,
+    link: producto.link,
+    similares
+  };
 
   carritoCotizador.push(item);
   guardarCarritoEnStorage();
   renderCarritoCotizador();
 
-  // Guardar cotización completa en el servidor
-  guardarCotizacionEnServidor().catch(err =>
-    console.warn("No se pudo guardar cotización:", err)
-  );
+  guardarCotizacionEnServidor().catch(() => {});
 }
+
+
+
+
+
 let ultimaCotizacionJSON = "";
 
 async function guardarCotizacionEnServidor() {
@@ -1198,9 +1288,6 @@ function mostrarModalVaciar() {
   if (!carritoCotizador.length) return;
   document.getElementById("modalVaciarCarrito").style.display = "flex";
 }
-function mostrarModalVaciar() {
-  document.getElementById("modalVaciarCarrito").style.display = "flex";
-}
 
 function cerrarModalVaciar() {
   document.getElementById("modalVaciarCarrito").style.display = "none";
@@ -1213,6 +1300,8 @@ function confirmarVaciarCarrito() {
   cerrarModalVaciar();
   mostrarToast("Cotización vaciada");
 }
+
+
 function mostrarToast(msg) {
   const toast = document.getElementById("toast-notificacion");
   toast.textContent = msg;
@@ -1259,43 +1348,45 @@ function renderCarritoCotizador() {
         <div class="carrito-precios">
     `;
 
-    // Precios por tienda
-    TIENDAS_COMPARACION.forEach(t => {
-      const det = item.similares && item.similares[t];
-      if (!det || typeof det.precio !== "number") return;
+TIENDAS_COMPARACION.forEach(t => {
+  const det = item.similares ? item.similares[t] : null;
 
-      const precioTotalItem = det.precio * qty;
-      totalesPorTienda[t] += precioTotalItem;
+  const nombreTienda =
+    t === "unimarc" ? "Unimarc" :
+    t === "tottus" ? "Tottus" :
+    t === "jumbo" ? "Jumbo" :
+    t === "acuenta" ? "Acuenta" :
+    t === "santaisabel" ? "Santa Isabel" : t;
 
-      const nombreTienda =
-        t === "unimarc" ? "Unimarc" :
-        t === "tottus" ? "Tottus" :
-        t === "jumbo" ? "Jumbo" :
-        t === "acuenta" ? "Acuenta" :
-        t === "santaisabel" ? "Santa Isabel" : t;
+  // ❌ NO HAY COINCIDENCIA
+  if (!det || typeof det.precio !== "number") {
+    html += `
+      <div class="carrito-precio-tienda" style="color:#b91c1c;font-size:12px;">
+        <span>${nombreTienda}</span>
+        <span>❌ Sin coincidencia</span>
+      </div>
+    `;
+    return;
+  }
 
-      // Mostrar similitud baja
-      if (det.porcentaje < 80) {
-        html += `
-          <div class="carrito-precio-tienda" style="color:#b91c1c;font-size:12px;">
-            <span>${nombreTienda}</span>
-            <span>❗ Sin coincidencia compatible</span>
-          </div>
-        `;
-      } else {
-        html += `
-          <div class="carrito-precio-tienda">
-            <span>
-              <img src="${det.imagen}" style="width:18px;height:18px;border-radius:4px;vertical-align:middle;margin-right:4px;" onerror="this.src='/img/placeholder.png'">
-              <a href="${det.link}" target="_blank" style="text-decoration:none;color:#0ea5e9;">
-                ${nombreTienda}
-              </a>
-            </span>
-            <span>${formatearCLP(det.precio)} c/u</span>
-          </div>
-        `;
-      }
-    });
+  // ✅ SÍ HAY COINCIDENCIA → SUMAR
+  const precioTotalItem = det.precio * qty;
+  totalesPorTienda[t] += precioTotalItem;
+
+  html += `
+    <div class="carrito-precio-tienda">
+      <span>
+        <img src="${det.imagen}" style="width:18px;height:18px;border-radius:4px;vertical-align:middle;margin-right:4px;"
+             onerror="this.src='/img/placeholder.png'">
+        <a href="${det.link}" target="_blank" style="text-decoration:none;color:#0ea5e9;">
+          ${nombreTienda}
+        </a>
+      </span>
+      <span>${formatearCLP(det.precio)} c/u</span>
+    </div>
+  `;
+});
+
 
     html += `
         </div>
@@ -1344,14 +1435,6 @@ function renderCarritoCotizador() {
     `;
   });
 
-  htmlTotales += `
-      <div class="carrito-total-general">
-        <span>Total 5 supermercados</span>
-        <span>${formatearCLP(totalGeneral)}</span>
-      </div>
-    </div>
-  `;
-
   html += htmlTotales;
 // ==============================
 // ⚠ DETECTAR SUPERMERCADOS INCOMPLETOS
@@ -1390,11 +1473,15 @@ cont.innerHTML = html + mensajeAdvertencia;
 
 }
 function resetFiltroMarcas() {
-  selectedBrands.clear();                 // 🧹 Vaciar marcas seleccionadas
-  const checkboxes = document.querySelectorAll(".chkMarca");
-  checkboxes.forEach(chk => chk.checked = false); // 🔄 Desmarcar visualmente
-  filtrarProductos();                     // 🔃 Refrescar catálogo
+  selectedBrands.clear();
+
+  const buscador = document.getElementById("filtroMarcasBuscar");
+  if (buscador) buscador.value = "";
+
+  // ✅ Simplemente volver a renderizar sin filtrar
+  renderizarProductos(productosGlobal);
 }
+
 
 async function cargarProductos(q = "", tiendas = []) {
   try {
@@ -1448,8 +1535,7 @@ async function cargarProductos(q = "", tiendas = []) {
 
     // Renderizar catálogo
     renderizarProductos(lista);
-      actualizarListaMarcas(data);  // 🔄 Reconstruir lista de marcas
-  resetFiltroMarcas();
+    resetFiltroMarcas();
 
   } catch (err) {
     console.error("❌ Error cargando catálogo:", err);

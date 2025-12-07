@@ -77,9 +77,21 @@ async function scrapeSantaIsabel() {
   });
 
   console.log(`\n[${STORE}] 🛒 Abriendo Santa Isabel Despensa...`);
-  await page.goto(URL, { waitUntil: "load", timeout: 60000 });
-  await page.waitForTimeout(2000);
+  await page.goto(URL, { waitUntil: "domcontentloaded", timeout: 60000 });
+  await page.waitForTimeout(4000);
 
+// Scroll real
+for (let i = 0; i < 6; i++) {
+  await page.evaluate(() => window.scrollBy(0, 800));
+  await page.waitForTimeout(1200);
+}
+
+// Espera real por precios
+await page.waitForFunction(() => {
+  return [...document.querySelectorAll("span")].some(s => s.innerText.includes("$"));
+}, { timeout: 20000 });
+
+console.log(`[santaisabel] ✅ Productos detectados por precios`);
   //  Aceptar Cookies fuerza bruta
   try {
     await page.waitForFunction(() => {
@@ -102,9 +114,8 @@ async function scrapeSantaIsabel() {
   } catch {
     console.log(`[${STORE}] ⚠️ No apareció modal de cookies.`);
   }
+await page.waitForTimeout(2000);
 
-  await page.waitForSelector("a.product-card", { timeout: 20000 });
-  console.log(`[${STORE}]  Productos visibles, iniciando scraping...`);
 
   // 📌 Paginación
   let totalPaginas = 1;
@@ -131,17 +142,19 @@ async function scrapeSantaIsabel() {
       if (pagina > 1) {
         // Primera página ya cargada; el resto se navega
         try {
-          await page.click(`.page-number:nth-child(${pagina})`);
+         await page.evaluate((p) => {
+          const botones = [...document.querySelectorAll(".page-number")];
+          const btn = botones.find(b => b.innerText.trim() === String(p));
+          if (btn) btn.click();
+        }, pagina);
+
+          await page.waitForTimeout(3000);
+
         } catch {
           await page.evaluate((i) => {
             document.querySelectorAll(".page-number")[i - 1]?.click();
           }, pagina);
         }
-
-        await page.waitForFunction(
-          () => document.querySelectorAll("a.product-card").length > 0,
-          { timeout: 8000 }
-        );
 
         await page.waitForTimeout(1000);
       }
@@ -153,62 +166,69 @@ async function scrapeSantaIsabel() {
     // ======================================================================
     //EXTRACCIÓN DE DATOS (SIN PARSEAR NÚMEROS AQUÍ)
 // ======================================================================
-    let productos = [];
-    for (let intento = 0; intento < 3; intento++) {
-      productos = await page.$$eval("a.product-card", (cards) =>
-        cards.map((c) => {
-          try {
-            const precioText =
-              c.querySelector(".prices-main-price")?.textContent?.trim() || null;
-            const pricePerUnitText =
-              c.querySelector(".ppum-price-container span")?.textContent?.trim() ||
-              null;
-            const imgEl = c.querySelector("img.lazy-image");
+let productos = [];
 
-            let image = imgEl?.getAttribute("src") || null;
-            if (image && image.startsWith("//")) {
-              image = "https:" + image;
-            }
+for (let intento = 0; intento < 3; intento++) {
 
-            const linkHref = c.getAttribute("href");
-            const link = linkHref
-              ? linkHref.startsWith("http")
-                ? linkHref
-                : "https://www.santaisabel.cl" + linkHref
-              : null;
+  productos = await page.$$eval("a[href$='/p']", (cards) =>
+    cards.map((c) => {
+      try {
+        const title =
+          c.querySelector("h2.product-card-name")?.textContent?.trim() || null;
 
-            const title =
-              c.querySelector(".product-card-name")?.textContent?.trim() || null;
-            const brand =
-              c.querySelector(".product-card-brand")?.textContent?.trim() ||
-              "Sin marca";
+        const brand =
+          c.querySelector("p.text-gray-500")?.textContent?.trim() || "Sin marca";
 
-            return {
-              title,
-              brand,
-              store: "santaisabel",
-              formattedPrice: precioText,
-              priceNormal: null,
-              pricePerUnit: pricePerUnitText,
-              image,
-              link,
-              categoria: "Despensa",
-              categoriaSlug: "despensa",
-              lastUpdate: new Date()
-            };
-          } catch {
-            return null;
-          }
-        }).filter(Boolean)
-      );
+        const precioActual =
+          c.querySelector("div.flex.items-baseline")?.innerText?.trim() || null;
 
-      //  Filtro rápido: solo productos con título y string de precio
-      productos = productos.filter((p) => p.title && p.formattedPrice);
+        const precioAnterior =
+          c.querySelector("span.line-through")?.textContent?.trim() || null;
 
-      if (productos.length > 0) break;
-      console.log(`[${STORE}] 🔁 Reintentando carga (intento ${intento + 1})...`);
-      await page.waitForTimeout(1500);
-    }
+        const pricePerUnit =
+          c.querySelector("div.ppum-price-container span")?.textContent?.trim() || null;
+
+        const img =
+          c.querySelector("div.principal-product-image img")?.getAttribute("src") || null;
+
+        const linkRel = c.getAttribute("href");
+
+        const link = linkRel
+          ? "https://www.santaisabel.cl" + linkRel
+          : null;
+
+        if (!title || !precioActual) return null;
+
+        return {
+          title,
+          brand,
+          store: "santaisabel",
+          formattedPrice: precioActual,
+          previousFormattedPrice: precioAnterior,
+          pricePerUnit,
+          priceNormal: null,
+          image: img,
+          link,
+          categoria: "Despensa",
+          categoriaSlug: "despensa",
+          lastUpdate: new Date()
+        };
+      } catch {
+        return null;
+      }
+    }).filter(Boolean)
+  );
+
+  productos = productos.filter(p => p.title && p.formattedPrice);
+
+  if (productos.length > 0) break;
+
+  console.log(`[santaisabel] 🔁 Reintentando extracción...`);
+  await page.waitForTimeout(2000);
+}
+
+
+
 
     console.log(
       `[${STORE}] 📦 Productos capturados en página ${pagina}: ${productos.length}`
@@ -216,7 +236,7 @@ async function scrapeSantaIsabel() {
 
     // ======================================================================
     //  GUARDAR EN BD + HISTORIAL (CON PARSER UNIFICADO)
-// ======================================================================
+    // ======================================================================
     for (const p of productos) {
       if (!p.title || !p.formattedPrice) continue;
 

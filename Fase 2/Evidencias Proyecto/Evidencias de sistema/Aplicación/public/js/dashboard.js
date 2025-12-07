@@ -1,3 +1,7 @@
+const ES_DASHBOARD_ANALITICO = !!document.getElementById("chartSegmentoProductos");
+
+
+
 // =============================================================
 //  CONFIG GLOBAL
 // =============================================================
@@ -880,6 +884,7 @@ socket.on("scrape-complete", (data) => {
 
   cargarDatosDashboard();
 });
+
 async function renderSegmentacion() {
   const res = await fetch("/api/estadisticas/segmentacion-productos");
   const json = await res.json();
@@ -978,7 +983,12 @@ async function renderSegmentacion() {
     `).join("");
 }
 
-document.addEventListener("DOMContentLoaded", renderSegmentacion);
+document.addEventListener("DOMContentLoaded", () => {
+  if (ES_DASHBOARD_ANALITICO) {
+    renderSegmentacion();
+  }
+});
+
 
 
 // Exponer ejecutarScraping globalmente

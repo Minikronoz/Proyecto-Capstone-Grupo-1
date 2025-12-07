@@ -287,25 +287,30 @@ export async function obtenerBajasDePrecio(req, res) {
     const db = getDB();
     const { supermercado, desde, hasta, page = 1, limit = 20 } = req.query;
 
-    const match = { variation: { $lt: 0 } };
+    const match = {
+      price: { $gt: 0 },
+      previousPrice: { $gt: 0 },
+      $expr: { $lt: ["$price", "$previousPrice"] } // ✅ BAJA REAL
+    };
 
     if (supermercado && supermercado.trim() !== "") {
       match.store = supermercado.toLowerCase().trim();
     }
 
-    if (desde || hasta) {
-      match.fecha = {};
-      if (desde) {
-        const desdeDate = new Date(desde);
-        desdeDate.setHours(0, 0, 0, 0);
-        match.fecha.$gte = desdeDate;
-      }
-      if (hasta) {
-        const hastaDate = new Date(hasta);
-        hastaDate.setHours(23, 59, 59, 999);
-        match.fecha.$lte = hastaDate;
-      }
-    }
+if (desde || hasta) {
+  match.fecha = {};
+
+  if (desde) {
+    const desdeDate = new Date(`${desde}T00:00:00.000Z`);
+    match.fecha.$gte = desdeDate;
+  }
+
+  if (hasta) {
+    const hastaDate = new Date(`${hasta}T23:59:59.999Z`);
+    match.fecha.$lte = hastaDate;
+  }
+}
+
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
@@ -316,6 +321,7 @@ export async function obtenerBajasDePrecio(req, res) {
         { $sort: { fecha: -1 } },
         { $skip: skip },
         { $limit: parseInt(limit) },
+
         {
           $lookup: {
             from: "productos",
@@ -325,6 +331,7 @@ export async function obtenerBajasDePrecio(req, res) {
           }
         },
         { $unwind: "$producto" },
+
         {
           $project: {
             _id: 1,
@@ -336,11 +343,19 @@ export async function obtenerBajasDePrecio(req, res) {
             image: "$producto.image",
             precioAnterior: "$previousPrice",
             precioActual: "$price",
+
+            // ✅ DIFERENCIA POSITIVA
             diferencia: { $subtract: ["$previousPrice", "$price"] },
+
             porcentaje: {
               $abs: {
                 $multiply: [
-                  { $divide: [{ $subtract: ["$price", "$previousPrice"] }, "$previousPrice"] },
+                  {
+                    $divide: [
+                      { $subtract: ["$price", "$previousPrice"] },
+                      "$previousPrice"
+                    ]
+                  },
                   100
                 ]
               }
@@ -366,6 +381,7 @@ export async function obtenerBajasDePrecio(req, res) {
     res.status(500).json({ ok: false, error: error.message });
   }
 }
+
 
 
 export async function obtenerSubidasDePrecio(req, res) {
@@ -601,11 +617,6 @@ export async function obtenerProductosVolatiles(req, res) {
     res.status(500).json({ ok: false, error: err.message });
   }
 }
-
-
-
-
-
 
 
 //  Insights del sistema (Atlas compatible)

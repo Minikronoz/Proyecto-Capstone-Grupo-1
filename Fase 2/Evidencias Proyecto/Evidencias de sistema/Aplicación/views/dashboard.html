@@ -198,7 +198,7 @@
 </div>
 </section>
 
-
+  <!-- 
 
 <section class="card-analitica full-width">
   <h2>Productos por Segmentos Demográficos</h2>
@@ -227,9 +227,7 @@
     </table>
   </div>
 </section>
-
-
-
+-->
   <section class="full-width">
     <h2>Productos más consultados por día/mes/año</h2>
     <div class="chart-container"><canvas id="porTiempo"></canvas></div>
@@ -246,7 +244,9 @@
 let charts = {};
 let filtros = {};
 let filtrosAlertasGlobal = {};
-let filtrosPrecios = {};
+let filtrosBajas = {};
+let filtrosSubidas = {};
+
 
 // Variables para scroll infinito (tablas)
 let paginaBajas = 1;
@@ -446,7 +446,7 @@ async function cargarBajas(filtros = {}, append = false) {
     `;
     paginaBajas = 1;
     hayMasBajas = true;
-    filtrosPrecios = { ...filtros };
+    filtrosBajas = { ...filtros };
   } else {
     const loaderRow = document.createElement("tr");
     loaderRow.className = "loader-row";
@@ -459,11 +459,20 @@ async function cargarBajas(filtros = {}, append = false) {
   }
 
   try {
+    // ✅ LIMPIEZA REAL DE FILTROS
+    const cleanFiltros = { ...filtrosBajas };
+    if (!cleanFiltros.supermercado) delete cleanFiltros.supermercado;
+    if (!cleanFiltros.desde) delete cleanFiltros.desde;
+    if (!cleanFiltros.hasta) delete cleanFiltros.hasta;
+
     const params = new URLSearchParams({
-      ...filtrosPrecios,
+      ...cleanFiltros,
       page: paginaBajas,
       limit: 20
     });
+
+    // ✅ LOG CLAVE PARA DEPURAR
+    console.log("🟢 BAJAS URL FINAL:", `/api/estadisticas/bajas?${params}`);
 
     const res = await fetch(`/api/estadisticas/bajas?${params}`);
     const data = await res.json();
@@ -526,10 +535,10 @@ async function cargarBajas(filtros = {}, append = false) {
 // =============================================================
 async function cargarSubidas(filtros = {}, append = false) {
   if (cargandoSubidas || !hayMasSubidas) return;
-  
+
   cargandoSubidas = true;
   const tbody = document.querySelector("#tablaSubidas tbody");
-  
+
   if (!append) {
     tbody.innerHTML = `
       <tr><td colspan="6" style="text-align:center; padding:20px; color:#64748b;">
@@ -538,10 +547,10 @@ async function cargarSubidas(filtros = {}, append = false) {
     `;
     paginaSubidas = 1;
     hayMasSubidas = true;
-    filtrosPrecios = { ...filtros };
+    filtrosSubidas = { ...filtros };
   } else {
-    const loaderRow = document.createElement('tr');
-    loaderRow.className = 'loader-row';
+    const loaderRow = document.createElement("tr");
+    loaderRow.className = "loader-row";
     loaderRow.innerHTML = `
       <td colspan="6" style="text-align:center; padding:15px;">
         <div class="loader"></div> Cargando más...
@@ -551,16 +560,24 @@ async function cargarSubidas(filtros = {}, append = false) {
   }
 
   try {
+    // ✅ LIMPIEZA REAL
+    const cleanFiltros = { ...filtrosSubidas };
+    if (!cleanFiltros.supermercado) delete cleanFiltros.supermercado;
+    if (!cleanFiltros.desde) delete cleanFiltros.desde;
+    if (!cleanFiltros.hasta) delete cleanFiltros.hasta;
+
     const params = new URLSearchParams({
-      ...filtrosPrecios, 
+      ...cleanFiltros,
       page: paginaSubidas,
       limit: 20
     });
-    
+
+    console.log("🔴 SUBIDAS URL FINAL:", `/api/estadisticas/subidas?${params}`);
+
     const res = await fetch(`/api/estadisticas/subidas?${params}`);
     const data = await res.json();
 
-    const loaderRow = tbody.querySelector('.loader-row');
+    const loaderRow = tbody.querySelector(".loader-row");
     if (loaderRow) loaderRow.remove();
 
     if (!data.ok || !data.data.length) {
@@ -579,7 +596,7 @@ async function cargarSubidas(filtros = {}, append = false) {
 
     data.data.forEach(item => {
       const fecha = new Date(item.fecha).toLocaleDateString("es-CL");
-      const row = document.createElement('tr');
+      const row = document.createElement("tr");
       row.innerHTML = `
         <td class="col-producto">
           <a href="${item.link}" target="_blank" class="producto-link">
@@ -619,23 +636,21 @@ async function cargarSubidas(filtros = {}, append = false) {
 function setupInfiniteScroll() {
   const tablaBajas = document.querySelector('#tablaBajas').closest('.tabla-scroll');
   const tablaSubidas = document.querySelector('#tablaSubidas').closest('.tabla-scroll');
-  
+
   if (tablaBajas) {
     tablaBajas.addEventListener('scroll', () => {
       const { scrollTop, scrollHeight, clientHeight } = tablaBajas;
-      
       if (scrollTop + clientHeight >= scrollHeight - 50 && hayMasBajas && !cargandoBajas) {
-        cargarBajas({}, true);
+        cargarBajas(filtrosBajas, true);
       }
     });
   }
-  
+
   if (tablaSubidas) {
     tablaSubidas.addEventListener('scroll', () => {
       const { scrollTop, scrollHeight, clientHeight } = tablaSubidas;
-      
       if (scrollTop + clientHeight >= scrollHeight - 50 && hayMasSubidas && !cargandoSubidas) {
-        cargarSubidas({}, true);
+        cargarSubidas(filtrosSubidas, true);
       }
     });
   }
@@ -1315,20 +1330,28 @@ async function renderSegmentacion(filtros = {}) {
 //  INICIALIZACIÓN (CORREGIDO)
 // =============================================================
 async function initDashboard() {
+
+  // 🎨 GRÁFICOS
   await cargarDashboard(filtros);
   await renderTendencia(filtros);
   await renderMapaChile(filtros); 
-  await cargarBajas(filtros);
-  await cargarSubidas(filtros);
   await renderSegmentacion(); 
-  await cargarAlertas();
-  await cargarAlertasHoy({}, false);
-
-  // ✅ SOLUCIÓN: cargar volátiles al iniciar
   await cargarVolatiles();
+
+  // ✅ TABLAS DE PRECIOS SIN FILTROS RAROS
+filtrosBajas   = {};
+filtrosSubidas = {};
+
+
+  await cargarBajas(filtrosBajas);
+  await cargarSubidas(filtrosSubidas);
+
+  // ✅ ALERTAS SOLO HOY
+  await cargarAlertasHoy({}, false);
 
   setupInfiniteScroll();
 }
+
 
 
 
@@ -1344,11 +1367,16 @@ document.getElementById("btnFiltrar").addEventListener("click", () => {
   };
 
   // 🛒 FILTROS SOLO PARA PRECIOS (7 días)
-  const filtrosPreciosNuevos = {
-    supermercado: document.getElementById("filtroSuper").value || "",
-    desde: document.getElementById("filtroFecha").value || "",
-    hasta: document.getElementById("filtroHasta").value || ""
-  };
+const filtrosPreciosNuevos = {};
+
+const superSel = document.getElementById("filtroSuper").value;
+const desdeSel  = document.getElementById("filtroFecha").value;
+const hastaSel  = document.getElementById("filtroHasta").value;
+
+if (superSel) filtrosPreciosNuevos.supermercado = superSel;
+if (desdeSel)  filtrosPreciosNuevos.desde = desdeSel;
+if (hastaSel)  filtrosPreciosNuevos.hasta = hastaSel;
+
 
   // 🔔 ALERTAS DEL DÍA — SOLO FILTRO SUPERMERCADO
   const filtrosAlertas = {
@@ -1377,8 +1405,12 @@ document.getElementById("btnFiltrar").addEventListener("click", () => {
   hayMasRiesgos = true;
 
   // ✅ ACTUALIZAR VARIABLE GLOBAL DE FILTROS
-  filtrosPrecios = { ...filtrosPreciosNuevos };
-  console.log("✅ filtrosPrecios ACTUALIZADO:", filtrosPrecios);
+  filtrosBajas   = { ...filtrosPreciosNuevos };
+  filtrosSubidas = { ...filtrosPreciosNuevos };
+
+  console.log("✅ filtrosBajas:", filtrosBajas);
+  console.log("✅ filtrosSubidas:", filtrosSubidas);
+
 
   // ============================
   // 📊 ACTUALIZAR GRÁFICOS
@@ -1431,10 +1463,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   // =============================
   await initDashboard();
 
-  // =============================
-  // 🔔 CARGA INICIAL DE ALERTAS
-  // =============================
-cargarAlertasHoy(filtrosAlertasGlobal, false);
 
 
 
