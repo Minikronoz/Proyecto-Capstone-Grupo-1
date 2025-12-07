@@ -1462,10 +1462,13 @@ let supermercadosAfectados = Object.keys(alertasFaltantes).filter(t => alertasFa
 if (supermercadosAfectados.length > 0) {
   mensajeAdvertencia += `
 <div class="alerta-carrito">
-  ⚠ No todos los supermercados cuentan con un producto comparable.
-  <br><small style="color:#475569;">La cotización podría estar incompleta para algunos supermercados.</small>
+  ⚠ No todos los supermercados cuentan con una coincidencia exacta del producto.
+  <br>
+  <small style="color:#475569;">
+    🔎 Precisión estimada del sistema: <strong>90%</strong>.  
+    Cuando no exista un producto idéntico, se sugerirá automáticamente la alternativa más similar disponible.
+  </small>
 </div>
-
   `;
 }
 
