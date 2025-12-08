@@ -24,7 +24,7 @@ Node.js (versión 18 o superior)
 
 npm
 
-Git
+Git https://github.com/Minikronoz/Proyecto-Capstone-Grupo-1
 
 Cuenta activa en MongoDB Atlas
 
@@ -32,7 +32,7 @@ Instalación del Backend
 
 Clonar el repositorio:
 
-git clone https://github.com/tu_usuario/tu_repositorio.git
+git clone 
 
 
 Acceder a la carpeta del backend:
