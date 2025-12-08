@@ -1,0 +1,109 @@
+{
+  "baseDatos": "SistemaDeReportes",
+  "generadoEn": "2025-12-08T22:04:23.028Z",
+  "colecciones": {
+    "cotizaciones": {
+      "_id": "object",
+      "usuario": "object",
+      "carrito": "array",
+      "fecha": "date"
+    },
+    "users": {
+      "_id": "object",
+      "correo": "string",
+      "contraseña": "string",
+      "role": "string",
+      "nombre": "string",
+      "apellido": "string",
+      "genero": "string",
+      "region": "string",
+      "comuna": "string",
+      "sector": "string",
+      "tieneNegocio": "boolean",
+      "negocios": "array",
+      "creadoEn": "date",
+      "actualizadoEn": "date",
+      "edad": "number",
+      "fechaNacimiento": "string",
+      "rut": "string"
+    },
+    "productos": {
+      "_id": "object",
+      "globalId": "string",
+      "title": "string",
+      "brand": "string",
+      "store": "string",
+      "currentPrice": "number",
+      "formattedPrice": "string",
+      "priceNormal": "string",
+      "pricePerUnit": "string",
+      "quantity": "string",
+      "unidadEstandar": "string",
+      "image": "string",
+      "link": "string",
+      "categoria": "string",
+      "lastUpdate": "date",
+      "createdAt": "date"
+    },
+    "locales_supermercados": {
+      "_id": "object",
+      "tienda": "string",
+      "nombre": "string",
+      "direccion": "string",
+      "comuna": "string",
+      "region": "string",
+      "latitud": "null",
+      "longitud": "null",
+      "horario": "string",
+      "telefono": "null",
+      "servicios": "array"
+    },
+    "sesiones": {
+      "_id": "string",
+      "expires": "date",
+      "session": "string"
+    },
+    "busquedas": {
+      "_id": "object",
+      "usuarioEmail": "string",
+      "termino": "string",
+      "palabrasClave": "array",
+      "fecha": "date"
+    },
+    "priceHistory": {
+      "_id": "object",
+      "productId": "object",
+      "store": "string",
+      "price": "number",
+      "previousPrice": "null",
+      "variation": "number",
+      "offerDescription": "null",
+      "fecha": "date"
+    },
+    "clicks": {
+      "_id": "object",
+      "idProducto": "string",
+      "titulo": "string",
+      "marca": "string",
+      "precio": "number",
+      "precioPorUnidad": "string",
+      "supermercado": "string",
+      "link": "string",
+      "imagen": "string",
+      "userId": "null",
+      "userCorreo": "string",
+      "userNombre": "null",
+      "userApellido": "null",
+      "userGenero": "null",
+      "userRegion": "null",
+      "userComuna": "null",
+      "userSector": "null",
+      "userEdad": "null",
+      "negocios": "array",
+      "createdAt": "date",
+      "fecha": "date",
+      "ip": "string",
+      "ua": "string"
+    }
+  }
+}
