@@ -290,80 +290,95 @@ export async function obtenerBajasDePrecio(req, res) {
     const match = {
       price: { $gt: 0 },
       previousPrice: { $gt: 0 },
-      $expr: { $lt: ["$price", "$previousPrice"] } // ✅ BAJA REAL
+      $expr: { $lt: ["$price", "$previousPrice"] }
     };
 
     if (supermercado && supermercado.trim() !== "") {
       match.store = supermercado.toLowerCase().trim();
     }
 
+// ✅ RANGO DE FECHAS
 if (desde || hasta) {
   match.fecha = {};
 
   if (desde) {
-    const desdeDate = new Date(`${desde}T00:00:00.000Z`);
-    match.fecha.$gte = desdeDate;
+    const [y, m, d] = desde.split("-");
+    match.fecha.$gte = new Date(y, m - 1, d, 0, 0, 0, 0);
   }
 
   if (hasta) {
-    const hastaDate = new Date(`${hasta}T23:59:59.999Z`);
-    match.fecha.$lte = hastaDate;
+    const [y, m, d] = hasta.split("-");
+    match.fecha.$lte = new Date(y, m - 1, d, 23, 59, 59, 999);
   }
+
+} else {
+  // ✅ POR DEFECTO: ÚLTIMOS 7 DÍAS
+  const hoy = new Date();
+  hoy.setHours(23, 59, 59, 999);
+
+  const hace7 = new Date();
+  hace7.setDate(hoy.getDate() - 7);
+  hace7.setHours(0, 0, 0, 0);
+
+  match.fecha = { $gte: hace7, $lte: hoy };
 }
+
 
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    const data = await db
-      .collection("priceHistory")
-      .aggregate([
-        { $match: match },
-        { $sort: { fecha: -1 } },
-        { $skip: skip },
-        { $limit: parseInt(limit) },
+    const data = await db.collection("priceHistory").aggregate([
+      { $match: match },
+      { $sort: { fecha: -1 } },
+      { $skip: skip },
+      { $limit: parseInt(limit) },
 
-        {
-          $lookup: {
-            from: "productos",
-            localField: "productId",
-            foreignField: "_id",
-            as: "producto"
-          }
-        },
-        { $unwind: "$producto" },
+      {
+        $lookup: {
+          from: "productos",
+          localField: "productId",
+          foreignField: "_id",
+          as: "producto"
+        }
+      },
+      { $unwind: "$producto" },
 
-        {
-          $project: {
-            _id: 1,
-            productId: 1,
-            store: 1,
-            fecha: 1,
-            titulo: "$producto.title",
-            link: "$producto.link",
-            image: "$producto.image",
-            precioAnterior: "$previousPrice",
-            precioActual: "$price",
+      {
+        $project: {
+          _id: 1,
+          productId: 1,
+          store: 1,
+          fecha: 1,
+          titulo: "$producto.title",
+          link: "$producto.link",
+          image: "$producto.image",
+          precioAnterior: "$previousPrice",
+          precioActual: "$price",
 
-            // ✅ DIFERENCIA POSITIVA
-            diferencia: { $subtract: ["$previousPrice", "$price"] },
+          diferencia: { $subtract: ["$previousPrice", "$price"] },
 
-            porcentaje: {
-              $abs: {
-                $multiply: [
-                  {
-                    $divide: [
-                      { $subtract: ["$price", "$previousPrice"] },
-                      "$previousPrice"
-                    ]
-                  },
-                  100
-                ]
-              }
-            }
+          // ✅ PORCENTAJE CON 1 DECIMAL
+          porcentaje: {
+            $round: [
+              {
+                $abs: {
+                  $multiply: [
+                    {
+                      $divide: [
+                        { $subtract: ["$price", "$previousPrice"] },
+                        "$previousPrice"
+                      ]
+                    },
+                    100
+                  ]
+                }
+              },
+              1
+            ]
           }
         }
-      ])
-      .toArray();
+      }
+    ]).toArray();
 
     const totalCount = await db.collection("priceHistory").countDocuments(match);
 
@@ -376,6 +391,7 @@ if (desde || hasta) {
         hasMore: skip + data.length < totalCount
       }
     });
+
   } catch (error) {
     console.error("❌ Error en obtenerBajas:", error);
     res.status(500).json({ ok: false, error: error.message });
@@ -384,39 +400,56 @@ if (desde || hasta) {
 
 
 
+
 export async function obtenerSubidasDePrecio(req, res) {
   try {
     const db = getDB();
-    const { page = 1, limit = 20, supermercado } = req.query;
+    const { page = 1, limit = 20, supermercado, desde, hasta } = req.query;
 
-    const skip = (page - 1) * limit;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    const hoy = new Date();
-    hoy.setHours(23, 59, 59, 999);
-
-    const hace7 = new Date();
-    hace7.setDate(hoy.getDate() - 7);
-    hace7.setHours(0, 0, 0, 0);
-
-    // Filtro base del rango
     const filtroBase = {
-      fecha: { $gte: hace7, $lte: hoy },
       price: { $gt: 0 },
       previousPrice: { $gt: 0 }
     };
 
-    // Filtro inicial por supermercado
+    // ✅ FILTRO POR SUPERMERCADO
     if (supermercado && supermercado !== "Todos") {
-      filtroBase.store = supermercado;
+      filtroBase.store = supermercado.toLowerCase();
+    }
+
+    // ✅ RANGO DE FECHAS
+    if (desde || hasta) {
+      filtroBase.fecha = {};
+
+      if (desde) {
+        const [y, m, d] = desde.split("-");
+        filtroBase.fecha.$gte = new Date(y, m - 1, d, 0, 0, 0, 0);
+      }
+
+      if (hasta) {
+        const [y, m, d] = hasta.split("-");
+        filtroBase.fecha.$lte = new Date(y, m - 1, d, 23, 59, 59, 999);
+      }
+
+    } else {
+      // ✅ POR DEFECTO: ÚLTIMOS 7 DÍAS REALES
+      const hoy = new Date();
+      hoy.setHours(23, 59, 59, 999);
+
+      const hace7 = new Date();
+      hace7.setDate(hoy.getDate() - 7);
+      hace7.setHours(0, 0, 0, 0);
+
+      filtroBase.fecha = { $gte: hace7, $lte: hoy };
     }
 
     const data = await db.collection("priceHistory").aggregate([
 
       { $match: filtroBase },
-
       { $sort: { fecha: -1 } },
 
-      // Último cambio por producto
+      // ✅ ÚLTIMO CAMBIO POR PRODUCTO
       {
         $group: {
           _id: "$productId",
@@ -424,22 +457,16 @@ export async function obtenerSubidasDePrecio(req, res) {
         }
       },
 
-      // Subidas reales
+      // ✅ SOLO SUBIDAS REALES
       {
         $match: {
           $expr: { $gt: ["$ultimo.price", "$ultimo.previousPrice"] }
         }
       },
 
-      // Reemplazar root
       { $replaceRoot: { newRoot: "$ultimo" } },
 
-      // 📌 **FILTRAR AQUÍ TAMBIÉN POR SUPERMERCADO**
-      ...(supermercado && supermercado !== "Todos"
-        ? [{ $match: { store: supermercado } }]
-        : []),
-
-      // Traer datos del producto
+      // ✅ TRAER DATOS DEL PRODUCTO
       {
         $lookup: {
           from: "productos",
@@ -450,7 +477,6 @@ export async function obtenerSubidasDePrecio(req, res) {
       },
       { $unwind: "$producto" },
 
-      // Formato final
       {
         $project: {
           productId: 1,
@@ -460,13 +486,22 @@ export async function obtenerSubidasDePrecio(req, res) {
           store: 1,
           precioAnterior: "$previousPrice",
           precioActual: "$price",
+
           diferencia: { $subtract: ["$price", "$previousPrice"] },
+
+          // ✅ PORCENTAJE A 1 DECIMAL
           porcentaje: {
-            $multiply: [
-              { $divide: [{ $subtract: ["$price", "$previousPrice"] }, "$previousPrice"] },
-              100
+            $round: [
+              {
+                $multiply: [
+                  { $divide: [{ $subtract: ["$price", "$previousPrice"] }, "$previousPrice"] },
+                  100
+                ]
+              },
+              1
             ]
           },
+
           fecha: 1
         }
       },
@@ -477,11 +512,15 @@ export async function obtenerSubidasDePrecio(req, res) {
 
     ]).toArray();
 
+    const totalCount = await db.collection("priceHistory").countDocuments(filtroBase);
+
     res.json({
       ok: true,
       data,
       pagination: {
-        hasMore: data.length === parseInt(limit)
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(totalCount / parseInt(limit)),
+        hasMore: skip + data.length < totalCount
       }
     });
 
@@ -490,6 +529,8 @@ export async function obtenerSubidasDePrecio(req, res) {
     res.status(500).json({ ok: false, error: err.message });
   }
 }
+
+
 
 // ================================================================
 // 📌 Productos Más Volátiles (últimos 30 días) — CORREGIDA DEFINITIVA

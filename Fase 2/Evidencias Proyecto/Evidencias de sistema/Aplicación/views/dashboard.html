@@ -376,18 +376,16 @@ async function cargarAlertasHoy(filtros = {}, append = false) {
     const bajas = await resBajas.json();
     const subidas = await resSubidas.json();
 
-    // BAJAS
+    // ✅ BAJAS
     (bajas.data || []).forEach(p => {
       const fecha = new Date(p.fecha).toLocaleDateString("es-CL");
       boxBajas.innerHTML += `
         <div class="alerta-item">
           <span class="alerta-icono verde">●</span>
           <div class="alerta-texto">
-            <a href="${p.link}" target="_blank" class="alerta-titulo">
-              ${p.titulo}
-            </a>
+            <a href="${p.link}" target="_blank" class="alerta-titulo">${p.titulo}</a>
             <span class="alerta-info">
-              bajó ${p.porcentaje}% •
+              bajó ${p.porcentaje.toFixed(1)}% •
               $${p.precioAnterior.toLocaleString()} →
               $${p.precioActual.toLocaleString()} • ${p.store}
             </span>
@@ -400,18 +398,16 @@ async function cargarAlertasHoy(filtros = {}, append = false) {
     if (bajas.pagination?.hasMore) paginaOportunidades++;
     else hayMasOpo = false;
 
-    // SUBIDAS
+    // ✅ SUBIDAS
     (subidas.data || []).forEach(p => {
       const fecha = new Date(p.fecha).toLocaleDateString("es-CL");
       boxSubidas.innerHTML += `
         <div class="alerta-item">
           <span class="alerta-icono rojo">●</span>
           <div class="alerta-texto">
-            <a href="${p.link}" target="_blank" class="alerta-titulo">
-              ${p.titulo}
-            </a>
+            <a href="${p.link}" target="_blank" class="alerta-titulo">${p.titulo}</a>
             <span class="alerta-info">
-              subió ${p.porcentaje}% •
+              subió ${p.porcentaje.toFixed(1)}% •
               $${p.precioAnterior.toLocaleString()} →
               $${p.precioActual.toLocaleString()} • ${p.store}
             </span>
