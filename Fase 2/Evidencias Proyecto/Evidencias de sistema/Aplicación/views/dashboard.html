@@ -709,12 +709,29 @@ async function renderChart(id, url, label, filtros = {}) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        plugins: {
+          datalabels: {
+            anchor: "end",
+            align: "top",
+            offset: 4,
+            formatter: v => v.toLocaleString("es-CL"),
+            color: "#0f172a",
+            font: {
+              weight: "400",
+              size: 13,
+              family: "Poppins"
+            }
+          }
+        },
         scales: {
           x: { grid: { color: "transparent" } },
           y: { beginAtZero: true }
         }
-      }
+      },
+      plugins: [ChartDataLabels]
     });
+
+
   } catch (err) {
     console.error("❌ ERROR AL RENDERIZAR EL GRÁFICO:", err);
   }
@@ -1114,43 +1131,62 @@ async function renderTendencia(filtros = {}) {
         tension: 0.35,
         pointRadius: 5,
         pointBackgroundColor: "#007a85",
-        pointHoverRadius: 7
+        pointHoverRadius: 7,
+        clip: false 
       }]
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: "#1E293B",
-          titleColor: "#fff",
-          bodyColor: "#fff",
-          displayColors: false,
-          callbacks: {
-            label: ctx => `${ctx.raw.toLocaleString("es-CL")} consultas`
-          }
-        }
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: "#334155",
-            font: { size: 12, weight: "600" }
-          },
-          grid: { color: "transparent" }
-        },
-        y: {
-          beginAtZero: true,
-          ticks: {
-            color: "#475569",
-            font: { size: 12 },
-            callback: v => v.toLocaleString("es-CL")
-          },
-          grid: { color: "rgba(0,0,0,0.06)" }
-        }
+options: {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { display: false },
+
+    // ✅ NÚMEROS ARRIBA
+    datalabels: {
+      anchor: "end",
+      align: "top",
+      offset: 6,
+      formatter: v => v.toLocaleString("es-CL"),
+      color: "#0f172a",
+      font: {
+        weight: "400",
+        size: 12,
+        family: "Poppins"
+      }
+    },
+
+    tooltip: {
+      backgroundColor: "#1E293B",
+      titleColor: "#fff",
+      bodyColor: "#fff",
+      displayColors: false,
+      callbacks: {
+        label: ctx => `${ctx.raw.toLocaleString("es-CL")} consultas`
       }
     }
+  },
+  scales: {
+    x: {
+      ticks: {
+        color: "#334155",
+        font: { size: 12, weight: "600" }
+      },
+      grid: { color: "transparent" }
+    },
+    y: {
+      beginAtZero: true,
+      grace: "10%",
+      ticks: {
+        color: "#475569",
+        font: { size: 12 },
+        callback: v => v.toLocaleString("es-CL")
+      },
+      grid: { color: "rgba(0,0,0,0.06)" }
+    }
+  }
+},
+plugins: [ChartDataLabels]
+
   });
 }
 
@@ -1266,11 +1302,22 @@ async function renderSegmentacion(filtros = {}) {
           borderRadius: 14
         }]
       },
-      options: {
-        responsive: true,
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true } }
-      }
+options: {
+  responsive: true,
+  plugins: {
+    legend: { display: false },
+    datalabels: {
+      anchor: "end",
+      align: "top",
+      formatter: v => v.toLocaleString("es-CL"),
+      color: "#0f172a",
+      font: { weight: "400", size: 13 }
+    }
+  },
+  scales: { y: { beginAtZero: true } }
+},
+plugins: [ChartDataLabels]
+
     });
 
     // ================================
