@@ -277,10 +277,18 @@ function volverAtras() {
 
 function normalizarRegion(nombre) {
   if (!nombre) return "";
+
   nombre = nombre.trim();
-  if (nombre === "Metropolitana") return "Metropolitana de Santiago";
-  return nombre;
+
+  const mapa = {
+    "Metropolitana": "Metropolitana de Santiago",
+    "Metropolitana de Santiago": "Metropolitana de Santiago"
+  };
+
+  return mapa[nombre] || nombre;
 }
+
+
 
 async function fetchData(url, filtros = {}) {
   const query = new URLSearchParams(filtros).toString();
@@ -1190,9 +1198,6 @@ plugins: [ChartDataLabels]
   });
 }
 
-
-
-
 async function renderMapaChile(filtros = {}) {
   const mapa = document.getElementById("mapaChile");
   mapa.innerHTML = "";
@@ -1209,7 +1214,8 @@ async function renderMapaChile(filtros = {}) {
     "#23874b", "#1e7742", "#1a6638", "#14542d"
   ];
   
-  const data = await fetchData("/api/estadisticas/usuarios-por-region", filtros); // ✅ PASAR FILTROS
+  const data = await fetchData("/api/estadisticas/usuarios-por-region", filtros);
+
   const mapaUsuarios = Object.fromEntries(
     data.map(d => [normalizarRegion(d._id), d.total])
   );
@@ -1220,10 +1226,18 @@ async function renderMapaChile(filtros = {}) {
   mapa.appendChild(tooltip);
 
   regiones.forEach((region, i) => {
+
+    // ✅ SOLO MOSTRAR LA REGIÓN FILTRADA
+    if (filtros.region && normalizarRegion(region) !== normalizarRegion(filtros.region)) {
+      return;
+    }
+
     const bloque = document.createElement("div");
     bloque.className = "bloque-region";
     bloque.style.background = colores[i];
-    const total = mapaUsuarios[region] || 0;
+
+    const total = mapaUsuarios[normalizarRegion(region)] || 0;
+
     bloque.innerHTML = `<span>${region}</span><span>${total}</span>`;
     if (total > 0) bloque.classList.add("region-activa");
     
@@ -1238,6 +1252,10 @@ async function renderMapaChile(filtros = {}) {
     mapa.appendChild(bloque);
   });
 }
+
+
+
+
 
 // =============================================================
 //  CARGAR DASHBOARD COMPLETO (CORREGIDO)
@@ -1403,7 +1421,7 @@ document.getElementById("btnFiltrar").addEventListener("click", () => {
   // 🎨 FILTROS SOLO PARA GRÁFICOS
   const filtrosGraficos = {
     genero: document.getElementById("filtroGenero").value || "",
-    region: document.getElementById("filtroRegion").value || "",
+    region: normalizarRegion(document.getElementById("filtroRegion").value || ""),
     desde: document.getElementById("filtroFecha").value || "",
     hasta: document.getElementById("filtroHasta").value || "",
     periodo: document.getElementById("filtroPeriodo").value || ""
