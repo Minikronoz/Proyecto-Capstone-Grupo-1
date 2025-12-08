@@ -1,22 +1,137 @@
-Proyecto del ramo Capstone de la carrera Ingenieria en Informatica
+Descripción General del Proyecto
+
+Este proyecto corresponde al desarrollo de una plataforma web de comparación y análisis de precios de supermercados en Chile. El sistema permite a los consumidores comparar precios en tiempo real entre distintas cadenas, mientras que a los negocios les entrega información analítica basada en búsquedas, comportamiento de usuarios y variaciones históricas de precios.
+
+La plataforma integra procesos automatizados de web scraping para la captura de datos, un backend encargado del procesamiento y exposición de la información mediante una API REST, una base de datos centralizada en MongoDB Atlas para el almacenamiento histórico, y un frontend web que presenta los resultados de manera visual e interactiva. El objetivo principal es apoyar la toma de decisiones tanto de consumidores como de dueños de negocios mediante datos confiables y análisis comparativos.
+
+Instalación y Configuración del Proyecto
+
+Este proyecto está compuesto por los siguientes módulos:
+
+Backend: Node.js, Express y Playwright (Scraping)
+
+Frontend: React
+
+Base de Datos: MongoDB Atlas
+
+Autenticación: Gestión de usuarios mediante MongoDB
+
+Requisitos Previos
+
+Antes de comenzar, se debe contar con los siguientes requisitos instalados:
+
+Node.js (versión 18 o superior)
+
+npm
+
+Git https://github.com/Minikronoz/Proyecto-Capstone-Grupo-1
+
+Cuenta activa en MongoDB Atlas
+
+Instalación del Backend
+
+Clonar el repositorio:
+
+git clone 
 
 
-Este es un proyecto de título para una aplicación web de comparador de precios de supermercados en Chile, construida con React y Node.js.
+Acceder a la carpeta del backend:
+
+cd backend
 
 
+Instalar dependencias:
 
-La aplicación tiene dos objetivos principales:
-
-Para los consumidores: Permite buscar productos y comparar sus precios actuales en diferentes tiendas (como Jumbo, Unimarc, etc.) para ayudarles a ahorrar.
-
-Para los dueños de negocios: Ofrece un dashboard analítico que muestra qué productos son los más buscados por región y comuna, proporcionando datos valiosos para la toma de decisiones.
+npm install
 
 
+Instalar Playwright y sus navegadores:
 
-Para lograr esto, el sistema utiliza:
+npx playwright install
 
-Web Scraping con Playwright para extraer automáticamente los datos de los productos desde los sitios web de los supermercados.
 
-Firebase para la autenticación y gestión de perfiles de usuario.
+Crear archivo de variables de entorno .env:
 
-MongoDB como base de datos principal para almacenar de forma centralizada todos los productos y los registros de búsquedas para el análisis.
+MONGODB_URI=mongodb+srv://usuario:password@cluster.mongodb.net/SistemaDeReportes
+DB_NAME=SistemaDeReportes
+SESSION_SECRET="Clave_ejemplo"
+
+
+Ejecutar el servidor:
+
+npm run dev
+
+
+El backend quedará disponible en:
+
+http://localhost:4000
+
+Instalación del Frontend
+
+Acceder a la carpeta del frontend:
+
+cd 'Fase 2\Evidencias Proyecto\Evidencias de sistema\Aplicación'
+
+
+Instalar dependencias:
+
+npm install
+
+
+Ejecutar la aplicación:
+
+npm run dev
+
+
+El sistema quedará disponible en:
+
+http://localhost:4000
+
+
+Los datos capturados se almacenan en MongoDB Atlas.
+
+Base de Datos
+
+La base de datos está alojada en MongoDB Atlas y cuenta con las siguientes colecciones principales:
+
+productos
+
+priceHistory
+
+usuarios
+
+busquedas
+
+clicks
+
+locales_supermercados
+
+Estas colecciones permiten realizar análisis históricos, segmentación territorial y generación de dashboards analíticos.
+
+Flujo General de Funcionamiento
+
+El proceso de scraping obtiene los datos desde los supermercados.
+
+Los datos son almacenados en MongoDB Atlas.
+
+El backend procesa y expone la información mediante una API REST.
+
+El frontend consume la API.
+
+El usuario visualiza las comparaciones y los análisis.
+
+Estado del Proyecto
+
+El sistema se encuentra completamente operativo, incluyendo:
+
+Backend funcional
+
+Scraping operativo
+
+Base de datos centralizada
+
+Autenticación con MongoDB
+
+Dashboards analíticos
+
+Comparador de precios activo
