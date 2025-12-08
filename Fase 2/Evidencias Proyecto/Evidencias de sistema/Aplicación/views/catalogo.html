@@ -512,6 +512,13 @@ function mostrarAdvertencia(tienda, usuario) {
 <script>
 document.getElementById("btn-recargar").addEventListener("click", () => {
 
+  selectedWeights.clear();
+  selectedBrands.clear();
+  filtrosPesoVisibles = false;
+
+  // ✅ SOLO OCULTAR, NUNCA BORRAR EL CONTENEDOR
+  ocultarFiltrosPeso();
+
   //  Limpiar texto del buscador
   document.getElementById("busqueda").value = "";
   document.getElementById("sugerencias").innerHTML = "";
@@ -525,9 +532,7 @@ document.getElementById("btn-recargar").addEventListener("click", () => {
   selectedBrands.clear();
   filtrosPesoVisibles = false;
 
-  //  Borrar sección de filtros de peso visual
-  document.getElementById("filtros-peso").innerHTML = "";
-
+  ocultarFiltrosPeso();
   //  Vaciar buscador de marcas
   document.getElementById("filtroMarcasBuscar").value = "";
 

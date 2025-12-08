@@ -14,6 +14,7 @@ let pageSize = 200;
 let totalPages = 1;
 
 
+
 /// ===============================
 // 🔢 CARRITO COTIZADOR - VARIABLES GLOBALES
 // ===============================
@@ -28,6 +29,7 @@ let carritoCotizador = [];
 window.registrarProductosGlobales = function (lista) {
   if (Array.isArray(lista)) window.__todosLosProductos = lista;
 };
+let mostrarAlertaCotizacion = false;
 
 // ===============================
 // 🔤 NORMALIZACIÓN TEXTO
@@ -42,7 +44,15 @@ function normalizarTexto(str = "") {
     .replace(/\s+/g, " ")
     .trim();
 }
+function mostrarFiltrosPeso() {
+  const filtros = document.getElementById("filtros-peso");
+  if (filtros) filtros.classList.add("visible");
+}
 
+function ocultarFiltrosPeso() {
+  const filtros = document.getElementById("filtros-peso");
+  if (filtros) filtros.classList.remove("visible");
+}
 // ===============================
 // 🧾 FORMATEAR CLP
 // ===============================
@@ -1348,45 +1358,42 @@ function renderCarritoCotizador() {
         <div class="carrito-precios">
     `;
 
-TIENDAS_COMPARACION.forEach(t => {
-  const det = item.similares ? item.similares[t] : null;
+    TIENDAS_COMPARACION.forEach(t => {
+      const det = item.similares ? item.similares[t] : null;
 
-  const nombreTienda =
-    t === "unimarc" ? "Unimarc" :
-    t === "tottus" ? "Tottus" :
-    t === "jumbo" ? "Jumbo" :
-    t === "acuenta" ? "Acuenta" :
-    t === "santaisabel" ? "Santa Isabel" : t;
+      const nombreTienda =
+        t === "unimarc" ? "Unimarc" :
+        t === "tottus" ? "Tottus" :
+        t === "jumbo" ? "Jumbo" :
+        t === "acuenta" ? "Acuenta" :
+        t === "santaisabel" ? "Santa Isabel" : t;
 
-  // ❌ NO HAY COINCIDENCIA
-  if (!det || typeof det.precio !== "number") {
-    html += `
-      <div class="carrito-precio-tienda" style="color:#b91c1c;font-size:12px;">
-        <span>${nombreTienda}</span>
-        <span>❌ Sin coincidencia</span>
-      </div>
-    `;
-    return;
-  }
+      if (!det || typeof det.precio !== "number") {
+        html += `
+          <div class="carrito-precio-tienda" style="color:#b91c1c;font-size:12px;">
+            <span>${nombreTienda}</span>
+            <span>❌ Sin coincidencia</span>
+          </div>
+        `;
+        return;
+      }
 
-  // ✅ SÍ HAY COINCIDENCIA → SUMAR
-  const precioTotalItem = det.precio * qty;
-  totalesPorTienda[t] += precioTotalItem;
+      const precioTotalItem = det.precio * qty;
+      totalesPorTienda[t] += precioTotalItem;
 
-  html += `
-    <div class="carrito-precio-tienda">
-      <span>
-        <img src="${det.imagen}" style="width:18px;height:18px;border-radius:4px;vertical-align:middle;margin-right:4px;"
-             onerror="this.src='/img/placeholder.png'">
-        <a href="${det.link}" target="_blank" style="text-decoration:none;color:#0ea5e9;">
-          ${nombreTienda}
-        </a>
-      </span>
-      <span>${formatearCLP(det.precio)} c/u</span>
-    </div>
-  `;
-});
-
+      html += `
+        <div class="carrito-precio-tienda">
+          <span>
+            <img src="${det.imagen}" style="width:18px;height:18px;border-radius:4px;vertical-align:middle;margin-right:4px;"
+                 onerror="this.src='/img/placeholder.png'">
+            <a href="${det.link}" target="_blank" style="text-decoration:none;color:#0ea5e9;">
+              ${nombreTienda}
+            </a>
+          </span>
+          <span>${formatearCLP(det.precio)} c/u</span>
+        </div>
+      `;
+    });
 
     html += `
         </div>
@@ -1394,21 +1401,21 @@ TIENDAS_COMPARACION.forEach(t => {
     `;
   });
 
-  // Totales por supermercado
+  // ==============================
+  // ✅ TOTALES POR SUPERMERCADO
+  // ==============================
   let totalGeneral = 0;
   let htmlTotales = `
     <div class="carrito-totales">
       <h4>Totales por supermercado</h4>
   `;
 
-  // Detectar el más barato
   let minPrecio = Infinity;
   let mejorSuper = null;
 
   TIENDAS_COMPARACION.forEach(t => {
     const totalT = totalesPorTienda[t] || 0;
-    if (totalT <= 0) return;
-    if (totalT < minPrecio) {
+    if (totalT > 0 && totalT < minPrecio) {
       minPrecio = totalT;
       mejorSuper = t;
     }
@@ -1435,46 +1442,47 @@ TIENDAS_COMPARACION.forEach(t => {
     `;
   });
 
+  htmlTotales += `</div>`; // ✅ CIERRE CORRECTO
   html += htmlTotales;
-// ==============================
-// ⚠ DETECTAR SUPERMERCADOS INCOMPLETOS
-// ==============================
-let alertasFaltantes = {};
 
-TIENDAS_COMPARACION.forEach(tienda => {
-  alertasFaltantes[tienda] = [];
-});
+  // ==============================
+  // ⚠ DETECTAR INCOMPLETOS
+  // ==============================
+  let alertasFaltantes = {};
+  TIENDAS_COMPARACION.forEach(tienda => alertasFaltantes[tienda] = []);
 
-carritoCotizador.forEach(item => {
-  const qty = item.cantidad || 1;
-  TIENDAS_COMPARACION.forEach(tienda => {
-    const det = item.similares && item.similares[tienda];
-    if (!det || det.porcentaje < 80) {
-      alertasFaltantes[tienda].push(item.titulo);
-    }
+  carritoCotizador.forEach(item => {
+    TIENDAS_COMPARACION.forEach(tienda => {
+      const det = item.similares && item.similares[tienda];
+      if (!det || typeof det.precio !== "number") {
+  alertasFaltantes[tienda].push(item.titulo);
+}
+    });
   });
-});
 
-// Construir mensaje de alerta
-let mensajeAdvertencia = "";
-let supermercadosAfectados = Object.keys(alertasFaltantes).filter(t => alertasFaltantes[t].length > 0);
+  let supermercadosAfectados = Object.keys(alertasFaltantes)
+    .filter(t => alertasFaltantes[t].length > 0);
 
-if (supermercadosAfectados.length > 0) {
-  mensajeAdvertencia += `
-<div class="alerta-carrito">
-  ⚠ No todos los supermercados cuentan con una coincidencia exacta del producto.
-  <br>
-  <small style="color:#475569;">
-    🔎 Precisión estimada del sistema: <strong>90%</strong>.  
-    Cuando no exista un producto idéntico, se sugerirá automáticamente la alternativa más similar disponible.
-  </small>
-</div>
-  `;
+  let mensajeAdvertencia = "";
+
+  if (supermercadosAfectados.length > 0) {
+    mensajeAdvertencia = `
+      <div class="alerta-carrito">
+        ⚠ No todos los supermercados cuentan con una coincidencia exacta del producto.
+        <br>
+        <small style="color:#475569;">
+          🔎 Precisión estimada del sistema: <strong>90%</strong>.  
+          Cuando no exista un producto idéntico, se sugerirá automáticamente la alternativa más similar disponible.
+        </small>
+      </div>
+    `;
+  }
+
+  cont.innerHTML = html + mensajeAdvertencia;
 }
 
-cont.innerHTML = html + mensajeAdvertencia;
 
-}
+
 function resetFiltroMarcas() {
   selectedBrands.clear();
 
@@ -1526,15 +1534,14 @@ async function cargarProductos(q = "", tiendas = []) {
     // Filtro de marcas SIEMPRE activo
     cargarMarcasSidebar();
 
-    // Filtro de PESO/VOLUMEN — SOLO si hay búsqueda
-    const panelPeso = document.querySelector("#filtros-peso");
-
+//  Filtro de PESO/VOLUMEN — SOLO si hay búsqueda real
     if (q && q.trim() !== "") {
-      panelPeso.style.display = "block";
+      mostrarFiltrosPeso();
       renderizarFiltrosPeso(lista);
     } else {
-      panelPeso.style.display = "none";
+      ocultarFiltrosPeso();
     }
+
 
     // Renderizar catálogo
     renderizarProductos(lista);
@@ -1703,9 +1710,15 @@ async function buscar() {
     });
   } catch (e) {}
 
-  // 🚀 Ahora sí llamar a cargarProductos correctamente
+  // ✅ Ejecutar búsqueda
   await cargarProductos(terminoConsulta);
+
+  // ✅ LIMPIAR BUSCADOR DESPUÉS DE BUSCAR
+  inputBusqueda.value = "";
+  contenedorSugerencias.innerHTML = "";
+  contenedorSugerencias.style.display = "none";
 }
+
 
 
 
