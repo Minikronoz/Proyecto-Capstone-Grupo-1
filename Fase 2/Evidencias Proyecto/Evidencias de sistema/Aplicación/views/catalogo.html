@@ -550,6 +550,40 @@ document.getElementById("btn-recargar").addEventListener("click", () => {
 
 
 </script>
+<script>
+// ===============================
+// ✅ SINCRONIZAR FILTROS SUPERIOR ↔ CARRITO
+// ===============================
+document.addEventListener("DOMContentLoaded", () => {
 
+  document.querySelectorAll(".filtro-super").forEach(cb => {
+
+    cb.addEventListener("change", () => {
+
+      // ✅ Reconstruir tiendas activas
+      selectedStores.clear();
+
+      document.querySelectorAll(".filtro-super:checked").forEach(check => {
+        selectedStores.add(check.value);
+      });
+
+      // ⚠️ Nunca dejar vacío total
+      if (selectedStores.size === 0) {
+        cb.checked = true;
+        selectedStores.add(cb.value);
+      }
+
+      // ✅ Refiltrar catálogo
+      currentPage = 1;
+      renderizarProductos(getFilteredProducts());
+
+      // ✅ Re-renderizar carrito filtrado
+      renderCarritoCotizador();
+    });
+
+  });
+
+});
+</script>
 </body>
 </html>

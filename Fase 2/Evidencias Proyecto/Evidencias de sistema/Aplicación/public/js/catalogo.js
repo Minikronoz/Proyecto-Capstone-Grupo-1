@@ -1324,6 +1324,9 @@ function renderCarritoCotizador() {
   const panel = document.getElementById("carritoRapidoPanel");
   if (!cont || !panel) return;
 
+  // ✅ USAR SOLO SUPERMERCADOS ACTIVOS
+  const tiendasActivas = new Set(selectedStores);
+
   if (!carritoCotizador.length) {
     cont.innerHTML = `
       <p>🧮 Aún no has agregado productos.</p>
@@ -1343,23 +1346,23 @@ function renderCarritoCotizador() {
     html += `
       <div class="carrito-item">
         <div class="carrito-item-header">
-          <img src="${item.imagen || "/img/placeholder.png"}" alt="Producto" class="carrito-img" onerror="this.src='/img/placeholder.png'">
+          <img src="${item.imagen || "/img/placeholder.png"}" class="carrito-img">
           <div class="carrito-info">
-            <div class="carrito-titulo" title="${item.titulo}">
-              ${item.titulo} <span style="color:#007bff;">x${qty}</span>
-            </div>
-            <div class="carrito-detalle">
-              ${item.marca ? `<strong>${item.marca}</strong>` : "Sin marca"}
-              ${item.pesoTexto ? " • " + item.pesoTexto : ""}
-            </div>
+            <div class="carrito-titulo">${item.titulo} <span style="color:#007bff;">x${qty}</span></div>
+            <div class="carrito-detalle">${item.marca || "Sin marca"} ${item.pesoTexto ? " • "+item.pesoTexto : ""}</div>
           </div>
           <button class="carrito-eliminar" onclick="eliminarDelCarrito('${item.uid}')">✖</button>
         </div>
+
         <div class="carrito-precios">
     `;
 
     TIENDAS_COMPARACION.forEach(t => {
-      const det = item.similares ? item.similares[t] : null;
+
+      // ✅ FILTRO REAL POR CHECKBOX
+      if (!tiendasActivas.has(t)) return;
+
+      const det = item.similares?.[t];
 
       const nombreTienda =
         t === "unimarc" ? "Unimarc" :
@@ -1368,25 +1371,27 @@ function renderCarritoCotizador() {
         t === "acuenta" ? "Acuenta" :
         t === "santaisabel" ? "Santa Isabel" : t;
 
+      // ❌ Sin coincidencia
       if (!det || typeof det.precio !== "number") {
         html += `
-          <div class="carrito-precio-tienda" style="color:#b91c1c;font-size:12px;">
+          <div class="carrito-precio-tienda" style="color:#b91c1c;">
             <span>${nombreTienda}</span>
             <span>❌ Sin coincidencia</span>
-          </div>
-        `;
+          </div>`;
         return;
       }
 
-      const precioTotalItem = det.precio * qty;
-      totalesPorTienda[t] += precioTotalItem;
+      const totalItem = det.precio * qty;
+      totalesPorTienda[t] += totalItem;
+
+      const linkSeguro = det.link && det.link !== "#" ? det.link : item.link;
 
       html += `
         <div class="carrito-precio-tienda">
           <span>
             <img src="${det.imagen}" style="width:18px;height:18px;border-radius:4px;vertical-align:middle;margin-right:4px;"
-                 onerror="this.src='/img/placeholder.png'">
-            <a href="${det.link}" target="_blank" style="text-decoration:none;color:#0ea5e9;">
+              onerror="this.src='/img/placeholder.png'">
+            <a href="${linkSeguro}" target="_blank" style="text-decoration:none;color:#0ea5e9;">
               ${nombreTienda}
             </a>
           </span>
@@ -1395,25 +1400,20 @@ function renderCarritoCotizador() {
       `;
     });
 
-    html += `
-        </div>
-      </div>
-    `;
+    html += `</div></div>`;
   });
 
   // ==============================
-  // ✅ TOTALES POR SUPERMERCADO
+  // ✅ TOTALES SOLO DE TIENDAS ACTIVAS
   // ==============================
   let totalGeneral = 0;
-  let htmlTotales = `
-    <div class="carrito-totales">
-      <h4>Totales por supermercado</h4>
-  `;
+  let htmlTotales = `<div class="carrito-totales"><h4>Totales por supermercado</h4>`;
 
   let minPrecio = Infinity;
   let mejorSuper = null;
 
   TIENDAS_COMPARACION.forEach(t => {
+    if (!tiendasActivas.has(t)) return;
     const totalT = totalesPorTienda[t] || 0;
     if (totalT > 0 && totalT < minPrecio) {
       minPrecio = totalT;
@@ -1422,8 +1422,10 @@ function renderCarritoCotizador() {
   });
 
   TIENDAS_COMPARACION.forEach(t => {
+    if (!tiendasActivas.has(t)) return;
+
     const totalT = totalesPorTienda[t] || 0;
-    if (totalT <= 0) return;
+    if (!totalT) return;
 
     const nombreTienda =
       t === "unimarc" ? "Unimarc" :
@@ -1438,48 +1440,33 @@ function renderCarritoCotizador() {
       <div class="carrito-total-linea" style="${t === mejorSuper ? "background:#dcfce7;font-weight:700;border-radius:6px;" : ""}">
         <span>${nombreTienda}${t === mejorSuper ? " 🏆" : ""}</span>
         <span>${formatearCLP(totalT)}</span>
-      </div>
-    `;
+      </div>`;
   });
 
-  htmlTotales += `</div>`; // ✅ CIERRE CORRECTO
-  html += htmlTotales;
+  htmlTotales += `
+    <div class="carrito-total-linea total">
+      <span>Total</span>
+      <span>${formatearCLP(totalGeneral)}</span>
+    </div>
+  </div>`;
 
   // ==============================
-  // ⚠ DETECTAR INCOMPLETOS
+  // ⚠ ADVERTENCIA
   // ==============================
-  let alertasFaltantes = {};
-  TIENDAS_COMPARACION.forEach(tienda => alertasFaltantes[tienda] = []);
+  let mensajeAdvertencia = `
+    <div class="alerta-carrito">
+      ⚠ No todos los supermercados cuentan con coincidencia exacta.
+      <br>
+      <small style="color:#475569;">
+        🔎 Precisión estimada del sistema: <strong>90%</strong>.  
+        Se puede sugerir un producto alternativo similar.
+      </small>
+    </div>
+  `;
 
-  carritoCotizador.forEach(item => {
-    TIENDAS_COMPARACION.forEach(tienda => {
-      const det = item.similares && item.similares[tienda];
-      if (!det || typeof det.precio !== "number") {
-  alertasFaltantes[tienda].push(item.titulo);
+  cont.innerHTML = html + htmlTotales + mensajeAdvertencia;
 }
-    });
-  });
 
-  let supermercadosAfectados = Object.keys(alertasFaltantes)
-    .filter(t => alertasFaltantes[t].length > 0);
-
-  let mensajeAdvertencia = "";
-
-  if (supermercadosAfectados.length > 0) {
-    mensajeAdvertencia = `
-      <div class="alerta-carrito">
-        ⚠ No todos los supermercados cuentan con una coincidencia exacta del producto.
-        <br>
-        <small style="color:#475569;">
-          🔎 Precisión estimada del sistema: <strong>90%</strong>.  
-          Cuando no exista un producto idéntico, se sugerirá automáticamente la alternativa más similar disponible.
-        </small>
-      </div>
-    `;
-  }
-
-  cont.innerHTML = html + mensajeAdvertencia;
-}
 
 
 
