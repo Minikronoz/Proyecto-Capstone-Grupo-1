@@ -1,3 +1,9 @@
+Descripción General del Proyecto
+
+Este proyecto corresponde al desarrollo de una plataforma web de comparación y análisis de precios de supermercados en Chile. El sistema permite a los consumidores comparar precios en tiempo real entre distintas cadenas, mientras que a los negocios les entrega información analítica basada en búsquedas, comportamiento de usuarios y variaciones históricas de precios.
+
+La plataforma integra procesos automatizados de web scraping para la captura de datos, un backend encargado del procesamiento y exposición de la información mediante una API REST, una base de datos centralizada en MongoDB Atlas para el almacenamiento histórico, y un frontend web que presenta los resultados de manera visual e interactiva. El objetivo principal es apoyar la toma de decisiones tanto de consumidores como de dueños de negocios mediante datos confiables y análisis comparativos.
+
 Instalación y Configuración del Proyecto
 
 Este proyecto está compuesto por los siguientes módulos:
@@ -46,9 +52,9 @@ npx playwright install
 
 Crear archivo de variables de entorno .env:
 
-PORT=3000
 MONGODB_URI=mongodb+srv://usuario:password@cluster.mongodb.net/SistemaDeReportes
 DB_NAME=SistemaDeReportes
+SESSION_SECRET="Clave_ejemplo"
 
 
 Ejecutar el servidor:
@@ -58,13 +64,13 @@ npm run dev
 
 El backend quedará disponible en:
 
-http://localhost:3000
+http://localhost:4000
 
 Instalación del Frontend
 
 Acceder a la carpeta del frontend:
 
-cd frontend
+cd 'Fase 2\Evidencias Proyecto\Evidencias de sistema\Aplicación'
 
 
 Instalar dependencias:
@@ -79,15 +85,7 @@ npm run dev
 
 El sistema quedará disponible en:
 
-http://localhost:5173
-
-Ejecución del Proceso de Scraping
-
-El scraping se ejecuta desde el backend utilizando Playwright para extraer automáticamente los precios desde los supermercados.
-
-Ejecución:
-
-npm run scraper
+http://localhost:4000
 
 
 Los datos capturados se almacenan en MongoDB Atlas.
