@@ -8,7 +8,7 @@ Frontend: React
 
 Base de Datos: MongoDB Atlas
 
-Autenticación: Firebase Authentication
+Autenticación: Gestión de usuarios mediante MongoDB
 
 Requisitos Previos
 
@@ -21,8 +21,6 @@ npm
 Git
 
 Cuenta activa en MongoDB Atlas
-
-Cuenta activa en Firebase
 
 Instalación del Backend
 
@@ -51,10 +49,6 @@ Crear archivo de variables de entorno .env:
 PORT=3000
 MONGODB_URI=mongodb+srv://usuario:password@cluster.mongodb.net/SistemaDeReportes
 DB_NAME=SistemaDeReportes
-
-FIREBASE_API_KEY=TU_API_KEY
-FIREBASE_AUTH_DOMAIN=TU_AUTH_DOMAIN
-FIREBASE_PROJECT_ID=TU_PROJECT_ID
 
 
 Ejecutar el servidor:
@@ -89,26 +83,14 @@ http://localhost:5173
 
 Ejecución del Proceso de Scraping
 
-El sistema ejecuta el scraping desde el backend utilizando Playwright para extraer los precios desde los supermercados.
+El scraping se ejecuta desde el backend utilizando Playwright para extraer automáticamente los precios desde los supermercados.
 
 Ejecución:
 
 npm run scraper
 
 
-Los datos se almacenan automáticamente en MongoDB Atlas.
-
-Configuración de Firebase
-
-El sistema utiliza Firebase para:
-
-Registro de usuarios
-
-Inicio de sesión
-
-Gestión de perfiles
-
-Las credenciales deben configurarse en el archivo .env.
+Los datos capturados se almacenan en MongoDB Atlas.
 
 Base de Datos
 
@@ -126,19 +108,19 @@ clicks
 
 locales_supermercados
 
-Estas colecciones permiten realizar análisis históricos, segmentación territorial y generación de dashboards.
+Estas colecciones permiten realizar análisis históricos, segmentación territorial y generación de dashboards analíticos.
 
 Flujo General de Funcionamiento
 
-El scraping obtiene los productos desde los supermercados.
+El proceso de scraping obtiene los datos desde los supermercados.
 
-Los datos se almacenan en MongoDB Atlas.
+Los datos son almacenados en MongoDB Atlas.
 
-El backend procesa la información.
+El backend procesa y expone la información mediante una API REST.
 
 El frontend consume la API.
 
-El usuario visualiza comparaciones y análisis.
+El usuario visualiza las comparaciones y los análisis.
 
 Estado del Proyecto
 
@@ -146,12 +128,12 @@ El sistema se encuentra completamente operativo, incluyendo:
 
 Backend funcional
 
-Scraping activo
+Scraping operativo
 
-Base de datos en la nube
+Base de datos centralizada
 
-Autenticación implementada
+Autenticación con MongoDB
 
 Dashboards analíticos
 
-Comparador de precios operativo
+Comparador de precios activo
