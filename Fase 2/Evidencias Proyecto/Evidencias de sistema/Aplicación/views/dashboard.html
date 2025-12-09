@@ -356,7 +356,10 @@ async function cargarAlertasHoy(filtros = {}, append = false) {
     const boxBajas = document.getElementById("bajasHoy");
     const boxSubidas = document.getElementById("subidasHoy");
 
-    const hoy = new Date().toISOString().split("T")[0];
+    // ✅ FECHA CHILE REAL
+    const ahora = new Date();
+    ahora.setHours(ahora.getHours() - 3);
+    const hoy = ahora.toISOString().split("T")[0];
 
     const filtrosHoy = {
       supermercado: filtros.supermercado || "",
@@ -384,12 +387,16 @@ async function cargarAlertasHoy(filtros = {}, append = false) {
     const bajas = await resBajas.json();
     const subidas = await resSubidas.json();
 
-    // ✅ BAJAS
+    // ✅ BAJAS CON IMAGEN
     (bajas.data || []).forEach(p => {
       const fecha = new Date(p.fecha).toLocaleDateString("es-CL");
+
       boxBajas.innerHTML += `
         <div class="alerta-item">
+          <img src="${p.image}" alt="${p.titulo}" class="alerta-img">
+          
           <span class="alerta-icono verde">●</span>
+
           <div class="alerta-texto">
             <a href="${p.link}" target="_blank" class="alerta-titulo">${p.titulo}</a>
             <span class="alerta-info">
@@ -406,12 +413,16 @@ async function cargarAlertasHoy(filtros = {}, append = false) {
     if (bajas.pagination?.hasMore) paginaOportunidades++;
     else hayMasOpo = false;
 
-    // ✅ SUBIDAS
+    // ✅ SUBIDAS CON IMAGEN
     (subidas.data || []).forEach(p => {
       const fecha = new Date(p.fecha).toLocaleDateString("es-CL");
+
       boxSubidas.innerHTML += `
         <div class="alerta-item">
+          <img src="${p.image}" alt="${p.titulo}" class="alerta-img">
+
           <span class="alerta-icono rojo">●</span>
+
           <div class="alerta-texto">
             <a href="${p.link}" target="_blank" class="alerta-titulo">${p.titulo}</a>
             <span class="alerta-info">
