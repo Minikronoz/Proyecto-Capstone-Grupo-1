@@ -43,15 +43,6 @@ DB_NAME=SistemaDeReportes
 SESSION_SECRET="Clave_ejemplo"
 
 
-Ejecutar el servidor:
-
-npm run dev
-
-
-El backend quedará disponible en:
-
-http://localhost:4000
-
 Instalación del Frontend
 
 Acceder a la carpeta del frontend:
