@@ -35,20 +35,6 @@ Clonar el repositorio:
 git clone 
 
 
-Acceder a la carpeta del backend:
-
-cd backend
-
-
-Instalar dependencias:
-
-npm install
-
-
-Instalar Playwright y sus navegadores:
-
-npx playwright install
-
 
 Crear archivo de variables de entorno .env:
 
@@ -76,6 +62,11 @@ cd 'Fase 2\Evidencias Proyecto\Evidencias de sistema\Aplicación'
 Instalar dependencias:
 
 npm install
+
+
+Instalar Playwright y sus navegadores:
+
+npx playwright install
 
 
 Ejecutar la aplicación:
